@@ -1,0 +1,11 @@
+method_id,title,aqil_use,evidence_status,priority_gate,data_needs,limitations
+PASSIVE_GLOBAL,Market-cap global equity baseline,Portfolio benchmark,Concept established; provider/licence specific implementation unverified,G3,"Holdings/index/ETF prices, FX, corporate actions",No alpha claim; compare risk and cashflows
+FAMA_FRENCH,"Value, profitability, investment factors",Factor exposure context,Primary published dataset available; ETF implementation not replicated,Later,Regional/US factor series and product holdings,"ETF tracking, exposure leakage, regime cycling"
+MOMENTUM,Cross-sectional/time-series momentum,Simple rules-only control,Published research; Aqil test unstarted,G3,"Point-in-time total returns, trade calendars","Reversals, turnover, out-of-sample decay"
+CMA,Valuation-based capital market assumptions,12/24/36 mo contextual scenarios,Practitioner published assumptions; models not reproduced,Later,"Valuation, yield, earnings and currency inputs",Not a precise 12-month timer
+REGIME,Growth/inflation economic regimes,Context and risk scenario,Conceptual; quantitative definition not selected,Later,"Growth, prices, rates and vintage data",Hard to forecast and unstable across periods
+ROBUST_OPT,Risk-constrained portfolio allocation,Allocation controls and risk diagnostics,Foundational mathematics; estimated inputs uncertain,G3,"Returns, covariance, constraints and costs",Sensitivity and concentration
+EARNINGS_REV,Consensus earnings revisions,Industry profitability signal,Academic/practitioner evidence; cheap point-in-time feed unverified,Later,Historical timestamped analyst revisions,"Consensus data costs, missing history"
+SUPPLY_DEMAND,Physical commodity balance modelling,Macro causal hypothesis,Established economics; no Aqil validated model,G4,"Official production, inventory, consumption","Elasticities, substitution and pricing"
+EVENT_STUDY,Policy/event studies,Policy transmission assessment,Academic method; causal identification not assured,Later,"Event dates, contemporaneous prices and controls",Confounding concurrent events
+STRESS,Scenario/stress testing,Portfolio risk and resilience,"Risk-management tool, not an alpha promise",G5,Historical shocks and factor mappings,Historical scenarios do not bound future losses

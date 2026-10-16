@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/layout.css";
+
+@theme inline {
+  --color-background: var(--colour-background);
+  --color-foreground: var(--colour-text);
+  --color-surface: var(--colour-surface);
+  --color-surface-subtle: var(--colour-surface-subtle);
+  --color-surface-active: var(--colour-surface-active);
+  --color-muted: var(--colour-text-muted);
+  --color-inverse: var(--colour-text-inverse);
+  --color-brand-navy: var(--colour-brand-navy);
+  --color-brand-gold: var(--colour-brand-gold);
+  --color-border: var(--colour-border);
+  --color-border-strong: var(--colour-border-strong);
+  --color-link: var(--colour-link);
+  --color-focus: var(--colour-focus);
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-mono);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --shadow-card: var(--shadow-card);
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  background: var(--colour-background);
+  color: var(--colour-text);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-reading);
+}
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}

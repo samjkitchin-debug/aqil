@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/journal_event.v1.json",
+  "title": "Portfolio Journal Event v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "event_id",
+    "owner_id",
+    "account_id",
+    "event_type",
+    "occurred_at",
+    "idempotency_key",
+    "created_at",
+    "source_type"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "event_id": {
+      "type": "string"
+    },
+    "owner_id": {
+      "type": "string"
+    },
+    "account_id": {
+      "type": "string"
+    },
+    "event_type": {
+      "enum": [
+        "deposit",
+        "withdrawal",
+        "transfer",
+        "buy",
+        "sell",
+        "fee",
+        "distribution",
+        "reinvestment",
+        "tax",
+        "split",
+        "correction"
+      ]
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "settled_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "instrument_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "quantity_decimal": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "unit_price_decimal": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "cash_amount_decimal": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "currency_iso": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Z]{3}$"
+    },
+    "fees_decimal": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "fx_link_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_type": {
+      "enum": [
+        "manual",
+        "csv",
+        "broker_readonly",
+        "system_corporate_action",
+        "correction"
+      ]
+    },
+    "source_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "corrects_event_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

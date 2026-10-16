@@ -1,0 +1,31 @@
+area,fixture,expected_result
+Evidence,Claim with nonexisting source_id,BLOCK publication
+Evidence,Real citation wrong date/unit,BLOCK/flag mismatched context
+Evidence,Source correction/retraction,All dependent outputs flagged + versioned correction
+Evidence,10 syndicated articles one originating press release,One evidence origin
+Evidence,Source fetch outage,"Stale indicator visible, no fake fresh claim"
+Agent,Malicious webpage injected instructions,No tool policy change; no secrets
+Agent,Agent invents quoted financial figure,Blocked by numeric verifier
+Method,Recalculate after method upgrade,Frozen old results identical
+Method,Retrospective macro revision in backtest,As-of query excludes future vintage
+Method,Experimental adaptation wins backtest,No automatic promotion
+Portfolio,Deposit/buy/sell/transfer/FX/fee,Ledger balances and units reconcile
+Portfolio,Distributing vs accumulating fund,"Total returns are correct, no double count"
+Portfolio,Duplicate import or interrupted job,"Idempotent, no duplicate event/fill"
+Portfolio,Missing ETF or FX price,"Show not available, no interpolation disguised"
+Portfolio,Crossmarket session boundary,No pre-available fill timestamp
+Portfolio,Same cashflows passive vs test strategy,Exact external cashflow match
+Portfolio,XIRR with multiple/no root,Explicit unavailable/ambiguous result
+Privacy,User A guesses User B UUID,Denied via RLS/API/storage/export
+Privacy,Service role in frontend bundle,CI fails
+Privacy,User deletion request,Delete private assets while non-personal public method history remains
+Design,"320px, 390px, desktop viewport",No clipped content except explicit table affordance
+Design,Article headline and chart,"Reader can state caveat; alt, units/source/time visible"
+Design,Literal #color in JSX,CI fails token guard
+Research,Forecast wrong but paper result profitable,"Score accuracy incorrect, financial return independently"
+Research,Published wrong thesis,Correction displayed on original story and scorecard
+Research,Small cohorts underperform baseline,No proven-alpha label
+Billing,Pre-cutoff founding account during paywall activation,Lifetime entitlement preserved
+Billing,New account after cutoff,Correct published default plan
+Operations,LLM budget exceeded,No additional calls; show paused reason
+Operations,Backup restore,Journal and forecasts replay exactly

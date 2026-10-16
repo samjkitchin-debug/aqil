@@ -1,0 +1,13 @@
+source_id,purpose,starting_url,data_verification,private_use_rights,commercial_redistribution_rights,connection_status,notes
+FRED_ALFRED,US economic vintages,https://fred.stlouisfed.org/docs/api/fred/realtime_period.html,unverified per-series,unknown,unknown,unconnected,official API example
+FRENCH_LIBRARY,Factor research data,https://mba.tuck.dartmouth.edu/pages/faculty/Ken.French/data_library.html,unverified historical subset,unknown,unknown,unconnected,research data and methodology
+EIA,US/global energy,https://www.eia.gov/developer/,unverified endpoint,unknown,unknown,unconnected,official supply/energy data
+SEC_EDGAR,US corporate disclosures,https://www.sec.gov/about/developer-resources,unverified per feed,unknown,unknown,unconnected,official filings
+WTO,Trade data,https://apiportal.wto.org/,unverified coverage,unknown,unknown,unconnected,trade flows and tariffs
+NASA_POWER,Climate and meteorology,https://power.larc.nasa.gov/,unverified geography,unknown,unknown,unconnected,scientific data
+USGS,Minerals and supply,https://www.usgs.gov/centers/national-minerals-information-center/mineral-commodity-summaries,unverified per-year history,unknown,unknown,unconnected,critical mineral official data
+UCITS_ISSUER,UCITS factsheet/holdings,issuer URL to be selected,not sampled,unknown,unknown,unconnected,identify 2–3 share classes first
+ETF_PRICE_PROVIDER,UCITS price history + corporate actions,provider to be selected,not sampled,unknown,unknown,unconnected,critical G0 blocker
+FX_PROVIDER,SGD FX time series,provider to be selected,not sampled,unknown,unknown,unconnected,critical G0 blocker
+POLICY_PRIMARY,National government legislation and implementation,official jurisdictional source to be selected,not sampled,unknown,unknown,unconnected,one full amended policy test
+GLOBAL_NEWS_DISCOVERY,Global cross-source event discovery,https://www.gdeltproject.org/,not onboarded,unknown,unknown,unconnected,discovery never stand-alone verification

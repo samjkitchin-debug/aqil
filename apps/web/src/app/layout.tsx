@@ -1,0 +1,32 @@
+import type { Metadata, Viewport } from "next";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: {
+    default: "Aqil",
+    template: "%s · Aqil",
+  },
+  description:
+    "Human-centred investment intelligence and long-term wealth-building.",
+  applicationName: "Aqil",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Aqil",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
+export default function RootLayout({ children }: LayoutProps<"/">) {
+  return (
+    <html lang="en-GB" className="h-full">
+      <body className="min-h-full antialiased">{children}</body>
+    </html>
+  );
+}

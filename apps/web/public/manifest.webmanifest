@@ -1,0 +1,21 @@
+{
+  "name": "Aqil",
+  "short_name": "Aqil",
+  "description": "Investment intelligence and long-term wealth-building.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "browser"],
+  "background_color": "#ffffff",
+  "theme_color": "#152f4b",
+  "lang": "en-GB",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon",
+      "purpose": "any"
+    }
+  ]
+}

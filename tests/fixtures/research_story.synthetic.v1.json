@@ -1,0 +1,26 @@
+{
+  "fixture_kind": "synthetic_research_story",
+  "schema_version": "1.0",
+  "label": "SYNTHETIC — not investment research",
+  "research_version_id": "rv-synthetic-g0-001",
+  "story_id": "story-synthetic-g0-001",
+  "status": "scaffold_only",
+  "updated_at": "2026-10-16T00:00:00Z",
+  "quick_read": {
+    "headline": "Placeholder briefing shell",
+    "summary": "This fixture validates structure only. No macro event, forecast or ETF implication is asserted.",
+    "material_uncertainty": "Not applicable — synthetic scaffold."
+  },
+  "connected_analysis": {
+    "body": "Connected analysis depth will reference verified source_claim_ids when AQ-015 is implemented.",
+    "source_claim_ids": []
+  },
+  "research_detail": {
+    "method_card_ids": [],
+    "forecast_contract_ids": [],
+    "insufficient_evidence": true
+  },
+  "navigation": {
+    "primary_destinations": ["today", "explore", "learn", "research", "my_wealth"]
+  }
+}

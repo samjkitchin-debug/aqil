@@ -1,0 +1,56 @@
+---
+description: Aqil engineering standards for all contributors and agents
+alwaysApply: true
+---
+
+# Aqil engineering rules
+
+## Product truth
+
+- Read `docs/00_READ_ME_FIRST.md` first, then the relevant specs in `docs/` before implementing behaviour.
+- JSON Schemas in `docs/schemas/` (mirrored under `packages/contracts/schemas/`) define cross-language contracts.
+- Do not invent detailed product requirements, financial narratives, market data or research conclusions in code or UI.
+
+## Change discipline
+
+- Prefer small, scoped diffs. Do not refactor unrelated code.
+- Do not add dependencies unless they clearly reduce risk or duplication.
+- Classify risk (R0–R3 per `docs/06_ENGINEERING_DISCIPLINE.md`) and run relevant tests before claiming work is complete.
+- Ask before destructive operations, permission changes, production migrations or security-sensitive changes.
+
+## Repository layout
+
+- Follow `docs/06_ENGINEERING_DISCIPLINE.md` for module boundaries (`apps/web`, `workers/research`, `packages/contracts`, `database/migrations`, `database/tests`, `tests/fixtures`).
+
+## Design system
+
+- `docs/design/tokens.css` is the design authority; `apps/web/src/styles/tokens.css` must stay aligned.
+- Responsive shell contract: `docs/RESPONSIVE_LAYOUT_CONTRACT.md`; layout utilities in `apps/web/src/styles/layout.css`.
+- Components use semantic tokens and Tailwind theme aliases only — no raw hex/RGB/HSL in `apps/web/src` outside `styles/tokens.css`.
+- Run `npm run check:tokens` before finishing UI work.
+- Responsive shell contract: `docs/RESPONSIVE_LAYOUT_CONTRACT.md`; run `npm run test:e2e` after layout changes.
+
+## Data and research integrity
+
+- Facts, inferences, scenarios and predictions must remain distinct (see `docs/00_READ_ME_FIRST.md`).
+- Do not silently change published research history; append corrections and versions.
+- `workers/research` claim verification must fail closed until registry checks exist.
+
+## Security and safety
+
+- Never commit secrets, `.env` files or service role keys to Git.
+- `SUPABASE_SERVICE_ROLE_KEY` is server-only (`apps/web/src/lib/env/server.ts` with `server-only`); never import server env or service role code in client components.
+- Do not implement autonomous trading or connect production Supabase without explicit approval.
+
+## Database
+
+- Schema evolves only via `database/migrations/` once defined in authoritative docs.
+- RLS and tenant isolation tests belong in `database/tests/` and `tests/database/rls/`.
+
+## Wealth and privacy
+
+- Do not store private financial data in public browser caches; sensitive routes use `private, no-store` headers.
+
+## G0 scope guard
+
+- Do not add agent frameworks, paid feeds, broker links, LLM providers or live financial analytics until G0 gates in `docs/07_ROADMAP_AND_GATES.md` are satisfied.

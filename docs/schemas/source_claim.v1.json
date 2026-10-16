@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/source_claim.v1.json",
+  "title": "Source Claim v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "claim_id",
+    "claim_type",
+    "statement",
+    "source_artifact_id",
+    "source_locator",
+    "source_published_at",
+    "first_seen_at",
+    "verification_status",
+    "rights_class"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "claim_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "claim_type": {
+      "enum": [
+        "observed",
+        "reported_by_source",
+        "calculated",
+        "inference",
+        "scenario"
+      ]
+    },
+    "statement": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_artifact_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_locator": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_published_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "first_seen_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "available_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "data_vintage": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "numeric_value": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "unit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "geography": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "verification_status": {
+      "enum": [
+        "pending",
+        "supported",
+        "contested",
+        "insufficient",
+        "retracted"
+      ]
+    },
+    "verification_method": {
+      "enum": [
+        "not_checked",
+        "deterministic_field",
+        "direct_source_span",
+        "human_reviewed"
+      ]
+    },
+    "reviewer_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rights_class": {
+      "enum": [
+        "unknown",
+        "private_only",
+        "public_attribution",
+        "derived_only",
+        "display_licensed"
+      ]
+    },
+    "supersedes_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

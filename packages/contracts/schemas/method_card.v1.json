@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/method_card.v1.json",
+  "title": "Methodology Card v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "method_id",
+    "method_version",
+    "name",
+    "research_question",
+    "primary_reference",
+    "original_universe",
+    "data_requirements",
+    "assumptions",
+    "limitations",
+    "evidence_stage"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "method_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "method_version": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "research_question": {
+      "type": "string"
+    },
+    "primary_reference": {
+      "type": "string"
+    },
+    "original_universe": {
+      "type": "string"
+    },
+    "original_horizon": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "formula_specification": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "data_requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_stage": {
+      "enum": [
+        "documented",
+        "implemented",
+        "replicated",
+        "historically_evaluated",
+        "prospectively_testing",
+        "prospectively_supported",
+        "degraded",
+        "retired"
+      ]
+    },
+    "implementation_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "licence_status": {
+      "enum": [
+        "unknown",
+        "permitted_private",
+        "permitted_public",
+        "restricted"
+      ]
+    },
+    "reviewer_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
