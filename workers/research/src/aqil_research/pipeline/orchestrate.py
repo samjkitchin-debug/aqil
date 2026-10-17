@@ -128,6 +128,9 @@ def execute_research_run(
             if outcome.fetch and outcome.fetch.errors:
                 ingest_notes.extend(error.message for error in outcome.fetch.errors)
 
+    if not adapter_ids and request.primary_adapter_id:
+        adapter_ids.append(request.primary_adapter_id)
+
     try:
         assert_rights_for_replay(rights)
         assert_rights_for_analysis(rights)

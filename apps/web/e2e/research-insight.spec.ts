@@ -1,14 +1,14 @@
 import { expect, test } from "@playwright/test";
 
-const founderCookie = {
-  name: "aqil_founder_insight",
-  value: "ci-founder-test-token",
-  url: process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000",
-};
-
 test.describe("research insight UI", () => {
-  test.beforeEach(async ({ context }) => {
-    await context.addCookies([founderCookie]);
+  test.beforeEach(async ({ context, baseURL }) => {
+    await context.addCookies([
+      {
+        name: "aqil_founder_insight",
+        value: "ci-founder-test-token",
+        url: baseURL!,
+      },
+    ]);
   });
 
   test("shows fixture research on Today and Research", async ({ page }) => {
