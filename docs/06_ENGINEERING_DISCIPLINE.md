@@ -11,8 +11,9 @@ aqil/
   workers/research/            # Python source collectors, indicators, methods, evaluation
     src/aqil/{sources,methods,signals,causal,etf,ledger,lab,evaluation,editorial,ops}
   packages/contracts/         # shared versioned JSON Schemas + generated types
-  database/migrations/        # RLS/grants and canonical schema; review every migration
-  database/tests/             # database grant / tenant isolation fixtures
+  supabase/migrations/        # canonical SQL migrations (Git source of truth)
+  supabase/tests/database/    # pgTAP RLS and grant tests (authenticated roles, not postgres-only)
+  database/                   # pointers and ops notes (no parallel migration tree)
   docs/                       # charters, design manifesto, ADRs, source rights, incidents
   tests/fixtures/             # historical data vintages, corrected claims, portfolio ledger
   scripts/                    # data validation, restore, migration, style token guard
@@ -62,7 +63,43 @@ No LLM can autonomously promote model changes, approve legal scope, grant admin 
 - Test at phone widths 320/375/390/430px and desktop, keyboard navigation, reduced motion and screen readers where relevant.
 
 ## 7. Automated gates (CI from day one)
-`tsc --noEmit` / TS strict; ESLint / Prettier; Python Ruff/type checker/pytest; SQL migrations and grants; cross-language schema contracts; unit/integration fixtures; Playwright key journeys, automated axe accessibility; component screenshot diffs; secret scanning/dependency audits; token-only styling guard; failed-safe dry-run tests for data outage and model budget caps.
+
+Documentation tiers: `docs/DOCUMENTATION_AUTHORITY.md`. Auth/session acceptance: `docs/AUTH_AND_SESSION_DOCTRINE.md`.
+
+A check that has **not run** is **unverified**, not a pass. Report PASS, FAIL or SKIPPED. Do not mark a backlog item done without executed evidence.
+
+**Remote database rule:** do not apply hosted migrations until **`supabase test db` passes** on a disposable PostgreSQL 17-compatible stack (local Docker or CI) for the same Git migration files. MCP inspection is not a second migration history. If MCP applies SQL, it must match the Git file byte for byte and appear in `list_migrations`.
+
+**Database privilege rule (every new private table in `public`):** Supabase default grants give `anon` and `authenticated` broad table rights at `CREATE TABLE`. Before any narrow `GRANT`, run `REVOKE ALL ON TABLE … FROM PUBLIC, anon, authenticated`, then grant only the intended DML (`SELECT`, `INSERT`, `UPDATE`, `DELETE` as required). RLS does not protect `TRUNCATE` or `CREATE TRIGGER`; pgTAP must include negative tests for both, executed under `authenticated` (not only `postgres`). Assert `current_user` where role matters.
+
+**Database test rule:** RLS and grant tests live in `supabase/tests/database/` only — never in `supabase/migrations/`. Test helpers (`SECURITY DEFINER`, synthetic `auth.users`) must not run on hosted Supabase (`supabase test db --linked` is forbidden) and must not enter deployable migrations or `db pull`/`db diff` output from a pgTAP-polluted local DB. Supported npm entry points: `npm run test:db` (start, reset, pgTAP), `npm run db:test` (pgTAP with localhost guard), `npm run db:reset` (start, reset).
+
+**RPC / function rule (before user-facing RPCs):** test `anon` and `authenticated` separately. Review `SECURITY DEFINER` owner and `search_path`, and `EXECUTE` grants including `PUBLIC` and `anon`. Run functions with valid and invalid inputs. A test that connects only as `postgres` does not prove RLS.
+
+### Always required (every change touching the repo)
+
+| Gate | Command / mechanism |
+|------|---------------------|
+| TypeScript strict | `npm run typecheck` |
+| ESLint | `npm run lint` |
+| Production build | `npm run build` |
+| Token styling guard | `npm run check:tokens` |
+| Python worker | `npm run test:research` (when `workers/research` touched) |
+
+### Required when subsystem exists
+
+| Subsystem | Gate |
+|-----------|------|
+| Web layout / shell | `npm run test:e2e` (Playwright + axe smoke) |
+| Database schema / RLS | `npm run test:db` (or CI: `supabase db reset --no-seed` + `supabase test db` on local stack); types diff (`apps/web/src/types/database.generated.ts`) |
+| Contracts | JSON Schema validation in CI (when validator wired); mirror `docs/schemas/` → `packages/contracts/schemas/` |
+| Auth / private routes | Doctrine tests in `AUTH_AND_SESSION_DOCTRINE.md` §7 |
+| Financial ledger / research methods | Golden fixtures, invariant matrix rows, reproducibility hashes |
+| Release | Build identity recorded; rollback steps; smoke tests on target environment |
+
+### Planned / incremental
+
+Prettier; component screenshot diffs; secret scanning in CI; dependency audit policy (track `npm audit` dev-chain findings); failed-safe dry-run for data outage and model budget caps.
 
 **Mandatory invariant tests:**
 1. A citation ID not present in the verified claim registry blocks public publication.
@@ -84,7 +121,9 @@ No LLM can autonomously promote model changes, approve legal scope, grant admin 
 ## 8. Release discipline
 - `dev`, `preview`, `staging`, `production` separate keys and data; synthetic seeds never appear unlabelled on production.
 - Protected main, pull requests with change class/impact/acceptance, code review even if self-review, no direct prod DDL or ad hoc secret injection.
-- Every production release has migration plan, backup check, staging fixtures, telemetry, rollback/feature flag and release notes.
+- Record **build identity** (git SHA, migration versions, dependency lock hashes) in release notes or deployment log.
+- Every production release has migration plan, backup check, staging fixtures, telemetry, **rollback procedure**, feature flags where needed and release notes.
+- Post-deploy **smoke tests**: health route, auth boundary (when live), one read-only public page, migration version match.
 - Research methodology promotion has a distinct approval record; model updates do not automatically change published conclusions.
 - Incidents recorded with root-cause uncertainty and actual containment: `detected_at`, `scope`, `source`, `impacted_ids`, `block_action`, `corrected_at`, `recurrence_test`.
 - Measure and reduce blast radius by preventing propagation of unverified claims and isolating faulty providers/method versions.
@@ -96,8 +135,10 @@ Functionally correct; meets human task; consistent token styling; accessible; ha
 ```text
 Project: Aqil v2.0. Read docs/00_READ_ME_FIRST.md, 01_PRODUCT_CHARTER.md,
 03_RESEARCH_ENGINE_AND_METHODS.md, 04_ARCHITECTURE_AND_DATA.md,
-05_HUMAN_EXPERIENCE_AND_DESIGN.md, 06_ENGINEERING_DISCIPLINE.md
+05_HUMAN_EXPERIENCE_AND_DESIGN.md, 06_ENGINEERING_DISCIPLINE.md,
+DOCUMENTATION_AUTHORITY.md, AUTH_AND_SESSION_DOCTRINE.md (if auth/private),
 and the relevant current source/schema before writing code.
+Do not implement from docs/sausage-transfer/ without canonical mapping.
 
 Goal: [one user-facing job / one backend invariant].
 Risk class: [R0/R1/R2/R3].

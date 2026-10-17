@@ -34,6 +34,24 @@ jobs:
         env:
           CI: true
 
+  database:
+    name: Database (Supabase migrations + RLS)
+    # Ephemeral local stack only; pgTAP helpers in supabase/tests are not migrations.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+      - name: Start Supabase local stack
+        run: supabase start -x storage-api,imgproxy
+      - run: supabase db reset --no-seed
+      - run: supabase test db
+      - name: Verify generated types match schema
+        run: |
+          supabase gen types typescript --local --schema public > apps/web/src/types/database.generated.ts
+          git diff --exit-code apps/web/src/types/database.generated.ts
+
   research:
     name: Research worker (Python)
     runs-on: ubuntu-latest

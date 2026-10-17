@@ -105,6 +105,20 @@ For each feed classify **per action**: permitted private download, storage, deri
 ## Agent security
 Treat all news, PDFs and peer submissions as hostile content. Read-only retrieval roles, domain/tool allowlists, bounded context and output schemas, prompt-injection separation, no arbitrary shell/DB write/secret access for LLM, safe link handling, SSRF protections for fetchers, rate/cost caps, human-reviewed publication. Model providers receive minimised non-private evidence by default; user wealth sent only under explicit documented opt-in and minimum sufficient abstraction.
 
+## Authentication and sessions (web)
+
+- Supabase Auth with `@supabase/ssr` and cookie-based sessions on Next.js; one authoritative server-side session decision per request.
+- Canonical requirements: `docs/AUTH_AND_SESSION_DOCTRINE.md` (refresh concurrency, PWA resume, fail-closed private access, regression tests).
+- Service role credentials are server-only; private portfolio and settings data require authenticated RLS paths.
+
+## Data integrity (cross-cutting)
+
+- **Immutable authoritative history** for research forecasts, journal events and published story versions — corrections append; no silent rewrites (`immutable record model` below).
+- **Versioned derived outputs** (methods, indicators, evaluations) carry method/config hashes and input vintages for replay.
+- **Idempotent ingestion** via `idempotency_key` / batch scope. Each field has one owning source. A partial, empty or failed upstream response must not delete or blank authoritative observations, journal rows or user records.
+- **Provenance** — `effective_at`, `published_at`, `retrieved_at`, `available_to_model_at` clocks for observations; revision tables for macro and policy sources.
+- Apply to economic data, investment hypotheses, virtual portfolios and performance evaluations consistently.
+
 ## Multi-tenant and scale-readiness
 - `tenant_id` or `user_id` on every private asset and owned job. Private access guarded by DB RLS/grants, enforced again in server routes and tested against direct DB requests, storage, views and exports.
 - Shared global research computed once and cached; **do not** spawn individual geopolitical agents for each subscriber.

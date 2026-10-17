@@ -3,9 +3,9 @@ AQ-001,G0,foundation,"Initialise repo, locked dependencies and separate environm
 AQ-002,G0,foundation,Establish shared versioned JSON schemas,AQ-001,Schema validation in TS and Python; version check fixture,Must,R3,M,Not started
 AQ-003,G0,design,Install central CSS tokens and Aptos fallback,AQ-001,No component literal colours; mobile screenshots; font fallback,Must,R0,S,Not started
 AQ-004,G0,design,Implement public accessible shell and navigation,AQ-003,"Keyboard/mobile 320/390/desktop, a11y checks",Must,R0,M,Not started
-AQ-005,G0,database,Supabase local/preview with migrations and grants,AQ-001,DB boots/replays from migration only,Must,R3,M,Not started
-AQ-006,G0,security,Create RLS deny-by-default test suite,AQ-005,Anonymous and cross-user read/write attacks denied,Must,R3,M,Not started
-AQ-007,G0,ops,Wire CI lint typecheck pytest db Playwright and secret scan,AQ-001,"CI rejects failing fixture, bad token or secret",Must,R3,M,Not started
+AQ-005,G0,database,Supabase migrations in supabase/migrations with local replay,AQ-001,supabase db reset from clean applies Git migrations only,Must,R3,M,Written; replay not executed (Docker missing; CI job not observed)
+AQ-006,G0,security,Executable RLS test suite (pgTAP via supabase test db),AQ-005,Tests use synthetic users; anon/cross-tenant denied; green in CI before remote migration apply,Must,R3,M,Written; pgTAP not executed
+AQ-007,G0,ops,Wire CI lint typecheck pytest database Playwright token guard,AQ-001,CI fails on test/lint/build/RLS regression; secret scan planned,Must,R3,M,Partial; database job not observed on a green run
 AQ-008,G0,rights,Make official feed/rights source register,AQ-002,Public/private/commercial rights and uncertainty stored,Must,R3,M,Not started
 AQ-009,G0,instruments,Verify 2-3 UCITS ETF fund+share+listing identities,AQ-008,"Official issuer docs, ISIN/share class/MIC/fees evidence",Must,R2,M,Not started
 AQ-010,G0,market_data,"Test dated price, corporate action and SGD FX coverage",AQ-009,"Reproducible price/FX sample, gaps shown and data rights reviewed",Must,R3,L,Not started

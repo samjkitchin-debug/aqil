@@ -21,3 +21,4 @@
 | 016 | Optional anonymous reading and optional private wealth | inclusive product, consent minimisation | privacy UX evidence |
 | 017 | No graph/vector DB at first | relational representation adequate for MVP | measured complexity/quality improvement |
 | 018 | CI, migrations, security fixtures and restore drill from day one | prevent rebuild and data loss | never revoke |
+| 019 | Server-side Supabase SSR session authority; doctrine in AUTH_AND_SESSION_DOCTRINE.md | prevent auth drift, refresh races and PWA logout bugs | only via ADR if identity model changes |
