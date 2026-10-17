@@ -17,8 +17,8 @@ test.describe("verified macro horizon bundle", () => {
     await page.goto("/research");
     await expect(page.getByTestId("forward-research-detail")).toBeVisible();
     await expect(page.getByText("Source-backed pre-event assessment")).toBeVisible();
-    await expect(page.getByText("Expected information:")).toBeVisible();
-    await expect(page.getByText("No-action conclusion:")).toBeVisible();
+    await expect(page.getByText(/Expected information/)).toBeVisible();
+    await expect(page.getByText(/No-action conclusion/)).toBeVisible();
     await expect(page.getByTestId("forward-outcome-block")).toHaveCount(0);
   });
 });

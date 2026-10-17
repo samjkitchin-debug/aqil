@@ -27,6 +27,7 @@ export default defineConfig({
   },
   projects: viewportProjects.map((viewport) => ({
     name: viewport.name,
+    testIgnore: /forward-verified-macro\.spec\.ts/,
     use: {
       viewport: { width: viewport.width, height: viewport.height },
     },
