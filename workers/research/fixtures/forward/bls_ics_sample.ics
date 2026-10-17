@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+PRODID:-//Department of Labor//Bureau of Labor Statistics//EN
+X-WR-TIMEZONE:America/Washington_DC
+VERSION:2.0
+BEGIN:VEVENT
+UID:sample-employment-situation
+DTSTART:20080404T123000Z
+SUMMARY:Employment Situation
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:sample-consumer-price-index
+DTSTART:20080416T123000Z
+SUMMARY:Consumer Price Index
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR

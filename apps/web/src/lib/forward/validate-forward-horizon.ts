@@ -78,6 +78,7 @@ export function validateForwardHorizon(data: unknown): data is ForwardHorizonV1 
     if (event.interpretation_status !== "unverified") return false;
     if (
       event.schedule_evidence !== "verified_schedule" &&
+      event.schedule_evidence !== "verified_announcement" &&
       event.schedule_evidence !== "synthetic_demonstration" &&
       event.schedule_evidence !== "unverified"
     ) {
@@ -86,7 +87,10 @@ export function validateForwardHorizon(data: unknown): data is ForwardHorizonV1 
     if (event.is_fixture === true && event.schedule_evidence !== "synthetic_demonstration") {
       return false;
     }
-    if (event.schedule_evidence === "verified_schedule") {
+    if (
+      event.schedule_evidence === "verified_schedule" ||
+      event.schedule_evidence === "verified_announcement"
+    ) {
       if (event.date_precision !== "confirmed" || event.is_fixture !== false) return false;
     }
     if (event.materiality_basis === "insufficient_evidence" && event.materiality !== "insufficient_evidence") {

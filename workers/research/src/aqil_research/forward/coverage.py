@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 
 import psycopg
 
-from aqil_research.sources.rights import load_source_rights, source_usable
+from aqil_research.sources.rights import RightsOperation, load_source_rights, source_usable
 
 
 def build_coverage_report(conn: psycopg.Connection) -> dict[str, object]:
@@ -18,8 +18,12 @@ def build_coverage_report(conn: psycopg.Connection) -> dict[str, object]:
         for row in rights_rows
         if row.dataset_id.startswith("forward.")
         or row.source_id.startswith("federal_reserve")
-        or row.source_id.startswith("bls_release")
+        or row.source_id.startswith("bls_")
+        or row.source_id.startswith("bea_")
+        or row.source_id.startswith("sec_edgar")
+        or row.source_id.startswith("company_ir")
         or row.source_id.startswith("vanguard")
+        or row.source_id.startswith("ishares")
     ]
 
     with conn.cursor() as cur:
@@ -81,7 +85,7 @@ def build_coverage_report(conn: psycopg.Connection) -> dict[str, object]:
                 "dataset_id": row.dataset_id,
                 "operational_status": row.operational_status.value,
                 "automated_access": row.automated_access.value,
-                "usable_for_ingest": source_usable(row),
+                "usable_for_ingest": source_usable(row, RightsOperation.AUTOMATED_ACCESS),
             },
         )
 

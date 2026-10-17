@@ -1,0 +1,15 @@
+{
+  "cik": 789019,
+  "facts": {
+    "us-gaap": {
+      "RevenueFromContractWithCustomerExcludingAssessedTax": {
+        "units": {
+          "USD": [
+            {"end": "2025-06-30", "val": 100},
+            {"end": "2025-09-30", "val": 110}
+          ]
+        }
+      }
+    }
+  }
+}

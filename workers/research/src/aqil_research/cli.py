@@ -130,6 +130,10 @@ def main(argv: list[str] | None = None) -> int:
         from aqil_research.cli_ops import run_export_forward_horizon
 
         return run_export_forward_horizon(args)
+    if args.command == "import-forward-holdings":
+        from aqil_research.cli_ops import run_import_forward_holdings
+
+        return run_import_forward_holdings(args)
     return 1
 
 

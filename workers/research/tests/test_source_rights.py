@@ -83,6 +83,11 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "forward.fomc.schedule",
         "forward.bls.empsit.schedule",
         "forward.etf.vwra.holdings",
+        "forward.etf.ishares.holdings",
+        "forward.bls.selected_releases.schedule",
+        "forward.bea.news.schedule",
+        "forward.sec.edgar.completed_filings",
+        "forward.company_ir.watchlist",
     }
     for record in records:
         assert record.terms_url in record.evidence_urls

@@ -32,7 +32,7 @@ export type HorizonEvent = {
   scheduled_time?: string | null;
   timezone?: string | null;
   date_precision: "confirmed" | "estimated" | "tentative" | "unknown";
-  schedule_evidence: "verified_schedule" | "synthetic_demonstration" | "unverified";
+  schedule_evidence: "verified_schedule" | "verified_announcement" | "synthetic_demonstration" | "unverified";
   materiality: "high" | "medium" | "low" | "insufficient_evidence";
   materiality_basis: "calculated" | "insufficient_evidence" | "macro_qualitative";
   interpretation_status: "unverified";

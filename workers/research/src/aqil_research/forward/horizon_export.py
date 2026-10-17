@@ -77,13 +77,16 @@ def _load_verified_events(
             select event_id, title, category, subject_id, scheduled_at, timezone,
                    date_precision, evidence_class, payload
             from forward.catalyst_events
-            where evidence_class in (
-              'verified_schedule', 'verified_announcement', 'curated_verified'
-            )
+            where (
+              evidence_class in (
+                'verified_schedule', 'verified_announcement', 'curated_verified'
+              )
               and scheduled_at is not null
               and scheduled_at::date >= %s
               and scheduled_at::date <= %s
-            order by scheduled_at
+            )
+            or evidence_class = 'watchlist_unverified'
+            order by scheduled_at nulls last
             """,
             (start, end),
         )
@@ -105,6 +108,26 @@ def _load_verified_events(
         )
         scheduled_at = row[4]
         scheduled_date = scheduled_at.date().isoformat() if scheduled_at else "unknown"
+        clock_unstated = (
+            isinstance(payload, dict) and payload.get("clock_timezone_stated") is False
+        )
+        scheduled_time = None
+        if scheduled_at is not None and not clock_unstated:
+            scheduled_time = scheduled_at.isoformat()
+        schedule_evidence = row[7]
+        if schedule_evidence == "watchlist_unverified":
+            schedule_evidence = "unverified"
+        why = macro.rationale
+        if category in {"company_earnings_watchlist", "us_company_filing", "company_earnings"}:
+            why = (
+                "No licensed ETF constituent weight is linked, so this event does not "
+                "state a fund exposure."
+            )
+        elif clock_unstated:
+            why = (
+                f"Published clock {payload.get('published_clock')} with no timezone stated "
+                "on the source schedule."
+            )
         events.append(
             {
                 "event_id": row[0],
@@ -112,17 +135,17 @@ def _load_verified_events(
                 "category": category,
                 "subject_label": row[3],
                 "scheduled_date": scheduled_date,
-                "scheduled_time": scheduled_at.isoformat() if scheduled_at else None,
+                "scheduled_time": scheduled_time,
                 "timezone": row[5],
                 "date_precision": row[6],
-                "schedule_evidence": row[7],
+                "schedule_evidence": schedule_evidence,
                 "materiality": materiality.category,
                 "materiality_basis": "insufficient_evidence"
                 if materiality.category == "insufficient_evidence"
                 else "macro_qualitative",
                 "interpretation_status": "unverified",
                 "source_confidence": row[7],
-                "why_it_matters": macro.rationale,
+                "why_it_matters": why,
                 "etf_ids": [],
                 "is_fixture": False,
                 "macro_relevance": {

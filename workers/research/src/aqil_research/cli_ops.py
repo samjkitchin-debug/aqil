@@ -72,7 +72,7 @@ def register_collect_parsers(sub: argparse._SubParsersAction) -> None:
     collect_fwd.add_argument(
         "--source",
         required=True,
-        choices=["fed-fomc", "bls-empsit"],
+        choices=["fed-fomc", "bls-empsit", "bls-ics", "bea-schedule", "sec-filings", "company-ir"],
     )
     collect_fwd.add_argument("--live", action="store_true")
     collect_fwd.add_argument("--fixture", type=Path, default=None)
@@ -90,6 +90,12 @@ def register_collect_parsers(sub: argparse._SubParsersAction) -> None:
     export_hz.add_argument("--output", type=Path, required=True)
     export_hz.add_argument("--include-demo", action="store_true")
     export_hz.add_argument("--horizon-days", type=int, default=180)
+
+    import_holdings = sub.add_parser(
+        "import-forward-holdings",
+        help="Import a manual ETF holdings JSON file (rights-checked, no automated fetch)",
+    )
+    import_holdings.add_argument("--file", type=Path, required=True)
 
 
 def run_collect(args: argparse.Namespace) -> int:
@@ -213,8 +219,12 @@ def run_collect_forward(args: argparse.Namespace) -> int:
     from datetime import date
 
     from aqil_research.forward.collection.service import (
+        collect_bea_schedule,
         collect_bls_empsit_schedule,
+        collect_bls_ics_schedule,
+        collect_company_ir_watchlist,
         collect_fed_fomc_calendar,
+        collect_sec_completed_filings,
     )
 
     today = date.today()
@@ -222,16 +232,27 @@ def run_collect_forward(args: argparse.Namespace) -> int:
 
     try:
         with research_connection() as conn:
-            if args.source == "fed-fomc":
-                result = collect_fed_fomc_calendar(
+            collectors = {
+                "fed-fomc": collect_fed_fomc_calendar,
+                "bls-empsit": collect_bls_empsit_schedule,
+                "bls-ics": collect_bls_ics_schedule,
+                "bea-schedule": collect_bea_schedule,
+            }
+            if args.source == "sec-filings":
+                result = collect_sec_completed_filings(
                     conn,
                     live=args.live,
                     fixture_path=args.fixture,
-                    horizon_start=today,
-                    horizon_end=horizon_end,
                 )
+            elif args.source == "company-ir":
+                default_watchlist = (
+                    Path(__file__).resolve().parents[2]
+                    / "fixtures/forward/company_ir_watchlist.json"
+                )
+                watchlist = args.fixture or default_watchlist
+                result = collect_company_ir_watchlist(conn, watchlist_path=watchlist)
             else:
-                result = collect_bls_empsit_schedule(
+                result = collectors[args.source](
                     conn,
                     live=args.live,
                     fixture_path=args.fixture,
@@ -264,6 +285,27 @@ def run_forward_coverage(args: argparse.Namespace) -> int:
         print(f"database error: {exc}", file=sys.stderr)
         return 10
     print(format_coverage_report(report))
+    return 0
+
+
+def run_import_forward_holdings(args: argparse.Namespace) -> int:
+    from aqil_research.forward.holdings_import import import_holdings_from_file
+
+    try:
+        with research_connection() as conn:
+            result = import_holdings_from_file(conn, args.file)
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+
+    print(
+        f"outcome={result.outcome} source_id={result.source_id} "
+        f"snapshot_id={result.snapshot_id} row_status={result.row_status}",
+    )
+    if result.error_summary:
+        print(f"error: {result.error_summary}", file=sys.stderr)
+    if result.outcome != "completed":
+        return 5
     return 0
 
 

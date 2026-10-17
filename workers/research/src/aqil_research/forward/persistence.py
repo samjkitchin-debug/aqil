@@ -6,6 +6,7 @@ import hashlib
 import json
 from datetime import UTC, date, datetime
 from decimal import Decimal
+from typing import Literal
 from uuid import UUID
 
 import psycopg
@@ -70,7 +71,7 @@ def import_demo_fixture_bundle(
         )
 
     holdings = vwra_holdings_snapshot_payload()
-    snapshot_id = _upsert_holdings_snapshot(conn, holdings, recorded_at=recorded_at)
+    snapshot_id, _ = import_etf_holdings_snapshot(conn, holdings, recorded_at=recorded_at)
     ids["snapshot_id"] = str(snapshot_id)
 
     for event_payload, event_id in (
@@ -116,12 +117,23 @@ def import_demo_fixture_bundle(
     return ids
 
 
+def import_etf_holdings_snapshot(
+    conn: psycopg.Connection,
+    holdings: dict[str, object],
+    *,
+    recorded_at: datetime,
+) -> tuple[UUID, Literal["new", "unchanged"]]:
+    """Insert a holdings snapshot when content hash is new; otherwise return the existing row."""
+    snapshot_id, inserted = _upsert_holdings_snapshot(conn, holdings, recorded_at=recorded_at)
+    return snapshot_id, "new" if inserted else "unchanged"
+
+
 def _upsert_holdings_snapshot(
     conn: psycopg.Connection,
     holdings: dict[str, object],
     *,
     recorded_at: datetime,
-) -> UUID:
+) -> tuple[UUID, bool]:
     retrieved_at = recorded_at
     content_hash = _payload_hash(holdings)
     with conn.cursor() as cur:
@@ -153,7 +165,8 @@ def _upsert_holdings_snapshot(
             ),
         )
         row = cur.fetchone()
-        if row is not None:
+        inserted = row is not None
+        if inserted:
             snapshot_id = row[0]
         else:
             cur.execute(
@@ -190,7 +203,7 @@ def _upsert_holdings_snapshot(
                     line.get("category", "equity"),
                 ),
             )
-    return snapshot_id
+    return snapshot_id, inserted
 
 
 def _upsert_catalyst(

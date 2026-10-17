@@ -117,7 +117,14 @@
         "scheduled_time": { "type": ["string", "null"] },
         "timezone": { "type": ["string", "null"] },
         "date_precision": { "enum": ["confirmed", "estimated", "tentative", "unknown"] },
-        "schedule_evidence": { "enum": ["verified_schedule", "synthetic_demonstration", "unverified"] },
+        "schedule_evidence": {
+          "enum": [
+            "verified_schedule",
+            "verified_announcement",
+            "synthetic_demonstration",
+            "unverified"
+          ]
+        },
         "materiality": { "enum": ["high", "medium", "low", "insufficient_evidence"] },
         "materiality_basis": {
           "enum": ["calculated", "insufficient_evidence", "macro_qualitative"]
@@ -141,6 +148,18 @@
         {
           "if": {
             "properties": { "schedule_evidence": { "const": "verified_schedule" } },
+            "required": ["schedule_evidence"]
+          },
+          "then": {
+            "properties": {
+              "date_precision": { "const": "confirmed" },
+              "is_fixture": { "const": false }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "schedule_evidence": { "const": "verified_announcement" } },
             "required": ["schedule_evidence"]
           },
           "then": {
