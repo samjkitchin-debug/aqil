@@ -39,7 +39,7 @@ Private persistence for the M1 intelligence engine. **Not** listed in `supabase/
 ## Worker identity (hosted)
 
 - `research_writer` — `NOLOGIN` role with append-only table privileges.
-- `research_worker` — `LOGIN` role (migration `20261017120000_research_worker_login.sql`) with `INHERIT` membership in `research_writer`. Local/CI default password is `research_worker` on port `54322` only; **rotate on hosted deploy** via vault (`ALTER ROLE research_worker PASSWORD ...`). Never commit production passwords.
+- `research_worker` — `NOLOGIN` in Git migrations (`20261017120000_research_worker_login.sql`); `INHERIT` membership in `research_writer`. **Local/CI only:** `scripts/provision-research-worker-local.sql` enables `LOGIN` with a dev password (never run on hosted). Hosted: enable login and set password via vault/secrets only.
 - `research_worker_app` — `NOLOGIN` placeholder for a future separately named principal if needed.
 - Worker connections use `RESEARCH_DATABASE_URL` with the `research_worker` user — **not** `service_role`.
 - `CREATE ROLE` in migrations is supported on Supabase hosted Postgres; apply via approved `supabase db push` only.

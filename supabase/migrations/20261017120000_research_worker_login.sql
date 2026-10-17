@@ -1,11 +1,10 @@
--- M2 Phase 2: LOGIN principal for the research worker (password rotated on hosted deploy).
--- Local default password is for CI/local Supabase only; never use in production without rotation.
+-- M2: research worker principal (NOLOGIN in Git-tracked migrations).
+-- Local/CI login password: scripts/provision-research-worker-local.sql (not applied on hosted push).
 
 do $$
 begin
   create role research_worker
-    login
-    password 'research_worker'
+    nologin
     nosuperuser
     nocreatedb
     nocreaterole
@@ -15,7 +14,7 @@ exception
 end $$;
 
 comment on role research_worker is
-  'Research worker DB login. Grant research_writer only. Set password via vault on hosted deploy.';
+  'Research worker DB principal. Grant research_writer only. Enable LOGIN and set password via approved secrets on hosted deploy; use scripts/provision-research-worker-local.sql locally.';
 
 grant research_writer to research_worker;
 grant connect on database postgres to research_worker;

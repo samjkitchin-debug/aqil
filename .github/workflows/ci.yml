@@ -51,6 +51,8 @@ jobs:
       - name: Start Supabase local stack
         run: supabase start -x storage-api,imgproxy
       - run: supabase db reset --no-seed
+      - name: Provision local research_worker login
+        run: supabase db query -f scripts/provision-research-worker-local.sql
       - run: supabase test db
       - name: Verify generated types match schema
         run: |
@@ -74,6 +76,9 @@ jobs:
       - name: Apply migrations
         working-directory: .
         run: supabase db reset --no-seed
+      - name: Provision local research_worker login
+        working-directory: .
+        run: supabase db query -f scripts/provision-research-worker-local.sql
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.13"
