@@ -13,7 +13,12 @@ test.describe("verified macro horizon bundle", () => {
     ]);
   });
 
-  test("research shows source-backed pre-event assessment", async ({ page }) => {
+  test("today and research show verified macro intelligence", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByTestId("forward-horizon")).toBeVisible();
+    await expect(page.getByText("FOMC meeting — federal funds rate decision")).toBeVisible();
+    await expect(page.getByText("Forward intelligence preview")).toBeVisible();
+
     await page.goto("/research");
     await expect(page.getByTestId("forward-research-detail")).toBeVisible();
     await expect(page.getByText("Source-backed pre-event assessment")).toBeVisible();
