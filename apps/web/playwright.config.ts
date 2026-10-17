@@ -25,13 +25,22 @@ export default defineConfig({
     browserName: "chromium",
     trace: "on-first-retry",
   },
-  projects: viewportProjects.map((viewport) => ({
-    name: viewport.name,
-    testIgnore: /forward-verified-macro\.spec\.ts/,
-    use: {
-      viewport: { width: viewport.width, height: viewport.height },
+  projects: [
+    ...viewportProjects.map((viewport) => ({
+      name: viewport.name,
+      testIgnore: /forward-verified-macro\.spec\.ts/,
+      use: {
+        viewport: { width: viewport.width, height: viewport.height },
+      },
+    })),
+    {
+      name: "verified-macro",
+      testMatch: /forward-verified-macro\.spec\.ts/,
+      use: {
+        viewport: { width: 1280, height: 800 },
+      },
     },
-  })),
+  ],
   webServer: {
     command: "npm run start",
     url: baseURL,

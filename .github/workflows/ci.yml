@@ -46,7 +46,7 @@ jobs:
           AQIL_ALLOW_FOUNDER_INSIGHT_HEADER: "true"
           E2E_USE_DEV_SERVER: "true"
       - name: Playwright verified macro bundle
-        run: npx playwright test e2e/forward-verified-macro.spec.ts --project=laptop
+        run: npx playwright test e2e/forward-verified-macro.spec.ts --project=verified-macro
         env:
           CI: true
           RESEARCH_INSIGHT_PATH: fixtures/research-insight.v1.json
