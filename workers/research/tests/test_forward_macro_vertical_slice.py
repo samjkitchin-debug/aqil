@@ -76,5 +76,13 @@ def test_macro_vertical_slice_collect_freeze_export(require_db: None) -> None:
     assert assessment.get("record_source") == "database"
     assert assessment.get("expected_information")
     assert assessment.get("no_action_conclusion")
-    event_ids = {event["event_id"] for event in macro_events}
+    event_ids = {event["event_id"] for event in bundle["events"] if not event.get("is_fixture")}
     assert assessment["event_id"] in event_ids
+    assert any(
+        event["event_id"] == assessment["event_id"] and event.get("category") == "central_bank_meeting"
+        for event in bundle["events"]
+    ) or any(
+        event["event_id"] == assessment["event_id"]
+        and event.get("category") == "us_employment_report"
+        for event in bundle["events"]
+    )

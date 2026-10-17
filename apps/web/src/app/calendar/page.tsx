@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 
 import { AppShell } from "@/components/app-shell";
+
+export const dynamic = "force-dynamic";
 import { ForwardCalendarSection } from "@/components/forward/forward-calendar-section";
 import { ResearchEmptyState } from "@/components/research/research-empty-state";
 import { loadForwardHorizonBundle } from "@/lib/forward/load-forward-horizon";
