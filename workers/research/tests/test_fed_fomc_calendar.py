@@ -1,4 +1,3 @@
-from datetime import date
 from pathlib import Path
 
 from aqil_research.forward.adapters.fed_fomc_calendar import (
