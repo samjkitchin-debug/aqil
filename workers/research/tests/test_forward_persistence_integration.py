@@ -43,8 +43,7 @@ def test_demo_fixture_import_and_scenario_immutable(require_db: None) -> None:
             )
             assert cur.fetchone()[0] == 1
             update_sql = (
-                "update forward.forward_scenarios set payload = '{}'::jsonb "
-                "where scenario_id = %s"
+                "update forward.forward_scenarios set payload = '{}'::jsonb where scenario_id = %s"
             )
             with pytest.raises(psycopg.Error) as exc_info:
                 cur.execute(update_sql, (DEMO_SCENARIO_ID,))

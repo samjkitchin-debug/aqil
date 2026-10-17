@@ -26,7 +26,7 @@ export function ForwardEtfExplore({ bundle }: Props) {
       <p className="research-body">
         Holdings snapshot as of {etf.holdings_as_of}. Completeness: {etf.completeness}.
       </p>
-      {bundle.data_mode !== "verified_only" && (
+      {bundle.data_mode !== "verified_source" && (
         <p className="research-meta">
           Synthetic demonstration weights and catalysts — not provider or consensus data.
         </p>
