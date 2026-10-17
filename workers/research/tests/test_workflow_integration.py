@@ -81,20 +81,23 @@ def test_collect_and_run_fixture_e2e(require_db: None) -> None:
             from aqil_research.persistence.reproduce import verify_stored_run_replay
 
             replay = verify_stored_run_replay(conn, run_id)
+            db_replay = verify_stored_run_replay(conn, run_id)
             raise AssertionError(
                 f"replay mismatch: input_snapshot={replay.input_snapshot_hash_match}, "
                 f"calculation={replay.calculation_match}, "
+                f"calc_keys={replay.calculation_mismatch_keys()}, "
+                f"db_calc={db_replay.calculation_match}, "
+                f"db_calc_keys={db_replay.calculation_mismatch_keys()}, "
                 f"payload={replay.analytical_payload_hash_match}, "
                 f"observation_ids={replay.observation_ids_match}, "
                 f"warnings={outcome.warnings}",
             )
     with research_connection() as conn:
-        from aqil_research.persistence.reproduce import recompute_stored_run
-        from aqil_research.persistence.runs import load_research_run
+        from aqil_research.persistence.reproduce import verify_stored_run_replay
 
-        stored = load_research_run(conn, run_id)
-        recomputed = recompute_stored_run(conn, run_id)
-    assert stored.calculation == recomputed.calculation
+        db_replay = verify_stored_run_replay(conn, run_id)
+    assert db_replay.calculation_match
+    assert db_replay.input_snapshot_hash_match
     assert outcome.insight is not None
     assert outcome.insight.publication_status in ("internal_preview", "blocked", "not_eligible")
     assert outcome.insight.data_provenance == "latest_revised"

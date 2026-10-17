@@ -33,6 +33,14 @@ class RunReplayVerification:
         recomputed = normalize_calculation_payload(self.recomputed.calculation)
         return json.dumps(stored, sort_keys=True) == json.dumps(recomputed, sort_keys=True)
 
+    def calculation_mismatch_keys(self) -> tuple[str, ...]:
+        if self.stored.calculation is None or self.recomputed.calculation is None:
+            return ("calculation",)
+        stored = normalize_calculation_payload(self.stored.calculation) or {}
+        recomputed = normalize_calculation_payload(self.recomputed.calculation) or {}
+        keys = sorted(set(stored) | set(recomputed))
+        return tuple(key for key in keys if stored.get(key) != recomputed.get(key))
+
     @property
     def input_snapshot_hash_match(self) -> bool:
         return self.stored.input_snapshot_hash == self.recomputed.input_snapshot_hash
@@ -55,10 +63,15 @@ class RunReplayVerification:
         )
 
 
-def verify_stored_run_replay(conn: psycopg.Connection, run_id: str) -> RunReplayVerification:
-    stored = load_research_run(conn, run_id)
+def verify_stored_run_replay(
+    conn: psycopg.Connection,
+    run_id: str,
+    *,
+    stored: ResearchRun | None = None,
+) -> RunReplayVerification:
+    persisted = stored if stored is not None else load_research_run(conn, run_id)
     recomputed = recompute_stored_run(conn, run_id)
-    return RunReplayVerification(stored=stored, recomputed=recomputed)
+    return RunReplayVerification(stored=persisted, recomputed=recomputed)
 
 
 def recompute_stored_run(conn: psycopg.Connection, run_id: str) -> ResearchRun:

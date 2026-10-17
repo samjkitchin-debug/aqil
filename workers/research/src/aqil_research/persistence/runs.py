@@ -2,12 +2,18 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import UTC, date, datetime
 
 import psycopg
 
 from aqil_research.persistence.calculation_normalize import normalize_calculation_payload
 from aqil_research.pipeline.models import ResearchRun
+
+
+def _ensure_utc(value: datetime) -> datetime:
+    if value.tzinfo is None:
+        return value.replace(tzinfo=UTC)
+    return value.astimezone(UTC)
 
 
 def save_research_run(conn: psycopg.Connection, run: ResearchRun) -> None:
@@ -131,7 +137,7 @@ def load_research_run(conn: psycopg.Connection, run_id: str) -> ResearchRun:
 
     return ResearchRun(
         run_id=row[0],
-        executed_at=row[1],
+        executed_at=_ensure_utc(row[1]),
         execution_status=row[2],
         dataset_id=row[3],
         input_dataset_ids=[row[3]],
@@ -139,7 +145,7 @@ def load_research_run(conn: psycopg.Connection, run_id: str) -> ResearchRun:
         rights_record_id=row[5],
         analysis_mode=AnalysisMode(row[6]),
         analysis_type=row[7],
-        decision_at=row[8],
+        decision_at=_ensure_utc(row[8]),
         evaluation_period=evaluation_str,
         method_id=row[10],
         method_version=row[11],
