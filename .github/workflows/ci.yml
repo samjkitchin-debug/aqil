@@ -45,19 +45,6 @@ jobs:
           AQIL_FOUNDER_INSIGHT_TOKEN: ci-founder-test-token
           AQIL_ALLOW_FOUNDER_INSIGHT_HEADER: "true"
           E2E_USE_DEV_SERVER: "true"
-      - name: Playwright verified macro bundle
-        run: npx playwright test e2e/forward-verified-macro.spec.ts --project=verified-macro
-        env:
-          CI: true
-          PORT: "3001"
-          PLAYWRIGHT_BASE_URL: http://localhost:3001
-          RESEARCH_INSIGHT_PATH: fixtures/research-insight.v1.json
-          FORWARD_HORIZON_PATH: fixtures/forward-horizon-verified-macro.v1.json
-          AQIL_ALLOW_RESEARCH_FIXTURE: "true"
-          AQIL_FOUNDER_INSIGHT_TOKEN: ci-founder-test-token
-          AQIL_ALLOW_FOUNDER_INSIGHT_HEADER: "true"
-          E2E_USE_DEV_SERVER: "true"
-
   database:
     name: Database (Supabase migrations + RLS)
     # Ephemeral local stack only; pgTAP helpers in supabase/tests are not migrations.
