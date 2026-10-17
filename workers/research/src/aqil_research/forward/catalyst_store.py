@@ -3,10 +3,35 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import psycopg
+
+
+def _normalize_instant(value: object) -> datetime | None:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        if value.tzinfo is None:
+            return value.replace(tzinfo=UTC)
+        return value.astimezone(UTC)
+    if isinstance(value, str):
+        return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(UTC)
+    return None
+
+
+def _schedule_times_equal(previous_at: object, new_at: object) -> bool:
+    return _normalize_instant(previous_at) == _normalize_instant(new_at)
+
+
+def _coerce_payload(previous_payload: object) -> dict[str, object] | None:
+    if isinstance(previous_payload, dict):
+        return previous_payload
+    if isinstance(previous_payload, str):
+        parsed = json.loads(previous_payload)
+        return parsed if isinstance(parsed, dict) else None
+    return None
 
 
 def _stable_payload(payload: dict[str, object]) -> dict[str, object]:
@@ -49,7 +74,7 @@ def upsert_catalyst_event(
 
         previous_at, previous_payload = existing
         new_at = payload.get("scheduled_at")
-        if previous_at is not None and new_at is not None and str(previous_at) != str(new_at):
+        if not _schedule_times_equal(previous_at, new_at):
             cur.execute(
                 """
                 insert into forward.catalyst_event_revisions (
@@ -89,9 +114,7 @@ def upsert_catalyst_event(
             )
             return "updated"
 
-        prev_stable = (
-            _stable_payload(previous_payload) if isinstance(previous_payload, dict) else None
-        )
+        prev_stable = _stable_payload(prev) if (prev := _coerce_payload(previous_payload)) else None
         if prev_stable is not None and prev_stable != _stable_payload(payload):
             cur.execute(
                 """
