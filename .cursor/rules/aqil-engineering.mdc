@@ -5,11 +5,14 @@ alwaysApply: true
 
 # Aqil engineering rules
 
+**Non-negotiable:** follow all twelve rules in `docs/AGENT_OPERATING_RULES.md` (read before substantive work; scope; verification; security; approval gates; research integrity; costs; backlog/handover; Git authorisation; build the product — not bureaucracy).
+
 ## Documentation authority
 
-- Start with `docs/00_READ_ME_FIRST.md` and `docs/DOCUMENTATION_AUTHORITY.md`.
+- Start with `docs/00_READ_ME_FIRST.md`, `docs/AGENT_OPERATING_RULES.md`, and `docs/DOCUMENTATION_AUTHORITY.md`.
 - Canonical specs win over reference material. **`docs/sausage-transfer/` is historical investigation only — never implement from it without a canonical mapping.**
 - Workflow: `docs/CURSOR_COLLABORATION_WORKFLOW.md`.
+- After substantive work: update `docs/07_BUILD_BACKLOG.csv` and fill `docs/CURSOR_SESSION_HANDOVER.md` (no unsupported “verified” claims).
 
 ## Product truth
 
@@ -47,6 +50,7 @@ alwaysApply: true
 
 ## Security and safety
 
+- Follow `docs/INFORMATION_SECURITY_STANDARD.md` for threat model, control tiers and AI/research rules.
 - Never commit secrets, `.env` files or service role keys to Git.
 - `SUPABASE_SERVICE_ROLE_KEY` is server-only (`apps/web/src/lib/env/server.ts` with `server-only`); never import server env or service role code in client components.
 - Do not apply hosted migrations until `supabase test db` has actually passed for the same Git files. An unrun check is not a pass. MCP must not become a second schema history.

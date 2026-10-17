@@ -1,0 +1,95 @@
+{
+  "dataset_id": "bls.ln.LNS14000000",
+  "observations": [
+    {
+      "observation_id": "ueq-2023-10",
+      "period": "2023-10-01",
+      "value": "4.0",
+      "vintage": "2023-11-05"
+    },
+    {
+      "observation_id": "ueq-2023-11",
+      "period": "2023-11-01",
+      "value": "4.0",
+      "vintage": "2023-12-05"
+    },
+    {
+      "observation_id": "ueq-2023-12",
+      "period": "2023-12-01",
+      "value": "4.0",
+      "vintage": "2024-01-05"
+    },
+    {
+      "observation_id": "ueq-2024-01",
+      "period": "2024-01-01",
+      "value": "4.0",
+      "vintage": "2024-02-05"
+    },
+    {
+      "observation_id": "ueq-2024-02",
+      "period": "2024-02-01",
+      "value": "4.0",
+      "vintage": "2024-03-05"
+    },
+    {
+      "observation_id": "ueq-2024-03",
+      "period": "2024-03-01",
+      "value": "4.0",
+      "vintage": "2024-04-05"
+    },
+    {
+      "observation_id": "ueq-2024-04",
+      "period": "2024-04-01",
+      "value": "4.0",
+      "vintage": "2024-05-05"
+    },
+    {
+      "observation_id": "ueq-2024-05",
+      "period": "2024-05-01",
+      "value": "4.0",
+      "vintage": "2024-06-05"
+    },
+    {
+      "observation_id": "ueq-2024-06",
+      "period": "2024-06-01",
+      "value": "4.0",
+      "vintage": "2024-07-05"
+    },
+    {
+      "observation_id": "ueq-2024-07",
+      "period": "2024-07-01",
+      "value": "4.0",
+      "vintage": "2024-08-05"
+    },
+    {
+      "observation_id": "ueq-2024-08",
+      "period": "2024-08-01",
+      "value": "4.0",
+      "vintage": "2024-09-05"
+    },
+    {
+      "observation_id": "ueq-2024-09",
+      "period": "2024-09-01",
+      "value": "4.0",
+      "vintage": "2024-10-05"
+    },
+    {
+      "observation_id": "ueq-2024-10",
+      "period": "2024-10-01",
+      "value": "4.5",
+      "vintage": "2024-11-05"
+    },
+    {
+      "observation_id": "ueq-2024-11",
+      "period": "2024-11-01",
+      "value": "4.5",
+      "vintage": "2024-12-05"
+    },
+    {
+      "observation_id": "ueq-2024-12",
+      "period": "2024-12-01",
+      "value": "4.5",
+      "vintage": "2025-01-05"
+    }
+  ]
+}

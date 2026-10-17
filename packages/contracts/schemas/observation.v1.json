@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/observation.v1.json",
+  "title": "Economic observation v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "observation_id",
+    "dataset_id",
+    "provider_id",
+    "source_id",
+    "rights_record_id",
+    "period_start",
+    "frequency",
+    "geography",
+    "unit",
+    "seasonal_adjustment",
+    "raw_value",
+    "quality_status",
+    "series_provenance",
+    "provider_vintage_date",
+    "availability_precision",
+    "retrieved_at",
+    "first_seen_at",
+    "adapter_version"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "observation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provider_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rights_record_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "period_start": {
+      "type": "string",
+      "format": "date"
+    },
+    "period_end": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "frequency": {
+      "enum": [
+        "daily",
+        "weekly",
+        "monthly",
+        "quarterly",
+        "annual"
+      ]
+    },
+    "geography": {
+      "type": "string",
+      "minLength": 1
+    },
+    "unit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "seasonal_adjustment": {
+      "enum": [
+        "seasonally_adjusted",
+        "not_seasonally_adjusted",
+        "unknown"
+      ]
+    },
+    "raw_value": {
+      "type": "string",
+      "pattern": "^-?\\d+(\\.\\d+)?$"
+    },
+    "quality_status": {
+      "enum": [
+        "observed",
+        "missing",
+        "contested",
+        "retracted"
+      ]
+    },
+    "series_provenance": {
+      "enum": [
+        "provider_vintage",
+        "latest_revised",
+        "aqil_archived"
+      ]
+    },
+    "provider_vintage_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "source_release_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "earliest_model_available_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "availability_precision": {
+      "enum": [
+        "timestamp",
+        "date",
+        "unknown"
+      ]
+    },
+    "retrieved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "first_seen_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_locator": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "adapter_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "supersedes_observation_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "series_provenance": {
+            "const": "provider_vintage"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "availability_precision": {
+            "enum": [
+              "timestamp",
+              "date"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "series_provenance": {
+            "const": "provider_vintage"
+          },
+          "availability_precision": {
+            "const": "timestamp"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "earliest_model_available_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "earliest_model_available_at"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "series_provenance": {
+            "const": "aqil_archived"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "earliest_model_available_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "earliest_model_available_at"
+        ]
+      }
+    }
+  ]
+}

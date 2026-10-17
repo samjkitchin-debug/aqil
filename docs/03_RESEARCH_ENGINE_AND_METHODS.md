@@ -59,6 +59,22 @@ A method is eligible for use only after a `MethodCard` is created. Required fiel
 
 Do **not** implement 20 methods in v1. Start with passive baseline, one risk diagnostic, one robust published quantitative signal (e.g. momentum, chosen only after data feasibility), and one event-to-causal research chain. All variants are preregistered.
 
+### Historical analogues (later milestone; not M1)
+Historical analogues and recurring market behaviour are a required later capability of this same method, factor, configuration and evidence architecture. They are not a separate product, not a universal scoring matrix, and not part of the first macro slice.
+
+A future method card may compare a current episode with past macroeconomic, geopolitical and financial events; record how markets responded over short, medium and long horizons; and condition similarity on inflation, monetary policy, valuations, liquidity, expectations and other stated regime features. Historical price patterns, momentum, reversals and support or resistance may enter only as named, testable candidate factors with their own method cards. Similarity weights and thresholds are versioned configuration.
+
+The method must show outcome distributions, contradictory precedents and patterns that failed. Inputs are point-in-time, so later revisions and later prices cannot leak into the comparison. Evaluation uses matched benchmarks, out-of-sample tests and explicit controls for overfitting. A historical correlation, a proposed causal explanation and a demonstrated predictive result stay separate objects. None of them is implied by the others.
+
+### Modular research pipeline (M1)
+The macro worker exposes small protocols, not a plugin platform:
+
+- **Provider adapters** map provider-native fixtures or feeds to `observation.v1` only. Adapter choice is configuration (`adapter_id`). Disabling a source blocks new collection; it does not delete stored observations.
+- **Analytical methods** consume a normalised as-of observation view. Method choice is configuration (`method_id` + versioned config hash). Replacing a provider or swapping methods does not change the orchestrator.
+- **Configuration vs version:** parameter changes (thresholds, windows, labelled sensitivity cases) change `config_id` / `config_hash` only. Formula, input-contract or window-definition changes require a new `method_version`. A different research question requires a new `method_id` and MethodCard.
+- **Future matrices:** methods may attach validated parameter documents (scalars and rectangular decimal matrices) via `MethodParameterDocument`; this is not a general factor-weighting engine.
+- **ResearchRun** records a method **implementation hash** (for Sahm: SHA-256 of the `sahm.py` module bytes only—not transitive Python/runtime dependencies), **config hash**, **input snapshot hash** and a deterministic **analytical payload hash**. Publication remains a separate fail-closed gate from analytical completion.
+
 ## 4. Signal detection: no autonomous conviction manufacture
 - **Collectors:** official/public data feeds and rights-approved discovery sources; source-specific release schedule.
 - **Normaliser:** entities, units, frequency, geography, geospatial/timeframe, published/available timestamps, revision, rights.

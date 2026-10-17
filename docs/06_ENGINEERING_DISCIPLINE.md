@@ -1,5 +1,5 @@
 # AQIL — Engineering Discipline, AI Guardrails and Cursor Working Agreement
-**This is an enforceable repository contract, not optional guidance.**
+**This is an enforceable repository contract, not optional guidance.** Every agent session must also follow `docs/AGENT_OPERATING_RULES.md`.
 
 ## 1. Repository structure
 ```text
@@ -21,7 +21,7 @@ aqil/
 ```
 
 ## 2. Before ANY Cursor task
-1. Inspect existing code, schema, tests and design tokens. Do not fabricate API names, sources or inferred file structure.
+1. Inspect existing code, schema, tests and design tokens. Do not fabricate API names, sources or inferred file structure. Check `docs/07_BUILD_BACKLOG.csv` for item status, blockers and `next_action`.
 2. Identify the human problem, domain owner and targeted acceptance test. Explicitly list what this task must NOT change.
 3. Confirm data classification: `synthetic`, `public_rights_verified`, `rights_restricted`, `private_financial` or `unknown`.
 4. Determine risk class **R0 UI**, **R1 content**, **R2 methodology**, **R3 financial ledger/security/regulatory**. The higher class controls tests, review and rollout.
@@ -99,7 +99,9 @@ A check that has **not run** is **unverified**, not a pass. Report PASS, FAIL or
 
 ### Planned / incremental
 
-Prettier; component screenshot diffs; secret scanning in CI; dependency audit policy (track `npm audit` dev-chain findings); failed-safe dry-run for data outage and model budget caps.
+Prettier; component screenshot diffs; GitHub org secret-scanning push protection (enable in repo settings); failed-safe dry-run for data outage and model budget caps; Python `pip-audit` when worker dependencies grow.
+
+**Security standard:** `docs/INFORMATION_SECURITY_STANDARD.md` — threat model, risk register and control tiers. **Dependency audit:** CI runs `npm audit --omit=dev --audit-level=high` on web production deps; dev-only findings (e.g. ESLint toolchain) are tracked in the risk register, not silently “fixed” with `--force`.
 
 **Mandatory invariant tests:**
 1. A citation ID not present in the verified claim registry blocks public publication.

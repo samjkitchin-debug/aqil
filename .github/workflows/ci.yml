@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   web:
     name: Web (Next.js)
@@ -20,6 +23,8 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
+      - name: Audit production npm dependencies
+        run: npm audit --omit=dev --audit-level=high
       - run: npm run check:tokens
         working-directory: .
       - run: npm run typecheck
