@@ -366,7 +366,7 @@ M3 merged (PR #7); M4 forward-intelligence slice on `m4/forward-intelligence` �
 
 ### Git
 - **main:** PR #7 merged (`54c4a16`); M3 CI run 39022602296 green.
-- **M4:** `m4/forward-intelligence` (pending push/PR).
+- **M4:** PR #8 `m4/forward-intelligence` @ `1de94f5`; CI run 39024070752 green — **not merged** (awaiting approval).
 
 ### M4 deliverables (summary)
 - Migration `20261017180000_forward_intelligence.sql`; pgTAP `forward_schema.test.sql`.
@@ -379,7 +379,7 @@ M3 merged (PR #7); M4 forward-intelligence slice on `m4/forward-intelligence` �
 | `uv run pytest` (minus forward integration) | 76 passed, 1 skipped |
 | Forward unit tests | 3 passed |
 | `npm run typecheck` / lint | pass |
-| M4 GitHub CI | pending after push |
+| M4 GitHub CI run 39024070752 | pass |
 
 ### Backlog
 - AQ-068 → Verified; AQ-069 → Implemented — unverified.
