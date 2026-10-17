@@ -2,14 +2,11 @@ import { expect, test } from "@playwright/test";
 
 test.describe("forward horizon UI", () => {
   test.beforeEach(async ({ context, baseURL }) => {
-    const origin = new URL(baseURL!);
     await context.addCookies([
       {
         name: "aqil_founder_insight",
         value: "ci-founder-test-token",
         url: baseURL!,
-        path: "/",
-        domain: origin.hostname,
         httpOnly: true,
         sameSite: "Lax",
       },
