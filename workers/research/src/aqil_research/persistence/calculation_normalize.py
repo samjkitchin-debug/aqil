@@ -3,7 +3,17 @@
 from __future__ import annotations
 
 import json
+from decimal import Decimal
 from typing import Any
+
+
+def _decimal_field(key: str, value: object) -> str:
+    parsed = Decimal(str(value))
+    if key in ("three_month_average", "prior_twelve_month_low_of_average"):
+        return str(parsed.quantize(Decimal("0.01")))
+    if key.endswith("percentage_points"):
+        return str(parsed.quantize(Decimal("0.01")))
+    return str(parsed)
 
 
 def normalize_calculation_payload(calculation: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -18,7 +28,7 @@ def normalize_calculation_payload(calculation: dict[str, Any] | None) -> dict[st
         "threshold_percentage_points",
     ):
         if key in payload and payload[key] is not None:
-            payload[key] = str(payload[key])
+            payload[key] = _decimal_field(key, payload[key])
     for list_key in (
         "months_used_for_average",
         "months_used_for_lookback",

@@ -11,5 +11,5 @@ def test_normalize_coerces_jsonb_floats_to_strings() -> None:
     }
     out = normalize_calculation_payload(raw)
     assert out is not None
-    assert out["gap_percentage_points"] == "0.5"
+    assert out["gap_percentage_points"] == "0.50"
     assert out["months_used_for_average"] == ["2024-11-01", "2024-12-01"]
