@@ -53,6 +53,10 @@
     "outcomes": {
       "type": "array",
       "items": { "$ref": "#/$defs/outcome_summary" }
+    },
+    "company_filings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/company_filing_summary" }
     }
   },
   "$defs": {
@@ -116,10 +120,19 @@
         "scheduled_date": { "type": "string" },
         "scheduled_time": { "type": ["string", "null"] },
         "timezone": { "type": ["string", "null"] },
-        "date_precision": { "enum": ["confirmed", "estimated", "unknown"] },
-        "schedule_evidence": { "enum": ["verified_schedule", "synthetic_demonstration", "unverified"] },
+        "date_precision": { "enum": ["confirmed", "estimated", "tentative", "unknown"] },
+        "schedule_evidence": {
+          "enum": [
+            "verified_schedule",
+            "verified_announcement",
+            "synthetic_demonstration",
+            "unverified"
+          ]
+        },
         "materiality": { "enum": ["high", "medium", "low", "insufficient_evidence"] },
-        "materiality_basis": { "enum": ["calculated", "insufficient_evidence"] },
+        "materiality_basis": {
+          "enum": ["calculated", "insufficient_evidence", "macro_qualitative"]
+        },
         "interpretation_status": { "const": "unverified" },
         "source_confidence": { "type": "string" },
         "why_it_matters": { "type": "string" },
@@ -139,6 +152,18 @@
         {
           "if": {
             "properties": { "schedule_evidence": { "const": "verified_schedule" } },
+            "required": ["schedule_evidence"]
+          },
+          "then": {
+            "properties": {
+              "date_precision": { "const": "confirmed" },
+              "is_fixture": { "const": false }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "schedule_evidence": { "const": "verified_announcement" } },
             "required": ["schedule_evidence"]
           },
           "then": {
@@ -194,8 +219,34 @@
         "upside_case": { "type": "string" },
         "downside_case": { "type": "string" },
         "evidence_gaps": { "type": "array", "items": { "type": "string" } },
-        "evidence_class": { "const": "synthetic_demonstration" },
-        "record_source": { "enum": ["fixture", "database"] }
+        "evidence_class": {
+          "enum": ["synthetic_demonstration", "research_assessment"]
+        },
+        "record_source": { "enum": ["fixture", "database"] },
+        "expected_information": { "type": "string" },
+        "no_action_conclusion": { "type": "string" },
+        "inconclusive": { "type": "string" },
+        "known_facts": { "type": "array", "items": { "type": "string" } },
+        "what_would_change_assessment": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "company_filing_summary": {
+      "type": "object",
+      "required": ["event_id", "title", "evidence_class"],
+      "properties": {
+        "event_id": { "type": "string" },
+        "title": { "type": "string" },
+        "issuer_id": { "type": "string" },
+        "form": { "type": "string" },
+        "filing_date": { "type": "string" },
+        "accepted_at": { "type": "string" },
+        "reported_period_end": { "type": "string" },
+        "source_locator": { "type": "string" },
+        "evidence_class": { "type": "string" },
+        "is_fixture": { "type": "boolean" }
       }
     },
     "outcome_summary": {

@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "etf_id": "etf:vanguard:ftse-all-world:vwra:lse:gbp:acc",
+  "as_of_date": "2099-01-01",
+  "source_publication_date": "2099-01-02",
+  "completeness": "top_holdings_partial",
+  "source_id": "vanguard_uk_vwra_holdings",
+  "source_locator": "synthetic://aqil/ci/vwra-holdings-import-structure",
+  "evidence_class": "synthetic_demonstration",
+  "licence_evidence": "CI structure sample only — not issuer holdings data.",
+  "currency": "USD",
+  "lines": [
+    {
+      "line_id": "ci:line:1",
+      "holding_name": "Structure test constituent A",
+      "issuer_id": "issuer:ci:test:a",
+      "weight_percentage": "1.00",
+      "category": "equity"
+    }
+  ]
+}

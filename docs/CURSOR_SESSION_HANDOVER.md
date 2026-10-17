@@ -391,3 +391,89 @@ Row counts stayed: instruments 1, holdings snapshots 1, holding lines 3, catalys
 - **main:** PR #7 merged (`54c4a16`).
 - **M4:** PR #8 `m4/forward-intelligence`. GitHub Actions on the correction commit is the merge gate.
 
+## Session handover — 2026-10-18 (M5 live intelligence coverage)
+
+### Current objective
+Convert forward intelligence from demonstration fixtures to rights-checked live macro calendars (Fed FOMC + BLS Employment Situation schedule), with idempotent Postgres persistence and operator coverage reporting. PR open; not merged.
+
+### What is genuinely sourced now
+- **Federal Reserve FOMC calendar** (`federal_reserve_fomc_calendar`) — HTML parser verified against live page (16 meetings from current year onward in smoke test).
+- **BLS Employment Situation schedule** (`bls_release_schedule`) — HTML table parser with fixture-backed CI tests.
+- **VWRA holdings** — rights row added; **automated_access unknown**; manual import only until terms are verified.
+
+### Operator commands
+- `uv run aqil-research collect-forward --source fed-fomc --fixture tests/fixtures/forward/fed_fomc_calendar_snippet.html`
+- `uv run aqil-research collect-forward --source bls-empsit --fixture tests/fixtures/forward/bls_empsit_schedule_snippet.html`
+- `uv run aqil-research collect-forward --source fed-fomc --live` (opt-in network)
+- `uv run aqil-research forward-coverage`
+- `uv run aqil-research export-forward-horizon --output path.json [--include-demo]`
+
+### Tests (local agent)
+| Check | Result |
+|-------|--------|
+| `uv run pytest` (unit, no integration DB) | 80 passed, 7 skipped |
+| Live Fed parser smoke | 16 meetings parsed |
+| Web `npm run typecheck` | pass |
+| GitHub CI | pending on M5 PR |
+
+### Honest gaps
+- No provider ETF holdings file ingested yet (Vanguard UK automation blocked).
+- No live company earnings adapter; demonstration MSFT path unchanged.
+- Hosted Supabase migration not applied; no unattended schedules enabled.
+
+### Git
+- **Branch:** `m5/live-intelligence-coverage`
+- **main:** M4 merged @ `dd82e40`
+
+## Session handover — 2026-10-18 (M5 macro vertical slice)
+
+### End-to-end macro path (verified)
+1. `collect-forward` (Fed FOMC / BLS empsit fixtures or `--live`)
+2. `sync-forward-intelligence --export apps/web/.local/forward-horizon.v1.json` freezes `research_assessment` scenarios in Postgres and exports `data_mode=verified_source` without `--include-demo`
+3. Founder web loads `.local/` or `FORWARD_HORIZON_PATH` → Calendar (30/90d), Research shows source-backed pre-event assessment from frozen DB export
+
+### Integration tests (require local Supabase)
+- `test_forward_macro_vertical_slice.py`
+- `test_forward_sec_filings_export.py`
+
+### Web proof without Postgres
+- `fixtures/forward-horizon-verified-macro.v1.json` + contract test + Playwright `forward-verified-macro.spec.ts` (second CI Playwright step)
+
+### Holdings
+- Manual import requires `internal_retention_authorized=true` for `provider_holdings`; no Vanguard/iShares production weights in Git.
+
+### Grok package
+- `docs/M5_GROK_REVIEW_PACKAGE.md`
+
+## Session handover — 2026-10-18 (M5 source findings)
+
+### Current objective
+Add the source-backed coverage that does not depend on a licensed ETF holdings file: official calendars, completed US filings, and an honest company-IR watchlist.
+
+### What changed
+- BLS selected-release iCalendar is the primary schedule adapter. HTML Employment Situation collection remains. The HTML schedule states that times are Eastern Time. Feed stamps ending in Z are stored as UTC instants.
+- BEA news schedule is parsed from the live Drupal table checked on 2026-10-18. That page lists a clock and does not state a timezone, so the clock stays text and the stored instant is only the calendar day.
+- SEC submissions and companyfacts parse completed 8-K, 10-Q and 10-K rows. Fixture mode is labelled synthetic. Live mode requires `AQIL_SEC_USER_AGENT` and does not create a next earnings date.
+- Company IR watchlist ships with Microsoft, Apple and NVIDIA marked unknown. Unknown cannot carry a date. Company events do not receive an ETF weight.
+- Vanguard Ireland automated collection is prohibited. iShares automated collection is disabled. Holdings contracts and the synthetic demo remain.
+
+### Tests
+| Check | Result |
+|-------|--------|
+| `uv run pytest` in `workers/research` | 89 passed, 9 skipped |
+| Skips | Local Supabase was not running, plus one missing malformed fixture |
+| `uv run ruff check` on the edited research files | pass |
+| Web typecheck, Playwright, `supabase test db` | not run |
+| Live `bls.ics` fetch | Access denied for the fetch client. Adapter tested from a format fixture |
+
+### Unavailable
+- Live Vanguard or iShares constituent weights.
+- Analyst consensus and invented future earnings dates.
+- ECB, BoE and BoJ calendars. Their reuse terms were not cleared.
+- A timezone for the BEA clock.
+- Hosted migration. `20261018140000_m5_watchlist_evidence.sql` is in Git only until a local database reset applies it.
+
+### Git
+- Branch remains `m5/live-intelligence-coverage`. This increment is not committed.
+
+

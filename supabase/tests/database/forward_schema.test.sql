@@ -139,13 +139,13 @@ select throws_ok(
       'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
       'event:pgtap:immutable',
       timestamptz '2026-01-01 00:00:00+00',
-      '{"schema_version":"1.0"}'::jsonb,
+      '{"schema_version":"1.0","evidence_class":"verified_schedule"}'::jsonb,
       'unlabelled'
     );
   $$,
   '23514',
   null,
-  'scenarios must be labelled synthetic demonstration data'
+  'scenarios must use allowed evidence classes'
 );
 
 set local role anon;

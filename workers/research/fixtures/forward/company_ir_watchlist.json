@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "issuers": [
+    {
+      "issuer_id": "issuer:us:cik:0000789019",
+      "legal_name": "Microsoft Corp",
+      "ticker": "MSFT",
+      "ir_events_url": "https://www.microsoft.com/en-us/investor/events/default.aspx",
+      "date_status": "unknown",
+      "scheduled_date": null,
+      "first_observed_at": null,
+      "note": "IR events page identified. No earnings date has been copied."
+    },
+    {
+      "issuer_id": "issuer:us:cik:0000320193",
+      "legal_name": "Apple Inc.",
+      "ticker": "AAPL",
+      "ir_events_url": "https://investor.apple.com/investor-relations/default.aspx",
+      "date_status": "unknown",
+      "scheduled_date": null,
+      "first_observed_at": null,
+      "note": "IR page identified. No earnings date has been copied."
+    },
+    {
+      "issuer_id": "issuer:us:cik:0001045810",
+      "legal_name": "NVIDIA Corp",
+      "ticker": "NVDA",
+      "ir_events_url": "https://investor.nvidia.com/financial-info/financial-reports/default.aspx",
+      "date_status": "unknown",
+      "scheduled_date": null,
+      "first_observed_at": null,
+      "note": "IR reports page identified. No earnings date has been copied."
+    }
+  ]
+}

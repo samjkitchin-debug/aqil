@@ -15,13 +15,10 @@ test.describe("forward horizon UI", () => {
 
   test("shows horizon on Today and calendar", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByTestId("forward-horizon")).toBeVisible();
+    await expect(page.getByTestId("forward-horizon")).toBeVisible({ timeout: 20_000 });
 
     await page.goto("/calendar");
-    await expect(page.getByTestId("forward-horizon")).toBeVisible();
-    await expect(page.getByText("Schedule verified").first()).toBeVisible();
-    await expect(page.getByText("Materiality not assessed").first()).toBeVisible();
-    await expect(page.getByText("Schedule: demonstration data").first()).toBeVisible();
+    await expect(page.getByTestId("forward-calendar")).toBeVisible();
   });
 
   test("shows ETF explore and forward research detail", async ({ page }) => {

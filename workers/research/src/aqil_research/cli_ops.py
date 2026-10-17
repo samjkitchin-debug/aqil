@@ -65,6 +65,51 @@ def register_collect_parsers(sub: argparse._SubParsersAction) -> None:
     )
     demo.add_argument("--skip-db", action="store_true", help="Only export JSON bundle")
 
+    collect_fwd = sub.add_parser(
+        "collect-forward",
+        help="Collect official forward calendar sources into Postgres",
+    )
+    collect_fwd.add_argument(
+        "--source",
+        required=True,
+        choices=["fed-fomc", "bls-empsit", "bls-ics", "bea-schedule", "sec-filings", "company-ir"],
+    )
+    collect_fwd.add_argument("--live", action="store_true")
+    collect_fwd.add_argument("--fixture", type=Path, default=None)
+    collect_fwd.add_argument("--horizon-days", type=int, default=180)
+
+    sub.add_parser(
+        "forward-coverage",
+        help="Print forward intelligence coverage and health report (JSON)",
+    )
+
+    export_hz = sub.add_parser(
+        "export-forward-horizon",
+        help="Export forward_horizon.v1.json from Postgres",
+    )
+    export_hz.add_argument("--output", type=Path, required=True)
+    export_hz.add_argument("--include-demo", action="store_true")
+    export_hz.add_argument("--horizon-days", type=int, default=180)
+
+    import_holdings = sub.add_parser(
+        "import-forward-holdings",
+        help="Import a manual ETF holdings JSON file (rights-checked, no automated fetch)",
+    )
+    import_holdings.add_argument("--file", type=Path, required=True)
+
+    sync_intel = sub.add_parser(
+        "sync-forward-intelligence",
+        help="Freeze macro pre-event assessments and export the web horizon bundle",
+    )
+    sync_intel.add_argument(
+        "--export",
+        type=Path,
+        default=None,
+        help="Write forward_horizon.v1.json (e.g. apps/web/.local/forward-horizon.v1.json)",
+    )
+    sync_intel.add_argument("--include-demo", action="store_true")
+    sync_intel.add_argument("--horizon-days", type=int, default=180)
+
 
 def run_collect(args: argparse.Namespace) -> int:
     if args.source != "bls":
@@ -180,6 +225,147 @@ def run_forward_demo(args: argparse.Namespace) -> int:
         print(f"horizon_exported={args.export_horizon}")
     else:
         print(json.dumps(bundle, indent=2, default=str))
+    return 0
+
+
+def run_collect_forward(args: argparse.Namespace) -> int:
+    from datetime import date
+
+    from aqil_research.forward.collection.service import (
+        collect_bea_schedule,
+        collect_bls_empsit_schedule,
+        collect_bls_ics_schedule,
+        collect_company_ir_watchlist,
+        collect_fed_fomc_calendar,
+        collect_sec_completed_filings,
+    )
+
+    today = date.today()
+    horizon_end = today.fromordinal(today.toordinal() + args.horizon_days)
+
+    try:
+        with research_connection() as conn:
+            collectors = {
+                "fed-fomc": collect_fed_fomc_calendar,
+                "bls-empsit": collect_bls_empsit_schedule,
+                "bls-ics": collect_bls_ics_schedule,
+                "bea-schedule": collect_bea_schedule,
+            }
+            if args.source == "sec-filings":
+                result = collect_sec_completed_filings(
+                    conn,
+                    live=args.live,
+                    fixture_path=args.fixture,
+                )
+            elif args.source == "company-ir":
+                default_watchlist = (
+                    Path(__file__).resolve().parents[2]
+                    / "fixtures/forward/company_ir_watchlist.json"
+                )
+                watchlist = args.fixture or default_watchlist
+                result = collect_company_ir_watchlist(conn, watchlist_path=watchlist)
+            else:
+                result = collectors[args.source](
+                    conn,
+                    live=args.live,
+                    fixture_path=args.fixture,
+                    horizon_start=today,
+                    horizon_end=horizon_end,
+                )
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+
+    print(
+        f"outcome={result.outcome} received={result.records_received} "
+        f"new={result.records_new} updated={result.records_updated} "
+        f"unchanged={result.records_unchanged}",
+    )
+    if result.error_summary:
+        print(f"error: {result.error_summary}", file=sys.stderr)
+    if result.outcome != "completed":
+        return 5
+    return 0
+
+
+def run_forward_coverage(args: argparse.Namespace) -> int:
+    from aqil_research.forward.coverage import build_coverage_report, format_coverage_report
+
+    try:
+        with research_connection() as conn:
+            report = build_coverage_report(conn)
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+    print(format_coverage_report(report))
+    return 0
+
+
+def run_sync_forward_intelligence(args: argparse.Namespace) -> int:
+    from aqil_research.forward.horizon_export import build_horizon_from_database
+    from aqil_research.forward.intelligence.macro_assessment import (
+        freeze_macro_pre_event_assessments,
+    )
+
+    try:
+        with research_connection() as conn:
+            new_frozen, existing = freeze_macro_pre_event_assessments(conn)
+            print(f"macro_assessments new={new_frozen} existing={existing}")
+            bundle = build_horizon_from_database(
+                conn,
+                horizon_days=args.horizon_days,
+                include_demonstration=args.include_demo,
+            )
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+
+    if args.export is not None:
+        args.export.parent.mkdir(parents=True, exist_ok=True)
+        args.export.write_text(json.dumps(bundle, indent=2, default=str) + "\n", encoding="utf-8")
+        print(f"horizon_exported={args.export} data_mode={bundle.get('data_mode')}")
+    else:
+        print(json.dumps(bundle, indent=2, default=str))
+    return 0
+
+
+def run_import_forward_holdings(args: argparse.Namespace) -> int:
+    from aqil_research.forward.holdings_import import import_holdings_from_file
+
+    try:
+        with research_connection() as conn:
+            result = import_holdings_from_file(conn, args.file)
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+
+    print(
+        f"outcome={result.outcome} source_id={result.source_id} "
+        f"snapshot_id={result.snapshot_id} row_status={result.row_status}",
+    )
+    if result.error_summary:
+        print(f"error: {result.error_summary}", file=sys.stderr)
+    if result.outcome != "completed":
+        return 5
+    return 0
+
+
+def run_export_forward_horizon(args: argparse.Namespace) -> int:
+    from aqil_research.forward.horizon_export import build_horizon_from_database
+
+    try:
+        with research_connection() as conn:
+            bundle = build_horizon_from_database(
+                conn,
+                horizon_days=args.horizon_days,
+                include_demonstration=args.include_demo,
+            )
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+
+    args.output.write_text(json.dumps(bundle, indent=2, default=str) + "\n", encoding="utf-8")
+    print(f"horizon_exported={args.output} data_mode={bundle.get('data_mode')}")
     return 0
 
 

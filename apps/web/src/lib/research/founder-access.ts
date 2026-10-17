@@ -6,10 +6,10 @@ const FOUNDER_COOKIE = "aqil_founder_insight";
 const FOUNDER_HEADER = "x-aqil-founder-insight";
 
 export function researchFixtureFallbackAllowed(): boolean {
-  if (process.env.NODE_ENV === "production") {
-    return false;
+  if (process.env.AQIL_ALLOW_RESEARCH_FIXTURE === "true") {
+    return true;
   }
-  return process.env.AQIL_ALLOW_RESEARCH_FIXTURE === "true";
+  return process.env.NODE_ENV !== "production";
 }
 
 /** Server-side gate for unpublished founder research (not UI labels). */

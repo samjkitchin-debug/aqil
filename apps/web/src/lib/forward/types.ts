@@ -7,6 +7,7 @@ export type ForwardHorizonV1 = {
   exposures: ExposureLink[];
   scenarios?: ScenarioSummary[];
   outcomes?: OutcomeSummary[];
+  company_filings?: CompanyFilingSummary[];
 };
 
 export type EtfSummary = {
@@ -31,10 +32,10 @@ export type HorizonEvent = {
   scheduled_date: string;
   scheduled_time?: string | null;
   timezone?: string | null;
-  date_precision: "confirmed" | "estimated" | "unknown";
-  schedule_evidence: "verified_schedule" | "synthetic_demonstration" | "unverified";
+  date_precision: "confirmed" | "estimated" | "tentative" | "unknown";
+  schedule_evidence: "verified_schedule" | "verified_announcement" | "synthetic_demonstration" | "unverified";
   materiality: "high" | "medium" | "low" | "insufficient_evidence";
-  materiality_basis: "calculated" | "insufficient_evidence";
+  materiality_basis: "calculated" | "insufficient_evidence" | "macro_qualitative";
   interpretation_status: "unverified";
   source_confidence: string;
   why_it_matters: string;
@@ -58,11 +59,29 @@ export type ScenarioSummary = {
   event_id: string;
   frozen_at: string;
   headline: string;
-  evidence_class: "synthetic_demonstration";
+  evidence_class: "synthetic_demonstration" | "research_assessment";
   record_source?: "fixture" | "database";
   upside_case?: string;
   downside_case?: string;
+  inconclusive?: string;
   evidence_gaps?: string[];
+  known_facts?: string[];
+  expected_information?: string;
+  no_action_conclusion?: string;
+  what_would_change_assessment?: string[];
+};
+
+export type CompanyFilingSummary = {
+  event_id: string;
+  title: string;
+  issuer_id?: string;
+  form?: string;
+  filing_date?: string;
+  accepted_at?: string | null;
+  reported_period_end?: string;
+  source_locator?: string;
+  evidence_class: string;
+  is_fixture?: boolean;
 };
 
 export type OutcomeSummary = {

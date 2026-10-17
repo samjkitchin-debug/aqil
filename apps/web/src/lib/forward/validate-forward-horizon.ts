@@ -1,7 +1,7 @@
 import type { ForwardHorizonV1 } from "@/lib/forward/types";
 
 const MATERIALITY = new Set(["high", "medium", "low", "insufficient_evidence"]);
-const DATE_PRECISION = new Set(["confirmed", "estimated", "unknown"]);
+const DATE_PRECISION = new Set(["confirmed", "estimated", "tentative", "unknown"]);
 const DATA_MODE = new Set(["fixture_demonstration", "verified_source", "mixed"]);
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -68,12 +68,17 @@ export function validateForwardHorizon(data: unknown): data is ForwardHorizonV1 
       return false;
     }
     if (typeof event.materiality !== "string" || !MATERIALITY.has(event.materiality)) return false;
-    if (event.materiality_basis !== "calculated" && event.materiality_basis !== "insufficient_evidence") {
+    if (
+      event.materiality_basis !== "calculated" &&
+      event.materiality_basis !== "insufficient_evidence" &&
+      event.materiality_basis !== "macro_qualitative"
+    ) {
       return false;
     }
     if (event.interpretation_status !== "unverified") return false;
     if (
       event.schedule_evidence !== "verified_schedule" &&
+      event.schedule_evidence !== "verified_announcement" &&
       event.schedule_evidence !== "synthetic_demonstration" &&
       event.schedule_evidence !== "unverified"
     ) {
@@ -82,7 +87,10 @@ export function validateForwardHorizon(data: unknown): data is ForwardHorizonV1 
     if (event.is_fixture === true && event.schedule_evidence !== "synthetic_demonstration") {
       return false;
     }
-    if (event.schedule_evidence === "verified_schedule") {
+    if (
+      event.schedule_evidence === "verified_schedule" ||
+      event.schedule_evidence === "verified_announcement"
+    ) {
       if (event.date_precision !== "confirmed" || event.is_fixture !== false) return false;
     }
     if (event.materiality_basis === "insufficient_evidence" && event.materiality !== "insufficient_evidence") {
@@ -125,7 +133,12 @@ export function validateForwardHorizon(data: unknown): data is ForwardHorizonV1 
       if (!isObject(scenario)) return false;
       if (!hasString(scenario, "scenario_id") || !hasString(scenario, "event_id")) return false;
       if (!hasString(scenario, "frozen_at") || !hasString(scenario, "headline")) return false;
-      if (scenario.evidence_class !== "synthetic_demonstration") return false;
+      if (
+        scenario.evidence_class !== "synthetic_demonstration" &&
+        scenario.evidence_class !== "research_assessment"
+      ) {
+        return false;
+      }
     }
   }
 
