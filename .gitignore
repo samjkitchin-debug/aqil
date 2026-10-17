@@ -55,5 +55,9 @@ apps/web/test-results/
 apps/web/playwright-report/
 apps/web/blob-report/
 
+# Supabase local
+supabase/.branches
+supabase/.temp
+
 # OS
 Desktop.ini

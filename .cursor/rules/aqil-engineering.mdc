@@ -5,9 +5,14 @@ alwaysApply: true
 
 # Aqil engineering rules
 
+## Documentation authority
+
+- Start with `docs/00_READ_ME_FIRST.md` and `docs/DOCUMENTATION_AUTHORITY.md`.
+- Canonical specs win over reference material. **`docs/sausage-transfer/` is historical investigation only — never implement from it without a canonical mapping.**
+- Workflow: `docs/CURSOR_COLLABORATION_WORKFLOW.md`.
+
 ## Product truth
 
-- Read `docs/00_READ_ME_FIRST.md` first, then the relevant specs in `docs/` before implementing behaviour.
 - JSON Schemas in `docs/schemas/` (mirrored under `packages/contracts/schemas/`) define cross-language contracts.
 - Do not invent detailed product requirements, financial narratives, market data or research conclusions in code or UI.
 
@@ -15,24 +20,28 @@ alwaysApply: true
 
 - Prefer small, scoped diffs. Do not refactor unrelated code.
 - Do not add dependencies unless they clearly reduce risk or duplication.
-- Classify risk (R0–R3 per `docs/06_ENGINEERING_DISCIPLINE.md`) and run relevant tests before claiming work is complete.
+- Classify risk (R0–R3 per `docs/06_ENGINEERING_DISCIPLINE.md`) and run applicable CI gates before claiming work is complete.
 - Ask before destructive operations, permission changes, production migrations or security-sensitive changes.
 
 ## Repository layout
 
-- Follow `docs/06_ENGINEERING_DISCIPLINE.md` for module boundaries (`apps/web`, `workers/research`, `packages/contracts`, `database/migrations`, `database/tests`, `tests/fixtures`).
+- Follow `docs/06_ENGINEERING_DISCIPLINE.md` for module boundaries (`apps/web`, `workers/research`, `packages/contracts`, `supabase/migrations`, `supabase/tests/database`).
+
+## Authentication (when implemented)
+
+- Follow `docs/AUTH_AND_SESSION_DOCTRINE.md`: one server-side auth decision per request, `@supabase/ssr` cookies, coalesced refresh, PWA resume, fail-closed private data. Middleware may continue to the server guard on a transport failure; it must not grant access.
 
 ## Design system
 
 - `docs/design/tokens.css` is the design authority; `apps/web/src/styles/tokens.css` must stay aligned.
-- Responsive shell contract: `docs/RESPONSIVE_LAYOUT_CONTRACT.md`; layout utilities in `apps/web/src/styles/layout.css`.
-- Components use semantic tokens and Tailwind theme aliases only — no raw hex/RGB/HSL in `apps/web/src` outside `styles/tokens.css`.
-- Run `npm run check:tokens` before finishing UI work.
-- Responsive shell contract: `docs/RESPONSIVE_LAYOUT_CONTRACT.md`; run `npm run test:e2e` after layout changes.
+- Responsive shell: `docs/RESPONSIVE_LAYOUT_CONTRACT.md`; layout utilities in `apps/web/src/styles/layout.css`.
+- Components use semantic tokens only — no raw hex/RGB/HSL in `apps/web/src` outside `styles/*.css` token files.
+- Run `npm run check:tokens` and `npm run test:e2e` after layout changes.
 
 ## Data and research integrity
 
 - Facts, inferences, scenarios and predictions must remain distinct (see `docs/00_READ_ME_FIRST.md`).
+- Immutable history, versioned models, idempotent ingestion, provenance clocks — `docs/04_ARCHITECTURE_AND_DATA.md`.
 - Do not silently change published research history; append corrections and versions.
 - `workers/research` claim verification must fail closed until registry checks exist.
 
@@ -40,12 +49,13 @@ alwaysApply: true
 
 - Never commit secrets, `.env` files or service role keys to Git.
 - `SUPABASE_SERVICE_ROLE_KEY` is server-only (`apps/web/src/lib/env/server.ts` with `server-only`); never import server env or service role code in client components.
+- Do not apply hosted migrations until `supabase test db` has actually passed for the same Git files. An unrun check is not a pass. MCP must not become a second schema history.
 - Do not implement autonomous trading or connect production Supabase without explicit approval.
 
 ## Database
 
-- Schema evolves only via `database/migrations/` once defined in authoritative docs.
-- RLS and tenant isolation tests belong in `database/tests/` and `tests/database/rls/`.
+- Schema evolves only via `supabase/migrations/` (Git source of truth).
+- RLS tests: `supabase/tests/database/` using synthetic authenticated users.
 
 ## Wealth and privacy
 

@@ -18,6 +18,16 @@ Portfolio,Same cashflows passive vs test strategy,Exact external cashflow match
 Portfolio,XIRR with multiple/no root,Explicit unavailable/ambiguous result
 Privacy,User A guesses User B UUID,Denied via RLS/API/storage/export
 Privacy,Service role in frontend bundle,CI fails
+Auth,Protected route without session,No private data rendered; fail closed
+Auth,Expired refresh token,Re-auth prompt; no redirect loop
+Auth,PWA resume after background,Session valid or clean re-auth; no spurious logout
+Auth,Concurrent session refresh,No cookie corruption or race logout
+Auth,Ambiguous refresh failure,Transient retry; private data withheld; session not cleared as a guess
+Auth,Framework redirect inside auth error handler,Redirect is rethrown; return path kept
+Database,SECURITY DEFINER callable by anon,Denied unless explicitly granted and tested
+Ingest,Partial upstream payload,Authoritative rows are not deleted or blanked
+Database,Remote migration before supabase test db green,Blocked by release policy
+Database,RLS tested only as postgres superuser,Rejected; must use authenticated test roles
 Privacy,User deletion request,Delete private assets while non-personal public method history remains
 Design,"320px, 390px, desktop viewport",No clipped content except explicit table affordance
 Design,Article headline and chart,"Reader can state caveat; alt, units/source/time visible"

@@ -5,7 +5,7 @@
 
 | Gate | Objective | Hard evidence to proceed | Explicitly deferred |
 |---|---|---|---|
-| G0: Ground truth and feasibility | Verify data access/rights and trusted repo foundation | UCITS instrument/price/FX sample, primary macro source with a revision, rights matrix, CI/RLS, token UI prototype | mass feeds, agents, prices, public launch |
+| G0: Ground truth and feasibility | Verify data access/rights and trusted repo foundation | UCITS instrument/price/FX sample, primary macro source with a revision, rights matrix; **CI green**; **executable RLS tests (`supabase test db`) pass before first hosted migration**; token UI prototype; engineering doctrines documented | mass feeds, agents, prices, public launch |
 | G1: Human understanding prototype | Test Today/Explore/Learn/Research presentation | Novices and experienced readers can explain same sample analysis and its uncertainties; mobile/a11y tests | investment signal automation |
 | G2: Portfolio truth | Build manual account journal + deterministic benchmark | Reproducible multi-currency ledger, total return/flows, error states, XIRR/TWR limitations, two-tenant isolation | broker integrations |
 | G3: Method foundation | Implement and reproduce baseline model(s) | documented method cards, verified dataset, named equations/assumptions, transparent benchmark | multiple agents |
@@ -16,7 +16,7 @@
 | G8: Subscription-readiness | Honor founder free cohort and paid entitlement | tested cutoff terms, anti-abuse, billing/security/legal, provider rights, cost viability | trade execution |
 
 ## First three pull requests
-**PR1: Repository and truth primitives.** Next.js app skeleton and tokens, Supabase migration/RLS tests, Python worker scaffold, versioned contracts, static synthetic research story, CI, no LLM. **Pass:** clean setup, CI and mobile story comprehension prototype.
+**PR1: Repository and truth primitives.** Next.js app skeleton and tokens, Supabase migration/RLS tests (**pgTAP green in CI before remote apply**), Python worker scaffold, versioned contracts, static synthetic research story, CI, no LLM. **Pass:** clean setup, CI and mobile story comprehension prototype.
 
 **PR2: Data feasibility proof.** Verify 2–3 chosen UCITS share-class identities and history, documented FX and company/official fund pages, one official historical policy release with amendment, rights matrix. **Pass:** sample real source/quote records are accurately ingested and linked; unknown data blocks.
 

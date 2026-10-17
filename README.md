@@ -17,7 +17,7 @@ Human-centred investment intelligence and long-term wealth-building platform (mo
 |------|---------|
 | `apps/web` | Next.js App Router PWA |
 | `workers/research` | Python research and analytics engine |
-| `database/migrations` | PostgreSQL migrations |
+| `supabase/migrations` | PostgreSQL migrations (Supabase CLI) |
 | `packages/contracts` | Versioned JSON Schemas (mirror of `docs/schemas`) |
 | `docs` | Product and engineering specifications |
 | `tests` | Shared fixtures and future integration tests |
@@ -63,7 +63,10 @@ npm run lint
 npm run test:research
 npm run check:tokens
 npm run test:e2e
+npm run test:db
 ```
+
+Database workflow: `supabase/migrations/`, `npm run db:reset`, `npm run db:test`, `npm run db:types` (requires Docker Desktop locally).
 
 Responsive layout contract: `docs/RESPONSIVE_LAYOUT_CONTRACT.md`.
 ```

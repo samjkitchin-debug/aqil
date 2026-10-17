@@ -1,0 +1,33 @@
+# Aqil — Supabase local development (Git-tracked migrations are source of truth).
+# Linked dev project ref: ojvswermsbbaltjohqph (apply via approved workflow only).
+
+project_id = "ojvswermsbbaltjohqph"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17
+
+[db.migrations]
+enabled = true
+
+[studio]
+# Optional for G0 db/pgTAP workflows; avoids pulling Studio on constrained Windows Docker setups.
+enabled = false
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000"]
+
+[storage]
+# G0 has no storage buckets; disable locally to avoid flaky storage-api health on Windows Docker.
+enabled = false
