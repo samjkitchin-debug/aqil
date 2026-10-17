@@ -6,6 +6,7 @@ from datetime import date
 
 import psycopg
 
+from aqil_research.persistence.calculation_normalize import normalize_calculation_payload
 from aqil_research.pipeline.models import ResearchRun
 
 
@@ -149,7 +150,7 @@ def load_research_run(conn: psycopg.Connection, run_id: str) -> ResearchRun:
         analytical_payload_hash=row[16] or "",
         data_sufficiency=row[17],
         missing_data_reason=row[18],
-        calculation=row[19],
+        calculation=normalize_calculation_payload(row[19]),
         statistical_interpretation=row[20],
         causal_hypothesis=row[21],
         market_pricing=row[22],

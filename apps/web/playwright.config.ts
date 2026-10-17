@@ -24,12 +24,6 @@ export default defineConfig({
     baseURL,
     browserName: "chromium",
     trace: "on-first-retry",
-    extraHTTPHeaders:
-      process.env.CI === "true"
-        ? {
-            "x-aqil-founder-insight": "ci-founder-test-token",
-          }
-        : undefined,
   },
   projects: viewportProjects.map((viewport) => ({
     name: viewport.name,

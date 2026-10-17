@@ -9,6 +9,7 @@ from typing import Literal
 from aqil_research.adapters.registry import AdapterRegistry
 from aqil_research.methods.protocol import MethodContext
 from aqil_research.methods.registry import MethodRegistry
+from aqil_research.persistence.calculation_normalize import normalize_calculation_payload
 from aqil_research.pipeline.evidence import assess_analytical_evidence
 from aqil_research.pipeline.ingestion import IngestionBlockedError, ingest_from_adapter
 from aqil_research.pipeline.integrity import analytical_payload_hash
@@ -232,7 +233,9 @@ def execute_research_run(
         input_snapshot_hash=snapshot_hash,
         data_sufficiency=execution.sufficiency,
         missing_data_reason=execution.missing_reason,
-        calculation=execution.calculation,
+        calculation=(
+            normalize_calculation_payload(execution.calculation) if execution.calculation else None
+        ),
         statistical_interpretation=execution.statistical_interpretation,
         causal_hypothesis=execution.causal_hypothesis,
         market_pricing="unknown",

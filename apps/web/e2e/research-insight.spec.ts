@@ -7,13 +7,14 @@ test.describe("research insight UI", () => {
         name: "aqil_founder_insight",
         value: "ci-founder-test-token",
         url: baseURL!,
+        httpOnly: true,
+        sameSite: "Lax",
       },
     ]);
   });
 
   test("shows fixture research on Today and Research", async ({ page }) => {
     await page.goto("/");
-    await page.reload();
     await expect(page.getByTestId("research-insight")).toBeVisible();
     await expect(page.getByTestId("research-preview-banner")).toContainText(
       /demonstration|internal research preview/i,

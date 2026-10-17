@@ -9,6 +9,7 @@ import psycopg
 
 from aqil_research.methods.configs import SAHM_PUBLISHED, SAHM_SENSITIVITY
 from aqil_research.methods.registry import default_method_registry
+from aqil_research.persistence.calculation_normalize import normalize_calculation_payload
 from aqil_research.persistence.observation_store import load_observations_by_ids
 from aqil_research.persistence.runs import load_research_run, load_run_observation_ids
 from aqil_research.pipeline.models import ResearchExecutionRequest, ResearchRun
@@ -28,9 +29,9 @@ class RunReplayVerification:
             return True
         if self.stored.calculation is None or self.recomputed.calculation is None:
             return False
-        stored = json.dumps(self.stored.calculation, sort_keys=True, default=str)
-        recomputed = json.dumps(self.recomputed.calculation, sort_keys=True, default=str)
-        return stored == recomputed
+        stored = normalize_calculation_payload(self.stored.calculation)
+        recomputed = normalize_calculation_payload(self.recomputed.calculation)
+        return json.dumps(stored, sort_keys=True) == json.dumps(recomputed, sort_keys=True)
 
     @property
     def input_snapshot_hash_match(self) -> bool:
@@ -47,7 +48,10 @@ class RunReplayVerification:
     @property
     def full_match(self) -> bool:
         return (
-            self.input_snapshot_hash_match and self.calculation_match and self.observation_ids_match
+            self.input_snapshot_hash_match
+            and self.calculation_match
+            and self.analytical_payload_hash_match
+            and self.observation_ids_match
         )
 
 
@@ -78,13 +82,19 @@ def recompute_stored_run(conn: psycopg.Connection, run_id: str) -> ResearchRun:
         collect=False,
         primary_adapter_id=stored.adapter_ids[0] if stored.adapter_ids else None,
     )
-    return execute_research_run(
+    recomputed = execute_research_run(
         request,
         store=store,
         rights_records=load_source_rights(),
         method_registry=default_method_registry(),
         executed_at=stored.executed_at,
         run_id=stored.run_id,
+    )
+    return recomputed.model_copy(
+        update={
+            "ingest_notes": list(stored.ingest_notes),
+            "adapter_ids": list(stored.adapter_ids),
+        },
     )
 
 

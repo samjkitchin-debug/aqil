@@ -2,7 +2,7 @@ import "server-only";
 
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { unstable_noStore as noStore } from "next/cache";
+import { connection } from "next/server";
 
 import {
   isFounderResearchAuthorised,
@@ -47,7 +47,7 @@ export type FounderInsightLoadResult =
   | { status: "unauthorized" };
 
 export async function loadFounderResearchInsight(): Promise<FounderInsightLoadResult> {
-  noStore();
+  await connection();
   if (!(await isFounderResearchAuthorised())) {
     return { status: "unauthorized" };
   }
