@@ -41,6 +41,7 @@ def insert_source_retrieval(
     provider_status: str | None,
     response_byte_count: int | None,
     ingest_notes: list[str],
+    response_fingerprint: str | None = None,
 ) -> UUID:
     identity = adapter.identity
     safe_attempts = max(1, attempt_count)
@@ -52,11 +53,11 @@ def insert_source_retrieval(
               adapter_id, adapter_version, retrieved_at, collection_mode,
               endpoint_host, request_series_ids, request_year_start, request_year_end,
               attempt_count, http_status, provider_status, response_byte_count,
-              rights_decision_snapshot, ingest_notes
+              rights_decision_snapshot, ingest_notes, response_fingerprint
             )
             values (
               %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-              %s::jsonb, %s
+              %s::jsonb, %s, %s
             )
             returning retrieval_id
             """,
@@ -79,9 +80,30 @@ def insert_source_retrieval(
                 response_byte_count,
                 psycopg.types.json.Json(rights_decision_snapshot(rights)),
                 ingest_notes,
+                response_fingerprint,
             ),
         )
         row = cur.fetchone()
         if row is None:
             raise RuntimeError("failed to insert source_retrieval")
         return row[0]
+
+
+def find_retrieval_by_fingerprint(
+    conn: psycopg.Connection,
+    dataset_id: str,
+    response_fingerprint: str,
+) -> UUID | None:
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            select retrieval_id
+            from research.source_retrievals
+            where dataset_id = %s and response_fingerprint = %s
+            order by recorded_at desc
+            limit 1
+            """,
+            (dataset_id, response_fingerprint),
+        )
+        row = cur.fetchone()
+        return row[0] if row else None

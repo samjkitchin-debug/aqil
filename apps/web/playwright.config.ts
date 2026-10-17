@@ -34,5 +34,9 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    env: {
+      ...process.env,
+      RESEARCH_INSIGHT_PATH: "fixtures/research-insight.v1.json",
+    },
   },
 });

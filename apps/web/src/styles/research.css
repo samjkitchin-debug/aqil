@@ -1,0 +1,48 @@
+.research-banner {
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  background: var(--colour-surface-subtle);
+  margin-bottom: var(--space-6);
+}
+
+.research-banner--preview {
+  border-color: var(--colour-brand-gold);
+}
+
+.research-headline {
+  font-size: var(--font-size-h2);
+  line-height: 1.25;
+  color: var(--colour-text);
+  margin: 0 0 var(--space-3);
+}
+
+.research-section-title {
+  font-size: var(--font-size-h3);
+  margin: var(--space-6) 0 var(--space-2);
+  color: var(--colour-text);
+}
+
+.research-body {
+  color: var(--colour-text-muted);
+  line-height: var(--line-height-reading);
+  margin: 0;
+}
+
+.research-meta {
+  font-size: var(--font-size-sm);
+  color: var(--colour-text-muted);
+  margin-top: var(--space-4);
+}
+
+.research-chart {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: var(--space-4) 0;
+}
+
+.research-chart-caption {
+  font-size: var(--font-size-xs);
+  color: var(--colour-text-muted);
+}

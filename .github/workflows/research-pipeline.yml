@@ -1,0 +1,58 @@
+name: Research pipeline (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "fixture (offline dry run) or live (requires secrets; not enabled by default)"
+        required: true
+        default: fixture
+        type: choice
+        options:
+          - fixture
+          - live
+
+permissions:
+  contents: read
+
+concurrency:
+  group: research-pipeline-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  collect-and-run:
+    name: Collect and run (dry run)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+      - name: Start local Supabase
+        run: supabase start -x storage-api,imgproxy
+      - name: Apply migrations and provision worker
+        run: |
+          supabase db reset --no-seed
+          supabase db query -f scripts/provision-research-worker-local.sql
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - name: Fixture collect-and-run
+        if: inputs.mode == 'fixture'
+        working-directory: workers/research
+        env:
+          RESEARCH_DATABASE_URL: postgresql://research_worker:research_worker@127.0.0.1:54322/postgres
+        run: |
+          uv sync --group dev
+          uv run aqil-research collect-and-run \
+            --source bls --method sahm \
+            --fixture tests/fixtures/bls/api_lns14000000_success.json \
+            --start-year 2022 --end-year 2025 \
+            --run-id "gha-${{ github.run_id }}" \
+            --allow-evaluation-fallback
+      - name: Live collect-and-run (disabled until hosted secrets approved)
+        if: inputs.mode == 'live'
+        run: |
+          echo "Live mode requires hosted RESEARCH_DATABASE_URL and BLS_API_KEY secrets — not activated in this sprint."
+          exit 1

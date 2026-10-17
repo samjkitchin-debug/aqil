@@ -1,13 +1,18 @@
 import { AppShell } from "@/components/app-shell";
-import { PlaceholderPanel } from "@/components/placeholder-panel";
+import { ResearchEmptyState } from "@/components/research/research-empty-state";
+import { ResearchInsightView } from "@/components/research/research-insight-view";
+import { loadFounderResearchInsight } from "@/lib/research/load-founder-insight";
 
-export default function ResearchPage() {
+export default async function ResearchPage() {
+  const loaded = await loadFounderResearchInsight();
+
   return (
     <AppShell title="Research">
-      <PlaceholderPanel
-        heading="Research"
-        body="The Python research worker will publish reproducible analyses here. No automated recommendations are shown during initialisation."
-      />
+      {loaded.status === "ok" ? (
+        <ResearchInsightView insight={loaded.insight} source={loaded.source} />
+      ) : (
+        <ResearchEmptyState reason={loaded.status === "invalid" ? "invalid" : "missing"} />
+      )}
     </AppShell>
   );
 }

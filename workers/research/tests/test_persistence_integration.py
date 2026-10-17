@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import uuid
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -105,7 +106,7 @@ def test_persisted_run_immutable_after_new_observations(require_db: None) -> Non
     rights = load_source_rights()
     record = next(r for r in rights if r.source_id == SOURCE_ID)
     adapter = FixtureLnCsvAdapter(PROVIDERS / "unemployment_equivalent.csv")
-    run_id = "immutability-run-1"
+    run_id = f"immutability-run-{uuid.uuid4().hex[:12]}"
 
     with research_connection() as conn:
         store, _ = ingest_adapter_to_postgres(

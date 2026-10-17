@@ -38,6 +38,7 @@ jobs:
       - run: npm run test:e2e
         env:
           CI: true
+          RESEARCH_INSIGHT_PATH: fixtures/research-insight.v1.json
 
   database:
     name: Database (Supabase migrations + RLS)
