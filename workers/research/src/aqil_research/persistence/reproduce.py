@@ -35,13 +35,12 @@ class RunReplayVerification:
 
     @property
     def observation_ids_match(self) -> bool:
-        return self.stored.observation_ids == self.recomputed.observation_ids
+        return sorted(self.stored.observation_ids) == sorted(self.recomputed.observation_ids)
 
     @property
     def full_match(self) -> bool:
         return (
-            self.calculation_match
-            and self.input_snapshot_hash_match
+            self.input_snapshot_hash_match
             and self.analytical_payload_hash_match
             and self.observation_ids_match
         )

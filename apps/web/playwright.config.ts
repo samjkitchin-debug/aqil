@@ -22,6 +22,12 @@ export default defineConfig({
     baseURL,
     browserName: "chromium",
     trace: "on-first-retry",
+    extraHTTPHeaders:
+      process.env.CI === "true"
+        ? {
+            "x-aqil-founder-insight": "ci-founder-test-token",
+          }
+        : undefined,
   },
   projects: viewportProjects.map((viewport) => ({
     name: viewport.name,
@@ -39,6 +45,7 @@ export default defineConfig({
       RESEARCH_INSIGHT_PATH: "fixtures/research-insight.v1.json",
       AQIL_ALLOW_RESEARCH_FIXTURE: "true",
       AQIL_FOUNDER_INSIGHT_TOKEN: "ci-founder-test-token",
+      AQIL_ALLOW_FOUNDER_INSIGHT_HEADER: "true",
     },
   },
 });

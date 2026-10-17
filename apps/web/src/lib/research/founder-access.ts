@@ -1,8 +1,9 @@
 import "server-only";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 const FOUNDER_COOKIE = "aqil_founder_insight";
+const FOUNDER_HEADER = "x-aqil-founder-insight";
 
 export function researchFixtureFallbackAllowed(): boolean {
   if (process.env.NODE_ENV === "production") {
@@ -18,5 +19,12 @@ export async function isFounderResearchAuthorised(): Promise<boolean> {
     return process.env.NODE_ENV !== "production";
   }
   const jar = await cookies();
-  return jar.get(FOUNDER_COOKIE)?.value === token;
+  if (jar.get(FOUNDER_COOKIE)?.value === token) {
+    return true;
+  }
+  if (process.env.AQIL_ALLOW_FOUNDER_INSIGHT_HEADER === "true") {
+    const header = (await headers()).get(FOUNDER_HEADER);
+    return header === token;
+  }
+  return false;
 }
