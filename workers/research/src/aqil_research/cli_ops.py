@@ -53,6 +53,18 @@ def register_collect_parsers(sub: argparse._SubParsersAction) -> None:
     export.add_argument("--run-id", required=True)
     export.add_argument("--output", type=Path, default=DEFAULT_WEB_INSIGHT_PATH)
 
+    demo = sub.add_parser(
+        "forward-demo",
+        help="Import fixture forward-intelligence demo and export horizon bundle JSON",
+    )
+    demo.add_argument(
+        "--export-horizon",
+        type=Path,
+        default=None,
+        help="Write forward-horizon.v1.json for the web app",
+    )
+    demo.add_argument("--skip-db", action="store_true", help="Only export JSON bundle")
+
 
 def run_collect(args: argparse.Namespace) -> int:
     if args.source != "bls":
@@ -136,6 +148,33 @@ def run_collect_and_run(args: argparse.Namespace) -> int:
         return 8
     if outcome.recompute_match is False:
         return 9
+    return 0
+
+
+def run_forward_demo(args: argparse.Namespace) -> int:
+    from datetime import UTC, datetime
+
+    from aqil_research.forward.horizon import build_forward_horizon_bundle
+    from aqil_research.forward.persistence import import_demo_fixture_bundle
+
+    now = datetime.now(tz=UTC)
+    if not args.skip_db:
+        try:
+            with research_connection() as conn:
+                import_demo_fixture_bundle(conn, recorded_at=now)
+        except OSError as exc:
+            print(f"database error: {exc}", file=sys.stderr)
+            return 10
+
+    bundle = build_forward_horizon_bundle()
+    if args.export_horizon is not None:
+        args.export_horizon.write_text(
+            json.dumps(bundle, indent=2, default=str) + "\n",
+            encoding="utf-8",
+        )
+        print(f"horizon_exported={args.export_horizon}")
+    else:
+        print(json.dumps(bundle, indent=2, default=str))
     return 0
 
 

@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/forward_horizon.v1.json",
+  "title": "Forward horizon bundle v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "data_mode",
+    "etfs",
+    "events",
+    "exposures"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "data_mode": { "enum": ["fixture_demonstration", "verified_source", "mixed"] },
+    "etfs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/etf_summary" }
+    },
+    "events": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/horizon_event" }
+    },
+    "exposures": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/exposure_link" }
+    },
+    "scenarios": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/scenario_summary" }
+    },
+    "outcomes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/outcome_summary" }
+    }
+  },
+  "$defs": {
+    "etf_summary": {
+      "type": "object",
+      "required": ["etf_id", "legal_name", "ticker", "exchange", "holdings_as_of", "completeness"],
+      "properties": {
+        "etf_id": { "type": "string" },
+        "legal_name": { "type": "string" },
+        "ticker": { "type": "string" },
+        "exchange": { "type": "string" },
+        "isin": { "type": "string" },
+        "holdings_as_of": { "type": "string", "format": "date" },
+        "completeness": { "type": "string" },
+        "top_holdings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "weight_percentage"],
+            "properties": {
+              "name": { "type": "string" },
+              "issuer_id": { "type": "string" },
+              "weight_percentage": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "horizon_event": {
+      "type": "object",
+      "required": ["event_id", "title", "category", "scheduled_date", "date_precision", "materiality", "why_it_matters"],
+      "properties": {
+        "event_id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "subject_label": { "type": "string" },
+        "scheduled_date": { "type": "string" },
+        "scheduled_time": { "type": ["string", "null"] },
+        "timezone": { "type": ["string", "null"] },
+        "date_precision": { "enum": ["confirmed", "estimated", "unknown"] },
+        "materiality": { "enum": ["high", "medium", "low", "insufficient_evidence"] },
+        "source_confidence": { "type": "string" },
+        "why_it_matters": { "type": "string" },
+        "etf_ids": { "type": "array", "items": { "type": "string" } },
+        "is_fixture": { "type": "boolean" }
+      }
+    },
+    "exposure_link": {
+      "type": "object",
+      "required": ["event_id", "etf_id", "issuer_id", "weight_percentage", "materiality"],
+      "properties": {
+        "event_id": { "type": "string" },
+        "etf_id": { "type": "string" },
+        "issuer_id": { "type": "string" },
+        "weight_percentage": { "type": "string" },
+        "materiality": { "type": "string" },
+        "snapshot_as_of": { "type": "string" }
+      }
+    },
+    "scenario_summary": {
+      "type": "object",
+      "required": ["scenario_id", "event_id", "frozen_at", "headline"],
+      "properties": {
+        "scenario_id": { "type": "string" },
+        "event_id": { "type": "string" },
+        "frozen_at": { "type": "string", "format": "date-time" },
+        "headline": { "type": "string" },
+        "upside_case": { "type": "string" },
+        "downside_case": { "type": "string" },
+        "evidence_gaps": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "outcome_summary": {
+      "type": "object",
+      "required": ["outcome_id", "event_id", "scenario_id", "headline"],
+      "properties": {
+        "outcome_id": { "type": "string" },
+        "event_id": { "type": "string" },
+        "scenario_id": { "type": "string" },
+        "headline": { "type": "string" },
+        "expectation_met": { "type": "string" },
+        "surprise_assessment": { "type": "string" }
+      }
+    }
+  }
+}

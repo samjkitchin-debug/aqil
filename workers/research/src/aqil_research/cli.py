@@ -114,6 +114,10 @@ def main(argv: list[str] | None = None) -> int:
         from aqil_research.cli_ops import run_export_insight
 
         return run_export_insight(args)
+    if args.command == "forward-demo":
+        from aqil_research.cli_ops import run_forward_demo
+
+        return run_forward_demo(args)
     return 1
 
 

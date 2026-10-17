@@ -359,3 +359,31 @@ Review M3 PR for: source rights, temporal integrity (latest-revised labelling), 
 ### Next milestone
 Hosted approval path: vault `research_worker` password, apply Git migrations, enable `research-pipeline` live mode with BLS key — then second macro source after Treasury licence resolution.
 
+## Session handover — 2026-10-17 (M3 merge + M4 forward intelligence)
+
+### Current objective
+M3 merged (PR #7); M4 forward-intelligence slice on `m4/forward-intelligence` — PR open, not merged.
+
+### Git
+- **main:** PR #7 merged (`54c4a16`); M3 CI run 39022602296 green.
+- **M4:** `m4/forward-intelligence` (pending push/PR).
+
+### M4 deliverables (summary)
+- Migration `20261017180000_forward_intelligence.sql`; pgTAP `forward_schema.test.sql`.
+- Worker: `forward/` package, `forward-demo` CLI, tests (materiality, horizon schema, persistence integration in CI).
+- Web: `forward_horizon.v1` fixture + founder-gated UI (Today, `/calendar`, Explore, Research); e2e `forward-horizon.spec.ts`.
+
+### Tests (local agent)
+| Check | Result |
+|-------|--------|
+| `uv run pytest` (minus forward integration) | 76 passed, 1 skipped |
+| Forward unit tests | 3 passed |
+| `npm run typecheck` / lint | pass |
+| M4 GitHub CI | pending after push |
+
+### Backlog
+- AQ-068 → Verified; AQ-069 → Implemented — unverified.
+
+### Grok High review (M4)
+Forward schema security, scenario immutability, fixture labelling, founder gate parity, materiality staleness, contract `forward_horizon.v1`.
+
