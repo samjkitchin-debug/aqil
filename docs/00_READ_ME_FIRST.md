@@ -11,14 +11,16 @@ A coordinated specification for Aqil: a calm, evidence-led, long-horizon wealth 
 4. `04_ARCHITECTURE_AND_DATA.md` — implementation architecture and stable contracts.
 5. `05_HUMAN_EXPERIENCE_AND_DESIGN.md` — people-first UX, Aptos/navy/gold design tokens; `RESPONSIVE_LAYOUT_CONTRACT.md` — shell and PWA layout gates.
 6. `06_ENGINEERING_DISCIPLINE.md` — how to instruct Cursor, test, review, release.
-7. `AUTH_AND_SESSION_DOCTRINE.md` — server-side auth, SSR cookies, PWA session recovery (when auth ships).
-8. `DOCUMENTATION_AUTHORITY.md` — canonical vs reference docs; `sausage-transfer/` is historical only.
-9. `CURSOR_COLLABORATION_WORKFLOW.md` — agent workflow summary.
-10. `07_ROADMAP_AND_GATES.md` plus `07_BUILD_BACKLOG.csv` — actual build order.
-11. `08_GOVERNANCE_AND_BUSINESS.md` — editorial accountability, future billing and compliance gates.
-12. `09_EVIDENCE_AND_METHOD_SOURCE_REGISTER.md` — references and source audit rules.
-13. `schemas/` and `reference/` — implementation examples and **unverified research catalogues**.
-14. `sausage-transfer/` — **historical investigations only**; see `sausage-transfer/README.md`.
+7. `INFORMATION_SECURITY_STANDARD.md` — security-by-design requirements, threat model and control tiers (not certification).
+8. `AUTH_AND_SESSION_DOCTRINE.md` — server-side auth, SSR cookies, PWA session recovery (when auth ships).
+9. `DOCUMENTATION_AUTHORITY.md` — canonical vs reference docs; `sausage-transfer/` is historical only.
+10. `AGENT_OPERATING_RULES.md` — non-negotiable rules for every agent session.
+11. `CURSOR_COLLABORATION_WORKFLOW.md` — agent workflow summary.
+12. `07_ROADMAP_AND_GATES.md` plus `07_BUILD_BACKLOG.csv` — gates and **authoritative progress register**; `CURSOR_SESSION_HANDOVER.md` — session continuity.
+13. `08_GOVERNANCE_AND_BUSINESS.md` — editorial accountability, future billing and compliance gates.
+14. `09_EVIDENCE_AND_METHOD_SOURCE_REGISTER.md` — references and source audit rules.
+15. `schemas/` and `reference/` — implementation examples and **unverified research catalogues**.
+16. `sausage-transfer/` — **historical investigations only**; see `sausage-transfer/README.md`.
 
 ## Non-negotiable distinctions
 - **Facts** are not **inferences**; **scenarios** are not **predictions**; **investment theses** are not **demonstrated alpha**; **paper outcomes** are not **real fills**; **wealth growth from contributions** is not **investment return**.

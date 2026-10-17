@@ -1,5 +1,7 @@
 # AQIL — First Complete End-to-End Vertical Slice
 
+**Sequencing:** Build **`docs/07_ROADMAP_AND_GATES.md` § M1** (macro engine pipeline) first. This document describes the **later** full reader-to-evaluation slice (G4-class), not the immediate next sprint.
+
 ## Outcome
 A real official economic/policy change becomes an accessible source-backed article and a frozen research hypothesis **without** pretending we already know its investment consequences. Any virtual portfolio test is only registered if fund data quality, market pricing and a falsifiable exposure claim pass all gates.
 

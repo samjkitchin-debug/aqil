@@ -1,5 +1,55 @@
 # AQIL — Execution Roadmap and Stage Gates
 
+**Last reconciled:** 17 October 2026 · **Git baseline:** `main` @ `92560cc` (PR #1 merged; CI run 38992659234 green on `main`).
+
+## Progress register
+
+- **Authoritative item list:** `docs/07_BUILD_BACKLOG.csv` (columns include `verification_evidence`, `blockers`, `next_action`).
+- **Statuses:** Not started · In progress · Blocked · Implemented — unverified · Verified · Deferred.
+- **Session continuity:** `docs/CURSOR_SESSION_HANDOVER.md`.
+- **Product chain (do not shortcut):** source acquisition → validation and provenance → deterministic analysis → causal interpretation → evidence verification → publication → longitudinal evaluation. Facts, statistical relationships, causal hypotheses, investment implications and demonstrated predictive value remain **distinct** (`docs/03_RESEARCH_ENGINE_AND_METHODS.md` §1).
+
+## G0 foundation status (not gate-complete)
+
+| Area | Status | Evidence / notes |
+|------|--------|------------------|
+| Next.js scaffold, tokens, shell, nav | **Verified** | CI web job: typecheck, lint, `check:tokens`, build, Playwright e2e |
+| Python research worker scaffold | **Verified** | CI research job: ruff, pytest |
+| Supabase migration + RLS/pgTAP | **Verified** | `20261017103000_create_user_settings.sql`; CI `supabase db reset` + `supabase test db`; types diff |
+| Local Docker database workflow | **Verified** | `scripts/run-db-tests.ps1`, `npm run test:db` (documented; re-run after env changes) |
+| GitHub CI (web / database / research) | **Verified** | Green on `main` post-merge |
+| Versioned JSON schemas (files) | **Implemented — unverified** | `docs/schemas/` mirrored in `packages/contracts/`; **no CI schema validator yet** |
+| Claim verifier fail-closed | **Implemented — unverified** | `workers/research/.../claim_verifier.py` + pytest; registry not built |
+| Auth doctrine | **Verified (document)** | `AUTH_AND_SESSION_DOCTRINE.md`; **no auth UI or private routes** |
+| Information security standard | **Implemented — unverified** | `INFORMATION_SECURITY_STANDARD.md` + CI hardening **in working tree; not on `main` until merged** |
+| Static synthetic research story (PR1) | **Not started** | Research page is placeholder only |
+| Hosted Supabase | **Not started** | No migrations applied to hosted project; `db push` awaits explicit approval after CI pgTAP |
+| G0 hard evidence (roadmap table) | **Not started** | Rights matrix, UCITS sample, macro source+revision, first hosted verify — see AQ-008–AQ-012 |
+
+**G0 gate remains open.** PR1 repository foundation is largely **verified**; **G0 exit criteria** (data feasibility + hosted migration verification) are **not** satisfied.
+
+## M1 — Next active milestone (macro intelligence engine slice)
+
+**Goal:** Prove an economical, source-backed **macro data → deterministic analysis → evidence-linked output** path for a **small, founder-chosen set** of datasets and **one** established method — without claiming investment edge, without LLM publication, and without expanding to the full user journey in `docs/12_FIRST_VERTICAL_SLICE.md` (that remains the later end-to-end gate).
+
+**Backlog anchor:** AQ-064 (parent); implements via AQ-008, AQ-012, AQ-013, AQ-014 and new subtasks as needed.
+
+### M1 acceptance (product value, not “cron ran”)
+
+1. **Rights and feasibility** — `SOURCE_RIGHTS.csv` (or equivalent register) records provider, licence class, permitted actions, cost notes and uncertainty for every dataset used; blocked if rights unknown for the intended use.
+2. **Point-in-time source records** — each ingested observation links to `source_artifact_id`, `retrieved_at`, `as_of`, and `data_vintage` per `docs/03_RESEARCH_ENGINE_AND_METHODS.md` §2.
+3. **Revision handling** — automated test proves a query at historical date **excludes** a later revision (matrix row: Method / retrospective macro revision).
+4. **Deterministic computation** — one `MethodCard` at status ≥ `implemented` with version hash; same inputs reproduce identical outputs in CI.
+5. **Bounded pipeline** — idempotent ingest job, retry/budget hooks or documented stubs (AQ-014); stale or partial feed **fails closed** (no silent fill).
+6. **Evidence linkage** — outputs reference verified claim IDs or explicit `insufficient_evidence`; fail-closed verifier still blocks publication.
+7. **Uncertainty and gaps** — missing series, revisions unknown or licence gaps surface as structured states, not interpolated narrative.
+8. **Regression tests** — pytest (and future contract tests) cover parser, vintage rule, method replay and negative cases (bad vintage, missing field).
+9. **Economical operation** — single-founder scheduling, no paid feed lock-in without documented approval; no agent framework (G0 guard).
+
+**M1 does not require:** auth, portfolio ledger, causal graph UI, LLM agents, ETF eligibility, or public launch.
+
+**When M1 is verified:** update AQ-064 and dependent rows; then either deepen toward `12_FIRST_VERTICAL_SLICE.md` (G4) or complete remaining G0 data items (PR2).
+
 ## Strategic order
 **Do not confuse feature completeness with research reliability.** Two tracks run in parallel: a small human-facing prototype to validate comprehension, and deep evidence/accounting infrastructure to validate correctness. Only combine them in a live research journey after gates pass.
 

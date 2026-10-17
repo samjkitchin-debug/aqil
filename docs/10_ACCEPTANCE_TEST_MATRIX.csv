@@ -26,6 +26,7 @@ Auth,Ambiguous refresh failure,Transient retry; private data withheld; session n
 Auth,Framework redirect inside auth error handler,Redirect is rethrown; return path kept
 Database,SECURITY DEFINER callable by anon,Denied unless explicitly granted and tested
 Ingest,Partial upstream payload,Authoritative rows are not deleted or blanked
+Research,M1 pipeline output without rights record,Blocked; no narrative fill for missing licence
 Database,Remote migration before supabase test db green,Blocked by release policy
 Database,RLS tested only as postgres superuser,Rejected; must use authenticated test roles
 Privacy,User deletion request,Delete private assets while non-personal public method history remains
