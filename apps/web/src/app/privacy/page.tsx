@@ -27,10 +27,11 @@ export default function PrivacyPage() {
 
         <LegalSection title="Authentication">
           <LegalParagraph>
-            Sign-in is handled by Supabase Auth. The application is designed to use Google as the
-            only supported sign-in provider. A dedicated sign-in flow may not yet be visible on
-            every environment; until it is, access to some private features may rely on separate
-            development-only controls rather than your Google account.
+            Sign-in is handled by Supabase Auth. Google is the only enabled provider. A successful
+            Google sign-in creates a Supabase user id. It does not by itself permit use of private
+            research or portfolio screens. Permission is an explicit operator allow-list or an
+            access_grants row. Accounts are not linked automatically because two providers share an
+            email address. There is no separate founder cookie.
           </LegalParagraph>
           <LegalParagraph>
             When you sign in with Google, Supabase receives the profile information Google shares
@@ -49,7 +50,8 @@ export default function PrivacyPage() {
             items={[
               "Account identity in Supabase Auth (linked to your Google sign-in when used).",
               "Optional user settings (for example locale and timezone) in the user_settings table, restricted to your user id.",
-              "If you enter or import portfolio information while signed in: wealth profile metadata, positions (including identifiers such as ISIN or symbol where you provide them), strategic allocation targets, contribution plans and contribution events. These rows are stored in Supabase PostgreSQL and are scoped to your user id.",
+              "An access_grants row, if an operator has created one, recording that your user id may use Aqil. You cannot create that row yourself.",
+              "Portfolio holdings are not stored by the authentication change. A separate portfolio migration, when applied, is designed so each row belongs to one user id.",
             ]}
           />
           <LegalParagraph>

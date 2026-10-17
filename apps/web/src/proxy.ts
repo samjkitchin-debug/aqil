@@ -4,7 +4,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isAllowlisted, parseAuthorisedUserIds } from "@/lib/auth/allowlist";
 import { isPublicPath } from "@/lib/auth/paths";
 import { safeNextPath } from "@/lib/auth/safe-next";
-import { classifyAuthFailure, isPrefetchRequest, shouldContactAuthServer } from "@/lib/auth/session-policy";
+import {
+  classifyAuthFailure,
+  hasAuthSessionCookie,
+  isPrefetchRequest,
+  shouldContactAuthServer,
+} from "@/lib/auth/session-policy";
 
 function copyCookies(from: NextResponse, to: NextResponse) {
   from.cookies.getAll().forEach((cookie) => {
@@ -36,8 +41,12 @@ export async function proxy(request: NextRequest) {
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const next = safeNextPath(`${pathname}${request.nextUrl.search}`);
   if (!url || !anon) {
-    return redirectTo(request, session, "/login", "?error=unavailable");
+    return redirectTo(request, session, "/login", `?error=unavailable&next=${encodeURIComponent(next)}`);
+  }
+  if (!hasAuthSessionCookie(request.cookies.getAll().map((cookie) => cookie.name))) {
+    return redirectTo(request, session, "/login", `?error=signed_out&next=${encodeURIComponent(next)}`);
   }
 
   const supabase = createServerClient(url, anon, {
@@ -58,8 +67,19 @@ export async function proxy(request: NextRequest) {
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) {
     const status = classifyAuthFailure(error);
-    const reason = status === "temporarily_unavailable" ? "unavailable" : status === "terminal_invalid_session" ? "session_ended" : "signed_out";
-    const next = safeNextPath(`${pathname}${request.nextUrl.search}`);
+    if (status === "terminal_invalid_session") {
+      try {
+        await supabase.auth.signOut();
+      } catch {
+        // Cookie cleanup is best-effort. Do not retry.
+      }
+    }
+    const reason =
+      status === "temporarily_unavailable"
+        ? "unavailable"
+        : status === "terminal_invalid_session"
+          ? "session_ended"
+          : "signed_out";
     return redirectTo(request, session, "/login", `?error=${reason}&next=${encodeURIComponent(next)}`);
   }
 

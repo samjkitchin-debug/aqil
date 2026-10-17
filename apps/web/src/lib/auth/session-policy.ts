@@ -22,7 +22,11 @@ export function isProviderEnabled(provider: string): provider is EnabledAuthProv
 
 export function classifyAuthFailure(error: AuthFailure | null): AccessStatus {
   if (!error) return "signed_out";
-  if (error.status === 429 || error.name === "AuthRetryableFetchError") {
+  if (
+    error.status === 429 ||
+    (typeof error.status === "number" && error.status >= 500 && error.status <= 599) ||
+    error.name === "AuthRetryableFetchError"
+  ) {
     return "temporarily_unavailable";
   }
   const message = (error.message ?? "").toLowerCase();
@@ -47,9 +51,34 @@ export function classifyAuthFailure(error: AuthFailure | null): AccessStatus {
   return "signed_out";
 }
 
-/** Public pages must not call the Auth server. That avoids refresh storms while signed out. */
+/** Public pages, including login and the OAuth callback, must not call the Auth server. */
 export function shouldContactAuthServer(isPublic: boolean): boolean {
   return !isPublic;
+}
+
+/** Supabase session cookies only. Names are checked; values are never read here. */
+export function hasAuthSessionCookie(names: readonly string[]): boolean {
+  return names.some((name) => name.startsWith("sb-") && name.includes("-auth-token"));
+}
+
+/**
+ * Deployed environments must name their own origin. Local development may use localhost.
+ * This is not an account-linking rule and does not read email addresses.
+ */
+export function configuredAppOrigin(env: {
+  nodeEnv?: string;
+  appUrl?: string;
+}): { ok: true; origin: string } | { ok: false } {
+  const configured = env.appUrl?.trim().replace(/\/$/, "");
+  if (configured) {
+    try {
+      return { ok: true, origin: new URL(configured).origin };
+    } catch {
+      return { ok: false };
+    }
+  }
+  if (env.nodeEnv === "production") return { ok: false };
+  return { ok: true, origin: "http://localhost:3000" };
 }
 
 export function isPrefetchRequest(headers: { get(name: string): string | null }): boolean {

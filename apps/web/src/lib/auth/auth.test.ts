@@ -7,7 +7,9 @@ import { isPublicPath } from "./paths.ts";
 import { safeNextPath } from "./safe-next.ts";
 import {
   classifyAuthFailure,
+  configuredAppOrigin,
   documentCacheControl,
+  hasAuthSessionCookie,
   isPrefetchRequest,
   isProviderEnabled,
   shouldContactAuthServer,
@@ -71,6 +73,7 @@ test("oauth callback rejects mismatched origins and failed exchanges", () => {
 test("missing auth configuration is one stable unavailable state", () => {
   assert.equal(classifyAuthFailure({ name: "AuthRetryableFetchError" }), "temporarily_unavailable");
   assert.equal(classifyAuthFailure({ status: 429, message: "rate limit" }), "temporarily_unavailable");
+  assert.equal(classifyAuthFailure({ status: 503, message: "upstream unavailable" }), "temporarily_unavailable");
   assert.equal(
     classifyAuthFailure({ message: "Invalid Refresh Token: Already Used" }),
     "terminal_invalid_session",
@@ -79,9 +82,14 @@ test("missing auth configuration is one stable unavailable state", () => {
 });
 
 test("public routes do not contact the auth server", () => {
-  assert.equal(shouldContactAuthServer(true), false);
-  assert.equal(shouldContactAuthServer(false), true);
+  assert.equal(shouldContactAuthServer(isPublicPath("/login")), false);
+  assert.equal(shouldContactAuthServer(isPublicPath("/auth/callback")), false);
+  assert.equal(shouldContactAuthServer(isPublicPath("/research")), true);
   assert.equal(documentCacheControl(), null);
+  assert.equal(hasAuthSessionCookie(["sb-project-auth-token"]), true);
+  assert.equal(hasAuthSessionCookie(["other"]), false);
+  assert.equal(configuredAppOrigin({ nodeEnv: "production" }).ok, false);
+  assert.equal(configuredAppOrigin({ nodeEnv: "development" }).ok, true);
 });
 
 test("prefetch of a private route is recognisable and does not bounce", () => {

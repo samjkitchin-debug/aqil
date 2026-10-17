@@ -19,6 +19,7 @@ export function AppShell({ title, children }: AppShellProps) {
           <div className="flex min-h-[var(--layout-header-height)] items-center justify-between gap-[var(--space-3)]">
             <Link
               href="/"
+              prefetch={false}
               className="aq-brand-title text-brand-navy font-semibold tracking-tight"
             >
               Aqil

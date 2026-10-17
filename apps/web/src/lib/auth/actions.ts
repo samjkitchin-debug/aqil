@@ -3,19 +3,22 @@
 import { redirect } from "next/navigation";
 
 import { safeNextPath } from "@/lib/auth/safe-next";
-import { isProviderEnabled } from "@/lib/auth/session-policy";
+import { configuredAppOrigin, isProviderEnabled } from "@/lib/auth/session-policy";
 import { isSupabaseConfigured } from "@/lib/env/public";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-function appOrigin(): string {
-  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim();
-  if (configured) return configured.replace(/\/$/, "");
-  return "http://localhost:3000";
+function appOrigin(): string | null {
+  const resolved = configuredAppOrigin({
+    nodeEnv: process.env.NODE_ENV,
+    appUrl: process.env.NEXT_PUBLIC_APP_URL,
+  });
+  return resolved.ok ? resolved.origin : null;
 }
 
 export async function signInWithGoogle(formData: FormData): Promise<void> {
   const next = safeNextPath(String(formData.get("next") ?? "/"));
-  if (!isSupabaseConfigured()) {
+  const origin = appOrigin();
+  if (!isSupabaseConfigured() || !origin) {
     redirect("/login?error=unavailable");
   }
 
@@ -23,7 +26,7 @@ export async function signInWithGoogle(formData: FormData): Promise<void> {
     redirect("/login?error=provider_denied");
   }
   const supabase = await createSupabaseServerClient();
-  const redirectTo = `${appOrigin()}/auth/callback?next=${encodeURIComponent(next)}`;
+  const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(next)}`;
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {

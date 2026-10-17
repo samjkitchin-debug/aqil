@@ -422,4 +422,37 @@ Replace the founder-cookie gate with Supabase Google OAuth, explicit founder all
 - After that change the document reload stopped (one 200, then silence on the dev server).
 - Live Google round trip and pgTAP remain outstanding. Docker was offline.
 
+## Session handover — 2026-10-18 (auth audit incorporation)
+
+### Current objective
+Stop the signed-out login loop and keep authentication reliable when Auth is slow, failing, or refreshing, without making the proxy the only authorisation authority.
+
+### Confirmed root cause
+The flicker was a document reload of `/login?error=unavailable`, not a 307 redirect loop. The dev server logged repeated `GET` 200 responses with `Cache-Control: no-store`. Two causes were confirmed in code:
+
+- `proxy.ts` used to call `getUser()` before deciding that `/login` and `/auth/callback` are public. That is removed. Public routes return before any Auth call.
+- The login shell still rendered a brand link to `/` with prefetch enabled, and primary navigation links to protected routes. A protected prefetch that redirected back to login gave the browser another document to load. Protected prefetches now return 204, and links in the shell use `prefetch={false}`.
+
+### What changed
+- No Auth call when there is no Supabase auth cookie. A terminal refresh failure signs out once, then redirects. HTTP 429 and 500–599 are temporary unavailability, not sign-out.
+- Production sign-in and the OAuth callback require `NEXT_PUBLIC_APP_URL`. The callback does not exchange a code when the origin does not match.
+- Allow-list and `access_grants` stay in `resolveAccess()` for the server render. The proxy does not inject an identity header. `getClaims()` is not in the installed Auth SDK. Founder cookie and header paths stay absent.
+- Privacy copy no longer describes a founder cookie or development-only access. It does not claim portfolio rows exist in this branch.
+
+### Tests and verification
+| Check | Result |
+|-------|--------|
+| `node --experimental-strip-types --test src/lib/auth/auth.test.ts` | 10 passed |
+| Browser, 32 seconds on `http://localhost:3000/login?error=unavailable` | Stayed on that URL. 1 navigation, 17 static resources, no protected-route request. Dev log had no further `GET /login` during the wait. |
+| `npm run db:test` | not run — Docker engine offline |
+| Real Google OAuth, expired-token rotation, two tabs, 429/503 against Auth, Playwright, production browser | not run |
+
+### Blockers
+- Docker is offline, so `access_grants` pgTAP and My Wealth RLS are unverified here. My Wealth RLS lives on PR #11, which was not merged.
+- Google client configuration and `AQIL_AUTHORISED_USER_IDS` are outside Git, so a live OAuth round trip was not attempted.
+- A session cookie still produces two sequential `getUser()` calls: proxy refresh, then one React-cached server authorisation. That is the supported cookie-propagation pattern. A live two-tab rotation test was not run.
+
+### Next recommended step
+Re-run `npm run db:test` when Docker is up, then one real Google sign-in once the dashboard client and allow-list are set. Do not merge PR #11 or apply hosted migrations until that evidence exists.
+
 
