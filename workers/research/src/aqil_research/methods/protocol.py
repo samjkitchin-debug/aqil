@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from typing import Literal, Protocol
 
@@ -17,6 +17,9 @@ class MethodContext:
     evaluation_period: date
     analysis_mode: AnalysisMode
     primary_dataset_id: str
+    all_vintages_by_dataset: dict[str, tuple[EconomicObservation, ...]] = field(
+        default_factory=dict,
+    )
 
     def primary_series(self) -> dict[date, EconomicObservation]:
         series = self.inputs_by_dataset.get(self.primary_dataset_id)

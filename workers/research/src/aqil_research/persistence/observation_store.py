@@ -96,6 +96,31 @@ class PostgresDatasetObservationStore:
         return select_as_of_series(rows, dataset_id, decision_at, mode)
 
 
+@dataclass(slots=True)
+class PostgresResearchObservationStore:
+    """Read-only store spanning all datasets on a connection (post-ingest research)."""
+
+    _conn: psycopg.Connection
+
+    def append(self, observation: EconomicObservation) -> AppendResult:
+        raise RuntimeError("PostgresResearchObservationStore is read-only")
+
+    def append_many(self, observations: tuple[EconomicObservation, ...]) -> AppendResult:
+        raise RuntimeError("PostgresResearchObservationStore is read-only")
+
+    def all_observations(self) -> tuple[EconomicObservation, ...]:
+        return load_all_observations(self._conn)
+
+    def as_of(
+        self,
+        dataset_id: str,
+        decision_at: datetime,
+        mode: AnalysisMode,
+    ) -> dict[date, EconomicObservation]:
+        rows = load_observations_for_dataset(self._conn, dataset_id)
+        return select_as_of_series(rows, dataset_id, decision_at, mode)
+
+
 class PostgresObservationStore:
     """Append-only observation store using research.try_insert_observation."""
 

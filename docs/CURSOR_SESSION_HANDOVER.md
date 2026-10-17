@@ -476,4 +476,32 @@ Add the source-backed coverage that does not depend on a licensed ETF holdings f
 ### Git
 - Branch remains `m5/live-intelligence-coverage`. This increment is not committed.
 
+## Session handover — 2026-10-18 (M6 research methods)
+
+### Current objective
+Implement SLOOS C&I (`SUBLPDCILS_N.Q`) and Census advance durable goods (`advm3` / MDM / NO) with a combined macro conditions panel; leave near-term forward spread blocked.
+
+### Git
+- Branch: `m6/research-methods` (from M5 green baseline)
+
+### What changed
+- `SOURCE_RIGHTS.csv`: SLOOS, Census advance orders, blocked `board.yield.ntfs` row.
+- Adapters: `fed_sloos`, `census_adv_orders` (fixture + opt-in live; Census key optional).
+- Methods: `SLOOS_CIL_LENDING_STANDARDS`, `CENSUS_ADV_DURABLE_ORDERS`, `MACRO_CONDITIONS_PANEL` (Sahm unchanged).
+- Orchestration: multi-dataset inputs, per-adapter rights on optional ingest, Census vintage history.
+- Workflow: `collect_and_run_macro_conditions`; insight `build_macro_conditions.py`.
+- Web: `ResearchInsightView` panels for macro conditions method.
+- Fixtures: `tests/fixtures/fed_sloos/`, `tests/fixtures/census/`.
+
+### Tests
+| Check | Result |
+|-------|--------|
+| `uv run pytest` in `workers/research` | 96 passed, 12 skipped (integration needs local Supabase) |
+| `uv run ruff check` | E501 line-length warnings remain on new method strings; no F821 |
+
+### Not done
+- Hosted Supabase migration apply, live schedules, PR merge approval.
+- Full monorepo CI (`npm` web job) not run in this session.
+- Near-term forward spread remains blocked by design.
+
 
