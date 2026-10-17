@@ -18,7 +18,7 @@ function withinHorizon(event: HorizonEvent, horizonDays: number, today: string):
 }
 
 export function ForwardCalendarSection({ bundle, source, horizonDays }: Props) {
-  const today = bundle.generated_at.slice(0, 10);
+  const today = new Date().toISOString().slice(0, 10);
   const events = bundle.events
     .filter((event) => withinHorizon(event, horizonDays, today))
     .sort((a, b) => a.scheduled_date.localeCompare(b.scheduled_date));
