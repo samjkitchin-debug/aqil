@@ -400,9 +400,7 @@ def collect_bls_ics_schedule(
         today = horizon_start or date.today()
         end = horizon_end or date(today.year + 1, 12, 31)
         releases = [
-            release
-            for release in parse_bls_ics(body)
-            if today <= release.starts_at.date() <= end
+            release for release in parse_bls_ics(body) if today <= release.starts_at.date() <= end
         ]
         return [
             (

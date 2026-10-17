@@ -108,9 +108,7 @@ def _load_verified_events(
         )
         scheduled_at = row[4]
         scheduled_date = scheduled_at.date().isoformat() if scheduled_at else "unknown"
-        clock_unstated = (
-            isinstance(payload, dict) and payload.get("clock_timezone_stated") is False
-        )
+        clock_unstated = isinstance(payload, dict) and payload.get("clock_timezone_stated") is False
         scheduled_time = None
         if scheduled_at is not None and not clock_unstated:
             scheduled_time = scheduled_at.isoformat()
