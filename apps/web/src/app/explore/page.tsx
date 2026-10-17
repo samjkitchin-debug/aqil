@@ -22,6 +22,9 @@ async function ExploreForward() {
 export default function ExplorePage() {
   return (
     <AppShell title="Explore">
+      <h1 className="aq-panel-heading mb-[var(--space-4)] font-semibold text-foreground">
+        Explore
+      </h1>
       <Suspense fallback={<ResearchEmptyState reason="missing" />}>
         <ExploreForward />
       </Suspense>

@@ -22,6 +22,9 @@ async function CalendarBody() {
 export default function CalendarPage() {
   return (
     <AppShell title="Calendar">
+      <h1 className="aq-panel-heading mb-[var(--space-4)] font-semibold text-foreground">
+        Calendar
+      </h1>
       <p className="research-body mb-[var(--space-4)]">
         30–90 day catalyst view for the vetted ETF research universe. Filter controls will
         expand as coverage grows.
