@@ -36,7 +36,7 @@ export default defineConfig({
     },
   })),
   webServer: {
-    command: "npm run start",
+    command: process.env.CI ? "npm run dev -- --port 3000" : "npm run start",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
@@ -46,6 +46,7 @@ export default defineConfig({
       AQIL_ALLOW_RESEARCH_FIXTURE: "true",
       AQIL_FOUNDER_INSIGHT_TOKEN: "ci-founder-test-token",
       AQIL_ALLOW_FOUNDER_INSIGHT_HEADER: "true",
+      E2E_USE_DEV_SERVER: process.env.CI ? "true" : "false",
     },
   },
 });

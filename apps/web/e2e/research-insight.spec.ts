@@ -27,6 +27,10 @@ test.describe("research insight UI", () => {
   test("hides founder research without authorisation cookie", async ({
     browser,
   }) => {
+    test.skip(
+      process.env.E2E_USE_DEV_SERVER === "true",
+      "Dev server allows local founder preview without a cookie",
+    );
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto("/research");
