@@ -7,10 +7,10 @@ test.describe("research insight UI", () => {
     await expect(page.getByTestId("research-preview-banner")).toContainText(
       /demonstration|internal research preview/i,
     );
-    await expect(page.getByTestId("research-unemployment-chart")).toBeVisible();
 
     await page.goto("/research");
     await expect(page.getByTestId("research-insight")).toBeVisible();
+    await expect(page.getByTestId("research-unemployment-chart")).toBeVisible();
     await expect(page.getByTestId("research-run-ref")).toContainText("m3-e2e-run");
   });
 
