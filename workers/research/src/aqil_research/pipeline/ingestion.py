@@ -9,7 +9,7 @@ from aqil_research.sources.rights import SourceRightsRecord
 from aqil_research.sources.rights_gate import RightsGateError, assert_rights_for_ingest
 from aqil_research.vintages.store import (
     AppendResult,
-    InMemoryObservationStore,
+    ObservationStore,
     VintageConflictError,
 )
 
@@ -28,7 +28,7 @@ class IngestOutcome:
 
 
 def ingest_from_adapter(
-    store: InMemoryObservationStore,
+    store: ObservationStore,
     adapter: ProviderAdapter,
     rights: SourceRightsRecord,
     *,
@@ -50,6 +50,17 @@ def ingest_from_adapter(
         raise IngestionBlockedError(message) from exc
 
     fetch_result = adapter.fetch()
+    return ingest_from_fetch(store, fetch_result, rights, optional=optional)
+
+
+def ingest_from_fetch(
+    store: ObservationStore,
+    fetch_result: ProviderFetchResult,
+    rights: SourceRightsRecord,
+    *,
+    optional: bool = False,
+) -> IngestOutcome:
+    """Append a pre-fetched provider payload."""
     if fetch_result.errors and not fetch_result.observations:
         if optional:
             return IngestOutcome(

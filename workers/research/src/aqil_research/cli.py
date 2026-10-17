@@ -15,6 +15,10 @@ from aqil_research.methods.configs import SAHM_PUBLISHED
 from aqil_research.methods.evaluation import sahm_window_complete
 from aqil_research.methods.registry import SAHM_METHOD_ID, default_method_registry
 from aqil_research.methods.sahm import SAHM_METHOD_VERSION
+from aqil_research.persistence.connection import research_connection
+from aqil_research.persistence.ingest import ingest_adapter_to_postgres
+from aqil_research.persistence.reproduce import recompute_stored_run
+from aqil_research.persistence.runs import load_research_run, save_research_run
 from aqil_research.pipeline.artefact import ResearchArtefact
 from aqil_research.pipeline.ingestion import IngestionBlockedError, ingest_from_adapter
 from aqil_research.pipeline.models import ResearchExecutionRequest
@@ -70,6 +74,22 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="If the latest month lacks a full Sahm window, use the latest sufficient month",
     )
+    run.add_argument(
+        "--store",
+        choices=["memory", "postgres"],
+        default="memory",
+        help="Observation and run persistence backend (default: memory)",
+    )
+    run.add_argument(
+        "--run-id", type=str, default=None, help="Explicit research run id when persisting"
+    )
+    retrieve = sub.add_parser("retrieve-run", help="Load a persisted research run from PostgreSQL")
+    retrieve.add_argument("--run-id", required=True)
+    retrieve.add_argument(
+        "--recompute",
+        action="store_true",
+        help="Recompute Sahm from frozen observation evidence and print comparison",
+    )
     return parser
 
 
@@ -77,6 +97,8 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "run":
         return _run_bls_sahm(args)
+    if args.command == "retrieve-run":
+        return _retrieve_run(args)
     return 1
 
 
@@ -104,10 +126,59 @@ def _run_bls_sahm(args: argparse.Namespace) -> int:
         fixture_path=args.fixture if not args.live else None,
     )
     adapter = BlsUnemploymentAdapter(config=config, retrieved_at=today)
-    store = InMemoryObservationStore()
     adapter_registry = AdapterRegistry()
     adapter_registry.register(adapter)
+    collection_mode = "live" if args.live else "fixture"
+    ingest_notes: list[str] = []
 
+    if args.store == "postgres":
+        try:
+            with research_connection() as conn:
+                store, ingest = ingest_adapter_to_postgres(
+                    conn,
+                    adapter,
+                    rights,
+                    retrieved_at=today,
+                    collection_mode=collection_mode,
+                )
+                ingest_notes = list(ingest.conflicts)
+                if ingest.fetch and ingest.fetch.errors and not ingest.fetch.observations:
+                    print(ingest.fetch.errors[0].message, file=sys.stderr)
+                    return 6
+                by_period, _evaluation, run = _evaluate_and_run(
+                    store,
+                    rights_records,
+                    today,
+                    args,
+                    run_id=args.run_id,
+                )
+                if not by_period or run is None:
+                    print("No observations available after ingest.", file=sys.stderr)
+                    return 7
+                save_research_run(conn, run)
+                note = render_bls_sahm_research_note(run)
+                _print_run_summary(run, note, store, ingest, args, collection_mode, ingest_notes)
+                if args.export:
+                    artefact = ResearchArtefact(
+                        run=run,
+                        observations=store.all_observations(),
+                        diagnostics=_diagnostics(
+                            args, store, ingest, collection_mode, ingest_notes
+                        ),
+                        research_note=note,
+                        persistence="postgresql",
+                    )
+                    args.export.write_text(artefact.to_json(), encoding="utf-8")
+                    print(f"exported={args.export}")
+                return 0 if run.execution_status == "completed" else 8
+        except IngestionBlockedError as exc:
+            print(str(exc), file=sys.stderr)
+            return 5
+        except OSError as exc:
+            print(f"database error: {exc}", file=sys.stderr)
+            return 10
+
+    store = InMemoryObservationStore()
     try:
         ingest = ingest_from_adapter(store, adapter, rights, optional=False)
     except IngestionBlockedError as exc:
@@ -118,21 +189,76 @@ def _run_bls_sahm(args: argparse.Namespace) -> int:
         print(ingest.fetch.errors[0].message, file=sys.stderr)
         return 6
 
-    by_period = store.as_of(BLS_DATASET_ID, today, AnalysisMode.LATEST_REVISED)
-    if not by_period:
+    by_period, _evaluation, run = _evaluate_and_run(
+        store,
+        rights_records,
+        today,
+        args,
+        run_id=args.run_id,
+    )
+    if not by_period or run is None:
         print("No observations available after ingest.", file=sys.stderr)
         return 7
+    note = render_bls_sahm_research_note(run)
+    _print_run_summary(run, note, store, ingest, args, collection_mode, ingest_notes)
+    if args.export:
+        artefact = ResearchArtefact(
+            run=run,
+            observations=store.all_observations(),
+            diagnostics=_diagnostics(args, store, ingest, collection_mode, ingest_notes),
+            research_note=note,
+        )
+        args.export.write_text(artefact.to_json(), encoding="utf-8")
+        print(f"exported={args.export}")
+    return 0 if run.execution_status == "completed" else 8
+
+
+def _retrieve_run(args: argparse.Namespace) -> int:
+    try:
+        with research_connection() as conn:
+            run = load_research_run(conn, args.run_id)
+            print(f"run_id={run.run_id}")
+            print(f"execution_status={run.execution_status}")
+            print(f"analytical_payload_hash={run.analytical_payload_hash}")
+            if args.recompute:
+                fresh = recompute_stored_run(conn, args.run_id)
+                print(f"recompute_calculation_match={fresh.calculation == run.calculation}")
+    except LookupError as exc:
+        print(str(exc), file=sys.stderr)
+        return 11
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+    return 0
+
+
+def _evaluate_and_run(
+    store: object,
+    rights_records: object,
+    today: datetime,
+    args: argparse.Namespace,
+    *,
+    run_id: str | None,
+):
+    from aqil_research.methods.evaluation import latest_sahm_evaluation_period
+    from aqil_research.vintages.store import ObservationStore
+
+    if not isinstance(store, ObservationStore):
+        raise TypeError("store must implement ObservationStore")
+    by_period = store.as_of(BLS_DATASET_ID, today, AnalysisMode.LATEST_REVISED)
+    if not by_period:
+        return {}, None, None
     if args.evaluation_period:
         evaluation = datetime.fromisoformat(args.evaluation_period).date()
         if evaluation.day != 1:
             print("evaluation-period must be the first day of a month.", file=sys.stderr)
-            return 7
+            return by_period, None, None
         if not sahm_window_complete(by_period, evaluation):
             print(
                 f"Insufficient months for Sahm at {evaluation.isoformat()}.",
                 file=sys.stderr,
             )
-            return 7
+            return by_period, None, None
     else:
         evaluation = max(by_period)
         if not sahm_window_complete(by_period, evaluation):
@@ -142,13 +268,11 @@ def _run_bls_sahm(args: argparse.Namespace) -> int:
                     "Pass --allow-evaluation-fallback or --evaluation-period.",
                     file=sys.stderr,
                 )
-                return 7
-            from aqil_research.methods.evaluation import latest_sahm_evaluation_period
-
+                return by_period, None, None
             fallback = latest_sahm_evaluation_period(by_period)
             if fallback is None:
                 print("No month has a complete Sahm window.", file=sys.stderr)
-                return 7
+                return by_period, None, None
             evaluation = fallback
     request = ResearchExecutionRequest(
         source_id=BLS_SOURCE_ID,
@@ -167,35 +291,57 @@ def _run_bls_sahm(args: argparse.Namespace) -> int:
         rights_records=rights_records,
         method_registry=default_method_registry(),
         executed_at=today,
+        run_id=run_id,
     )
-    note = render_bls_sahm_research_note(run)
-    diagnostics = {
+    return by_period, evaluation, run
+
+
+def _diagnostics(
+    args: argparse.Namespace,
+    store: object,
+    ingest: object,
+    collection_mode: str,
+    ingest_notes: list[str],
+) -> dict[str, object]:
+    from aqil_research.vintages.store import ObservationStore
+
+    count = len(store.all_observations()) if isinstance(store, ObservationStore) else 0
+    conflicts = list(getattr(ingest, "conflicts", ())) or ingest_notes
+    diagnostics: dict[str, object] = {
         "live": bool(args.live),
-        "start_year": start_year,
-        "end_year": end_year,
-        "observation_count": len(store.all_observations()),
-        "ingest_conflicts": list(ingest.conflicts),
-        "adapter_id": adapter.identity.adapter_id,
+        "start_year": args.start_year,
+        "end_year": args.end_year,
+        "observation_count": count,
+        "ingest_conflicts": conflicts,
+        "collection_mode": collection_mode,
         "method_version": SAHM_METHOD_VERSION,
     }
-    if ingest.fetch:
-        diagnostics["provider_errors"] = [error.message for error in ingest.fetch.errors]
+    fetch = getattr(ingest, "fetch", None)
+    if fetch and fetch.errors:
+        diagnostics["provider_errors"] = [error.message for error in fetch.errors]
+    return diagnostics
 
-    artefact = ResearchArtefact(
-        run=run,
-        observations=store.all_observations(),
-        diagnostics=diagnostics,
-        research_note=note,
-    )
+
+def _print_run_summary(
+    run: object,
+    note: str,
+    store: object,
+    ingest: object,
+    args: argparse.Namespace,
+    collection_mode: str,
+    ingest_notes: list[str],
+) -> None:
+    from aqil_research.vintages.store import ObservationStore
+
     print(note)
     print("")
     print(f"execution_status={run.execution_status} data_sufficiency={run.data_sufficiency}")
     print(f"analytical_payload_hash={run.analytical_payload_hash}")
-    print(f"requests=1 live={bool(args.live)} observations={len(store.all_observations())}")
-    if args.export:
-        args.export.write_text(artefact.to_json(), encoding="utf-8")
-        print(f"exported={args.export}")
-    return 0 if run.execution_status == "completed" else 8
+    count = len(store.all_observations()) if isinstance(store, ObservationStore) else 0
+    print(
+        f"requests=1 live={bool(args.live)} store={args.store} "
+        f"mode={collection_mode} observations={count}",
+    )
 
 
 def _collection_allowed(rights: object) -> bool:

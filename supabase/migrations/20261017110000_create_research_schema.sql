@@ -644,32 +644,10 @@ revoke all on all functions in schema research from anon;
 revoke all on all functions in schema research from authenticated;
 revoke all on all functions in schema research from service_role;
 
-grant execute on function research.try_insert_observation(
-  text,
-  uuid,
-  text,
-  text,
-  text,
-  text,
-  date,
-  date,
-  text,
-  text,
-  text,
-  text,
-  text,
-  text,
-  text,
-  date,
-  timestamptz,
-  timestamptz,
-  text,
-  timestamptz,
-  timestamptz,
-  text,
-  text,
-  text
-) to research_writer;
+grant execute on all functions in schema research to research_writer;
+
+alter default privileges in schema research
+grant execute on functions to research_writer;
 
 -- Migration owner only (local CI / hosted apply role). Not granted to anon, authenticated or service_role.
 grant research_writer to postgres;

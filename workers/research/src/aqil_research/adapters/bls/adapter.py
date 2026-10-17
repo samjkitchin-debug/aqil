@@ -36,6 +36,7 @@ class BlsUnemploymentAdapter:
 
     config: BlsAdapterConfig
     retrieved_at: datetime | None = None
+    _last_diagnostics: object | None = None
 
     @property
     def identity(self) -> ProviderIdentity:
@@ -82,6 +83,7 @@ class BlsUnemploymentAdapter:
                 live=self.config.live,
                 fixture_payload=fixture_payload,
             )
+            self._last_diagnostics = api_response.diagnostics
             parsed: BlsParseResult = parse_bls_payload(
                 api_response.payload,
                 adapter_version=f"{ADAPTER_ID}:{ADAPTER_VERSION}",
