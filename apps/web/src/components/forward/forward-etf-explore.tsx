@@ -26,6 +26,11 @@ export function ForwardEtfExplore({ bundle }: Props) {
       <p className="research-body">
         Holdings snapshot as of {etf.holdings_as_of}. Completeness: {etf.completeness}.
       </p>
+      {bundle.data_mode !== "verified_only" && (
+        <p className="research-meta">
+          Synthetic demonstration weights and catalysts — not provider or consensus data.
+        </p>
+      )}
       <h3 className="research-section-title">Largest supported exposures</h3>
       <ul className="forward-horizon-list">
         {etf.top_holdings.map((line) => (

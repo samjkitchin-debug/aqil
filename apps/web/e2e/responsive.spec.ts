@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-const routes = ["/", "/explore", "/learn", "/research", "/my-wealth"];
+const routes = ["/", "/explore", "/calendar", "/learn", "/research", "/my-wealth"];
 
 async function expectNoHorizontalOverflow(page: Page) {
   const metrics = await page.evaluate(() => {
@@ -53,7 +53,14 @@ test.describe("responsive shell", () => {
     const nav = page.getByRole("navigation", { name: "Primary" });
     await expect(nav).toBeVisible();
 
-    for (const label of ["Today", "Explore", "My wealth", "Learn", "Research"]) {
+    for (const label of [
+      "Today",
+      "Explore",
+      "Calendar",
+      "My wealth",
+      "Learn",
+      "Research",
+    ]) {
       const link = nav.getByRole("link", { name: label });
       await expect(link).toBeVisible();
       await expect(link).toBeEnabled();
