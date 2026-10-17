@@ -162,6 +162,23 @@ def run_sahm(
     )
 
 
+def sahm_threshold_crossed(
+    by_period: dict[date, EconomicObservation],
+    evaluation_period: date,
+    config: SahmConfig,
+) -> bool:
+    """True only when the threshold is met and the prior month was below threshold."""
+    current = run_sahm(by_period, evaluation_period, config)
+    if not current.triggered:
+        return False
+    prior_month = _add_months(evaluation_period, -1)
+    try:
+        prior = run_sahm(by_period, prior_month, config)
+    except SahmMethodError:
+        return False
+    return not prior.triggered
+
+
 def _validate_input_contract(by_period: dict[date, EconomicObservation]) -> None:
     for row in by_period.values():
         if row.geography != REQUIRED_GEOGRAPHY:

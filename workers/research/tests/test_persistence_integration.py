@@ -141,3 +141,5 @@ def test_persisted_run_immutable_after_new_observations(require_db: None) -> Non
 
         recompute = recompute_stored_run(conn, run_id)
         assert recompute.calculation == run.calculation
+        assert recompute.input_snapshot_hash == run.input_snapshot_hash
+        assert recompute.analytical_payload_hash == run.analytical_payload_hash

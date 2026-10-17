@@ -3,20 +3,30 @@ import "server-only";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+import {
+  isFounderResearchAuthorised,
+  researchFixtureFallbackAllowed,
+} from "@/lib/research/founder-access";
 import type { ResearchInsightV1 } from "@/lib/research/types";
 
 const FIXTURE_PATH = path.join(process.cwd(), "fixtures", "research-insight.v1.json");
 const LOCAL_PATH = path.join(process.cwd(), ".local", "research-insight.v1.json");
 
 function insightCandidates(): string[] {
+  const paths: string[] = [];
   const configured = process.env.RESEARCH_INSIGHT_PATH?.trim();
   if (configured) {
     const resolved = path.isAbsolute(configured)
       ? configured
       : path.join(/* turbopackIgnore: true */ process.cwd(), configured);
-    return [resolved, FIXTURE_PATH];
+    paths.push(resolved);
+  } else {
+    paths.push(LOCAL_PATH);
   }
-  return [LOCAL_PATH, FIXTURE_PATH];
+  if (researchFixtureFallbackAllowed() && !paths.includes(FIXTURE_PATH)) {
+    paths.push(FIXTURE_PATH);
+  }
+  return paths;
 }
 
 function isValidInsight(data: unknown): data is ResearchInsightV1 {
@@ -32,9 +42,14 @@ function isValidInsight(data: unknown): data is ResearchInsightV1 {
 export type FounderInsightLoadResult =
   | { status: "ok"; insight: ResearchInsightV1; source: "local" | "fixture" }
   | { status: "missing" }
-  | { status: "invalid" };
+  | { status: "invalid" }
+  | { status: "unauthorized" };
 
 export async function loadFounderResearchInsight(): Promise<FounderInsightLoadResult> {
+  if (!(await isFounderResearchAuthorised())) {
+    return { status: "unauthorized" };
+  }
+
   const candidates = insightCandidates();
   for (const filePath of candidates) {
     try {
@@ -43,7 +58,8 @@ export async function loadFounderResearchInsight(): Promise<FounderInsightLoadRe
       if (!isValidInsight(parsed)) {
         return { status: "invalid" };
       }
-      const source = filePath.includes("fixtures") ? "fixture" : "local";
+      const isFixture = filePath.includes(`${path.sep}fixtures${path.sep}`);
+      const source = isFixture ? "fixture" : "local";
       return { status: "ok", insight: parsed, source };
     } catch (err) {
       const code = (err as NodeJS.ErrnoException).code;

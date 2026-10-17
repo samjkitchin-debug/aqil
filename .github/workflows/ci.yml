@@ -39,6 +39,8 @@ jobs:
         env:
           CI: true
           RESEARCH_INSIGHT_PATH: fixtures/research-insight.v1.json
+          AQIL_ALLOW_RESEARCH_FIXTURE: "true"
+          AQIL_FOUNDER_INSIGHT_TOKEN: ci-founder-test-token
 
   database:
     name: Database (Supabase migrations + RLS)

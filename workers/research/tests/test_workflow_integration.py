@@ -76,6 +76,7 @@ def test_collect_and_run_fixture_e2e(require_db: None) -> None:
         )
     assert outcome.run_id == run_id
     assert outcome.execution_status == "completed"
+    assert outcome.recompute_match is True
     with research_connection() as conn:
         from aqil_research.persistence.reproduce import recompute_stored_run
         from aqil_research.persistence.runs import load_research_run

@@ -12,7 +12,6 @@ from aqil_research.collection.service import collect_bls_unemployment
 from aqil_research.insight.build_sahm import build_sahm_insight
 from aqil_research.insight.io import DEFAULT_WEB_INSIGHT_PATH, write_insight
 from aqil_research.persistence.connection import research_connection
-from aqil_research.persistence.reproduce import recompute_stored_run
 from aqil_research.persistence.runs import load_research_run
 from aqil_research.workflow.collect_and_run import collect_and_run_sahm
 
@@ -144,8 +143,10 @@ def run_export_insight(args: argparse.Namespace) -> int:
     try:
         with research_connection() as conn:
             run = load_research_run(conn, args.run_id)
-            recompute = recompute_stored_run(conn, args.run_id)
-            match = recompute.analytical_payload_hash == run.analytical_payload_hash
+            from aqil_research.persistence.reproduce import verify_stored_run_replay
+
+            replay = verify_stored_run_replay(conn, args.run_id)
+            match = replay.full_match
             insight = build_sahm_insight(run)
             write_insight(args.output, insight)
     except OSError as exc:

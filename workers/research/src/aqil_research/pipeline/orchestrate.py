@@ -24,6 +24,26 @@ from aqil_research.sources.rights_gate import (
 from aqil_research.vintages.store import ObservationStore, content_snapshot_hash
 
 
+def cited_observation_snapshot_hash(
+    store: ObservationStore,
+    observation_ids: list[str],
+) -> str:
+    """Hash only observations cited on the run (frozen evidence set)."""
+    if not observation_ids:
+        return content_snapshot_hash(())
+    wanted = frozenset(observation_ids)
+    cited = tuple(
+        sorted(
+            (obs for obs in store.all_observations() if obs.observation_id in wanted),
+            key=lambda row: row.observation_id,
+        )
+    )
+    if len(cited) != len(wanted):
+        missing = wanted - {row.observation_id for row in cited}
+        raise ValueError(f"cited observations missing from store: {sorted(missing)}")
+    return content_snapshot_hash(cited)
+
+
 def execute_research_run(
     request: ResearchExecutionRequest,
     *,
@@ -123,8 +143,9 @@ def execute_research_run(
 
     evaluation_period = date.fromisoformat(request.evaluation_period)
     by_period = store.as_of(request.dataset_id, request.decision_at, request.analysis_mode)
-    snapshot_rows = tuple(by_period[period] for period in sorted(by_period))
-    snapshot_hash = content_snapshot_hash(snapshot_rows)
+    as_of_snapshot_hash = content_snapshot_hash(
+        tuple(by_period[period] for period in sorted(by_period)),
+    )
 
     method = method_registry.get(request.method_id)
     try:
@@ -137,7 +158,7 @@ def execute_research_run(
             wall_clock=wall_clock,
             run_id=run_id,
             rights=rights,
-            input_snapshot_hash=snapshot_hash,
+            input_snapshot_hash=as_of_snapshot_hash,
             method=method,
         )
 
@@ -157,11 +178,16 @@ def execute_research_run(
             wall_clock=wall_clock,
             run_id=run_id,
             rights=rights,
-            input_snapshot_hash=snapshot_hash,
+            input_snapshot_hash=as_of_snapshot_hash,
             method=method,
             config_id=getattr(config, "config_id", ""),
             config_hash=method.config_hash(config),
         )
+
+    if execution.observation_ids:
+        snapshot_hash = cited_observation_snapshot_hash(store, list(execution.observation_ids))
+    else:
+        snapshot_hash = content_snapshot_hash(())
 
     execution_status: Literal["completed", "completed_insufficient"] = (
         "completed" if execution.sufficiency == "sufficient" else "completed_insufficient"

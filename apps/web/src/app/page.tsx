@@ -18,11 +18,14 @@ async function MacroIntelligenceSection() {
     );
   }
 
-  return (
-    <ResearchEmptyState
-      reason={loaded.status === "invalid" ? "invalid" : "missing"}
-    />
-  );
+  const reason =
+    loaded.status === "invalid"
+      ? "invalid"
+      : loaded.status === "unauthorized"
+        ? "unauthorized"
+        : "missing";
+
+  return <ResearchEmptyState reason={reason} />;
 }
 
 export default function TodayPage() {

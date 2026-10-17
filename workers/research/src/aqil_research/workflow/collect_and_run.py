@@ -15,8 +15,8 @@ from aqil_research.insight.models import ChartPoint, ResearchInsight
 from aqil_research.methods.configs import SAHM_PUBLISHED
 from aqil_research.methods.evaluation import sahm_window_complete
 from aqil_research.methods.registry import SAHM_METHOD_ID, default_method_registry
-from aqil_research.persistence.reproduce import recompute_stored_run
-from aqil_research.persistence.runs import load_research_run, save_research_run
+from aqil_research.persistence.reproduce import verify_stored_run_replay
+from aqil_research.persistence.runs import save_research_run
 from aqil_research.pipeline.models import ResearchExecutionRequest
 from aqil_research.pipeline.orchestrate import execute_research_run
 from aqil_research.sources.rights import load_source_rights
@@ -143,9 +143,8 @@ def collect_and_run_sahm(
         run_id=run_id,
     )
     save_research_run(conn, run)
-    reloaded = load_research_run(conn, run_id)
-    recompute = recompute_stored_run(conn, run_id)
-    recompute_match = recompute.analytical_payload_hash == reloaded.analytical_payload_hash
+    replay = verify_stored_run_replay(conn, run_id)
+    recompute_match = replay.full_match
 
     chart_points = _chart_points(by_period)
     insight = build_sahm_insight(run, chart_points=chart_points)

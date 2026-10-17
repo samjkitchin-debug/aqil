@@ -21,26 +21,30 @@ def build_sahm_insight(
     insight_id = f"insight-{run.run_id}"
 
     calc = run.calculation or {}
-    triggered = bool(calc.get("triggered"))
+    threshold_met = bool(calc.get("threshold_met", calc.get("triggered")))
+    threshold_crossed = bool(calc.get("threshold_crossed"))
     gap = calc.get("gap_percentage_points")
     sufficient = run.data_sufficiency == "sufficient" and run.calculation is not None
 
     if not sufficient:
         headline = "Latest data does not support a complete Sahm assessment."
-    elif triggered:
+    elif threshold_crossed:
         headline = "The Sahm recession indicator has crossed its conventional threshold."
+    elif threshold_met:
+        headline = "The Sahm recession indicator meets its conventional threshold."
     elif gap is not None and float(gap) > 0:
         headline = "US unemployment deterioration has increased."
     else:
         headline = "Latest data does not satisfy the Sahm threshold."
 
     if sufficient:
+        crossing_note = f"Threshold crossed (prior month below threshold): {threshold_crossed}."
         what_changed = (
             f"Evaluation month {calc.get('evaluation_period')}: three-month average "
             f"{calc.get('three_month_average')}% versus a prior 12-month low of "
             f"{calc.get('prior_twelve_month_low_of_average')}% (gap "
             f"{calc.get('gap_percentage_points')} percentage points). "
-            f"Published 0.50 threshold met: {calc.get('triggered')}."
+            f"Published 0.50 threshold met: {threshold_met}. {crossing_note}"
         )
     else:
         what_changed = run.missing_data_reason or "Insufficient observations for Sahm window."
