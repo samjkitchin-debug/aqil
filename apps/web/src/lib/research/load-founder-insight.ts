@@ -5,20 +5,18 @@ import path from "node:path";
 
 import type { ResearchInsightV1 } from "@/lib/research/types";
 
-const FIXTURE_FALLBACK = path.join(
-  process.cwd(),
-  "fixtures",
-  "research-insight.v1.json",
-);
+const FIXTURE_PATH = path.join(process.cwd(), "fixtures", "research-insight.v1.json");
+const LOCAL_PATH = path.join(process.cwd(), ".local", "research-insight.v1.json");
 
-function insightPath(): string {
+function insightCandidates(): string[] {
   const configured = process.env.RESEARCH_INSIGHT_PATH?.trim();
   if (configured) {
-    return path.isAbsolute(configured)
+    const resolved = path.isAbsolute(configured)
       ? configured
-      : path.join(process.cwd(), configured);
+      : path.join(/* turbopackIgnore: true */ process.cwd(), configured);
+    return [resolved, FIXTURE_PATH];
   }
-  return path.join(process.cwd(), ".local", "research-insight.v1.json");
+  return [LOCAL_PATH, FIXTURE_PATH];
 }
 
 function isValidInsight(data: unknown): data is ResearchInsightV1 {
@@ -37,7 +35,7 @@ export type FounderInsightLoadResult =
   | { status: "invalid" };
 
 export async function loadFounderResearchInsight(): Promise<FounderInsightLoadResult> {
-  const candidates = [insightPath(), FIXTURE_FALLBACK];
+  const candidates = insightCandidates();
   for (const filePath of candidates) {
     try {
       const raw = await readFile(filePath, "utf8");
