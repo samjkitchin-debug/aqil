@@ -1,7 +1,7 @@
 import type { ForwardHorizonV1 } from "@/lib/forward/types";
 
 const MATERIALITY = new Set(["high", "medium", "low", "insufficient_evidence"]);
-const DATE_PRECISION = new Set(["confirmed", "estimated", "unknown"]);
+const DATE_PRECISION = new Set(["confirmed", "estimated", "tentative", "unknown"]);
 const DATA_MODE = new Set(["fixture_demonstration", "verified_source", "mixed"]);
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -68,7 +68,11 @@ export function validateForwardHorizon(data: unknown): data is ForwardHorizonV1 
       return false;
     }
     if (typeof event.materiality !== "string" || !MATERIALITY.has(event.materiality)) return false;
-    if (event.materiality_basis !== "calculated" && event.materiality_basis !== "insufficient_evidence") {
+    if (
+      event.materiality_basis !== "calculated" &&
+      event.materiality_basis !== "insufficient_evidence" &&
+      event.materiality_basis !== "macro_qualitative"
+    ) {
       return false;
     }
     if (event.interpretation_status !== "unverified") return false;

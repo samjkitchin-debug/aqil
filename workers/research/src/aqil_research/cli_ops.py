@@ -78,7 +78,7 @@ def register_collect_parsers(sub: argparse._SubParsersAction) -> None:
     collect_fwd.add_argument("--fixture", type=Path, default=None)
     collect_fwd.add_argument("--horizon-days", type=int, default=180)
 
-    coverage = sub.add_parser(
+    sub.add_parser(
         "forward-coverage",
         help="Print forward intelligence coverage and health report (JSON)",
     )
