@@ -83,6 +83,7 @@ def test_collect_and_run_fixture_e2e(require_db: None) -> None:
             replay = verify_stored_run_replay(conn, run_id)
             raise AssertionError(
                 f"replay mismatch: input_snapshot={replay.input_snapshot_hash_match}, "
+                f"calculation={replay.calculation_match}, "
                 f"payload={replay.analytical_payload_hash_match}, "
                 f"observation_ids={replay.observation_ids_match}, "
                 f"warnings={outcome.warnings}",

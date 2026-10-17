@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 
 import psycopg
@@ -23,7 +24,13 @@ class RunReplayVerification:
 
     @property
     def calculation_match(self) -> bool:
-        return self.stored.calculation == self.recomputed.calculation
+        if self.stored.calculation is None and self.recomputed.calculation is None:
+            return True
+        if self.stored.calculation is None or self.recomputed.calculation is None:
+            return False
+        stored = json.dumps(self.stored.calculation, sort_keys=True, default=str)
+        recomputed = json.dumps(self.recomputed.calculation, sort_keys=True, default=str)
+        return stored == recomputed
 
     @property
     def input_snapshot_hash_match(self) -> bool:
