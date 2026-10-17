@@ -49,6 +49,8 @@ jobs:
         run: npx playwright test e2e/forward-verified-macro.spec.ts --project=verified-macro
         env:
           CI: true
+          PORT: "3001"
+          PLAYWRIGHT_BASE_URL: http://localhost:3001
           RESEARCH_INSIGHT_PATH: fixtures/research-insight.v1.json
           FORWARD_HORIZON_PATH: fixtures/forward-horizon-verified-macro.v1.json
           AQIL_ALLOW_RESEARCH_FIXTURE: "true"
