@@ -267,3 +267,51 @@ Observation and research-run JSON shapes are **stable enough to draft** a migrat
 ### Next recommended step
 Founder review of diffs; then commit and run GitHub CI. Approve minimal `economic_observations` migration design when ready.
 
+## Session handover — 2026-10-17 (M2 accelerated persistence vertical slice)
+
+### Current objective
+Complete durable research persistence: Postgres adapters, immutable runs, operator CLI, memory equivalence and immutability proofs, CI integration — without hosted Supabase deploy.
+
+### Authoritative docs consulted
+- docs/AGENT_OPERATING_RULES.md
+- docs/07_BUILD_BACKLOG.csv AQ-012, AQ-064, AQ-067
+- supabase/migrations/README_RESEARCH_SCHEMA.md
+
+### Git
+- Branch: `m2/research-persistence-schema`
+- Commit: pending push (this session)
+
+### Files changed (high level)
+- `supabase/migrations/20261017110000_create_research_schema.sql` — grant execute on all `research` functions to `research_writer`
+- `supabase/migrations/20261017120000_research_worker_login.sql` — `research_worker` LOGIN (local/CI password)
+- `workers/research/src/aqil_research/persistence/` — connection, ingest, observations, runs, reproduce
+- `workers/research/src/aqil_research/cli.py` — `--store postgres`, `retrieve-run --recompute`
+- `.github/workflows/ci.yml` — Supabase start + integration pytest
+- `workers/research/tests/test_persistence_integration.py`
+
+### Decisions made
+- Worker DB principal is `research_worker` (inherits `research_writer`); `service_role` rejected in Python connection guard.
+- CHECK-constraint helper functions require explicit `EXECUTE` grants after default revoke-from-public.
+- `attempt_count` coerced to ≥1 on retrieval insert when fixture diagnostics report 0.
+
+### Tests and verification
+| Command / check | Result |
+|-----------------|--------|
+| `npx supabase db reset --no-seed` | pass |
+| `npm run db:test` | **55** pgTAP pass |
+| `uv run pytest` (workers/research, `RESEARCH_DATABASE_URL` set) | **62** passed |
+| `uv run aqil-research run ... --store postgres --run-id cli-demo-1` | completed; payload hash `88808a3e...` |
+| `uv run aqil-research retrieve-run --run-id cli-demo-1 --recompute` | `recompute_calculation_match=True` |
+| GitHub CI | pending after push |
+| Hosted Supabase migration | **not applied** |
+
+### Progress register
+- Backlog: AQ-012, AQ-064, AQ-067 updated
+- PR: #6 (same feature branch)
+
+### Blockers
+- none for local/CI; hosted deploy requires founder approval
+
+### Next recommended step
+Review and merge PR #6 after green CI; rotate `research_worker` password on hosted apply.
+

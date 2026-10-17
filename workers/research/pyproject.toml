@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "httpx>=0.28.1",
+    "psycopg[binary]>=3.2.0",
     "pydantic>=2.14.1",
 ]
 
@@ -29,6 +30,9 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src", "tests"]
+markers = [
+    "integration: requires local Supabase Postgres (RESEARCH_DATABASE_URL)",
+]
 
 [tool.ruff]
 line-length = 100

@@ -74,6 +74,8 @@ if ($Mode -eq "Full" -or $Mode -eq "ResetOnly") {
 if ($Mode -eq "Full" -or $Mode -eq "ResetOnly") {
   Write-Host "Resetting database and replaying migrations ..."
   Invoke-Supabase db reset --no-seed
+  Write-Host "Provisioning local research_worker login (dev/CI only) ..."
+  Invoke-Supabase db query -f scripts/provision-research-worker-local.sql
 }
 
 if ($Mode -eq "Full" -or $Mode -eq "TestOnly") {

@@ -21,13 +21,13 @@ from aqil_research.sources.rights_gate import (
     assert_rights_for_replay,
     resolve_research_rights,
 )
-from aqil_research.vintages.store import InMemoryObservationStore, content_snapshot_hash
+from aqil_research.vintages.store import ObservationStore, content_snapshot_hash
 
 
 def execute_research_run(
     request: ResearchExecutionRequest,
     *,
-    store: InMemoryObservationStore,
+    store: ObservationStore,
     rights_records: tuple[SourceRightsRecord, ...],
     method_registry: MethodRegistry,
     adapter_registry: AdapterRegistry | None = None,

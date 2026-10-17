@@ -6,7 +6,7 @@ import hashlib
 import json
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 from aqil_research.contracts.canonical import observation_canonical_dict
 from aqil_research.contracts.observation import AnalysisMode, EconomicObservation
@@ -24,6 +24,7 @@ class AppendResult:
     conflicts: int
 
 
+@runtime_checkable
 class ObservationStore(Protocol):
     def append(self, observation: EconomicObservation) -> AppendResult: ...
 
