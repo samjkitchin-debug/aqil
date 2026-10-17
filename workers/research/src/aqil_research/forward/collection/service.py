@@ -443,8 +443,7 @@ def collect_bea_schedule(
         end = horizon_end or date(today.year + 1, 12, 31)
         releases = [
             release
-            for year in range(today.year, end.year + 1)
-            for release in parse_bea_schedule_html(body, year=year)
+            for release in parse_bea_schedule_html(body, year=today.year)
             if today <= release.release_date <= end
         ]
         return [

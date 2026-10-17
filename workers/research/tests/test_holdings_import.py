@@ -8,7 +8,11 @@ from pathlib import Path
 import psycopg
 import pytest
 
-from aqil_research.forward.holdings_import import import_holdings_from_file
+from aqil_research.forward.holdings_import import (
+    HoldingsImportValidationError,
+    import_holdings_from_file,
+    validate_holdings_document,
+)
 from aqil_research.persistence.config import research_database_url_or_local_default
 from aqil_research.persistence.connection import research_connection
 
@@ -34,6 +38,20 @@ pytestmark = pytest.mark.integration
 def require_db() -> None:
     if not _db_available():
         pytest.skip("local Supabase not available")
+
+
+def test_provider_holdings_requires_internal_retention_authorisation() -> None:
+    document = {
+        "etf_id": "etf:test",
+        "as_of_date": "2026-01-01",
+        "completeness": "top_holdings_partial",
+        "source_id": "vanguard_uk_vwra_holdings",
+        "source_locator": "https://example.com/holdings",
+        "evidence_class": "provider_holdings",
+        "lines": [{"line_id": "1", "holding_name": "X", "weight_percentage": "1"}],
+    }
+    with pytest.raises(HoldingsImportValidationError):
+        validate_holdings_document(document)
 
 
 def test_manual_holdings_import_idempotent(require_db: None) -> None:

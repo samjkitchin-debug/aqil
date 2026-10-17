@@ -18,7 +18,7 @@ test.describe("forward horizon UI", () => {
     await expect(page.getByTestId("forward-horizon")).toBeVisible();
 
     await page.goto("/calendar");
-    await expect(page.getByTestId("forward-horizon")).toBeVisible();
+    await expect(page.getByTestId("forward-calendar")).toBeVisible();
     await expect(page.getByText("Schedule: official (confirmed)").first()).toBeVisible();
     await expect(page.getByText("Materiality not assessed").first()).toBeVisible();
     await expect(page.getByText("Schedule: demonstration data").first()).toBeVisible();

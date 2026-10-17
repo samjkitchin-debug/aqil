@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-10-18T00:00:00+00:00",
+  "data_mode": "verified_source",
+  "etfs": [],
+  "events": [
+    {
+      "event_id": "event:verified:fed:fomc:2026-10-28",
+      "title": "FOMC meeting — federal funds rate decision",
+      "category": "central_bank_meeting",
+      "subject_label": "issuer:us:federal_reserve:fomc",
+      "scheduled_date": "2026-10-28",
+      "scheduled_time": "2026-10-28T18:00:00+00:00",
+      "timezone": "America/New_York",
+      "date_precision": "confirmed",
+      "schedule_evidence": "verified_schedule",
+      "materiality": "insufficient_evidence",
+      "materiality_basis": "macro_qualitative",
+      "interpretation_status": "unverified",
+      "source_confidence": "verified_schedule",
+      "why_it_matters": "No ETF-level numerical impact is estimated without a verified holdings link and a published transmission model.",
+      "etf_ids": [],
+      "is_fixture": false,
+      "macro_relevance": {
+        "transmission": "Policy rate expectations and financial conditions can affect global risk appetite and discount rates.",
+        "geography": "Global diversified ETFs include substantial US exposure.",
+        "confidence": "qualitative_only"
+      }
+    }
+  ],
+  "exposures": [],
+  "scenarios": [
+    {
+      "scenario_id": "00000000-0000-4000-8000-000000000001",
+      "event_id": "event:verified:fed:fomc:2026-10-28",
+      "frozen_at": "2026-10-18T12:00:00+00:00",
+      "headline": "Pre-event assessment — FOMC meeting — federal funds rate decision",
+      "evidence_class": "research_assessment",
+      "record_source": "database",
+      "expected_information": "Federal funds rate decision, policy statement and, when published, economic projections.",
+      "no_action_conclusion": "Insufficient substantiated evidence to justify changing a diversified long-horizon allocation based on this calendar entry alone.",
+      "inconclusive": "No ETF-level numerical impact is estimated without a verified holdings link and a published transmission model.",
+      "known_facts": [
+        "Schedule evidence: verified official calendar (federal_reserve_fomc_calendar).",
+        "Source locator: https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm.",
+        "Date precision on record: confirmed."
+      ],
+      "evidence_gaps": [
+        "No verified analyst consensus or market-implied expectations ingested."
+      ],
+      "what_would_change_assessment": [
+        "Authorised issuer holdings linked to the vetted ETF universe."
+      ]
+    }
+  ],
+  "outcomes": [],
+  "company_filings": []
+}

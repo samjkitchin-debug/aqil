@@ -134,6 +134,10 @@ def main(argv: list[str] | None = None) -> int:
         from aqil_research.cli_ops import run_import_forward_holdings
 
         return run_import_forward_holdings(args)
+    if args.command == "sync-forward-intelligence":
+        from aqil_research.cli_ops import run_sync_forward_intelligence
+
+        return run_sync_forward_intelligence(args)
     return 1
 
 

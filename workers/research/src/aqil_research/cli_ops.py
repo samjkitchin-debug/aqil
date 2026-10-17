@@ -97,6 +97,19 @@ def register_collect_parsers(sub: argparse._SubParsersAction) -> None:
     )
     import_holdings.add_argument("--file", type=Path, required=True)
 
+    sync_intel = sub.add_parser(
+        "sync-forward-intelligence",
+        help="Freeze macro pre-event assessments and export the web horizon bundle",
+    )
+    sync_intel.add_argument(
+        "--export",
+        type=Path,
+        default=None,
+        help="Write forward_horizon.v1.json (e.g. apps/web/.local/forward-horizon.v1.json)",
+    )
+    sync_intel.add_argument("--include-demo", action="store_true")
+    sync_intel.add_argument("--horizon-days", type=int, default=180)
+
 
 def run_collect(args: argparse.Namespace) -> int:
     if args.source != "bls":
@@ -285,6 +298,34 @@ def run_forward_coverage(args: argparse.Namespace) -> int:
         print(f"database error: {exc}", file=sys.stderr)
         return 10
     print(format_coverage_report(report))
+    return 0
+
+
+def run_sync_forward_intelligence(args: argparse.Namespace) -> int:
+    from aqil_research.forward.horizon_export import build_horizon_from_database
+    from aqil_research.forward.intelligence.macro_assessment import (
+        freeze_macro_pre_event_assessments,
+    )
+
+    try:
+        with research_connection() as conn:
+            new_frozen, existing = freeze_macro_pre_event_assessments(conn)
+            print(f"macro_assessments new={new_frozen} existing={existing}")
+            bundle = build_horizon_from_database(
+                conn,
+                horizon_days=args.horizon_days,
+                include_demonstration=args.include_demo,
+            )
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+
+    if args.export is not None:
+        args.export.parent.mkdir(parents=True, exist_ok=True)
+        args.export.write_text(json.dumps(bundle, indent=2, default=str) + "\n", encoding="utf-8")
+        print(f"horizon_exported={args.export} data_mode={bundle.get('data_mode')}")
+    else:
+        print(json.dumps(bundle, indent=2, default=str))
     return 0
 
 

@@ -49,8 +49,8 @@ def test_bls_ics_parses_utc_stamps_and_records_eastern_calendar() -> None:
 
 def test_bea_schedule_keeps_an_unstated_timezone_unstated() -> None:
     html = (FIXTURES / "bea_schedule_snippet.html").read_text(encoding="utf-8")
-    releases = parse_bea_schedule_html(html, year=2026)
-    assert len(releases) == 2
+    releases = parse_bea_schedule_html(html)
+    assert len(releases) == 1
     payload = bea_payload(releases[0], retrieved_at=datetime(2026, 10, 18, tzinfo=UTC))
     assert payload["timezone"] is None
     assert payload["clock_timezone_stated"] is False

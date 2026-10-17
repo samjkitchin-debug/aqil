@@ -25,6 +25,9 @@ def build_horizon_from_database(
     events = _load_verified_events(conn, ref, window_end)
     etfs, exposures = _load_etf_exposure(conn, ref)
 
+    verified_scenarios = _load_verified_scenarios(conn)
+    verified_outcomes: list[dict[str, object]] = []
+
     demo_events: list[dict[str, object]] = []
     demo_scenarios: list[dict[str, object]] = []
     demo_outcomes: list[dict[str, object]] = []
@@ -54,6 +57,8 @@ def build_horizon_from_database(
     else:
         data_mode = "fixture_demonstration"
 
+    filing_history = _load_company_filing_history(conn)
+
     return {
         "schema_version": "1.0",
         "generated_at": horizon_bundle_generated_at().isoformat(),
@@ -61,9 +66,87 @@ def build_horizon_from_database(
         "etfs": etfs,
         "events": merged_events,
         "exposures": exposures,
-        "scenarios": demo_scenarios,
-        "outcomes": demo_outcomes,
+        "scenarios": verified_scenarios + demo_scenarios,
+        "outcomes": verified_outcomes + demo_outcomes,
+        "company_filings": filing_history,
     }
+
+
+def _load_company_filing_history(conn: psycopg.Connection) -> list[dict[str, object]]:
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            select event_id, title, payload, evidence_class, scheduled_at
+            from forward.catalyst_events
+            where category = 'us_company_filing'
+            order by scheduled_at desc nulls last
+            limit 24
+            """,
+        )
+        rows = cur.fetchall()
+
+    filings: list[dict[str, object]] = []
+    for event_id, title, payload, evidence_class, scheduled_at in rows:
+        if isinstance(payload, str):
+            payload = json.loads(payload)
+        if not isinstance(payload, dict):
+            continue
+        accepted = scheduled_at.isoformat() if scheduled_at is not None else None
+        filings.append(
+            {
+                "event_id": event_id,
+                "title": title,
+                "issuer_id": payload.get("subject_id"),
+                "form": payload.get("form"),
+                "filing_date": payload.get("scheduled_at"),
+                "accepted_at": accepted,
+                "reported_period_end": payload.get("reported_period_end"),
+                "source_locator": payload.get("source_locator"),
+                "evidence_class": evidence_class,
+                "is_fixture": bool(payload.get("is_fixture")),
+            },
+        )
+    return filings
+
+
+def _load_verified_scenarios(conn: psycopg.Connection) -> list[dict[str, object]]:
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            select scenario_id::text, event_id, frozen_at, payload, evidence_class
+            from forward.forward_scenarios
+            where evidence_class = 'research_assessment'
+            order by frozen_at
+            """,
+        )
+        rows = cur.fetchall()
+
+    scenarios: list[dict[str, object]] = []
+    for scenario_id, event_id, frozen_at, payload, evidence_class in rows:
+        if isinstance(payload, str):
+            payload = json.loads(payload)
+        if not isinstance(payload, dict):
+            continue
+        frozen_text = frozen_at.isoformat() if hasattr(frozen_at, "isoformat") else str(frozen_at)
+        scenarios.append(
+            {
+                "scenario_id": scenario_id,
+                "event_id": event_id,
+                "frozen_at": frozen_text,
+                "headline": str(payload.get("headline", "")),
+                "evidence_class": evidence_class,
+                "record_source": "database",
+                "upside_case": payload.get("upside_case"),
+                "downside_case": payload.get("downside_case"),
+                "inconclusive": payload.get("inconclusive"),
+                "evidence_gaps": payload.get("evidence_gaps"),
+                "known_facts": payload.get("known_facts"),
+                "expected_information": payload.get("expected_information"),
+                "no_action_conclusion": payload.get("no_action_conclusion"),
+                "what_would_change_assessment": payload.get("what_would_change_assessment"),
+            },
+        )
+    return scenarios
 
 
 def _load_verified_events(

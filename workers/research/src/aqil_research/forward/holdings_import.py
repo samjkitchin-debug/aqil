@@ -50,12 +50,21 @@ def load_holdings_document(path: Path) -> dict[str, object]:
 
 
 def validate_holdings_document(document: dict[str, object]) -> None:
+    """Validate structure. Provider weights require explicit internal-retention authorisation."""
     missing = REQUIRED_FIELDS - set(document)
     if missing:
         raise HoldingsImportValidationError(f"missing required fields: {sorted(missing)}")
     evidence = str(document["evidence_class"])
     if evidence not in ALLOWED_EVIDENCE:
         raise HoldingsImportValidationError(f"unsupported evidence_class {evidence}")
+    if (
+        evidence == "provider_holdings"
+        and document.get("internal_retention_authorized") is not True
+    ):
+        raise HoldingsImportValidationError(
+            "provider_holdings requires internal_retention_authorized=true "
+            "with founder-confirmed rights; manual import does not imply redistribution rights",
+        )
     lines = document.get("lines")
     if not isinstance(lines, list) or not lines:
         raise HoldingsImportValidationError("lines must be a non-empty list")

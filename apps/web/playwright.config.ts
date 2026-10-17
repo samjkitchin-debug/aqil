@@ -39,7 +39,8 @@ export default defineConfig({
     env: {
       ...process.env,
       RESEARCH_INSIGHT_PATH: "fixtures/research-insight.v1.json",
-      FORWARD_HORIZON_PATH: "fixtures/forward-horizon.v1.json",
+      FORWARD_HORIZON_PATH:
+        process.env.FORWARD_HORIZON_PATH ?? "fixtures/forward-horizon.v1.json",
       AQIL_ALLOW_RESEARCH_FIXTURE: "true",
       AQIL_FOUNDER_INSIGHT_TOKEN: "ci-founder-test-token",
       AQIL_ALLOW_FOUNDER_INSIGHT_HEADER: "true",

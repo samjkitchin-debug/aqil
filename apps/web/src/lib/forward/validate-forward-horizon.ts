@@ -133,7 +133,12 @@ export function validateForwardHorizon(data: unknown): data is ForwardHorizonV1 
       if (!isObject(scenario)) return false;
       if (!hasString(scenario, "scenario_id") || !hasString(scenario, "event_id")) return false;
       if (!hasString(scenario, "frozen_at") || !hasString(scenario, "headline")) return false;
-      if (scenario.evidence_class !== "synthetic_demonstration") return false;
+      if (
+        scenario.evidence_class !== "synthetic_demonstration" &&
+        scenario.evidence_class !== "research_assessment"
+      ) {
+        return false;
+      }
     }
   }
 

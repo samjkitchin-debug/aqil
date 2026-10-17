@@ -15,9 +15,11 @@ SOURCE_ID = "bea_release_schedule"
 DATASET_ID = "forward.bea.news.schedule"
 SOURCE_LOCATOR = "https://www.bea.gov/news/schedule"
 
+_YEAR = re.compile(r"Year\s+(\d{4})", re.I)
 _ROW = re.compile(
-    r"<tr>\s*<td>\s*([A-Za-z]+ \d{1,2})\s+(\d{1,2}:\d{2}\s*[AP]M)\s*</td>\s*"
-    r"<td>\s*([^<]+?)\s*</td>\s*<td>\s*([^<]+?)\s*</td>",
+    r'<div class="release-date">\s*([A-Za-z]+ \d{1,2})\s*</div>\s*'
+    r"<small[^>]*>\s*(\d{1,2}:\d{2}\s*[AP]M)\s*</small>.*?"
+    r'<td class="release-title[^"]*"[^>]*>\s*([^<]+?)\s*</td>',
     re.I | re.S,
 )
 
@@ -30,16 +32,23 @@ class BeaRelease:
     title: str
 
 
-def parse_bea_schedule_html(html: str, *, year: int) -> list[BeaRelease]:
+def parse_bea_schedule_html(html: str, *, year: int | None = None) -> list[BeaRelease]:
+    header_year = _YEAR.search(html)
+    resolved_year = int(header_year.group(1)) if header_year else year
+    if resolved_year is None:
+        return []
     releases: list[BeaRelease] = []
     for match in _ROW.finditer(html):
-        month_day = datetime.strptime(f"{match.group(1)} {year}", "%B %d %Y").date()
+        month_day = datetime.strptime(
+            f"{match.group(1)} {resolved_year}",
+            "%B %d %Y",
+        ).date()
         releases.append(
             BeaRelease(
                 release_date=month_day,
                 published_clock=re.sub(r"\s+", " ", match.group(2)).strip().upper(),
-                release_type=re.sub(r"\s+", " ", match.group(3)).strip(),
-                title=re.sub(r"\s+", " ", match.group(4)).strip(),
+                release_type="news",
+                title=re.sub(r"\s+", " ", match.group(3)).strip(),
             ),
         )
     return releases

@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test:forward-contract": "node --experimental-strip-types --test src/lib/forward/validate-forward-horizon.test.ts",
+    "test:forward-contract": "node --experimental-strip-types --test src/lib/forward/validate-forward-horizon.test.ts src/lib/forward/forward-horizon-verified-export.test.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

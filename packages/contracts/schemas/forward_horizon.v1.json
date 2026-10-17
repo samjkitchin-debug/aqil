@@ -53,6 +53,10 @@
     "outcomes": {
       "type": "array",
       "items": { "$ref": "#/$defs/outcome_summary" }
+    },
+    "company_filings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/company_filing_summary" }
     }
   },
   "$defs": {
@@ -215,8 +219,34 @@
         "upside_case": { "type": "string" },
         "downside_case": { "type": "string" },
         "evidence_gaps": { "type": "array", "items": { "type": "string" } },
-        "evidence_class": { "const": "synthetic_demonstration" },
-        "record_source": { "enum": ["fixture", "database"] }
+        "evidence_class": {
+          "enum": ["synthetic_demonstration", "research_assessment"]
+        },
+        "record_source": { "enum": ["fixture", "database"] },
+        "expected_information": { "type": "string" },
+        "no_action_conclusion": { "type": "string" },
+        "inconclusive": { "type": "string" },
+        "known_facts": { "type": "array", "items": { "type": "string" } },
+        "what_would_change_assessment": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "company_filing_summary": {
+      "type": "object",
+      "required": ["event_id", "title", "evidence_class"],
+      "properties": {
+        "event_id": { "type": "string" },
+        "title": { "type": "string" },
+        "issuer_id": { "type": "string" },
+        "form": { "type": "string" },
+        "filing_date": { "type": "string" },
+        "accepted_at": { "type": "string" },
+        "reported_period_end": { "type": "string" },
+        "source_locator": { "type": "string" },
+        "evidence_class": { "type": "string" },
+        "is_fixture": { "type": "boolean" }
       }
     },
     "outcome_summary": {
