@@ -61,8 +61,13 @@ class SahmAnalyticalMethod:
             )
         calculation = output.to_dict()
         calculation["threshold_met"] = output.triggered
+        cited_ids = frozenset(output.observation_ids)
+        series = context.primary_series()
+        frozen_series = {
+            period: obs for period, obs in series.items() if obs.observation_id in cited_ids
+        }
         calculation["threshold_crossed"] = sahm_threshold_crossed(
-            context.primary_series(),
+            frozen_series,
             context.evaluation_period,
             config,
         )
