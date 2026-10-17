@@ -391,3 +391,47 @@ Row counts stayed: instruments 1, holdings snapshots 1, holding lines 3, catalys
 - **main:** PR #7 merged (`54c4a16`).
 - **M4:** PR #8 `m4/forward-intelligence`. GitHub Actions on the correction commit is the merge gate.
 
+## Session handover — 2026-10-18 (My Wealth vertical slice)
+
+### Current objective
+First private portfolio vertical slice: Supabase schema, deterministic analytics/contribution engine, and My Wealth UI on synthetic fixture (unauthenticated dev) or owner RLS data.
+
+### Authoritative docs consulted
+- docs/AGENT_OPERATING_RULES.md, docs/06_ENGINEERING_DISCIPLINE.md
+- docs/07_BUILD_BACKLOG.csv (AQ-027 in progress)
+- Portfolio governance acceptance themes (research must not move strategic targets; reserve exclusion; minor-unit reconciliation)
+
+### Git
+- Branch: `my-wealth/portfolio-slice` (from `origin/main` @ dd82e40; M5/M6 not merged)
+
+### Files changed (high level)
+- `supabase/migrations/20261018160000_my_wealth_portfolio.sql`, `supabase/tests/database/my_wealth_rls.test.sql`
+- `apps/web/src/lib/wealth/*`, `apps/web/src/components/wealth/*`, `apps/web/src/app/my-wealth/page.tsx`, `apps/web/src/styles/wealth.css`
+
+### Decisions made
+- Unauthenticated founder gate → synthetic tech-concentration fixture (no DB); authenticated empty → empty state; DB errors → empty (not fixture).
+- Scenario panel adjusts targets/contributions in-memory only (no persistence).
+- `tsconfig` target ES2020 + lib ES2020 for bigint portfolio maths.
+
+### Tests and verification
+| Command / check | Result |
+|-----------------|--------|
+| `npm run test:wealth` (apps/web) | pass (5 tests) |
+| `npm run typecheck` / `lint` / `build` (apps/web) | pass |
+| `npm run check:tokens` | pass |
+| `npm run db:test` | not run — Docker offline on workstation |
+
+### Progress register
+- AQ-027 → In progress (vertical slice evidence in backlog row)
+
+### Unverified assumptions
+- pgTAP `my_wealth_rls.test.sql` not executed locally
+- `database.generated.ts` not regenerated (loader uses untyped Supabase client cast)
+- No manual CRUD UI or seed action for authenticated users yet
+
+### Blockers
+- Hosted Supabase migration apply requires explicit approval
+
+### Next recommended step
+- Run `npm run test:db` when Docker is up; add seed/import server action; open PR for consolidated review.
+

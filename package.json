@@ -7,7 +7,7 @@
     "build": "npm run build --prefix apps/web",
     "lint": "npm run lint --prefix apps/web",
     "typecheck": "npm run typecheck --prefix apps/web",
-    "test:web": "npm run typecheck --prefix apps/web && npm run lint --prefix apps/web",
+    "test:web": "npm run typecheck --prefix apps/web && npm run lint --prefix apps/web && npm run test:wealth --prefix apps/web",
     "test:research": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-research-checks.ps1",
     "check:tokens": "node scripts/check-token-styling.mjs",
     "test:e2e": "npm run test:e2e --prefix apps/web",
