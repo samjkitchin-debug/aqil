@@ -65,6 +65,32 @@ def register_collect_parsers(sub: argparse._SubParsersAction) -> None:
     )
     demo.add_argument("--skip-db", action="store_true", help="Only export JSON bundle")
 
+    collect_fwd = sub.add_parser(
+        "collect-forward",
+        help="Collect official forward calendar sources into Postgres",
+    )
+    collect_fwd.add_argument(
+        "--source",
+        required=True,
+        choices=["fed-fomc", "bls-empsit"],
+    )
+    collect_fwd.add_argument("--live", action="store_true")
+    collect_fwd.add_argument("--fixture", type=Path, default=None)
+    collect_fwd.add_argument("--horizon-days", type=int, default=180)
+
+    coverage = sub.add_parser(
+        "forward-coverage",
+        help="Print forward intelligence coverage and health report (JSON)",
+    )
+
+    export_hz = sub.add_parser(
+        "export-forward-horizon",
+        help="Export forward_horizon.v1.json from Postgres",
+    )
+    export_hz.add_argument("--output", type=Path, required=True)
+    export_hz.add_argument("--include-demo", action="store_true")
+    export_hz.add_argument("--horizon-days", type=int, default=180)
+
 
 def run_collect(args: argparse.Namespace) -> int:
     if args.source != "bls":
@@ -180,6 +206,83 @@ def run_forward_demo(args: argparse.Namespace) -> int:
         print(f"horizon_exported={args.export_horizon}")
     else:
         print(json.dumps(bundle, indent=2, default=str))
+    return 0
+
+
+def run_collect_forward(args: argparse.Namespace) -> int:
+    from datetime import date
+
+    from aqil_research.forward.collection.service import (
+        collect_bls_empsit_schedule,
+        collect_fed_fomc_calendar,
+    )
+
+    today = date.today()
+    horizon_end = today.fromordinal(today.toordinal() + args.horizon_days)
+
+    try:
+        with research_connection() as conn:
+            if args.source == "fed-fomc":
+                result = collect_fed_fomc_calendar(
+                    conn,
+                    live=args.live,
+                    fixture_path=args.fixture,
+                    horizon_start=today,
+                    horizon_end=horizon_end,
+                )
+            else:
+                result = collect_bls_empsit_schedule(
+                    conn,
+                    live=args.live,
+                    fixture_path=args.fixture,
+                    horizon_start=today,
+                    horizon_end=horizon_end,
+                )
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+
+    print(
+        f"outcome={result.outcome} received={result.records_received} "
+        f"new={result.records_new} updated={result.records_updated} "
+        f"unchanged={result.records_unchanged}",
+    )
+    if result.error_summary:
+        print(f"error: {result.error_summary}", file=sys.stderr)
+    if result.outcome != "completed":
+        return 5
+    return 0
+
+
+def run_forward_coverage(args: argparse.Namespace) -> int:
+    from aqil_research.forward.coverage import build_coverage_report, format_coverage_report
+
+    try:
+        with research_connection() as conn:
+            report = build_coverage_report(conn)
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+    print(format_coverage_report(report))
+    return 0
+
+
+def run_export_forward_horizon(args: argparse.Namespace) -> int:
+    from aqil_research.forward.horizon_export import build_horizon_from_database
+
+    try:
+        with research_connection() as conn:
+            bundle = build_horizon_from_database(
+                conn,
+                horizon_days=args.horizon_days,
+                include_demonstration=args.include_demo,
+            )
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+
+    args.output.write_text(json.dumps(bundle, indent=2, default=str) + "\n", encoding="utf-8")
+    print(f"horizon_exported={args.output} data_mode={bundle.get('data_mode')}")
     return 0
 
 

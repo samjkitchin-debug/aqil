@@ -118,6 +118,18 @@ def main(argv: list[str] | None = None) -> int:
         from aqil_research.cli_ops import run_forward_demo
 
         return run_forward_demo(args)
+    if args.command == "collect-forward":
+        from aqil_research.cli_ops import run_collect_forward
+
+        return run_collect_forward(args)
+    if args.command == "forward-coverage":
+        from aqil_research.cli_ops import run_forward_coverage
+
+        return run_forward_coverage(args)
+    if args.command == "export-forward-horizon":
+        from aqil_research.cli_ops import run_export_forward_horizon
+
+        return run_export_forward_horizon(args)
     return 1
 
 

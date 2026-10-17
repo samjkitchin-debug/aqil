@@ -80,11 +80,17 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "treasury.xml.daily_treasury_yield_curve",
         "fiscal.avg_interest_rates",
         "board.h15.treasury_yields",
+        "forward.fomc.schedule",
+        "forward.bls.empsit.schedule",
+        "forward.etf.vwra.holdings",
     }
     for record in records:
         assert record.terms_url in record.evidence_urls
         assert record.evidence_note
-        assert record.assessed_on.isoformat() == "2026-10-17"
+        if record.dataset_id.startswith("forward."):
+            assert record.assessed_on.isoformat() == "2026-10-18"
+        else:
+            assert record.assessed_on.isoformat() == "2026-10-17"
 
     unemployment = by_dataset["bls.ln.LNS14000000"]
     assert unemployment.m1_role == M1Role.FIRST_LIVE_PROVIDER

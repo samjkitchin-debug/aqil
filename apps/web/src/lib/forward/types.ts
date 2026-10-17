@@ -31,10 +31,10 @@ export type HorizonEvent = {
   scheduled_date: string;
   scheduled_time?: string | null;
   timezone?: string | null;
-  date_precision: "confirmed" | "estimated" | "unknown";
+  date_precision: "confirmed" | "estimated" | "tentative" | "unknown";
   schedule_evidence: "verified_schedule" | "synthetic_demonstration" | "unverified";
   materiality: "high" | "medium" | "low" | "insufficient_evidence";
-  materiality_basis: "calculated" | "insufficient_evidence";
+  materiality_basis: "calculated" | "insufficient_evidence" | "macro_qualitative";
   interpretation_status: "unverified";
   source_confidence: string;
   why_it_matters: string;

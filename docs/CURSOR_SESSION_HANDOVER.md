@@ -391,3 +391,37 @@ Row counts stayed: instruments 1, holdings snapshots 1, holding lines 3, catalys
 - **main:** PR #7 merged (`54c4a16`).
 - **M4:** PR #8 `m4/forward-intelligence`. GitHub Actions on the correction commit is the merge gate.
 
+## Session handover — 2026-10-18 (M5 live intelligence coverage)
+
+### Current objective
+Convert forward intelligence from demonstration fixtures to rights-checked live macro calendars (Fed FOMC + BLS Employment Situation schedule), with idempotent Postgres persistence and operator coverage reporting. PR open; not merged.
+
+### What is genuinely sourced now
+- **Federal Reserve FOMC calendar** (`federal_reserve_fomc_calendar`) — HTML parser verified against live page (16 meetings from current year onward in smoke test).
+- **BLS Employment Situation schedule** (`bls_release_schedule`) — HTML table parser with fixture-backed CI tests.
+- **VWRA holdings** — rights row added; **automated_access unknown**; manual import only until terms are verified.
+
+### Operator commands
+- `uv run aqil-research collect-forward --source fed-fomc --fixture tests/fixtures/forward/fed_fomc_calendar_snippet.html`
+- `uv run aqil-research collect-forward --source bls-empsit --fixture tests/fixtures/forward/bls_empsit_schedule_snippet.html`
+- `uv run aqil-research collect-forward --source fed-fomc --live` (opt-in network)
+- `uv run aqil-research forward-coverage`
+- `uv run aqil-research export-forward-horizon --output path.json [--include-demo]`
+
+### Tests (local agent)
+| Check | Result |
+|-------|--------|
+| `uv run pytest` (unit, no integration DB) | 80 passed, 7 skipped |
+| Live Fed parser smoke | 16 meetings parsed |
+| Web `npm run typecheck` | pass |
+| GitHub CI | pending on M5 PR |
+
+### Honest gaps
+- No provider ETF holdings file ingested yet (Vanguard UK automation blocked).
+- No live company earnings adapter; demonstration MSFT path unchanged.
+- Hosted Supabase migration not applied; no unattended schedules enabled.
+
+### Git
+- **Branch:** `m5/live-intelligence-coverage`
+- **main:** M4 merged @ `dd82e40`
+

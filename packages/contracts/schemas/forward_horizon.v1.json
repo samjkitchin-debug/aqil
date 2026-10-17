@@ -116,10 +116,12 @@
         "scheduled_date": { "type": "string" },
         "scheduled_time": { "type": ["string", "null"] },
         "timezone": { "type": ["string", "null"] },
-        "date_precision": { "enum": ["confirmed", "estimated", "unknown"] },
+        "date_precision": { "enum": ["confirmed", "estimated", "tentative", "unknown"] },
         "schedule_evidence": { "enum": ["verified_schedule", "synthetic_demonstration", "unverified"] },
         "materiality": { "enum": ["high", "medium", "low", "insufficient_evidence"] },
-        "materiality_basis": { "enum": ["calculated", "insufficient_evidence"] },
+        "materiality_basis": {
+          "enum": ["calculated", "insufficient_evidence", "macro_qualitative"]
+        },
         "interpretation_status": { "const": "unverified" },
         "source_confidence": { "type": "string" },
         "why_it_matters": { "type": "string" },
