@@ -13,7 +13,7 @@ const viewportProjects = [
 
 export default defineConfig({
   testDir: "./e2e",
-  fullyParallel: true,
+  fullyParallel: !process.env.CI,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 1 : undefined,
@@ -36,7 +36,7 @@ export default defineConfig({
     },
   })),
   webServer: {
-    command: process.env.CI ? "npm run dev -- --port 3000" : "npm run start",
+    command: "npm run start",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

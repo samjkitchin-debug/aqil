@@ -40,9 +40,7 @@ class RunReplayVerification:
     @property
     def full_match(self) -> bool:
         return (
-            self.input_snapshot_hash_match
-            and self.calculation_match
-            and self.observation_ids_match
+            self.input_snapshot_hash_match and self.calculation_match and self.observation_ids_match
         )
 
 
