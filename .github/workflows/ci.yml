@@ -34,9 +34,6 @@ jobs:
           NEXT_PUBLIC_APP_URL: http://localhost:3000
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
-          AQIL_FOUNDER_INSIGHT_TOKEN: ci-founder-test-token
-          AQIL_ALLOW_FOUNDER_INSIGHT_HEADER: "true"
-          AQIL_ALLOW_RESEARCH_FIXTURE: "true"
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
         env:
