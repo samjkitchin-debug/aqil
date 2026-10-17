@@ -416,4 +416,10 @@ Replace the founder-cookie gate with Supabase Google OAuth, explicit founder all
 ### Next recommended step
 - After this PR merges, rebase PR #11 and delete the unauthenticated synthetic portfolio fallback in `load-snapshot.ts`.
 
+### Flicker follow-up (same branch)
+- Dev log showed repeated `GET /login?error=unavailable` **200** document loads from Edge, with `Cache-Control: no-store`, not a 307 cycle. A fresh tab stayed idle.
+- Public routes no longer call Auth. Private link prefetch returns 204 instead of a redirect to login. The login page no longer resolves a session on the server.
+- After that change the document reload stopped (one 200, then silence on the dev server).
+- Live Google round trip and pgTAP remain outstanding. Docker was offline.
+
 

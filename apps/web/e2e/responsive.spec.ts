@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-const publicRoutes = ["/login"];
+const publicRoutes = ["/login", "/privacy", "/tos"];
 const privateRoutes = ["/", "/explore", "/calendar", "/learn", "/research", "/my-wealth"];
 
 async function expectNoHorizontalOverflow(page: Page) {

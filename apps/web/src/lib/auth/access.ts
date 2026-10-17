@@ -1,14 +1,29 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { isAllowlisted, parseAuthorisedUserIds } from "@/lib/auth/allowlist";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { classifyAuthFailure, type AccessStatus } from "@/lib/auth/session-policy";
 import { isSupabaseConfigured } from "@/lib/env/public";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type AccessResolution =
   | { status: "signed_out" }
-  | { status: "unavailable" }
-  | { status: "unauthorised"; userId: string }
-  | { status: "authorised"; userId: string };
+  | { status: "temporarily_unavailable" }
+  | { status: "terminal_invalid_session" }
+  | { status: "authenticated_denied"; userId: string }
+  | { status: "authenticated_authorised"; userId: string };
+
+function rethrowRedirect(error: unknown): void {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error &&
+    String((error as { digest?: unknown }).digest).startsWith("NEXT_REDIRECT")
+  ) {
+    throw error;
+  }
+}
 
 function isMissingGrantsRelation(error: { code?: string; message?: string }): boolean {
   const code = error.code ?? "";
@@ -16,34 +31,24 @@ function isMissingGrantsRelation(error: { code?: string; message?: string }): bo
   return code === "42P01" || code === "PGRST205" || message.includes("access_grants");
 }
 
-function isTransportFailure(error: { name?: string; message?: string; status?: number }): boolean {
-  if (error.name === "AuthRetryableFetchError") return true;
-  if (error.status === 0) return true;
-  const message = (error.message ?? "").toLowerCase();
-  return message.includes("fetch") || message.includes("network") || message.includes("timeout");
-}
-
-/**
- * One verified identity check for this request.
- * Uses auth.getUser(), which asks the Auth server to validate the session.
- * getSession().user is not used for authorisation.
- */
-export async function resolveAccess(): Promise<AccessResolution> {
-  if (!isSupabaseConfigured()) return { status: "unavailable" };
+async function resolveAccessOnce(): Promise<AccessResolution> {
+  if (!isSupabaseConfigured()) return { status: "temporarily_unavailable" };
 
   try {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase.auth.getUser();
-    if (error) {
-      if (isTransportFailure(error)) return { status: "unavailable" };
+    if (error || !data.user) {
+      const status = classifyAuthFailure(error);
+      if (status === "temporarily_unavailable" || status === "terminal_invalid_session") {
+        return { status };
+      }
       return { status: "signed_out" };
     }
-    if (!data.user) return { status: "signed_out" };
 
     const userId = data.user.id;
     const allowlist = parseAuthorisedUserIds(process.env.AQIL_AUTHORISED_USER_IDS);
     if (isAllowlisted(userId, allowlist)) {
-      return { status: "authorised", userId };
+      return { status: "authenticated_authorised", userId };
     }
 
     const grant = await supabase
@@ -54,15 +59,21 @@ export async function resolveAccess(): Promise<AccessResolution> {
 
     if (grant.error) {
       if (isMissingGrantsRelation(grant.error)) {
-        return { status: "unauthorised", userId };
+        return { status: "authenticated_denied", userId };
       }
-      return { status: "unavailable" };
+      return { status: "temporarily_unavailable" };
     }
     if (grant.data?.role === "founder") {
-      return { status: "authorised", userId };
+      return { status: "authenticated_authorised", userId };
     }
-    return { status: "unauthorised", userId };
-  } catch {
-    return { status: "unavailable" };
+    return { status: "authenticated_denied", userId };
+  } catch (error) {
+    rethrowRedirect(error);
+    return { status: "temporarily_unavailable" };
   }
 }
+
+/** One Auth server check per React render, shared by every server component in the request. */
+export const resolveAccess = cache(resolveAccessOnce);
+
+export type { AccessStatus };

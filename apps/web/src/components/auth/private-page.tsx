@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { SignOutControl } from "@/components/auth/sign-out-control";
 import { resolveAccess } from "@/lib/auth/access";
 
 type Props = {
@@ -9,19 +10,25 @@ type Props = {
 
 export async function PrivatePage({ nextPath, children }: Props) {
   const access = await resolveAccess();
-  if (access.status === "signed_out") {
-    redirect(`/login?next=${encodeURIComponent(nextPath)}`);
+  if (access.status === "signed_out" || access.status === "terminal_invalid_session") {
+    const reason = access.status === "terminal_invalid_session" ? "session_ended" : "signed_out";
+    redirect(`/login?error=${reason}&next=${encodeURIComponent(nextPath)}`);
   }
-  if (access.status === "unauthorised") {
+  if (access.status === "authenticated_denied") {
     redirect("/access-denied");
   }
-  if (access.status === "unavailable") {
+  if (access.status === "temporarily_unavailable") {
     return (
       <p className="research-body" data-testid="auth-unavailable">
-        Aqil could not verify your session. Private research and portfolio data are not shown when
-        authentication is unavailable.
+        Aqil could not verify your session. Private research and portfolio data are not shown, and
+        your session has not been cleared.
       </p>
     );
   }
-  return children;
+  return (
+    <>
+      <SignOutControl />
+      {children}
+    </>
+  );
 }

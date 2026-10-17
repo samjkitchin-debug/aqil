@@ -4,8 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isAllowlisted, parseAuthorisedUserIds } from "@/lib/auth/allowlist";
 import { isPublicPath } from "@/lib/auth/paths";
 import { safeNextPath } from "@/lib/auth/safe-next";
-
-const PRIVATE_CACHE = "private, no-store, max-age=0";
+import { classifyAuthFailure, isPrefetchRequest, shouldContactAuthServer } from "@/lib/auth/session-policy";
 
 function copyCookies(from: NextResponse, to: NextResponse) {
   from.cookies.getAll().forEach((cookie) => {
@@ -19,17 +18,25 @@ function redirectTo(request: NextRequest, session: NextResponse, pathname: strin
   url.search = search;
   const redirect = NextResponse.redirect(url);
   copyCookies(session, redirect);
-  redirect.headers.set("Cache-Control", PRIVATE_CACHE);
   return redirect;
 }
 
 export async function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const isPublic = isPublicPath(pathname);
+
+  if (isPrefetchRequest(request.headers) && !isPublic) {
+    return new NextResponse(null, { status: 204 });
+  }
+
   let session = NextResponse.next({ request });
+  if (!shouldContactAuthServer(isPublic)) {
+    return session;
+  }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
   if (!url || !anon) {
-    if (isPublicPath(request.nextUrl.pathname)) return session;
     return redirectTo(request, session, "/login", "?error=unavailable");
   }
 
@@ -49,20 +56,9 @@ export async function proxy(request: NextRequest) {
   });
 
   const { data, error } = await supabase.auth.getUser();
-  const pathname = request.nextUrl.pathname;
-
-  if (isPublicPath(pathname)) {
-    session.headers.set("Cache-Control", PRIVATE_CACHE);
-    return session;
-  }
-
   if (error || !data.user) {
-    const message = (error?.message ?? "").toLowerCase();
-    const transport =
-      error?.name === "AuthRetryableFetchError" ||
-      message.includes("fetch") ||
-      message.includes("network");
-    const reason = transport ? "unavailable" : "signed_out";
+    const status = classifyAuthFailure(error);
+    const reason = status === "temporarily_unavailable" ? "unavailable" : status === "terminal_invalid_session" ? "session_ended" : "signed_out";
     const next = safeNextPath(`${pathname}${request.nextUrl.search}`);
     return redirectTo(request, session, "/login", `?error=${reason}&next=${encodeURIComponent(next)}`);
   }
@@ -70,11 +66,7 @@ export async function proxy(request: NextRequest) {
   const allowlist = parseAuthorisedUserIds(process.env.AQIL_AUTHORISED_USER_IDS);
   let permitted = isAllowlisted(data.user.id, allowlist);
   if (!permitted) {
-    const grant = await supabase
-      .from("access_grants")
-      .select("role")
-      .eq("user_id", data.user.id)
-      .maybeSingle();
+    const grant = await supabase.from("access_grants").select("role").eq("user_id", data.user.id).maybeSingle();
     if (grant.error) {
       const missing =
         grant.error.code === "42P01" ||
@@ -92,7 +84,6 @@ export async function proxy(request: NextRequest) {
     return redirectTo(request, session, "/access-denied", "");
   }
 
-  session.headers.set("Cache-Control", PRIVATE_CACHE);
   return session;
 }
 

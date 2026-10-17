@@ -5,6 +5,13 @@ import { isAllowlisted, isForeignUserId, parseAuthorisedUserIds } from "./allowl
 import { oauthCallbackDestination } from "./oauth-callback.ts";
 import { isPublicPath } from "./paths.ts";
 import { safeNextPath } from "./safe-next.ts";
+import {
+  classifyAuthFailure,
+  documentCacheControl,
+  isPrefetchRequest,
+  isProviderEnabled,
+  shouldContactAuthServer,
+} from "./session-policy.ts";
 
 const FOUNDER = "11111111-1111-4111-8111-111111111111";
 const OTHER = "22222222-2222-4222-8222-222222222222";
@@ -59,6 +66,35 @@ test("oauth callback rejects mismatched origins and failed exchanges", () => {
     oauthCallbackDestination({ ...base, next: "https://evil.example" }),
     "http://localhost:3000/",
   );
+});
+
+test("missing auth configuration is one stable unavailable state", () => {
+  assert.equal(classifyAuthFailure({ name: "AuthRetryableFetchError" }), "temporarily_unavailable");
+  assert.equal(classifyAuthFailure({ status: 429, message: "rate limit" }), "temporarily_unavailable");
+  assert.equal(
+    classifyAuthFailure({ message: "Invalid Refresh Token: Already Used" }),
+    "terminal_invalid_session",
+  );
+  assert.equal(classifyAuthFailure(null), "signed_out");
+});
+
+test("public routes do not contact the auth server", () => {
+  assert.equal(shouldContactAuthServer(true), false);
+  assert.equal(shouldContactAuthServer(false), true);
+  assert.equal(documentCacheControl(), null);
+});
+
+test("prefetch of a private route is recognisable and does not bounce", () => {
+  const headers = new Headers({ "next-router-prefetch": "1" });
+  assert.equal(isPrefetchRequest(headers), true);
+  assert.equal(isPrefetchRequest(new Headers()), false);
+});
+
+test("only google is enabled", () => {
+  assert.equal(isProviderEnabled("google"), true);
+  assert.equal(isProviderEnabled("apple"), false);
+  assert.equal(isProviderEnabled("facebook"), false);
+  assert.equal(isProviderEnabled("email"), false);
 });
 
 test("public routes stay reachable without a session", () => {

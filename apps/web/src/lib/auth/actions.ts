@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { safeNextPath } from "@/lib/auth/safe-next";
+import { isProviderEnabled } from "@/lib/auth/session-policy";
 import { isSupabaseConfigured } from "@/lib/env/public";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -18,6 +19,9 @@ export async function signInWithGoogle(formData: FormData): Promise<void> {
     redirect("/login?error=unavailable");
   }
 
+  if (!isProviderEnabled("google")) {
+    redirect("/login?error=provider_denied");
+  }
   const supabase = await createSupabaseServerClient();
   const redirectTo = `${appOrigin()}/auth/callback?next=${encodeURIComponent(next)}`;
   const { data, error } = await supabase.auth.signInWithOAuth({

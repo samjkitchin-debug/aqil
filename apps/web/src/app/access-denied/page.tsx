@@ -7,10 +7,13 @@ import { resolveAccess } from "@/lib/auth/access";
 
 async function DeniedBody() {
   const access = await resolveAccess();
-  if (access.status === "signed_out" || access.status === "unavailable") {
-    redirect("/login?error=" + (access.status === "unavailable" ? "unavailable" : "signed_out"));
+  if (access.status === "signed_out" || access.status === "terminal_invalid_session") {
+    redirect("/login?error=" + (access.status === "terminal_invalid_session" ? "session_ended" : "signed_out"));
   }
-  if (access.status === "authorised") {
+  if (access.status === "temporarily_unavailable") {
+    redirect("/login?error=unavailable");
+  }
+  if (access.status === "authenticated_authorised") {
     redirect("/");
   }
 

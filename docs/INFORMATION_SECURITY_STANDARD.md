@@ -96,7 +96,7 @@ Severity: **C** critical, **H** high, **M** medium, **L** low. Status: **Open**,
 
 | ID | Risk | Sev | Mitigation | Owner | Status |
 |----|------|-----|------------|-------|--------|
-| R1 | Auth not implemented; private routes undefined | H | Ship per `AUTH_AND_SESSION_DOCTRINE.md` before any private wealth UI | Engineering | Open |
+| R1 | Auth not implemented; private routes undefined | H | Google via Supabase Auth; explicit allow-list or `access_grants`; proxy does not refresh on public routes. Not an ISO 27001 certification. Live OAuth and hosted migration still outstanding | Engineering | Mitigated (partial — pgTAP and a live Google round trip were not run in the flicker fix) |
 | R2 | Hosted DB has no migrations applied; manual drift risk | M | `db push` only after CI pgTAP + explicit approval; never `test db --linked` | Founder | Mitigated (process) |
 | R3 | Service role imported client-side | C | `server-only` boundary; CI grep / review checklist | Engineering | Mitigated (partial — no automated bundle scan yet) |
 | R4 | Default Supabase table grants (`TRUNCATE`, `TRIGGER`) | H | `REVOKE ALL` pattern + pgTAP negatives on `user_settings` | Engineering | Mitigated |

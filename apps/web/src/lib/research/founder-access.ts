@@ -15,5 +15,5 @@ export function researchFixtureFallbackAllowed(): boolean {
  */
 export async function isFounderResearchAuthorised(): Promise<boolean> {
   const access = await resolveAccess();
-  return access.status === "authorised";
+  return access.status === "authenticated_authorised";
 }
