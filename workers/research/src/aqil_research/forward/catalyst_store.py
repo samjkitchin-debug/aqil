@@ -89,9 +89,10 @@ def upsert_catalyst_event(
             )
             return "updated"
 
-        if isinstance(previous_payload, dict) and _stable_payload(previous_payload) != _stable_payload(
-            payload,
-        ):
+        prev_stable = (
+            _stable_payload(previous_payload) if isinstance(previous_payload, dict) else None
+        )
+        if prev_stable is not None and prev_stable != _stable_payload(payload):
             cur.execute(
                 """
                 update forward.catalyst_events
