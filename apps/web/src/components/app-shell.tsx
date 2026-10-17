@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import Link from "next/link";
 
+import { SignOutControl } from "@/components/auth/sign-out-control";
 import { PrimaryNav } from "@/components/primary-nav";
 import { PageContainer } from "@/components/ui/page-container";
 import { SkipLink } from "@/components/ui/skip-link";
@@ -22,9 +24,12 @@ export function AppShell({ title, children }: AppShellProps) {
             >
               Aqil
             </Link>
-            <p className="aq-shell-page-title hidden text-muted sm:block">
-              {title}
-            </p>
+            <div className="flex items-center gap-[var(--space-3)]">
+              <p className="aq-shell-page-title hidden text-muted sm:block">{title}</p>
+              <Suspense fallback={null}>
+                <SignOutControl />
+              </Suspense>
+            </div>
           </div>
         </PageContainer>
       </header>

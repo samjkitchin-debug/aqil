@@ -5,7 +5,7 @@ type Props = {
 export function ResearchEmptyState({ reason }: Props) {
   const message =
     reason === "unauthorized"
-      ? "Founder research is not available in this session."
+      ? "Private research is available only to an explicitly authorised account."
       : reason === "invalid"
         ? "The research insight file could not be validated. Run the local research preview pipeline to regenerate it."
         : "No founder research insight is available yet. Run npm run research:preview after starting local Supabase.";

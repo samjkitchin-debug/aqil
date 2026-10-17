@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
 import { ForwardHorizonSection } from "@/components/forward/forward-horizon-section";
 import { ResearchEmptyState } from "@/components/research/research-empty-state";
@@ -22,6 +23,8 @@ async function CalendarBody() {
 export default function CalendarPage() {
   return (
     <AppShell title="Calendar">
+      <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
+        <PrivatePage nextPath="/calendar">
       <h1 className="aq-panel-heading mb-[var(--space-4)] font-semibold text-foreground">
         Calendar
       </h1>
@@ -31,6 +34,8 @@ export default function CalendarPage() {
       </p>
       <Suspense fallback={<ResearchEmptyState reason="missing" />}>
         <CalendarBody />
+      </Suspense>
+        </PrivatePage>
       </Suspense>
     </AppShell>
   );

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
 import { ResearchEmptyState } from "@/components/research/research-empty-state";
 import { ForwardResearchDetail } from "@/components/forward/forward-research-detail";
@@ -39,8 +40,12 @@ async function ResearchDetail() {
 export default function ResearchPage() {
   return (
     <AppShell title="Research">
+      <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
+        <PrivatePage nextPath="/research">
       <Suspense fallback={<ResearchEmptyState reason="missing" />}>
         <ResearchDetail />
+      </Suspense>
+        </PrivatePage>
       </Suspense>
     </AppShell>
   );

@@ -5,6 +5,21 @@ export type Database = {
   
   "public": {
           Tables: {
+            "access_grants": {
+                  Row: {
+                    "created_at": string,"role": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"role": string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"role"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },
             "user_settings": {
                   Row: {
                     "created_at": string,"locale": string,"timezone": string,"updated_at": string,"user_id": string

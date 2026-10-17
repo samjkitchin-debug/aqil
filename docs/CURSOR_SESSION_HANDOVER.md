@@ -391,3 +391,29 @@ Row counts stayed: instruments 1, holdings snapshots 1, holding lines 3, catalys
 - **main:** PR #7 merged (`54c4a16`).
 - **M4:** PR #8 `m4/forward-intelligence`. GitHub Actions on the correction commit is the merge gate.
 
+## Session handover — 2026-10-18 (Google auth foundation)
+
+### Current objective
+Replace the founder-cookie gate with Supabase Google OAuth, explicit founder allow-listing, and fail-closed private routes.
+
+### Git
+- Branch: `auth/google-foundation` from `origin/main` (`dd82e40`)
+- PR #11 (My Wealth) and M5/M6 were not merged
+
+### Tests and verification
+| Check | Result |
+|-------|--------|
+| `npm run test:auth` | 6 passed |
+| typecheck, lint, `npm run build` | pass |
+| `npm run db:test` | not run — Docker engine offline |
+| Playwright | not run — browser binary missing in this environment |
+| curl against `next start` on port 3010 | `/research` and `/my-wealth` returned 307 to `/login?error=unavailable` with `Cache-Control: private, no-store`; login HTML had the Google button and no research payload; `/auth/callback?error=access_denied` redirected to `error=provider_denied` |
+
+### Unverified
+- pgTAP `access_grants_rls.test.sql` (needs Docker / CI database job)
+- Live Google OAuth round-trip (needs the founder's client id in the Supabase project and `AQIL_AUTHORISED_USER_IDS`)
+
+### Next recommended step
+- After this PR merges, rebase PR #11 and delete the unauthenticated synthetic portfolio fallback in `load-snapshot.ts`.
+
+

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
 import { ResearchEmptyState } from "@/components/research/research-empty-state";
 import { ResearchInsightView } from "@/components/research/research-insight-view";
@@ -41,6 +42,8 @@ async function HorizonSection() {
 export default function TodayPage() {
   return (
     <AppShell title="Today">
+      <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
+      <PrivatePage nextPath="/">
       <section aria-labelledby="horizon-heading" className="mb-[var(--space-6)]">
         <h2 id="horizon-heading" className="research-section-title sr-only">
           On the horizon
@@ -61,6 +64,8 @@ export default function TodayPage() {
           <MacroIntelligenceSection />
         </Suspense>
       </section>
+      </PrivatePage>
+      </Suspense>
     </AppShell>
   );
 }
