@@ -145,6 +145,16 @@ def collect_and_run_sahm(
     save_research_run(conn, run)
     replay = verify_stored_run_replay(conn, run_id)
     recompute_match = replay.full_match
+    if not recompute_match:
+        warnings = tuple(
+            list(warnings)
+            + [
+                "Replay mismatch: "
+                f"input_snapshot={replay.input_snapshot_hash_match}, "
+                f"payload={replay.analytical_payload_hash_match}, "
+                f"observation_ids={replay.observation_ids_match}",
+            ],
+        )
 
     chart_points = _chart_points(by_period)
     insight = build_sahm_insight(run, chart_points=chart_points)

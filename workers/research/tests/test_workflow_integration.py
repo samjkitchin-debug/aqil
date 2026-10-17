@@ -76,7 +76,17 @@ def test_collect_and_run_fixture_e2e(require_db: None) -> None:
         )
     assert outcome.run_id == run_id
     assert outcome.execution_status == "completed"
-    assert outcome.recompute_match is True
+    if not outcome.recompute_match:
+        with research_connection() as conn:
+            from aqil_research.persistence.reproduce import verify_stored_run_replay
+
+            replay = verify_stored_run_replay(conn, run_id)
+            raise AssertionError(
+                f"replay mismatch: input_snapshot={replay.input_snapshot_hash_match}, "
+                f"payload={replay.analytical_payload_hash_match}, "
+                f"observation_ids={replay.observation_ids_match}, "
+                f"warnings={outcome.warnings}",
+            )
     with research_connection() as conn:
         from aqil_research.persistence.reproduce import recompute_stored_run
         from aqil_research.persistence.runs import load_research_run

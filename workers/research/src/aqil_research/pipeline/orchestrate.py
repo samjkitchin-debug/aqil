@@ -188,7 +188,17 @@ def execute_research_run(
         )
 
     if execution.observation_ids:
-        snapshot_hash = cited_observation_snapshot_hash(store, list(execution.observation_ids))
+        wanted = frozenset(execution.observation_ids)
+        cited_from_as_of = tuple(
+            sorted(
+                (obs for obs in by_period.values() if obs.observation_id in wanted),
+                key=lambda row: row.observation_id,
+            ),
+        )
+        if len(cited_from_as_of) == len(wanted):
+            snapshot_hash = content_snapshot_hash(cited_from_as_of)
+        else:
+            snapshot_hash = cited_observation_snapshot_hash(store, list(execution.observation_ids))
     else:
         snapshot_hash = content_snapshot_hash(())
 
