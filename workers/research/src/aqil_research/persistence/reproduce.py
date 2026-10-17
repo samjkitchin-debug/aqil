@@ -94,6 +94,7 @@ def recompute_stored_run(conn: psycopg.Connection, run_id: str) -> ResearchRun:
         method_config=method_config,
         collect=False,
         primary_adapter_id=stored.adapter_ids[0] if stored.adapter_ids else None,
+        replay_frozen_observations=True,
     )
     recomputed = execute_research_run(
         request,

@@ -146,7 +146,14 @@ def execute_research_run(
         )
 
     evaluation_period = date.fromisoformat(request.evaluation_period)
-    by_period = store.as_of(request.dataset_id, request.decision_at, request.analysis_mode)
+    if request.replay_frozen_observations:
+        by_period = {
+            obs.period_start: obs
+            for obs in store.all_observations()
+            if obs.dataset_id == request.dataset_id
+        }
+    else:
+        by_period = store.as_of(request.dataset_id, request.decision_at, request.analysis_mode)
     as_of_snapshot_hash = content_snapshot_hash(
         tuple(by_period[period] for period in sorted(by_period)),
     )

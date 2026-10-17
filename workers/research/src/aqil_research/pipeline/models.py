@@ -26,6 +26,7 @@ class ResearchExecutionRequest(BaseModel):
     collect: bool = False
     primary_adapter_id: str | None = None
     optional_adapter_ids: tuple[str, ...] = ()
+    replay_frozen_observations: bool = False
 
 
 class ResearchRunRequest(BaseModel):

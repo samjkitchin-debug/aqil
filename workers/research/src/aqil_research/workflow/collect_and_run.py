@@ -143,7 +143,7 @@ def collect_and_run_sahm(
         run_id=run_id,
     )
     save_research_run(conn, run)
-    replay = verify_stored_run_replay(conn, run_id, stored=run)
+    replay = verify_stored_run_replay(conn, run_id)
     recompute_match = replay.full_match
     if not recompute_match:
         warnings = tuple(
