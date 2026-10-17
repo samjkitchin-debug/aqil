@@ -7,6 +7,7 @@ export type AccessStatus =
 
 export type AuthFailure = {
   name?: string;
+  code?: string;
   message?: string;
   status?: number;
 };
@@ -20,17 +21,24 @@ export function isProviderEnabled(provider: string): provider is EnabledAuthProv
   return (ENABLED as readonly string[]).includes(provider);
 }
 
+const TERMINAL_REFRESH_CODES = new Set([
+  "refresh_token_not_found",
+  "refresh_token_already_used",
+  "session_not_found",
+]);
+
+/**
+ * 429 and 5xx are temporary. A confirmed dead refresh token is terminal.
+ * A bare 401 or 403 is neither: it must not clear every session and it is not proof the Auth service is down.
+ */
 export function classifyAuthFailure(error: AuthFailure | null): AccessStatus {
   if (!error) return "signed_out";
+  const message = (error.message ?? "").toLowerCase();
+  const code = (error.code ?? "").toLowerCase();
   if (
     error.status === 429 ||
     (typeof error.status === "number" && error.status >= 500 && error.status <= 599) ||
-    error.name === "AuthRetryableFetchError"
-  ) {
-    return "temporarily_unavailable";
-  }
-  const message = (error.message ?? "").toLowerCase();
-  if (
+    error.name === "AuthRetryableFetchError" ||
     message.includes("fetch") ||
     message.includes("network") ||
     message.includes("timeout") ||
@@ -39,15 +47,12 @@ export function classifyAuthFailure(error: AuthFailure | null): AccessStatus {
     return "temporarily_unavailable";
   }
   if (
-    message.includes("refresh") &&
-    (message.includes("already used") ||
-      message.includes("not found") ||
-      message.includes("invalid") ||
-      message.includes("revoked"))
+    TERMINAL_REFRESH_CODES.has(code) ||
+    (message.includes("refresh") &&
+      (message.includes("already used") || message.includes("not found") || message.includes("revoked")))
   ) {
     return "terminal_invalid_session";
   }
-  if (error.status === 401 || error.status === 403) return "terminal_invalid_session";
   return "signed_out";
 }
 
@@ -81,19 +86,24 @@ export function configuredAppOrigin(env: {
   return { ok: true, origin: "http://localhost:3000" };
 }
 
+/**
+ * Next.js 16 prefetch uses `next-router-prefetch` or `next-router-segment-prefetch`.
+ * A real navigation sets `sec-fetch-mode: navigate` or `rsc` without those headers.
+ * Server Actions set `next-action` and must reach the action.
+ */
 export function isPrefetchRequest(headers: { get(name: string): string | null }): boolean {
-  return (
-    headers.get("next-router-prefetch") === "1" ||
-    headers.get("purpose") === "prefetch" ||
-    headers.get("sec-purpose") === "prefetch"
-  );
+  if (headers.get("next-action")) return false;
+  if (headers.get("sec-fetch-mode") === "navigate") return false;
+  const nextPrefetch =
+    headers.get("next-router-prefetch") === "1" || headers.get("next-router-segment-prefetch") === "1";
+  const purpose = `${headers.get("purpose") ?? ""} ${headers.get("sec-purpose") ?? ""}`.toLowerCase();
+  const browserPrefetch = purpose.includes("prefetch");
+  if (!nextPrefetch && !browserPrefetch) return false;
+  if (headers.get("rsc") === "1" && !nextPrefetch) return false;
+  return true;
 }
 
-/**
- * HTML documents must not be marked no-store. Next's dev client treats that as
- * immediately stale and reloads the document. Dynamic rendering already opts
- * private routes out of the static cache.
- */
+/** Auth helpers do not set document cache policy. Private routes set it in next.config.ts. */
 export function documentCacheControl(): null {
   return null;
 }

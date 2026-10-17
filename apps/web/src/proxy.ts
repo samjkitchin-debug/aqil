@@ -17,6 +17,14 @@ function copyCookies(from: NextResponse, to: NextResponse) {
   });
 }
 
+function clearLocalAuthCookies(request: NextRequest, response: NextResponse) {
+  for (const cookie of request.cookies.getAll()) {
+    if (cookie.name.startsWith("sb-") && cookie.name.includes("-auth-token")) {
+      response.cookies.set(cookie.name, "", { path: "/", maxAge: 0 });
+    }
+  }
+}
+
 function redirectTo(request: NextRequest, session: NextResponse, pathname: string, search: string) {
   const url = request.nextUrl.clone();
   url.pathname = pathname;
@@ -64,23 +72,24 @@ export async function proxy(request: NextRequest) {
     },
   });
 
+  // getUser() calls the Auth user endpoint. The installed SDK refreshes the
+  // access token only when it is inside the expiry margin, then setAll copies
+  // those cookies onto this request for the server render. This is not a second
+  // refresh by itself, and it does not publish an identity header.
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) {
     const status = classifyAuthFailure(error);
-    if (status === "terminal_invalid_session") {
-      try {
-        await supabase.auth.signOut();
-      } catch {
-        // Cookie cleanup is best-effort. Do not retry.
-      }
-    }
     const reason =
       status === "temporarily_unavailable"
         ? "unavailable"
         : status === "terminal_invalid_session"
           ? "session_ended"
           : "signed_out";
-    return redirectTo(request, session, "/login", `?error=${reason}&next=${encodeURIComponent(next)}`);
+    const redirect = redirectTo(request, session, "/login", `?error=${reason}&next=${encodeURIComponent(next)}`);
+    if (status === "terminal_invalid_session") {
+      clearLocalAuthCookies(request, redirect);
+    }
+    return redirect;
   }
 
   const allowlist = parseAuthorisedUserIds(process.env.AQIL_AUTHORISED_USER_IDS);
@@ -93,7 +102,7 @@ export async function proxy(request: NextRequest) {
         grant.error.code === "PGRST205" ||
         grant.error.message.toLowerCase().includes("access_grants");
       if (!missing) {
-        return redirectTo(request, session, "/login", "?error=unavailable");
+        return redirectTo(request, session, "/login", `?error=unavailable&next=${encodeURIComponent(next)}`);
       }
     } else if (grant.data?.role === "founder") {
       permitted = true;

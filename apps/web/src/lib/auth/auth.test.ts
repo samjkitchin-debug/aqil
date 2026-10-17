@@ -78,6 +78,9 @@ test("missing auth configuration is one stable unavailable state", () => {
     classifyAuthFailure({ message: "Invalid Refresh Token: Already Used" }),
     "terminal_invalid_session",
   );
+  assert.equal(classifyAuthFailure({ code: "refresh_token_not_found", status: 401 }), "terminal_invalid_session");
+  assert.equal(classifyAuthFailure({ status: 401, message: "unauthorized" }), "signed_out");
+  assert.equal(classifyAuthFailure({ status: 403, message: "forbidden" }), "signed_out");
   assert.equal(classifyAuthFailure(null), "signed_out");
 });
 
@@ -93,8 +96,11 @@ test("public routes do not contact the auth server", () => {
 });
 
 test("prefetch of a private route is recognisable and does not bounce", () => {
-  const headers = new Headers({ "next-router-prefetch": "1" });
-  assert.equal(isPrefetchRequest(headers), true);
+  assert.equal(isPrefetchRequest(new Headers({ "next-router-prefetch": "1" })), true);
+  assert.equal(isPrefetchRequest(new Headers({ "next-router-segment-prefetch": "1" })), true);
+  assert.equal(isPrefetchRequest(new Headers({ rsc: "1", "next-router-state-tree": "%5B%5D" })), false);
+  assert.equal(isPrefetchRequest(new Headers({ "sec-fetch-mode": "navigate", "sec-purpose": "prefetch" })), false);
+  assert.equal(isPrefetchRequest(new Headers({ "next-action": "abc", "next-router-prefetch": "1" })), false);
   assert.equal(isPrefetchRequest(new Headers()), false);
 });
 

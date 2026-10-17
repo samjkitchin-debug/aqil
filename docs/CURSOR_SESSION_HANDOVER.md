@@ -455,4 +455,42 @@ The flicker was a document reload of `/login?error=unavailable`, not a 307 redir
 ### Next recommended step
 Re-run `npm run db:test` when Docker is up, then one real Google sign-in once the dashboard client and allow-list are set. Do not merge PR #11 or apply hosted migrations until that evidence exists.
 
+## Session handover — 2026-10-18 (auth final hardening)
+
+### Current objective
+Remove global sign-out from the proxy, correct privacy claims, and run the checks that can actually run on this machine.
+
+### Confirmed findings still true at b662596, and what changed
+- A bare HTTP 401 or 403 was classified as a terminal session, and the proxy then called `signOut()` (global by default in the installed SDK). That call is removed. Only a confirmed dead refresh token (`refresh_token_not_found`, `refresh_token_already_used`, `session_not_found`, or the matching message) is terminal, and the proxy only expires the local auth cookies.
+- Explicit sign-out now uses `scope: "local"`.
+- The installed GoTrue client refreshes inside the expiry margin only. A labelled mock fetch showed two `getUser()` calls on a current token make two user lookups and zero token refreshes. An expired token refreshed once. This is not a live rotation.
+- A database grant error now keeps the `next` path.
+- Next.js 16 prefetch is `next-router-prefetch` or `next-router-segment-prefetch`. A navigation (`sec-fetch-mode: navigate`) or a Server Action is not answered with 204.
+- `getClaims()` is still absent. No identity header was added.
+
+### Tests
+| Check | Result |
+|-------|--------|
+| `npm run test:auth` | 13 passed (3 of them are mock Auth HTTP, labelled in the test name) |
+| Production `next build` | passed |
+| Local `supabase test db` on 127.0.0.1 | 75 pgTAP passed, including `access_grants_rls.test.sql`. Windows had reserved ports 54321–54329, so the stack was started on temporary local ports and `config.toml` was restored afterwards. |
+| Playwright laptop project against `next start` on port 3010 | 25 passed, 1 failed. The failure is `/auth/callback?error=access_denied` landing on `error=unavailable` because this build had no `NEXT_PUBLIC_APP_URL`. CI bakes that URL in at build time. |
+| Production login idle, 300 seconds | Stayed on `/login?error=unavailable`. 1 document request. Footer prefetch of `/privacy` and `/tos` only. No protected-route request. |
+| Dev login via 127.0.0.1 | 6 document loads. The dev log shows Next blocked HMR from 127.0.0.1. That is not an Auth redirect loop. |
+| Client static chunks | no `SERVICE_ROLE`, `client_secret` or `sb_secret_` match |
+| Real Google OAuth, second identity, two tabs, live 429/503, revoked refresh | not run. No `.env` or `.env.local` is present, so there is no configured Google client or allow-list. |
+| My Wealth RLS | not on this branch |
+
+### PR #11 rebase, not done here
+- `load-snapshot.ts` still returns the synthetic fixture when `getUser()` has no user, after the old founder-cookie gate.
+- That branch's `founder-access.ts` still accepts the founder cookie, the founder header, and a non-production open gate.
+- `my_wealth_rls.test.sql` has 3 tests (cross-user read, cross-user insert, anon select). It does not cover update, delete, or the other wealth tables.
+- There is no portfolio mutation server action on that branch.
+
+### Verdict
+Not safe for real founder financial data. Do not merge PR #11 onto this until the fixture fallback and founder cookie are gone and the wealth RLS file has been run. Do not apply hosted migrations.
+
+### Next recommended step
+Merge PR #12 only after its CI is green. Then rebase PR #11, delete the fixture fallback and cookie gate, and re-run wealth pgTAP. A live Google round trip still needs the dashboard client and `AQIL_AUTHORISED_USER_IDS`.
+
 

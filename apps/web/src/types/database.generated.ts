@@ -19,8 +19,7 @@ export type Database = {
                   Relationships: [
                     
                   ]
-                },
-            "user_settings": {
+                },"user_settings": {
                   Row: {
                     "created_at": string,"locale": string,"timezone": string,"updated_at": string,"user_id": string
                   }

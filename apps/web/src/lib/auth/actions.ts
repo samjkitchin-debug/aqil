@@ -46,7 +46,7 @@ export async function signInWithGoogle(formData: FormData): Promise<void> {
 export async function signOut(): Promise<void> {
   if (isSupabaseConfigured()) {
     const supabase = await createSupabaseServerClient();
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({ scope: "local" });
   }
   redirect("/login");
 }

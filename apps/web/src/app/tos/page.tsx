@@ -45,7 +45,7 @@ export default function TermsPage() {
           <LegalList
             items={[
               "Features, data sources and access controls may change without notice during development.",
-              "Demonstration or synthetic data may be shown when live data or your account is unavailable.",
+              "Labelled research fixtures can appear only outside production, and only when an operator sets AQIL_ALLOW_RESEARCH_FIXTURE. An unavailable account does not fall back to synthetic holdings.",
               "The service does not execute trades, hold client money or connect to a brokerage for order placement in the current implementation.",
               "Availability is not guaranteed; maintenance, source outages or auth issues may interrupt access.",
             ]}

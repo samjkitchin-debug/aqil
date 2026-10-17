@@ -27,11 +27,12 @@ export default function PrivacyPage() {
 
         <LegalSection title="Authentication">
           <LegalParagraph>
-            Sign-in is handled by Supabase Auth. Google is the only enabled provider. A successful
-            Google sign-in creates a Supabase user id. It does not by itself permit use of private
-            research or portfolio screens. Permission is an explicit operator allow-list or an
-            access_grants row. Accounts are not linked automatically because two providers share an
-            email address. There is no separate founder cookie.
+            Sign-in is handled by Supabase Auth. Google is the only provider enabled in this
+            application. A successful Google sign-in creates a Supabase user id. That id is the
+            application identity. Signing in does not by itself permit private research or portfolio
+            screens. Permission is an operator allow-list or an access_grants row. Aqil does not
+            merge accounts by comparing email addresses. Supabase Auth may still link identities
+            when that project&apos;s own provider settings do so. There is no separate founder cookie.
           </LegalParagraph>
           <LegalParagraph>
             When you sign in with Google, Supabase receives the profile information Google shares
@@ -64,10 +65,10 @@ export default function PrivacyPage() {
 
         <LegalSection title="How we use this information">
           <LegalParagraph>
-            We use account and portfolio data to operate the product for you: displaying your
-            holdings and plan, running deterministic analytics you request in the interface, and
-            enforcing per-user access in the application and database. We do not use positive
-            research outputs to change your strategic allocation targets automatically.
+            Account data is used to decide whether this browser may open private screens. This
+            branch does not store portfolio holdings, and it does not run portfolio analytics. When
+            a later portfolio migration is applied, those rows are meant to stay tied to the
+            Supabase user id. Research outputs do not change allocation targets in this application.
           </LegalParagraph>
           <LegalParagraph>
             Engineering policy is to avoid writing access tokens, refresh tokens, cookies, OAuth
@@ -83,18 +84,21 @@ export default function PrivacyPage() {
             repository does not fix a production region.
           </LegalParagraph>
           <LegalParagraph>
-            Pages that can show private wealth information are served with cache-control headers
-            intended to prevent public caching (private, no-store on the My wealth route in the
-            application configuration).
+            API routes and the private screens (home, explore, calendar, learn, research and my
+            wealth) are configured with Cache-Control: private, no-store, max-age=0. A production
+            check on 18 October 2026 saw that header on the research and my wealth redirects. The
+            login, privacy and terms pages are prerendered and were served with Cache-Control:
+            s-maxage=31536000. They do not contain portfolio rows. This is not a retention period.
           </LegalParagraph>
         </LegalSection>
 
         <LegalSection title="Security">
           <LegalParagraph>
             Traffic between your browser and the application is expected to use HTTPS in deployed
-            environments. Database access from the application uses Supabase credentials and row-level
-            security policies on private tables so authenticated users can read and write only their
-            own rows (verified in automated database tests for user settings and wealth tables).
+            environments. The repository defines row-level security for user settings and access
+            grants. Those policies are enforced by the database, not by a header from the proxy.
+            Wealth-table policies are not part of this branch. A policy file is not the same as a
+            completed test run; the handover records which database tests actually passed.
           </LegalParagraph>
           <LegalParagraph>
             We have not published an independent security audit, backup restore drill or encryption
