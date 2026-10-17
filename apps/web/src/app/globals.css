@@ -2,6 +2,7 @@
 @import "../styles/tokens.css";
 @import "../styles/layout.css";
 @import "../styles/research.css";
+@import "../styles/wealth.css";
 @import "../styles/forward.css";
 
 @theme inline {

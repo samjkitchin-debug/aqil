@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test:forward-contract": "node --experimental-strip-types --test src/lib/forward/validate-forward-horizon.test.ts",
+    "test:wealth": "node --experimental-strip-types --test src/lib/wealth/analytics.test.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

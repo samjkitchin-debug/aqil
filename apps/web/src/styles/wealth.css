@@ -1,0 +1,122 @@
+.wealth-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-section-gap);
+  max-width: var(--layout-content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--layout-gutter);
+}
+
+.wealth-banner {
+  padding: var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface);
+}
+
+.wealth-panel {
+  padding: var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface);
+}
+
+.wealth-headline {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--colour-text-primary);
+  margin: var(--space-2) 0;
+}
+
+.wealth-section-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin: 0 0 var(--space-2);
+  color: var(--colour-text-primary);
+}
+
+.wealth-subtitle {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+.wealth-body,
+.wealth-meta {
+  color: var(--colour-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.wealth-meta {
+  font-size: var(--font-size-sm);
+}
+
+.wealth-warning {
+  color: var(--colour-accent-gold);
+  font-size: var(--font-size-sm);
+}
+
+.wealth-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.wealth-table th,
+.wealth-table td {
+  text-align: left;
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--colour-border);
+}
+
+.wealth-holdings-list,
+.wealth-allocation-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.wealth-allocation-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.wealth-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-3) 0;
+}
+
+.wealth-input {
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  font-size: var(--font-size-md);
+  background: var(--colour-background);
+  color: var(--colour-text-primary);
+}
+
+.wealth-scenario-options {
+  border: none;
+  margin: var(--space-2) 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.wealth-radio {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.wealth-footer {
+  padding-bottom: var(--space-6);
+}
