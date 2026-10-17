@@ -31,6 +31,7 @@ apps/web/next-env.d.ts
 apps/web/.env
 apps/web/.env.*
 !apps/web/.env.example
+apps/web/.local/
 
 # Logs and diagnostics
 *.log

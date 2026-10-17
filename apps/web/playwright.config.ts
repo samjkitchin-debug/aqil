@@ -1,7 +1,9 @@
 import { defineConfig } from "@playwright/test";
 
 const port = process.env.PORT ?? "3000";
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${port}`;
+const baseURL =
+  process.env.PLAYWRIGHT_BASE_URL ??
+  (process.env.CI ? `http://localhost:${port}` : `http://127.0.0.1:${port}`);
 
 const viewportProjects = [
   { name: "phone-small", width: 320, height: 568 },
@@ -13,7 +15,7 @@ const viewportProjects = [
 
 export default defineConfig({
   testDir: "./e2e",
-  fullyParallel: true,
+  fullyParallel: !process.env.CI,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 1 : undefined,
@@ -34,5 +36,13 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    env: {
+      ...process.env,
+      RESEARCH_INSIGHT_PATH: "fixtures/research-insight.v1.json",
+      AQIL_ALLOW_RESEARCH_FIXTURE: "true",
+      AQIL_FOUNDER_INSIGHT_TOKEN: "ci-founder-test-token",
+      AQIL_ALLOW_FOUNDER_INSIGHT_HEADER: "true",
+      E2E_USE_DEV_SERVER: process.env.CI ? "true" : "false",
+    },
   },
 });

@@ -13,6 +13,7 @@ from aqil_research.methods.sahm import (
     SahmMethodError,
     run_sahm,
     sahm_implementation_hash,
+    sahm_threshold_crossed,
 )
 
 
@@ -58,9 +59,21 @@ class SahmAnalyticalMethod:
                 investment_implication="insufficient_evidence",
                 narrative=f"Calculation incomplete. Reason: {exc}",
             )
+        calculation = output.to_dict()
+        calculation["threshold_met"] = output.triggered
+        cited_ids = frozenset(output.observation_ids)
+        series = context.primary_series()
+        frozen_series = {
+            period: obs for period, obs in series.items() if obs.observation_id in cited_ids
+        }
+        calculation["threshold_crossed"] = sahm_threshold_crossed(
+            frozen_series,
+            context.evaluation_period,
+            config,
+        )
         return MethodExecutionResult(
             sufficiency="sufficient",
-            calculation=output.to_dict(),
+            calculation=calculation,
             observation_ids=output.observation_ids,
             assumptions=output.assumptions,
             limitations=output.limitations,

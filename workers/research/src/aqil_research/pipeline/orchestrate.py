@@ -9,6 +9,7 @@ from typing import Literal
 from aqil_research.adapters.registry import AdapterRegistry
 from aqil_research.methods.protocol import MethodContext
 from aqil_research.methods.registry import MethodRegistry
+from aqil_research.persistence.calculation_normalize import normalize_calculation_payload
 from aqil_research.pipeline.evidence import assess_analytical_evidence
 from aqil_research.pipeline.ingestion import IngestionBlockedError, ingest_from_adapter
 from aqil_research.pipeline.integrity import analytical_payload_hash
@@ -22,6 +23,26 @@ from aqil_research.sources.rights_gate import (
     resolve_research_rights,
 )
 from aqil_research.vintages.store import ObservationStore, content_snapshot_hash
+
+
+def cited_observation_snapshot_hash(
+    store: ObservationStore,
+    observation_ids: list[str],
+) -> str:
+    """Hash only observations cited on the run (frozen evidence set)."""
+    if not observation_ids:
+        return content_snapshot_hash(())
+    wanted = frozenset(observation_ids)
+    cited = tuple(
+        sorted(
+            (obs for obs in store.all_observations() if obs.observation_id in wanted),
+            key=lambda row: row.observation_id,
+        )
+    )
+    if len(cited) != len(wanted):
+        missing = wanted - {row.observation_id for row in cited}
+        raise ValueError(f"cited observations missing from store: {sorted(missing)}")
+    return content_snapshot_hash(cited)
 
 
 def execute_research_run(
@@ -108,6 +129,9 @@ def execute_research_run(
             if outcome.fetch and outcome.fetch.errors:
                 ingest_notes.extend(error.message for error in outcome.fetch.errors)
 
+    if not adapter_ids and request.primary_adapter_id:
+        adapter_ids.append(request.primary_adapter_id)
+
     try:
         assert_rights_for_replay(rights)
         assert_rights_for_analysis(rights)
@@ -122,9 +146,17 @@ def execute_research_run(
         )
 
     evaluation_period = date.fromisoformat(request.evaluation_period)
-    by_period = store.as_of(request.dataset_id, request.decision_at, request.analysis_mode)
-    snapshot_rows = tuple(by_period[period] for period in sorted(by_period))
-    snapshot_hash = content_snapshot_hash(snapshot_rows)
+    if request.replay_frozen_observations:
+        by_period = {
+            obs.period_start: obs
+            for obs in store.all_observations()
+            if obs.dataset_id == request.dataset_id
+        }
+    else:
+        by_period = store.as_of(request.dataset_id, request.decision_at, request.analysis_mode)
+    as_of_snapshot_hash = content_snapshot_hash(
+        tuple(by_period[period] for period in sorted(by_period)),
+    )
 
     method = method_registry.get(request.method_id)
     try:
@@ -137,7 +169,7 @@ def execute_research_run(
             wall_clock=wall_clock,
             run_id=run_id,
             rights=rights,
-            input_snapshot_hash=snapshot_hash,
+            input_snapshot_hash=as_of_snapshot_hash,
             method=method,
         )
 
@@ -157,11 +189,26 @@ def execute_research_run(
             wall_clock=wall_clock,
             run_id=run_id,
             rights=rights,
-            input_snapshot_hash=snapshot_hash,
+            input_snapshot_hash=as_of_snapshot_hash,
             method=method,
             config_id=getattr(config, "config_id", ""),
             config_hash=method.config_hash(config),
         )
+
+    if execution.observation_ids:
+        wanted = frozenset(execution.observation_ids)
+        cited_from_as_of = tuple(
+            sorted(
+                (obs for obs in by_period.values() if obs.observation_id in wanted),
+                key=lambda row: row.observation_id,
+            ),
+        )
+        if len(cited_from_as_of) == len(wanted):
+            snapshot_hash = content_snapshot_hash(cited_from_as_of)
+        else:
+            snapshot_hash = cited_observation_snapshot_hash(store, list(execution.observation_ids))
+    else:
+        snapshot_hash = content_snapshot_hash(())
 
     execution_status: Literal["completed", "completed_insufficient"] = (
         "completed" if execution.sufficiency == "sufficient" else "completed_insufficient"
@@ -193,7 +240,9 @@ def execute_research_run(
         input_snapshot_hash=snapshot_hash,
         data_sufficiency=execution.sufficiency,
         missing_data_reason=execution.missing_reason,
-        calculation=execution.calculation,
+        calculation=(
+            normalize_calculation_payload(execution.calculation) if execution.calculation else None
+        ),
         statistical_interpretation=execution.statistical_interpretation,
         causal_hypothesis=execution.causal_hypothesis,
         market_pricing="unknown",

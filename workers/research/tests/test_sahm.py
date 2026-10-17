@@ -43,6 +43,33 @@ def test_sahm_hand_calculated_trigger_at_published_threshold() -> None:
     assert output.triggered is True
 
 
+def test_sahm_threshold_crossed_requires_prior_month_below() -> None:
+    from aqil_research.methods.sahm import sahm_threshold_crossed
+
+    base = constant_unemployment_series(month_start(2023, 1), 21, "4.0")
+    spike_months = (
+        make_observation(
+            period_start=month_start(2024, 10),
+            raw_value="4.5",
+            provider_vintage_date=date(2024, 11, 5),
+        ),
+        make_observation(
+            period_start=month_start(2024, 11),
+            raw_value="4.5",
+            provider_vintage_date=date(2024, 12, 5),
+        ),
+        make_observation(
+            period_start=month_start(2024, 12),
+            raw_value="4.5",
+            provider_vintage_date=date(2025, 1, 5),
+        ),
+    )
+    by_period = _series_dict(base + spike_months)
+    assert run_sahm(by_period, month_start(2024, 12), SAHM_PUBLISHED).triggered is True
+    assert run_sahm(by_period, month_start(2024, 11), SAHM_PUBLISHED).triggered is False
+    assert sahm_threshold_crossed(by_period, month_start(2024, 12), SAHM_PUBLISHED) is True
+
+
 def test_sensitivity_config_changes_threshold_not_method() -> None:
     base = constant_unemployment_series(month_start(2023, 10), 12, "4.0")
     last_three = (

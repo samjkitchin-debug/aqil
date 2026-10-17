@@ -315,3 +315,47 @@ Complete durable research persistence: Postgres adapters, immutable runs, operat
 ### Next recommended step
 Review and merge PR #6 after green CI; rotate `research_worker` password on hosted apply.
 
+## Session handover — 2026-10-17 (M3 first investment-intelligence sprint)
+
+### What Aqil can do now
+- **Collect** permitted BLS unemployment data with rights checks, retrieval provenance, conflict handling and idempotent duplicate-response detection (`aqil-research collect`).
+- **Collect and run** Sahm end-to-end into PostgreSQL with replay verification and structured insight export (`aqil-research collect-and-run`).
+- **Founder web preview** on Today and Research via server-only `research_insight.v1.json` (fixture in CI; `.local/` from `npm run research:preview`).
+- **Manual GitHub workflow** `.github/workflows/research-pipeline.yml` (fixture dry run; live mode blocked until secrets).
+
+### Demonstrated (local)
+| Item | Value |
+|------|--------|
+| Fixture | `workers/research/tests/fixtures/bls/api_lns14000000_success.json` |
+| Run ID | `m3-e2e-run` |
+| Sahm gap | 0.50 pp; threshold met |
+| Insight export | `apps/web/fixtures/research-insight.v1.json` |
+| Commands | `npm run research:preview`; `uv run aqil-research collect-and-run ... --export-insight` |
+
+### Git
+- M2: **merged** PR #6 → `main` @ `36681bb` (+ credential fix `70b03b8` on branch before merge)
+- M3 branch: `m3/first-investment-intelligence` (PR URL after push)
+
+### Tests
+| Check | Result |
+|-------|--------|
+| `uv run pytest` | **67 passed**, 1 skipped |
+| `npm run db:test` | **55** pgTAP |
+| Web typecheck/lint | pass locally |
+| GitHub CI | pending on M3 PR |
+
+### Security / integrity
+- `research_worker`: NOLOGIN in migrations; password only via `scripts/provision-research-worker-local.sql` (not for hosted).
+- BLS data: **latest_revised**; UI labels internal preview; `publication_allowed` remains false.
+- No browser access to `research` schema or worker credentials.
+
+### Known limitations
+- `recompute_match` CLI flag may be false when the DB contains observations beyond the frozen run set; calculation dict replay is tested in workflow integration.
+- Treasury 10y–3m spread: assessed, **blocked** — see `docs/sources/TREASURY_YIELD_SPREAD_ASSESSMENT.md`.
+
+### Grok High review (paste when ready)
+Review M3 PR for: source rights, temporal integrity (latest-revised labelling), reproducibility, DB grants/function EXECUTE, secret handling, unpublished vs public research, Sahm insight wording. Do not reopen architecture.
+
+### Next milestone
+Hosted approval path: vault `research_worker` password, apply Git migrations, enable `research-pipeline` live mode with BLS key — then second macro source after Treasury licence resolution.
+

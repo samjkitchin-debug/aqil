@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/research_insight.v1.json",
+  "title": "Research insight v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "insight_id",
+    "run_id",
+    "generated_at",
+    "headline",
+    "what_changed",
+    "why_it_matters",
+    "historical_context",
+    "investor_implications",
+    "confidence_and_limitations",
+    "what_comes_next",
+    "method_id",
+    "method_version",
+    "dataset_id",
+    "analysis_mode",
+    "data_provenance",
+    "publication_status",
+    "verification_status",
+    "calculation_summary",
+    "source_attribution",
+    "observation_ids"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "insight_id": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "headline": { "type": "string", "minLength": 1 },
+    "what_changed": { "type": "string", "minLength": 1 },
+    "why_it_matters": { "type": "string", "minLength": 1 },
+    "historical_context": { "type": "string", "minLength": 1 },
+    "investor_implications": { "type": "string", "minLength": 1 },
+    "confidence_and_limitations": { "type": "string", "minLength": 1 },
+    "what_comes_next": { "type": "string", "minLength": 1 },
+    "method_id": { "type": "string" },
+    "method_version": { "type": "string" },
+    "dataset_id": { "type": "string" },
+    "analysis_mode": { "type": "string" },
+    "data_provenance": {
+      "type": "string",
+      "enum": ["latest_revised", "provider_vintage", "first_seen_by_aqil"]
+    },
+    "publication_status": {
+      "type": "string",
+      "enum": ["internal_preview", "not_eligible", "blocked"]
+    },
+    "verification_status": { "type": "string" },
+    "calculation_summary": { "type": "object" },
+    "source_attribution": { "type": "string" },
+    "observation_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "analytical_payload_hash": { "type": "string" },
+    "evidence_reasons": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "chart_points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["period", "value"],
+        "properties": {
+          "period": { "type": "string" },
+          "value": { "type": "number" }
+        }
+      }
+    }
+  }
+}

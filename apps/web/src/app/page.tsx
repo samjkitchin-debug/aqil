@@ -1,13 +1,48 @@
+import { Suspense } from "react";
+
 import { AppShell } from "@/components/app-shell";
-import { PlaceholderPanel } from "@/components/placeholder-panel";
+import { ResearchEmptyState } from "@/components/research/research-empty-state";
+import { ResearchInsightView } from "@/components/research/research-insight-view";
+import { loadFounderResearchInsight } from "@/lib/research/load-founder-insight";
+
+async function MacroIntelligenceSection() {
+  const loaded = await loadFounderResearchInsight();
+
+  if (loaded.status === "ok") {
+    return (
+      <ResearchInsightView
+        insight={loaded.insight}
+        source={loaded.source}
+        compact
+      />
+    );
+  }
+
+  const reason =
+    loaded.status === "invalid"
+      ? "invalid"
+      : loaded.status === "unauthorized"
+        ? "unauthorized"
+        : "missing";
+
+  return <ResearchEmptyState reason={reason} />;
+}
 
 export default function TodayPage() {
   return (
     <AppShell title="Today">
-      <PlaceholderPanel
-        heading="Today"
-        body="Your daily briefing will summarise verified macro context and portfolio-relevant themes. This screen is a layout placeholder."
-      />
+      <section aria-labelledby="macro-intelligence-heading">
+        <h2 id="macro-intelligence-heading" className="research-section-title">
+          Macro intelligence
+        </h2>
+        <Suspense
+          fallback={
+            <ResearchEmptyState reason="missing" />
+          }
+        >
+          <MacroIntelligenceSection />
+        </Suspense>
+      </section>
     </AppShell>
   );
 }

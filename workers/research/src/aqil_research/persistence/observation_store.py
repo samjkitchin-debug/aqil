@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import date, datetime
 from uuid import UUID
 
@@ -67,6 +68,32 @@ from research.try_insert_observation(
   %(p_supersedes_observation_id)s
 )
 """
+
+
+@dataclass(slots=True)
+class PostgresDatasetObservationStore:
+    """Read-only view of all observations for a dataset (post-collection research)."""
+
+    _conn: psycopg.Connection
+    _dataset_id: str
+
+    def append(self, observation: EconomicObservation) -> AppendResult:
+        raise RuntimeError("PostgresDatasetObservationStore is read-only")
+
+    def append_many(self, observations: tuple[EconomicObservation, ...]) -> AppendResult:
+        raise RuntimeError("PostgresDatasetObservationStore is read-only")
+
+    def all_observations(self) -> tuple[EconomicObservation, ...]:
+        return load_observations_for_dataset(self._conn, self._dataset_id)
+
+    def as_of(
+        self,
+        dataset_id: str,
+        decision_at: datetime,
+        mode: AnalysisMode,
+    ) -> dict[date, EconomicObservation]:
+        rows = load_observations_for_dataset(self._conn, self._dataset_id)
+        return select_as_of_series(rows, dataset_id, decision_at, mode)
 
 
 class PostgresObservationStore:

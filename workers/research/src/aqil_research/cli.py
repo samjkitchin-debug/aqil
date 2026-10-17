@@ -44,8 +44,11 @@ DEFAULT_FIXTURE = (
 
 
 def build_parser() -> argparse.ArgumentParser:
+    from aqil_research.cli_ops import register_collect_parsers
+
     parser = argparse.ArgumentParser(prog="aqil-research")
     sub = parser.add_subparsers(dest="command", required=True)
+    register_collect_parsers(sub)
     run = sub.add_parser("run", help="Run a bounded macro research calculation")
     run.add_argument("--source", required=True, choices=["bls"])
     run.add_argument("--method", required=True, choices=["sahm"])
@@ -99,6 +102,18 @@ def main(argv: list[str] | None = None) -> int:
         return _run_bls_sahm(args)
     if args.command == "retrieve-run":
         return _retrieve_run(args)
+    if args.command == "collect":
+        from aqil_research.cli_ops import run_collect
+
+        return run_collect(args)
+    if args.command == "collect-and-run":
+        from aqil_research.cli_ops import run_collect_and_run
+
+        return run_collect_and_run(args)
+    if args.command == "export-insight":
+        from aqil_research.cli_ops import run_export_insight
+
+        return run_export_insight(args)
     return 1
 
 
