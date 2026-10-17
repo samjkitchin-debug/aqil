@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-10-17T10:00:00+00:00",
+  "data_mode": "mixed",
+  "etfs": [
+    {
+      "etf_id": "etf:vanguard:ftse-all-world:vwra:lse:gbp:acc",
+      "legal_name": "Vanguard FTSE All-World UCITS ETF",
+      "ticker": "VWRA",
+      "exchange": "LSE",
+      "isin": "IE00BK5BQT80",
+      "identity_evidence": "verified_instrument_identity",
+      "holdings_as_of": "2025-06-30",
+      "completeness": "top_holdings_partial",
+      "holdings_evidence": "synthetic_demonstration",
+      "holdings_caveat": "The ISIN identifies the share class. Weights are synthetic demonstration data, not fund-provider holdings.",
+      "top_holdings": [
+        {
+          "name": "Microsoft Corp",
+          "issuer_id": "issuer:microsoft:msft:nasdaq",
+          "weight_percentage": "4.20"
+        },
+        {
+          "name": "Apple Inc",
+          "issuer_id": "issuer:apple:aapl:nasdaq",
+          "weight_percentage": "3.80"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "event_id": "event:fixture:msft:fy26q2:earnings",
+      "title": "Microsoft Corp \u2014 Q2 FY2026 earnings release (fixture)",
+      "category": "company_earnings",
+      "subject_label": "issuer:microsoft:msft:nasdaq",
+      "scheduled_date": "2026-01-28",
+      "scheduled_time": null,
+      "timezone": "America/New_York",
+      "date_precision": "estimated",
+      "schedule_evidence": "synthetic_demonstration",
+      "materiality": "insufficient_evidence",
+      "materiality_basis": "calculated",
+      "interpretation_status": "unverified",
+      "source_confidence": "synthetic_demonstration",
+      "why_it_matters": "A synthetic demonstration snapshot shows Microsoft at 4.20%. Materiality is calculated from that demonstration weight. It is not a verified fund-provider holding.",
+      "etf_ids": [
+        "etf:vanguard:ftse-all-world:vwra:lse:gbp:acc"
+      ],
+      "is_fixture": true
+    },
+    {
+      "event_id": "event:verified:fed:fomc:2025-09-17",
+      "title": "FOMC meeting \u2014 federal funds rate decision",
+      "category": "central_bank_meeting",
+      "subject_label": "economy:us",
+      "scheduled_date": "2025-09-17",
+      "scheduled_time": null,
+      "timezone": "America/New_York",
+      "date_precision": "confirmed",
+      "schedule_evidence": "verified_schedule",
+      "materiality": "insufficient_evidence",
+      "materiality_basis": "insufficient_evidence",
+      "interpretation_status": "unverified",
+      "source_confidence": "verified_schedule",
+      "why_it_matters": "The meeting date is cited from the Federal Reserve FOMC calendar. No holdings weight is linked, so materiality is not assessed. Any view of market impact is an unverified interpretation.",
+      "etf_ids": [],
+      "is_fixture": false
+    }
+  ],
+  "exposures": [
+    {
+      "event_id": "event:fixture:msft:fy26q2:earnings",
+      "etf_id": "etf:vanguard:ftse-all-world:vwra:lse:gbp:acc",
+      "issuer_id": "issuer:microsoft:msft:nasdaq",
+      "weight_percentage": "4.20",
+      "weight_evidence": "synthetic_demonstration",
+      "materiality": "insufficient_evidence",
+      "materiality_evidence": "calculated",
+      "snapshot_as_of": "2025-06-30"
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
+      "event_id": "event:fixture:msft:fy26q2:earnings",
+      "frozen_at": "2026-01-20T12:00:00+00:00",
+      "headline": "Azure trajectory vs prior guidance (fixture scenario)",
+      "upside_case": "If reported Azure growth materially exceeds prior published guidance, operating momentum may be stronger than the market assumed \u2014 though ETF price reaction also depends on broader index moves and other holdings.",
+      "downside_case": "If cloud growth decelerates versus guidance, Microsoft may weigh on VWRA more than lower-weight peers, without implying a single-stock return forecast for the ETF.",
+      "evidence_gaps": [
+        "No live analyst consensus ingested.",
+        "Holdings snapshot is partial and dated."
+      ],
+      "evidence_class": "synthetic_demonstration",
+      "record_source": "database"
+    }
+  ],
+  "outcomes": [
+    {
+      "outcome_id": "bbbbbbbb-cccc-4ddd-8eee-ffffffffffff",
+      "event_id": "event:fixture:msft:fy26q2:earnings",
+      "scenario_id": "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
+      "headline": "Azure growth reported at 38% year over year (fixture outcome).",
+      "expectation_met": "partially_above_fixture_guidance",
+      "surprise_assessment": "small_positive_vs_fixture_guidance",
+      "evidence_class": "synthetic_demonstration"
+    }
+  ]
+}

@@ -359,3 +359,35 @@ Review M3 PR for: source rights, temporal integrity (latest-revised labelling), 
 ### Next milestone
 Hosted approval path: vault `research_worker` password, apply Git migrations, enable `research-pipeline` live mode with BLS key — then second macro source after Treasury licence resolution.
 
+## Session handover — 2026-10-17 (M4 review corrections)
+
+### Current objective
+Close the four M4 review findings on PR #8, then merge once GitHub Actions is green on the corrected tip. No hosted migration. No live scheduling.
+
+### Corrections
+- Synthetic holdings, expectations, scenarios and outcomes are labelled `synthetic_demonstration`. VWRA ISIN stays verified instrument identity. FOMC schedule stays a verified calendar citation; materiality is `insufficient_evidence` because no holdings weight is linked.
+- Identical imports conflict on content hash, not retrieval time. A changed holdings snapshot inserts a new row. Frozen scenarios are not updated.
+- `forward-demo` loads the horizon from the stored scenario row. The web fixture is that export (`record_source: database`). Founder cookie gate unchanged. `forward` stays out of the Data API.
+- Web rejects malformed or contradictory `forward_horizon.v1` payloads. pgTAP denies `service_role` on the forward schema.
+
+### Idempotency evidence (local, two imports, different `recorded_at`)
+Row counts stayed: instruments 1, holdings snapshots 1, holding lines 3, catalysts 2, exposures 1, expectations 1, scenarios 1, outcomes 1. Scenario `aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee` hash `6e04c5dbb50603fea66a64f724ee41a7fb54e7307e5c53b51bcaf698041a3943` unchanged. A later revised snapshot did not change that hash; the outcome still references the same scenario id.
+
+### Tests (local)
+| Check | Result |
+|-------|--------|
+| `supabase db reset` then `supabase test db` | 70 pgTAP passed |
+| `uv run pytest` | 80 passed, 1 skipped |
+| `uv run ruff check` / `ruff format --check` | pass |
+| Web typecheck, lint, production build | pass |
+| `npm run test:forward-contract` | 7 passed |
+| Playwright on a fresh production server | forward-horizon specs passed; 68 passed, 2 failed on the unauthorised research empty-state strict-mode case (skipped in GitHub CI via `E2E_USE_DEV_SERVER`) |
+
+### Remaining limitations
+- Holdings weights and the Microsoft earnings path are demonstration data. The FOMC date is a calendar citation, not a measured market effect.
+- Hosted Supabase is not migrated. Live scheduling is not enabled.
+
+### Git
+- **main:** PR #7 merged (`54c4a16`).
+- **M4:** PR #8 `m4/forward-intelligence`. GitHub Actions on the correction commit is the merge gate.
+

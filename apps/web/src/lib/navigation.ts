@@ -13,7 +13,12 @@ export const primaryNav: NavItem[] = [
   {
     href: "/explore",
     label: "Explore",
-    description: "Discover themes and markets — content coming later.",
+    description: "ETF exposure and holdings context.",
+  },
+  {
+    href: "/calendar",
+    label: "Calendar",
+    description: "Upcoming catalysts for vetted ETFs.",
   },
   {
     href: "/my-wealth",
