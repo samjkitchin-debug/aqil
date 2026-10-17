@@ -27,6 +27,17 @@ Auth,Framework redirect inside auth error handler,Redirect is rethrown; return p
 Database,SECURITY DEFINER callable by anon,Denied unless explicitly granted and tested
 Ingest,Partial upstream payload,Authoritative rows are not deleted or blanked
 Research,M1 pipeline output without rights record,Blocked; no narrative fill for missing licence
+Research,M1 point-in-time as-of before vintage availability,Revision excluded; later as-of may include it
+Research,M1 latest-revised row in point-in-time mode,Excluded from historical reconstruction; allowed in latest-revised mode
+Research,M1 Sahm fixture hand calculation,Gap and trigger match independent expected decimals
+Research,M1 research result without claim verification,Publication blocked (fail-closed)
+Research,M1 swap fixture provider adapter,Equivalent Sahm calculation; orchestrator unchanged
+Research,M1 second method via orchestrator,PERIOD_LEVEL_CHANGE completes without orchestrator edit
+Research,M1 disable source for collection,Ingest blocked; prior observations retained
+Research,M1 identical inputs replay,analytical_payload_hash stable across run_id
+Research,M1 BLS offline fixture ingest,Sahm completes with latest_revised labelling
+Research,M1 BLS live opt-in run,Rights gate passes; bounded HTTPS; no CI network
+Research,M1 latest-revised BLS in point-in-time mode,Excluded from as-of view
 Database,Remote migration before supabase test db green,Blocked by release policy
 Database,RLS tested only as postgres superuser,Rejected; must use authenticated test roles
 Privacy,User deletion request,Delete private assets while non-personal public method history remains

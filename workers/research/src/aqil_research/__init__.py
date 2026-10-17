@@ -4,4 +4,6 @@ __version__ = "0.1.0"
 
 
 def main() -> None:
-    print(f"aqil-research {__version__}")
+    from aqil_research.cli import run_cli
+
+    run_cli()

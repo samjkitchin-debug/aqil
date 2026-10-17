@@ -46,7 +46,7 @@
 8. **Regression tests** — pytest (and future contract tests) cover parser, vintage rule, method replay and negative cases (bad vintage, missing field).
 9. **Economical operation** — single-founder scheduling, no paid feed lock-in without documented approval; no agent framework (G0 guard).
 
-**M1 does not require:** auth, portfolio ledger, causal graph UI, LLM agents, ETF eligibility, or public launch.
+**M1 does not require:** auth, portfolio ledger, causal graph UI, LLM agents, ETF eligibility, public launch, or an historical analogue model (`03` §3).
 
 **When M1 is verified:** update AQ-064 and dependent rows; then either deepen toward `12_FIRST_VERTICAL_SLICE.md` (G4) or complete remaining G0 data items (PR2).
 
@@ -78,6 +78,7 @@
 - 'Self-learning' is not a one-time model feedback prompt. Must demonstrably preserve original forecasts and independently test changed rules.
 - 'Mock accounts' need only a ledger engine, not broker paper logins, individual AI instances or simulated fake market feeds.
 - Content and learning can launch while investment alpha is unproven. Never label the service an outperformer because of a profitable initial cohort.
+- Historical analogue research is a later method family (`03` §3; AQ-066). It uses versioned similarity configuration, point-in-time inputs, contradictory precedents and out-of-sample evaluation. It is not M1 and it is not a universal score.
 
 ## Release KPIs: not vanity metrics
 **Human value:** comprehension (conclusion + uncertainty), educational lesson clarity, voluntary helpful return visits, reported confidence in ability to understand (not market certainty). **Truth:** source support coverage, citation mismatch detection, correction time, unanswered challenges, data freshness. **Research:** preregistered trial status, outcomes and calibration vs baselines. **Money:** ledger reconciliation, total-return accuracy, FX coverage. **Reliability:** job success, restore drills, spend and security incidents.

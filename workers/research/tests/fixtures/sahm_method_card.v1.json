@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "method_id": "SAHM_UNEMPLOYMENT_GAP",
+  "method_version": "1.0.1",
+  "name": "Sahm unemployment gap rule",
+  "research_question": "Has the three-month average US unemployment rate risen by at least the configured threshold relative to its prior 12-month low?",
+  "primary_reference": "Claudia Sahm, Direct Stimulus Payments to Broadly Support the Economy, Brookings/Hamilton Project, March 2019",
+  "original_universe": "United States civilian unemployment rate (U-3), seasonally adjusted",
+  "original_horizon": null,
+  "formula_specification": "Three-month moving average of the unemployment rate minus the minimum three-month average over the prior 12 months, excluding the current month; trigger when the gap is at or above 0.50 percentage points in the published rule.",
+  "data_requirements": [
+    "Monthly US seasonally adjusted U-3 unemployment rate in percent",
+    "At least 15 contiguous months for one evaluation",
+    "Consistent geography, frequency and seasonal adjustment across inputs"
+  ],
+  "assumptions": [
+    "Inputs are validated economic observations, not derived features",
+    "Month boundaries follow calendar month starts"
+  ],
+  "limitations": [
+    "Association with recessions already under way; not an NBER determination",
+    "Not a forward recession forecast or investment signal",
+    "Independent academic replication not claimed until a reference example is matched"
+  ],
+  "evidence_stage": "implemented",
+  "implementation_hash": null,
+  "licence_status": "unknown",
+  "reviewer_id": null
+}
