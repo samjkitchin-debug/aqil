@@ -9,6 +9,12 @@ from typing import Any
 import psycopg
 
 
+def _stable_payload(payload: dict[str, object]) -> dict[str, object]:
+    stable = dict(payload)
+    stable.pop("retrieved_at", None)
+    return stable
+
+
 def upsert_catalyst_event(
     conn: psycopg.Connection,
     event_id: str,
@@ -83,7 +89,9 @@ def upsert_catalyst_event(
             )
             return "updated"
 
-        if isinstance(previous_payload, dict) and previous_payload != payload:
+        if isinstance(previous_payload, dict) and _stable_payload(previous_payload) != _stable_payload(
+            payload,
+        ):
             cur.execute(
                 """
                 update forward.catalyst_events
