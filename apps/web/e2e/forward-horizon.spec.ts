@@ -19,14 +19,22 @@ test.describe("forward horizon UI", () => {
 
     await page.goto("/calendar");
     await expect(page.getByTestId("forward-horizon")).toBeVisible();
+    await expect(page.getByText("Schedule verified").first()).toBeVisible();
+    await expect(page.getByText("Materiality not assessed").first()).toBeVisible();
+    await expect(page.getByText("Schedule: demonstration data").first()).toBeVisible();
   });
 
   test("shows ETF explore and forward research detail", async ({ page }) => {
     await page.goto("/explore");
     await expect(page.getByTestId("forward-etf-explore")).toBeVisible();
+    await expect(page.getByText("Verified instrument identity")).toBeVisible();
+    await expect(page.getByText(/synthetic demonstration data/i)).toBeVisible();
 
     await page.goto("/research");
     await expect(page.getByTestId("forward-research-detail")).toBeVisible();
+    await expect(page.getByText("Synthetic demonstration scenario")).toBeVisible();
+    await expect(page.getByText("Loaded from the frozen record")).toBeVisible();
     await expect(page.getByTestId("forward-outcome-block")).toBeVisible();
+    await expect(page.getByText("Synthetic demonstration outcome")).toBeVisible();
   });
 });

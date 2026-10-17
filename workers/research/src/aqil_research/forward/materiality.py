@@ -30,6 +30,32 @@ class MaterialityResult:
     rationale: str
 
 
+def assess_event_materiality(
+    *,
+    weight_percentage: Decimal | None,
+    holdings_completeness: str | None,
+    snapshot_as_of: date | None,
+    reference_date: date,
+    event_category: str,
+) -> MaterialityResult:
+    """Same rules for every event. Missing weight evidence is not a materiality score."""
+    if weight_percentage is None or holdings_completeness is None or snapshot_as_of is None:
+        return MaterialityResult(
+            category="insufficient_evidence",
+            rules_version=MATERIALITY_RULES_VERSION,
+            rationale="No holdings weight is linked, so materiality is not assessed.",
+        )
+    return assess_materiality(
+        MaterialityInput(
+            weight_percentage=weight_percentage,
+            holdings_completeness=holdings_completeness,
+            snapshot_as_of=snapshot_as_of,
+            reference_date=reference_date,
+            event_category=event_category,
+        ),
+    )
+
+
 def assess_materiality(inputs: MaterialityInput) -> MaterialityResult:
     if inputs.holdings_completeness in ("unknown", "not_available"):
         return MaterialityResult(

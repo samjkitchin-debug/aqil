@@ -17,7 +17,10 @@ export function ForwardResearchDetail({ bundle }: Props) {
 
   return (
     <section data-testid="forward-research-detail" className="research-banner">
-      <p className="research-meta">Pre-event analysis (frozen)</p>
+      <p className="research-meta">
+        Synthetic demonstration scenario
+        {scenario.record_source === "database" ? " · Loaded from the frozen record" : ""}
+      </p>
       <h2 className="research-headline">{scenario.headline}</h2>
       <p className="research-body">Catalyst: {event.title}</p>
       {scenario.upside_case && (
@@ -39,7 +42,9 @@ export function ForwardResearchDetail({ bundle }: Props) {
       )}
       {outcome && (
         <div className="forward-etf-card" data-testid="forward-outcome-block">
-          <p className="research-meta">Post-event evaluation (separate record)</p>
+          <p className="research-meta">
+            Synthetic demonstration outcome · References the frozen scenario
+          </p>
           <h3 className="research-section-title">What happened</h3>
           <p className="research-body">{outcome.headline}</p>
           {outcome.surprise_assessment && (

@@ -56,12 +56,16 @@ export function ForwardHorizonSection({ bundle, source, compact = false }: Props
               <>
                 <p className="research-body">{event.why_it_matters}</p>
                 <p className="research-meta">
-                  {event.date_precision === "confirmed"
-                    ? "Date confirmed"
-                    : event.date_precision === "estimated"
-                      ? "Date estimated"
-                      : "Date unknown"}
-                  {event.is_fixture ? " · Fixture event" : " · Verified source"}
+                  {event.schedule_evidence === "verified_schedule"
+                    ? "Schedule verified"
+                    : event.schedule_evidence === "synthetic_demonstration"
+                      ? "Schedule: demonstration data"
+                      : "Schedule unverified"}
+                  {" · "}
+                  {event.materiality_basis === "calculated"
+                    ? "Materiality calculated"
+                    : "Materiality not assessed"}
+                  {" · Investment interpretation unverified"}
                 </p>
               </>
             )}

@@ -155,18 +155,23 @@ def run_forward_demo(args: argparse.Namespace) -> int:
     from datetime import UTC, datetime
 
     from aqil_research.forward.horizon import build_forward_horizon_bundle
-    from aqil_research.forward.persistence import import_demo_fixture_bundle
+    from aqil_research.forward.persistence import (
+        import_demo_fixture_bundle,
+        load_persisted_forward_horizon,
+    )
 
     now = datetime.now(tz=UTC)
+    bundle = None
     if not args.skip_db:
         try:
             with research_connection() as conn:
                 import_demo_fixture_bundle(conn, recorded_at=now)
+                bundle = load_persisted_forward_horizon(conn)
         except OSError as exc:
             print(f"database error: {exc}", file=sys.stderr)
             return 10
-
-    bundle = build_forward_horizon_bundle()
+    if bundle is None:
+        bundle = build_forward_horizon_bundle()
     if args.export_horizon is not None:
         args.export_horizon.write_text(
             json.dumps(bundle, indent=2, default=str) + "\n",

@@ -1,7 +1,11 @@
 from datetime import date
 from decimal import Decimal
 
-from aqil_research.forward.materiality import MaterialityInput, assess_materiality
+from aqil_research.forward.materiality import (
+    MaterialityInput,
+    assess_event_materiality,
+    assess_materiality,
+)
 
 
 def test_high_materiality_for_meaningful_weight() -> None:
@@ -28,3 +32,15 @@ def test_insufficient_when_holdings_stale() -> None:
         ),
     )
     assert result.category == "insufficient_evidence"
+
+
+def test_missing_weight_is_insufficient_not_a_score() -> None:
+    result = assess_event_materiality(
+        weight_percentage=None,
+        holdings_completeness=None,
+        snapshot_as_of=None,
+        reference_date=date(2026, 10, 17),
+        event_category="central_bank_meeting",
+    )
+    assert result.category == "insufficient_evidence"
+    assert "not assessed" in result.rationale

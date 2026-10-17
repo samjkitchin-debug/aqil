@@ -30,10 +30,8 @@ def vwra_instrument_payload() -> dict[str, object]:
         "source_locator": "synthetic://aqil/demo/vwra-identity",
         "verification_date": "2026-10-01",
         "research_status": "fixture_verified_identity",
-        "caveat": (
-            "Identity fields align to public fund documentation; "
-            "this record is for offline demonstration only."
-        ),
+        "evidence_class": "verified_instrument_identity",
+        "caveat": ("Instrument identity only. This record does not verify holdings weights."),
     }
 
 
@@ -46,6 +44,7 @@ def vwra_holdings_snapshot_payload() -> dict[str, object]:
         "completeness": "top_holdings_partial",
         "source_id": "fixture_vwra_holdings_v1",
         "source_locator": "synthetic://aqil/demo/vwra-holdings-2025-06-30",
+        "evidence_class": "synthetic_demonstration",
         "licence_evidence": (
             "Synthetic weights for engineering demonstration only — not provider data."
         ),
@@ -74,7 +73,10 @@ def vwra_holdings_snapshot_payload() -> dict[str, object]:
             },
         ],
         "residual_weight_percentage": "91.50",
-        "caveat": "Partial top-holdings list; weights are not renormalised to 100%.",
+        "caveat": (
+            "Synthetic demonstration weights. The VWRA ISIN is not evidence that "
+            "these weights are Vanguard holdings."
+        ),
     }
 
 
@@ -94,6 +96,7 @@ def msft_earnings_event_payload() -> dict[str, object]:
         "source_locator": "synthetic://aqil/demo/msft-earnings-2026-01",
         "expected_information": "Quarterly revenue, operating income, Azure growth commentary.",
         "caveat": "Synthetic schedule for demonstration; not sourced from live IR feeds.",
+        "evidence_class": "synthetic_demonstration",
         "is_fixture": True,
     }
 
@@ -112,10 +115,13 @@ def fed_fomc_event_payload() -> dict[str, object]:
         "status": "scheduled",
         "source_id": "federal_reserve_fomc_calendar",
         "source_locator": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
-        "provider_published_at": "2025-01-01T00:00:00+00:00",
         "expected_information": "Policy statement and SEP materials when published.",
+        "evidence_class": "verified_schedule",
         "is_fixture": False,
-        "caveat": "Schedule taken from the Federal Reserve published FOMC calendar (2025).",
+        "caveat": (
+            "Scheduled date is cited from the Federal Reserve FOMC calendar. "
+            "That citation does not assess materiality or market impact."
+        ),
     }
 
 
@@ -129,6 +135,8 @@ def msft_expectation_payload() -> dict[str, object]:
             "Demonstration assumes management previously guided Azure growth in the mid-30% range. "
             "This is synthetic context for offline replay — not live consensus data."
         ),
+        "evidence_class": "synthetic_demonstration",
+        "source_id": "fixture_msft_expectation_v1",
         "is_fixture": True,
     }
 
@@ -139,7 +147,10 @@ def msft_scenario_payload() -> dict[str, object]:
         "event_id": DEMO_EVENT_MSFT_EARNINGS,
         "headline": "Azure trajectory vs prior guidance (fixture scenario)",
         "known_facts": [
-            "VWRA holds a partial snapshot weight in Microsoft as of 2025-06-30.",
+            (
+                "A synthetic demonstration snapshot assigns Microsoft a weight in VWRA "
+                "as of 2025-06-30. That weight is not a Vanguard holdings file."
+            ),
             "Earnings date is estimated, not confirmed.",
         ],
         "exposed_etf_ids": [DEMO_ETF_ID],
@@ -157,6 +168,7 @@ def msft_scenario_payload() -> dict[str, object]:
             "No live analyst consensus ingested.",
             "Holdings snapshot is partial and dated.",
         ],
+        "evidence_class": "synthetic_demonstration",
         "is_fixture": True,
     }
 
@@ -176,6 +188,7 @@ def msft_outcome_payload() -> dict[str, object]:
         ),
         "surprise_assessment": "small_positive_vs_fixture_guidance",
         "market_response_assessed": False,
+        "evidence_class": "synthetic_demonstration",
         "is_fixture": True,
     }
 

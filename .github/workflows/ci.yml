@@ -28,6 +28,7 @@ jobs:
       - run: npm run check:tokens
         working-directory: .
       - run: npm run typecheck
+      - run: npm run test:forward-contract
       - run: npm run lint
       - run: npm run build
         env:

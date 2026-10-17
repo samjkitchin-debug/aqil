@@ -9,8 +9,11 @@
       "ticker": "VWRA",
       "exchange": "LSE",
       "isin": "IE00BK5BQT80",
+      "identity_evidence": "verified_instrument_identity",
       "holdings_as_of": "2025-06-30",
       "completeness": "top_holdings_partial",
+      "holdings_evidence": "synthetic_demonstration",
+      "holdings_caveat": "The ISIN identifies the share class. Weights are synthetic demonstration data, not fund-provider holdings.",
       "top_holdings": [
         {
           "name": "Microsoft Corp",
@@ -35,9 +38,12 @@
       "scheduled_time": null,
       "timezone": "America/New_York",
       "date_precision": "estimated",
+      "schedule_evidence": "synthetic_demonstration",
       "materiality": "insufficient_evidence",
-      "source_confidence": "fixture",
-      "why_it_matters": "Microsoft is a 4.20% weight in the dated VWRA holdings snapshot. Earnings may shift cloud-growth narrative for this ETF exposure.",
+      "materiality_basis": "calculated",
+      "interpretation_status": "unverified",
+      "source_confidence": "synthetic_demonstration",
+      "why_it_matters": "A synthetic demonstration snapshot shows Microsoft at 4.20%. Materiality is calculated from that demonstration weight. It is not a verified fund-provider holding.",
       "etf_ids": [
         "etf:vanguard:ftse-all-world:vwra:lse:gbp:acc"
       ],
@@ -52,9 +58,12 @@
       "scheduled_time": null,
       "timezone": "America/New_York",
       "date_precision": "confirmed",
-      "materiality": "medium",
+      "schedule_evidence": "verified_schedule",
+      "materiality": "insufficient_evidence",
+      "materiality_basis": "insufficient_evidence",
+      "interpretation_status": "unverified",
       "source_confidence": "verified_schedule",
-      "why_it_matters": "US policy rates affect global discount rates for broad equity ETFs such as VWRA.",
+      "why_it_matters": "The meeting date is cited from the Federal Reserve FOMC calendar. No holdings weight is linked, so materiality is not assessed. Any view of market impact is an unverified interpretation.",
       "etf_ids": [],
       "is_fixture": false
     }
@@ -65,7 +74,9 @@
       "etf_id": "etf:vanguard:ftse-all-world:vwra:lse:gbp:acc",
       "issuer_id": "issuer:microsoft:msft:nasdaq",
       "weight_percentage": "4.20",
+      "weight_evidence": "synthetic_demonstration",
       "materiality": "insufficient_evidence",
+      "materiality_evidence": "calculated",
       "snapshot_as_of": "2025-06-30"
     }
   ],
@@ -80,7 +91,9 @@
       "evidence_gaps": [
         "No live analyst consensus ingested.",
         "Holdings snapshot is partial and dated."
-      ]
+      ],
+      "evidence_class": "synthetic_demonstration",
+      "record_source": "database"
     }
   ],
   "outcomes": [
@@ -90,7 +103,8 @@
       "scenario_id": "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
       "headline": "Azure growth reported at 38% year over year (fixture outcome).",
       "expectation_met": "partially_above_fixture_guidance",
-      "surprise_assessment": "small_positive_vs_fixture_guidance"
+      "surprise_assessment": "small_positive_vs_fixture_guidance",
+      "evidence_class": "synthetic_demonstration"
     }
   ]
 }

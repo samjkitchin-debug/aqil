@@ -9,6 +9,7 @@ comment on schema forward is
 revoke all on schema forward from public;
 revoke all on schema forward from anon;
 revoke all on schema forward from authenticated;
+revoke all on schema forward from service_role;
 
 grant usage on schema forward to research_writer;
 
@@ -21,13 +22,21 @@ create table forward.etf_instrument_records (
   etf_id text not null,
   schema_version text not null default '1.0',
   payload jsonb not null,
+  content_hash text not null,
+  evidence_class text not null,
   source_id text not null,
   source_locator text,
   verification_date date not null,
   research_status text not null,
   recorded_at timestamptz not null default (timezone('utc', now())),
-  constraint etf_instrument_payload_object check (jsonb_typeof(payload) = 'object')
+  constraint etf_instrument_payload_object check (jsonb_typeof(payload) = 'object'),
+  constraint etf_instrument_evidence_class check (
+    evidence_class = 'verified_instrument_identity'
+  )
 );
+
+create unique index etf_instrument_records_identity_idx
+  on forward.etf_instrument_records (etf_id, source_id, content_hash);
 
 create index etf_instrument_records_etf_id_idx
   on forward.etf_instrument_records (etf_id, recorded_at desc);
@@ -48,12 +57,34 @@ create table forward.etf_holdings_snapshots (
   licence_evidence text,
   currency text,
   payload jsonb not null,
+  content_hash text not null,
+  evidence_class text not null,
   recorded_at timestamptz not null default (timezone('utc', now())),
-  constraint holdings_payload_object check (jsonb_typeof(payload) = 'object')
+  constraint holdings_payload_object check (jsonb_typeof(payload) = 'object'),
+  constraint holdings_evidence_class check (
+    evidence_class in ('synthetic_demonstration', 'provider_holdings')
+  ),
+  constraint holdings_synthetic_not_provider check (
+    evidence_class <> 'synthetic_demonstration'
+    or (
+      source_locator like 'synthetic://%'
+      and coalesce(payload->>'evidence_class', '') = 'synthetic_demonstration'
+    )
+  ),
+  constraint holdings_provider_not_synthetic check (
+    evidence_class <> 'provider_holdings'
+    or (
+      source_locator is not null
+      and source_locator not like 'synthetic://%'
+    )
+  )
 );
 
+comment on constraint holdings_synthetic_not_provider on forward.etf_holdings_snapshots is
+  'A real instrument identifier must not be stored as if synthetic weights were provider holdings.';
+
 create unique index etf_holdings_snapshots_identity_idx
-  on forward.etf_holdings_snapshots (etf_id, as_of_date, source_id, retrieved_at);
+  on forward.etf_holdings_snapshots (etf_id, as_of_date, source_id, content_hash);
 
 create table forward.etf_holding_lines (
   snapshot_id uuid not null references forward.etf_holdings_snapshots (snapshot_id) on delete restrict,
@@ -89,7 +120,22 @@ create table forward.catalyst_events (
   first_observed_at timestamptz not null,
   last_verified_at timestamptz not null,
   payload jsonb not null default '{}'::jsonb,
-  recorded_at timestamptz not null default (timezone('utc', now()))
+  evidence_class text not null,
+  recorded_at timestamptz not null default (timezone('utc', now())),
+  constraint catalyst_evidence_class check (
+    evidence_class in ('verified_schedule', 'synthetic_demonstration')
+  ),
+  constraint catalyst_provenance_matches_evidence check (
+    (
+      evidence_class = 'synthetic_demonstration'
+      and source_locator like 'synthetic://%'
+    )
+    or (
+      evidence_class = 'verified_schedule'
+      and source_locator like 'https://%'
+      and date_precision = 'confirmed'
+    )
+  )
 );
 
 create table forward.catalyst_event_revisions (
@@ -118,8 +164,16 @@ create table forward.catalyst_etf_exposure (
   rationale text not null,
   holdings_completeness text not null,
   snapshot_as_of date not null,
-  recorded_at timestamptz not null default (timezone('utc', now()))
+  evidence_class text not null default 'calculated',
+  recorded_at timestamptz not null default (timezone('utc', now())),
+  constraint exposure_evidence_class check (evidence_class = 'calculated'),
+  constraint exposure_materiality_value check (
+    materiality in ('high', 'medium', 'low', 'insufficient_evidence')
+  )
 );
+
+create unique index catalyst_etf_exposure_identity_idx
+  on forward.catalyst_etf_exposure (event_id, etf_id, snapshot_id, issuer_id);
 
 create index catalyst_etf_exposure_event_idx on forward.catalyst_etf_exposure (event_id);
 
@@ -132,9 +186,21 @@ create table forward.event_expectations (
   event_id text not null references forward.catalyst_events (event_id) on delete restrict,
   recorded_at timestamptz not null,
   payload jsonb not null,
+  content_hash text not null,
   source_id text not null,
-  constraint expectation_payload_object check (jsonb_typeof(payload) = 'object')
+  evidence_class text not null default 'synthetic_demonstration',
+  constraint expectation_payload_object check (jsonb_typeof(payload) = 'object'),
+  constraint expectation_evidence_class check (
+    evidence_class in ('synthetic_demonstration', 'verified_source')
+  ),
+  constraint expectation_synthetic_locator check (
+    evidence_class <> 'synthetic_demonstration'
+    or coalesce(payload->>'evidence_class', '') = 'synthetic_demonstration'
+  )
 );
+
+create unique index event_expectations_identity_idx
+  on forward.event_expectations (event_id, source_id, content_hash);
 
 create table forward.forward_scenarios (
   scenario_id uuid primary key,
@@ -142,7 +208,14 @@ create table forward.forward_scenarios (
   frozen_at timestamptz not null,
   payload jsonb not null,
   payload_hash text not null,
-  constraint scenario_payload_object check (jsonb_typeof(payload) = 'object')
+  evidence_class text not null default 'synthetic_demonstration',
+  constraint scenario_payload_object check (jsonb_typeof(payload) = 'object'),
+  constraint scenario_evidence_class check (
+    evidence_class = 'synthetic_demonstration'
+  ),
+  constraint scenario_payload_labelled check (
+    coalesce(payload->>'evidence_class', '') = 'synthetic_demonstration'
+  )
 );
 
 create or replace function forward.deny_forward_scenario_mutation()
@@ -170,9 +243,20 @@ create table forward.event_outcomes (
   scenario_id uuid references forward.forward_scenarios (scenario_id) on delete restrict,
   observed_at timestamptz not null,
   payload jsonb not null,
+  content_hash text not null,
   source_id text not null,
-  constraint outcome_payload_object check (jsonb_typeof(payload) = 'object')
+  evidence_class text not null default 'synthetic_demonstration',
+  constraint outcome_payload_object check (jsonb_typeof(payload) = 'object'),
+  constraint outcome_evidence_class check (
+    evidence_class = 'synthetic_demonstration'
+  ),
+  constraint outcome_payload_labelled check (
+    coalesce(payload->>'evidence_class', '') = 'synthetic_demonstration'
+  )
 );
+
+create unique index event_outcomes_identity_idx
+  on forward.event_outcomes (event_id, source_id, content_hash);
 
 -- ---------------------------------------------------------------------------
 -- Privileges
@@ -192,7 +276,15 @@ revoke all on all tables in schema forward from anon;
 revoke all on all tables in schema forward from authenticated;
 revoke all on all tables in schema forward from service_role;
 
+revoke all on all functions in schema forward from public;
+revoke all on all functions in schema forward from anon;
+revoke all on all functions in schema forward from authenticated;
+revoke all on all functions in schema forward from service_role;
+
 grant execute on all functions in schema forward to research_writer;
+
+alter default privileges in schema forward
+  revoke execute on functions from public;
 
 alter default privileges in schema forward
   grant execute on functions to research_writer;

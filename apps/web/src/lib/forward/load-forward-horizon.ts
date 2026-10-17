@@ -6,6 +6,7 @@ import { connection } from "next/server";
 
 import { isFounderResearchAuthorised, researchFixtureFallbackAllowed } from "@/lib/research/founder-access";
 import type { ForwardHorizonV1 } from "@/lib/forward/types";
+import { validateForwardHorizon } from "@/lib/forward/validate-forward-horizon";
 
 const FIXTURE_PATH = path.join(process.cwd(), "fixtures", "forward-horizon.v1.json");
 const LOCAL_PATH = path.join(process.cwd(), ".local", "forward-horizon.v1.json");
@@ -29,9 +30,7 @@ function candidates(): string[] {
 }
 
 function isValid(data: unknown): data is ForwardHorizonV1 {
-  if (!data || typeof data !== "object") return false;
-  const o = data as Record<string, unknown>;
-  return o.schema_version === "1.0" && Array.isArray(o.events) && Array.isArray(o.etfs);
+  return validateForwardHorizon(data);
 }
 
 export type ForwardHorizonLoadResult =
@@ -48,7 +47,12 @@ export async function loadForwardHorizonBundle(): Promise<ForwardHorizonLoadResu
   for (const filePath of candidates()) {
     try {
       const raw = await readFile(filePath, "utf8");
-      const parsed: unknown = JSON.parse(raw);
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        return { status: "invalid" };
+      }
       if (!isValid(parsed)) {
         return { status: "invalid" };
       }
