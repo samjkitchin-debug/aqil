@@ -42,7 +42,11 @@ Path: why saving matters → emergency buffer and high-interest debt → what ow
 **Goals:** child's education, house deposit, retirement, independence or custom. Make horizons explicit: a short-term essential goal is not the same as a 30-year discretionary retirement portfolio. Never imply equities cannot lose money.
 
 ## 6. My Wealth
-First screen asks: 'How is my long-term plan progressing?' Then show contribution rhythm, invested holdings, value **as of** dated prices, benchmark, allocation and overlap, goals, data coverage and errors/unknowns.
+**The user reviews exceptions, not routine bookkeeping.** Prefer a read-only brokerage snapshot where permitted, then a statement or CSV import, then manual entry. For a known investment, a manual buy or sell shows at most three inputs: side, quantity and executed amount. The screen states whether that amount includes fees. Date, account, currency and instrument identity are reused when already known. Optional fields stay behind progressive disclosure. A missing value is not shown as zero.
+
+First screen asks: 'How is my long-term plan progressing?' Then show contribution rhythm, invested holdings, value **as of** dated prices, allocation and, when data exists, overlap and a benchmark. **Deploy Capital** asks where the next sum should go against the strategic targets, and says “insufficient reliable data” when it cannot.
+
+Acceptance for the capture path: a clean import needs no row edits; one bad row does not drop the valid rows; a failed refresh does not replace the last good holdings with zeros; simulated accounts are not mixed into live wealth.
 
 Mandatory distinctions: deposits vs gains; nominal vs inflation-adjusted; realised vs unrealised; time-weighted vs money-weighted; public research vs personally executed trades; paper experiments vs actual portfolio. Missing FX or price -> transparent unavailable result, never made-up zero or interpolated value presented as fact.
 
