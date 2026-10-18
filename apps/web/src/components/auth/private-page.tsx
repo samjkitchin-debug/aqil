@@ -14,9 +14,6 @@ export async function PrivatePage({ nextPath, children }: Props) {
     const reason = access.status === "terminal_invalid_session" ? "session_ended" : "signed_out";
     redirect(`/login?error=${reason}&next=${encodeURIComponent(nextPath)}`);
   }
-  if (access.status === "authenticated_denied") {
-    redirect("/access-denied");
-  }
   if (access.status === "temporarily_unavailable") {
     return (
       <p className="research-body" data-testid="auth-unavailable">

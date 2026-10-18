@@ -29,8 +29,7 @@ export default function PrivacyPage() {
           <LegalParagraph>
             Sign-in is handled by Supabase Auth. Google is the only provider enabled in this
             application. A successful Google sign-in creates a Supabase user id. That id is the
-            application identity. Signing in does not by itself permit private research or portfolio
-            screens. Permission is an operator allow-list or an access_grants row. Aqil does not
+            application identity. A successful Google sign-in opens the application. Aqil does not
             merge accounts by comparing email addresses. Supabase Auth may still link identities
             when that project&apos;s own provider settings do so. There is no separate founder cookie.
           </LegalParagraph>
@@ -51,7 +50,7 @@ export default function PrivacyPage() {
             items={[
               "Account identity in Supabase Auth (linked to your Google sign-in when used).",
               "Optional user settings (for example locale and timezone) in the user_settings table, restricted to your user id.",
-              "An access_grants row, if an operator has created one, recording that your user id may use Aqil. You cannot create that row yourself.",
+              "Portfolio rows, when stored, belong to one Supabase user id. Another Google account cannot read them.",
               "Portfolio holdings are not stored by the authentication change. A separate portfolio migration, when applied, is designed so each row belongs to one user id.",
             ]}
           />

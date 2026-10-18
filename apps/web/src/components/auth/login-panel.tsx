@@ -25,8 +25,7 @@ export function LoginPanel() {
         Sign in
       </h1>
       <p className="mt-[var(--space-3)] text-muted">
-        Aqil uses Google through Supabase Auth. Signing in does not by itself grant access to
-        private research or portfolio data.
+        Aqil uses Google through Supabase Auth. Your Supabase user id is your identity.
       </p>
       {message ? (
         <p className="mt-[var(--space-4)] text-foreground" data-testid="login-error">

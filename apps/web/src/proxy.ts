@@ -1,7 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { isAllowlisted, parseAuthorisedUserIds } from "@/lib/auth/allowlist";
 import { isPublicPath } from "@/lib/auth/paths";
 import { safeNextPath } from "@/lib/auth/safe-next";
 import {
@@ -90,27 +89,6 @@ export async function proxy(request: NextRequest) {
       clearLocalAuthCookies(request, redirect);
     }
     return redirect;
-  }
-
-  const allowlist = parseAuthorisedUserIds(process.env.AQIL_AUTHORISED_USER_IDS);
-  let permitted = isAllowlisted(data.user.id, allowlist);
-  if (!permitted) {
-    const grant = await supabase.from("access_grants").select("role").eq("user_id", data.user.id).maybeSingle();
-    if (grant.error) {
-      const missing =
-        grant.error.code === "42P01" ||
-        grant.error.code === "PGRST205" ||
-        grant.error.message.toLowerCase().includes("access_grants");
-      if (!missing) {
-        return redirectTo(request, session, "/login", `?error=unavailable&next=${encodeURIComponent(next)}`);
-      }
-    } else if (grant.data?.role === "founder") {
-      permitted = true;
-    }
-  }
-
-  if (!permitted) {
-    return redirectTo(request, session, "/access-denied", "");
   }
 
   return session;
