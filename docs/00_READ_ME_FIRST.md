@@ -1,6 +1,9 @@
 # AQIL — Final Ground-Zero Baseline v2.0
 **16 October 2026 | Decision status: proposed build baseline, not validated investing alpha | Owner: founder**
 
+## Implementation state (18 October 2026)
+`main` is `dd82e40` (M1–M4 merged). Open and unmerged: PR #12 auth (`9e449ee`, CI green, live Google unverified), PR #9 M5 (`a302053`, CI green), PR #10 M6 (research CI failed), PR #11 My Wealth (`817b1f2`, do not merge until the synthetic fallback and founder-cookie path are removed). Hosted database migrations are not applied. Deploy Capital is specified, not built. Detail: `07_ROADMAP_AND_GATES.md`.
+
 ## What this is
 A coordinated specification for Aqil: a calm, evidence-led, long-horizon wealth and global-intelligence application. This supersedes prior Agent Macro and Aqil drafts **for implementation decisions**, without discarding their history. Previous drafts remain historical inputs, not parallel product truth.
 

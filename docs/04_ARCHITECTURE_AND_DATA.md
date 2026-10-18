@@ -1,6 +1,8 @@
 # AQIL — System Architecture, Tech Stack and Stable Data Contracts
 **Baseline:** modular monolith, clearly isolated research worker. Design for future users/tenants now; do not buy distributed-system complexity before necessary.
 
+**As of 18 October 2026:** research schemas through forward intelligence are on `main`. `access_grants` is only on PR #12. Wealth tables are only on PR #11 and are not the ledger in ADR 010 until valuations are append-only and currencies are not summed without FX. Deploy Capital is an application workflow over those tables, not a new service. The worker must not update `wealth_allocation_targets`.
+
 ## Topology
 ```text
 Browser / installable PWA (Next.js App Router + TypeScript + Tailwind)

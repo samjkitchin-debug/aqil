@@ -1,6 +1,9 @@
 # AQIL — Research Crown Jewel: Evidence, Methods, Signals, Hypotheses and Learning
 **Build intent:** An auditable research workflow that uses existing published methodologies before trying experimental AI extensions. No process may claim a predictive edge without prospective evidence.
 
+## Research does not move the portfolio
+A research run, insight or headline must not write strategic allocation targets, contribution plans or orders. `investment_implication` stays `no_action` or `insufficient_evidence` until a separate, founder-approved Deploy Capital comparison exists. That comparison is stored beside the strategic baseline. It is not a demonstrated edge.
+
 ## 1. Scientific chain of custody
 Aqil's chain is `source → extract → verify → observation → event/indicator → causal candidate → applied named method → competing scenario → market-expectations check → eligible exposure analysis → registered forecast → paper experiment → independent evaluation → versioned learning`. Every arrow has a validator; any failing critical step stops publication or produces a visibly qualified research note.
 
@@ -57,7 +60,7 @@ A method is eligible for use only after a `MethodCard` is created. Required fiel
 - Policy/event studies and supply–demand systems modelling: heterogeneity and endogeneity; not inherently return-predictive.
 - Earnings revisions/consensus dispersion: potential information signal but costly historical point-in-time data.
 
-Do **not** implement 20 methods in v1. Start with passive baseline, one risk diagnostic, one robust published quantitative signal (e.g. momentum, chosen only after data feasibility), and one event-to-causal research chain. All variants are preregistered.
+Do **not** implement 20 methods in v1. The method register on `main` implements `SAHM_UNEMPLOYMENT_GAP` 1.0.1. Momentum is a cited candidate, not an implemented signal. All variants are preregistered. Aqil does not claim a calibrated forecast.
 
 ### Historical analogues (later milestone; not M1)
 Historical analogues and recurring market behaviour are a required later capability of this same method, factor, configuration and evidence architecture. They are not a separate product, not a universal scoring matrix, and not part of the first macro slice.

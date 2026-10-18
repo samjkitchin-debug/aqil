@@ -11,9 +11,9 @@
 **Who we are not:** A get-rich-quick service, a stock-picking feed, a day-trading terminal, an authority that demands trust, a guaranteed-returns product, or a substitute for personal judgment and professional advice where warranted.
 
 ## Product hierarchy: all previously agreed ideas retain their place
-1. **Research crown jewel (investment intelligence and causal hypothesis engine).** The primary technical investment: authoritative evidence, proven/published methods, causal hypotheses, alternative scenarios, 12/24/36-month broad-investment outlooks, independently evaluated virtual portfolios, calibrated prediction and historical learning.
+1. **Research crown jewel (investment intelligence and causal hypothesis engine).** The primary technical investment: authoritative evidence, published methods, causal hypotheses, alternative scenarios and independently evaluated records. Calibrated or proven prediction is a later standard, not a claim about the current Sahm implementation.
 2. **World intelligence and editorial reading.** Calm, daily commute-length reading spanning policy, conflict, climate, energy, technology, demography, industry, capital and markets. Read broadly, follow interesting tangents, inspect sources. Daily articles need not create financial recommendations.
-3. **Wealth companion.** Private portfolio recording and accurate performance, diversification, contribution discipline, goal scenarios, benchmark and optional long-run educational context. Eventually read-only broker integrations.
+3. **Wealth companion.** Private portfolio recording, diversification, contribution discipline and, only when the ledger supports it, performance. Eventually read-only broker integrations. **Deploy Capital** (decision support, not an order): “I have a sum to invest today; given holdings, targets and available evidence, where should it go, and why?” V1 must name specific founder-approved ETFs, not only asset classes. The strategic allocation is the default. A forward-informed alternative is shown only with a named method, a bound, and a stored comparison against that baseline. For the founder’s private use this is decision support. Commercial personalised recommendations need a separate regulatory review. No automatic trading.
 4. **Investment education.** Approachable guides to emergency liquidity, fees, risk, broad diversification, real vs nominal returns, ETFs, accumulation, compounding, disciplined saving and behaviour. Never shame low earners or promise five percent of any salary will fund education or retirement.
 5. **Peer scrutiny and accountability.** Real methods, corrections, post-mortems, challenger results, user disputes and unresolved questions visible from relevant content.
 
@@ -42,7 +42,7 @@ A core research object answers:
 
 ## Investment philosophy
 - Work, live, save if affordable, control expensive debt, build adequate liquidity, diversify, contribute consistently, keep costs low, value time and compounding; the portfolio is a tool for life goals.
-- Research may alter allocation strategically, not only with a 20% tactical sleeve; there is no built-in obligation to change the portfolio.
+- **Proposed policy, founder approval outstanding (18 October 2026):** The investor owns and controls their strategic allocation targets. Aqil may present evidence-backed alternatives for allocating new capital across approved investments, with the strategic allocation serving as the default comparator. Research outputs must never independently modify saved targets or execute trades. Any tactical alternative must disclose its evidence, costs and concentration implications and be preserved for prospective evaluation. This replaces the earlier wording that mentioned a 20% tactical sleeve. That sleeve is not a product rule. Do not treat this paragraph as approved governance until the founder accepts it.
 - Only consider eligible broad diversified, preferably accumulating ETFs with verified ISIN/share class, fee and tracking characteristics, fund and index history, investment exposure and overlap. Regional/factor/sector funds can be conditional rather than treated as 'core'.
 - No action, continuing contributions and rebalancing existing holdings are legitimate research outcomes.
 - Do not optimise to maximise reader actions, trade frequency, alerts, portfolio turnover or sensational engagement.
@@ -63,7 +63,7 @@ A core research object answers:
 - Potential future broker recommendations: editorial comparisons with compensation/conflicts clearly disclosed; no affiliate-led ranking masquerading as independent research.
 
 ## Product experiences
-**Today:** curated brief with one main idea, why it matters, uncertainty and links to related themes. **Explore:** causal connections, country strategy, timelines, theme maps. **Learn:** concise lessons and a scenario-based compounding tool. **My Wealth:** private positions, contribution-vs-growth, actual returns, consistent benchmark and goals. **Research:** full provenance, methods, hypotheses, portfolio experiments, scorecard, failed results and challenge mechanism.
+**Today:** curated brief with one main idea, why it matters, uncertainty and links to related themes. **Explore:** causal connections, country strategy, timelines, theme maps. **Learn:** concise lessons and a scenario-based compounding tool. **My Wealth:** private positions, native-currency values, allocation versus the investor’s targets, and contribution plans. Actual returns and a benchmark appear only when the journal and prices support them. **Deploy Capital** is the screen for placing the next sum. The user reviews exceptions, not routine bookkeeping. **Research:** full provenance, methods, hypotheses, portfolio experiments, scorecard, failed results and challenge mechanism.
 
 ## Success measures
 1. Human understanding: can a reader accurately explain the conclusion **and** key uncertainty?

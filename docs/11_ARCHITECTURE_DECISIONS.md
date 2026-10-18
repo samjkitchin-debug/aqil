@@ -22,3 +22,4 @@
 | 017 | No graph/vector DB at first | relational representation adequate for MVP | measured complexity/quality improvement |
 | 018 | CI, migrations, security fixtures and restore drill from day one | prevent rebuild and data loss | never revoke |
 | 019 | Server-side Supabase SSR session authority; doctrine in AUTH_AND_SESSION_DOCTRINE.md | prevent auth drift, refresh races and PWA logout bugs | only via ADR if identity model changes |
+| 020 | Deploy Capital: strategic baseline first; signal tilt only as a stored, bounded comparison | practical use of research without automatic target changes or invented conviction | founder approves a tilt method and its maximum weight |

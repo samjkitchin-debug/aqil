@@ -388,6 +388,27 @@ Row counts stayed: instruments 1, holdings snapshots 1, holding lines 3, catalys
 - Hosted Supabase is not migrated. Live scheduling is not enabled.
 
 ### Git
-- **main:** PR #7 merged (`54c4a16`).
-- **M4:** PR #8 `m4/forward-intelligence`. GitHub Actions on the correction commit is the merge gate.
+- **main:** PR #8 is merged at `dd82e40`. The lines above record the pre-merge session. Current open PRs are in the 18 October 2026 consolidation handover.
+
+## Session handover — 2026-10-18 (consolidation)
+
+### Current objective
+Record one source of truth for unmerged PRs, Deploy Capital, and the next gates. No product code.
+
+### Git
+- Branch: `docs/consolidation-2026-10-18` from `origin/main` `dd82e40`
+- Open: PR #12 `9e449ee` CI green; PR #9 `a302053` CI green; PR #10 `2b5bd1e` research CI failed; PR #11 `817b1f2` database CI failed
+
+### Decisions
+- The charter sentence on strategic versus tactical allocation is flagged for founder confirmation. It was not rewritten into a new policy.
+- Deploy Capital is decision support for the founder. Public personalised recommendations stay behind regulatory review.
+- Merge order: #12, #9, #10 after green research CI, then a rebased My Wealth that must not restore the founder cookie.
+
+### Unverified
+- Live Google OAuth
+- Hosted migrations
+- Employment Situation freeze (planned before 6 November 2026)
+
+### Next recommended step
+Founder approves this documentation PR, then merges PR #12 after one real Google sign-in.
 

@@ -24,7 +24,7 @@ Git-tracked **migrations** in `supabase/migrations/` are schema authority alongs
 6. **Stable contracts** need founder approval before change: session boundaries, ledger maths, entitlements, source provenance, forecast immutability, model promotion.
 7. **New living documents** state status (`canonical`, `living-ops`, `proposal`, `investigation`, `superseded`), owner, last verified date, and the canon they must not contradict. Do not add a parallel `docs/canon/` tree while the numbered specs remain the authority.
 8. **Debt** lives in one register (`KNOWN_UNKNOWNS.md` when created), with reason, risk and the trigger to revisit — not scattered TODOs that contradict canon.
-9. **Progress** — one register: `docs/07_BUILD_BACKLOG.csv`. Roadmap gates in `docs/07_ROADMAP_AND_GATES.md`; acceptance rows in `docs/10_ACCEPTANCE_TEST_MATRIX.csv`. Update backlog evidence when substantive work completes; use `docs/CURSOR_SESSION_HANDOVER.md` for session continuity. No competing roadmaps or duplicate status spreadsheets.
+9. **Progress** — one register: `docs/07_BUILD_BACKLOG.csv`. Roadmap gates in `docs/07_ROADMAP_AND_GATES.md` (snapshot dated 18 October 2026 overrides older “M1 is next” sentences in the same file). Acceptance rows in `docs/10_ACCEPTANCE_TEST_MATRIX.csv`. Update backlog evidence when substantive work completes; use `docs/CURSOR_SESSION_HANDOVER.md` for session continuity. No competing roadmaps or duplicate status spreadsheets.
 10. **Operating discipline** — one home per requirement; consequential forks → ADR in `docs/11_ARCHITECTURE_DECISIONS.md`; supersede in place, do not silently delete product requirements; no “verified” without executed evidence; trivial changes do not need new documents.
 
 ## Cursor and agents

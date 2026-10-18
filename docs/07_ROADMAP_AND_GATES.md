@@ -1,6 +1,39 @@
 # AQIL — Execution Roadmap and Stage Gates
 
-**Last reconciled:** 17 October 2026 · **Git baseline:** `main` @ `92560cc` (PR #1 merged; CI run 38992659234 green on `main`).
+**Last reconciled:** 18 October 2026 · **Git baseline:** `main` @ `dd82e40` (PR #8 / M4 merged). Earlier “PR #1 is the latest milestone” and “M1 is next” wording below is historical. Current open work is PRs #9–#12.
+
+## Current implementation snapshot (18 October 2026)
+
+Statuses: implemented and verified · implemented but not fully verified · in progress · planned · blocked.
+
+| Capability | Status | Where |
+|------------|--------|--------|
+| M1–M4 research engine, persistence, insight, forward fixture | Implemented and verified on `main` (`dd82e40`). Holdings weights and some events remain labelled synthetic. | Merged PRs #6–#8 |
+| M5 live macro calendars | In progress. CI green on `a302053`. Not merged. | PR #9 → `main` |
+| M6 SLOOS and Census methods | In progress. Web and database CI green; research worker CI failed on `2b5bd1e`. Stacked on M5. | PR #10 |
+| Google auth and allow-list | Implemented but not fully verified. Engineering CI green on `9e449ee` (run 39080685298). No verified live Google round trip. Not merged. | PR #12 |
+| My Wealth slice | In progress, and not safe to merge as-is. CI database job failed on `817b1f2`. Synthetic fixture when unsigned; mixed-currency sum; founder cookie still on that branch. | PR #11 |
+| Hosted Supabase | Blocked pending founder approval | Not applied |
+| Deploy Capital | Planned | This document; no code |
+| US Employment Situation cycle (6 November 2026) | Planned operational evaluation, not a demonstrated forecast | Gate D |
+
+**Deployed:** Vercel previews exist for the open PRs. Production on `main` does not include auth, M5, M6 or My Wealth. Hosted database migrations have not been applied.
+
+## Integration gates (pass/fail)
+
+**Gate A — Authentication.** Pass only when PR #12 is merged, a real Google sign-in and sign-out succeed, the founder allow-list or `access_grants` admits one identity and denies another, and the founder cookie/header path stays absent. Green CI alone is not a pass. ISO 27001 is not claimed.
+
+**Gate B — Branch order.** Pass when merges follow: PR #12, then PR #9, then PR #10 after its research CI is green, then a rebased My Wealth branch that does not restore the founder cookie. No hosted `db push` in this gate.
+
+**Gate C — My Wealth integrity.** Pass when the unsigned path does not return the synthetic book, unknown asset classes are rejected, mixed currencies are not summed without a dated FX rate, accounts separate simulation from live, valuations are append-only, and RLS covers read, insert, update and delete. Gains and returns stay unavailable until a journal exists.
+
+**Gate D — First prospective cycle.** Pass when the baseline and Sahm threshold are frozen before **6 November 2026, 13:30 UTC** (October Employment Situation, 8:30 a.m. US Eastern). The existing BLS unemployment series and Sahm method are sufficient. M5 and M6 are not prerequisites. The record must say that no directional unemployment-rate forecast was made. Crossing the threshold is not forecasting skill.
+
+**Gate E — Deploy Capital.** Pass for V1 when a signed-in founder can enter an amount in the reporting currency (default SGD) and receive a deterministic split across specific founder-approved ETFs, with an explicit “insufficient data” outcome. Asset-class totals alone are not V1. V2 adds overlap and costs. V3 may compare a signal-informed alternative only after a prospective evaluation exists. No automatic trading. Routine capture stays brokerage sync, then statement import, then a three-field manual trade.
+
+## M1 — Completed on main (no longer the next milestone)
+
+The acceptance list below remains the definition of the macro slice. It is **not** the next build. M1–M4 are on `main`. Remaining G0 items (hosted migration, UCITS/FX sample, rights for further series) are still open.
 
 ## Progress register
 
@@ -20,7 +53,7 @@
 | GitHub CI (web / database / research) | **Verified** | Green on `main` post-merge |
 | Versioned JSON schemas (files) | **Implemented — unverified** | `docs/schemas/` mirrored in `packages/contracts/`; **no CI schema validator yet** |
 | Claim verifier fail-closed | **Implemented — unverified** | `workers/research/.../claim_verifier.py` + pytest; registry not built |
-| Auth doctrine | **Verified (document)** | `AUTH_AND_SESSION_DOCTRINE.md`; **no auth UI or private routes** |
+| Auth doctrine and implementation | **In progress** | Doctrine on `main`. PR #12 implements Google auth; CI green; live OAuth unverified; not merged |
 | Information security standard | **Implemented — unverified** | `INFORMATION_SECURITY_STANDARD.md` + CI hardening **in working tree; not on `main` until merged** |
 | Static synthetic research story (PR1) | **Not started** | Research page is placeholder only |
 | Hosted Supabase | **Not started** | No migrations applied to hosted project; `db push` awaits explicit approval after CI pgTAP |
@@ -28,7 +61,7 @@
 
 **G0 gate remains open.** PR1 repository foundation is largely **verified**; **G0 exit criteria** (data feasibility + hosted migration verification) are **not** satisfied.
 
-## M1 — Next active milestone (macro intelligence engine slice)
+## M1 acceptance record (met on main; not the next build)
 
 **Goal:** Prove an economical, source-backed **macro data → deterministic analysis → evidence-linked output** path for a **small, founder-chosen set** of datasets and **one** established method — without claiming investment edge, without LLM publication, and without expanding to the full user journey in `docs/12_FIRST_VERTICAL_SLICE.md` (that remains the later end-to-end gate).
 
@@ -48,7 +81,7 @@
 
 **M1 does not require:** auth, portfolio ledger, causal graph UI, LLM agents, ETF eligibility, public launch, or an historical analogue model (`03` §3).
 
-**When M1 is verified:** update AQ-064 and dependent rows; then either deepen toward `12_FIRST_VERTICAL_SLICE.md` (G4) or complete remaining G0 data items (PR2).
+M1 acceptance was met by the engine now on `main`. Fixture tests do not verify a later live collection. Remaining G0 items (hosted migration, UCITS/FX sample) are still open.
 
 ## Strategic order
 **Do not confuse feature completeness with research reliability.** Two tracks run in parallel: a small human-facing prototype to validate comprehension, and deep evidence/accounting infrastructure to validate correctness. Only combine them in a live research journey after gates pass.
