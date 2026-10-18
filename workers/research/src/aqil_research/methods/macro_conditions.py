@@ -172,9 +172,12 @@ class MacroConditionsMethod:
                 config.label,
             ),
             limitations=limitations,
-            missing_reason=None if sufficiency == "sufficient" else "one or more panels insufficient",
+            missing_reason=(
+                None if sufficiency == "sufficient" else "one or more panels insufficient"
+            ),
             statistical_interpretation=(
-                "Joint read of labour deterioration, bank credit standards and advance factory orders. "
+                "Joint read of labour deterioration, bank credit standards "
+                "and advance factory orders. "
                 "Each line of evidence has distinct revision and availability limits."
             ),
             causal_hypothesis="No unified causal model is asserted across panels.",

@@ -83,8 +83,10 @@ class SloosCilMethod:
             limitations=_limitations(),
             missing_reason=None,
             statistical_interpretation=(
-                "Descriptive credit-conditions indicator from bank lending-officer survey responses. "
-                "Not a validated predictor of corporate earnings, ETF returns, or allocation changes."
+                "Descriptive credit-conditions indicator from bank lending-officer "
+                "survey responses. "
+                "Not a validated predictor of corporate earnings, ETF returns, "
+                "or allocation changes."
             ),
             causal_hypothesis="No causal mechanism is asserted.",
             investment_implication="no_action",
@@ -119,7 +121,8 @@ def _direction_label(value: Decimal) -> str:
 
 def _limitations() -> tuple[str, ...]:
     return (
-        "Survey-based qualitative standards indicator; subject to revision in later SLOOS releases.",
+        "Survey-based qualitative standards indicator; "
+        "subject to revision in later SLOOS releases.",
         "Not an earnings or ETF-return forecasting model.",
         "Do not infer ETF allocation changes from this output.",
     )

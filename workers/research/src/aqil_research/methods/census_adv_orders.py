@@ -105,21 +105,24 @@ class CensusAdvOrdersMethod:
             calculation=calculation,
             observation_ids=cited_ids,
             assumptions=(
-                "Census advance report MDM new orders, seasonally adjusted, in millions of dollars.",
+                "Census advance report MDM new orders, seasonally adjusted, "
+                "in millions of dollars.",
                 config.label,
             ),
             limitations=_limitations(),
             missing_reason=None,
             statistical_interpretation=(
                 "Descriptive manufacturing-demand indicator from the advance M3 release. "
-                "Not a validated predictor of corporate earnings, ETF returns, or allocation changes."
+                "Not a validated predictor of corporate earnings, ETF returns, "
+                "or allocation changes."
             ),
             causal_hypothesis="No causal mechanism is asserted.",
             investment_implication="no_action",
             narrative=(
                 f"Advance durable goods new orders for {current_period.isoformat()}: "
                 f"initial-estimate m/m {initial_mom}% versus official m/m {official_mom}% "
-                f"(prior month revised from {initial_prior_level} to {revised_prior_level} millions)."
+                "(prior month revised from "
+                f"{initial_prior_level} to {revised_prior_level} millions)."
             ),
         )
 

@@ -8,13 +8,13 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 
 from aqil_research.adapters.census_adv_orders.parse import parse_census_adv_payload
-from aqil_research.contracts.observation import EconomicObservation
 from aqil_research.adapters.protocol import (
     ProviderFailureCode,
     ProviderFetchError,
     ProviderFetchResult,
     ProviderIdentity,
 )
+from aqil_research.contracts.observation import EconomicObservation
 
 ADAPTER_ID = "census_m3_adv_mdm_no"
 ADAPTER_VERSION = "1.0.0"
