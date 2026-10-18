@@ -1,0 +1,22 @@
+{
+  "status": "baseline_frozen",
+  "frozen": true,
+  "assessment_kind": "baseline_only",
+  "freeze_file": "freeze-v1.json",
+  "payload_hash": "960e9817ee58661a5c671fd6efd2c08d0ba81700b4d8ca86677c866af7ff1727",
+  "frozen_at": "2026-10-18T03:29:56.902129+00:00",
+  "reason": "BLS returned no October 2025 unemployment rate. The Sahm look-back includes that month, so no threshold was calculated. The September 2026 rate 4.2 is the published baseline only.",
+  "series_id": "LNS14000000",
+  "latest_published_month": "2026-09",
+  "latest_published_value": "4.2",
+  "missing_observation": {
+    "period": "2025-10",
+    "value": "-",
+    "footnote": "Data unavailable due to the 2025 lapse in appropriations."
+  },
+  "release_at": "2026-11-06T13:30:00+00:00",
+  "schedule_verification": "source_unavailable",
+  "schedule_note": "https://www.bls.gov/schedule/news_release/empsit.htm returned an access-denied page on 18 October 2026. The 6 November 2026 13:30 UTC instant is the previously reported Eastern 08:30 release and is not marked verified.",
+  "statement": "No directional unemployment-rate forecast was made.",
+  "no_values_invented": true
+}
