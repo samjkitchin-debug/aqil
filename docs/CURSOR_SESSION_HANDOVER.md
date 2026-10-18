@@ -2,11 +2,11 @@
 
 **Status:** living continuity note  
 **Last updated:** 18 October 2026  
-**Release commit:** pending the close-out commit on `main`
+**Release commit:** parent integration `ddfccbb6bfdcc313d1c6cf52288e646a82fe74e0`. The pushed `main` tip is the commit that contains this note.
 
 ## Current state
 
-- Branch before the release push: `alignment/2026-10-18`, based on `origin/main` `6f47bdb`.
+- Integration commit: `ddfccbb6bfdcc313d1c6cf52288e646a82fe74e0` on `alignment/2026-10-18`, based on `origin/main` `6f47bdb`.
 - One shared shell. Primary navigation is Today, My Wealth and Intelligence. Content width is 78rem.
 - Local Saxo is read-only. The stored live snapshot reconciles: cash is present, the standard total matches cash plus holding market values, the extended-hours total is separate, four net holdings, no duplicate symbols, closed-market zeros are not prices. Holdings stay unclassified.
 - Production does not offer Connect Saxo. Tokens and snapshots are gitignored local files, not hosted storage.
