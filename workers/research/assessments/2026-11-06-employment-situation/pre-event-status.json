@@ -1,0 +1,20 @@
+{
+  "status": "blocked",
+  "frozen": false,
+  "reason": "BLS returned no October 2025 unemployment rate. The Sahm look-back for September 2026 includes that month, so the baseline and the October 2026 threshold were not computed.",
+  "retrieved_at": "2026-10-18T00:31:46+00:00",
+  "source_uri": "https://api.bls.gov/publicAPI/v2/timeseries/data/LNS14000000?startyear=2024&endyear=2026",
+  "series_id": "LNS14000000",
+  "api_status": "REQUEST_SUCCEEDED",
+  "latest_published_month": "2026-09",
+  "latest_published_value": "4.2",
+  "missing_observation": {
+    "period": "2025-10",
+    "value": "-",
+    "footnote": "Data unavailable due to the 2025 lapse in appropriations."
+  },
+  "release_at": "2026-11-06T13:30:00+00:00",
+  "schedule_page_verified": false,
+  "statement": "No directional unemployment-rate forecast was made.",
+  "no_values_invented": true
+}
