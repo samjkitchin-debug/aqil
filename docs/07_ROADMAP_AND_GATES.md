@@ -27,9 +27,9 @@ Statuses: implemented and verified · implemented but not fully verified · in p
 
 **Gate C — My Wealth integrity.** Pass when the unsigned path does not return the synthetic book, unknown asset classes are rejected, mixed currencies are not summed without a dated FX rate, accounts separate simulation from live, valuations are append-only, and RLS covers read, insert, update and delete. Gains and returns stay unavailable until a journal exists.
 
-**Gate D — First prospective cycle.** Pass when the baseline and Sahm threshold are frozen before the US Employment Situation release scheduled for 6 November 2026, the release is stored as an observation, and the evaluation record is kept. This does not prove an investment edge.
+**Gate D — First prospective cycle.** Pass when the baseline and Sahm threshold are frozen before **6 November 2026, 13:30 UTC** (October Employment Situation, 8:30 a.m. US Eastern). The existing BLS unemployment series and Sahm method are sufficient. M5 and M6 are not prerequisites. The record must say that no directional unemployment-rate forecast was made. Crossing the threshold is not forecasting skill.
 
-**Gate E — Deploy Capital.** Pass for V1 when a signed-in founder can enter an amount in the reporting currency (default SGD) and receive a deterministic split across an approved ETF list that respects their strategic targets, with an explicit “insufficient data” outcome. V2 adds overlap and costs. V3 may compare a signal-informed alternative only after Gate D-style evaluation exists. No automatic trading.
+**Gate E — Deploy Capital.** Pass for V1 when a signed-in founder can enter an amount in the reporting currency (default SGD) and receive a deterministic split across specific founder-approved ETFs, with an explicit “insufficient data” outcome. Asset-class totals alone are not V1. V2 adds overlap and costs. V3 may compare a signal-informed alternative only after a prospective evaluation exists. No automatic trading. Routine capture stays brokerage sync, then statement import, then a three-field manual trade.
 
 ## M1 — Completed on main (no longer the next milestone)
 
@@ -81,7 +81,7 @@ The acceptance list below remains the definition of the macro slice. It is **not
 
 **M1 does not require:** auth, portfolio ledger, causal graph UI, LLM agents, ETF eligibility, public launch, or an historical analogue model (`03` §3).
 
-**When M1 is verified:** update AQ-064 and dependent rows; then either deepen toward `12_FIRST_VERTICAL_SLICE.md` (G4) or complete remaining G0 data items (PR2).
+M1 acceptance was met by the engine now on `main`. Fixture tests do not verify a later live collection. Remaining G0 items (hosted migration, UCITS/FX sample) are still open.
 
 ## Strategic order
 **Do not confuse feature completeness with research reliability.** Two tracks run in parallel: a small human-facing prototype to validate comprehension, and deep evidence/accounting infrastructure to validate correctness. Only combine them in a live research journey after gates pass.
