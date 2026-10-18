@@ -391,3 +391,106 @@ Row counts stayed: instruments 1, holdings snapshots 1, holding lines 3, catalys
 - **main:** PR #7 merged (`54c4a16`).
 - **M4:** PR #8 `m4/forward-intelligence`. GitHub Actions on the correction commit is the merge gate.
 
+## Session handover — 2026-10-18 (Google auth foundation)
+
+### Current objective
+Replace the founder-cookie gate with Supabase Google OAuth, explicit founder allow-listing, and fail-closed private routes.
+
+### Git
+- Branch: `auth/google-foundation` from `origin/main` (`dd82e40`)
+- PR #11 (My Wealth) and M5/M6 were not merged
+
+### Tests and verification
+| Check | Result |
+|-------|--------|
+| `npm run test:auth` | 6 passed |
+| typecheck, lint, `npm run build` | pass |
+| `npm run db:test` | not run — Docker engine offline |
+| Playwright | not run — browser binary missing in this environment |
+| curl against `next start` on port 3010 | `/research` and `/my-wealth` returned 307 to `/login?error=unavailable` with `Cache-Control: private, no-store`; login HTML had the Google button and no research payload; `/auth/callback?error=access_denied` redirected to `error=provider_denied` |
+
+### Unverified
+- pgTAP `access_grants_rls.test.sql` (needs Docker / CI database job)
+- Live Google OAuth round-trip (needs the founder's client id in the Supabase project and `AQIL_AUTHORISED_USER_IDS`)
+
+### Next recommended step
+- After this PR merges, rebase PR #11 and delete the unauthenticated synthetic portfolio fallback in `load-snapshot.ts`.
+
+### Flicker follow-up (same branch)
+- Dev log showed repeated `GET /login?error=unavailable` **200** document loads from Edge, with `Cache-Control: no-store`, not a 307 cycle. A fresh tab stayed idle.
+- Public routes no longer call Auth. Private link prefetch returns 204 instead of a redirect to login. The login page no longer resolves a session on the server.
+- After that change the document reload stopped (one 200, then silence on the dev server).
+- Live Google round trip and pgTAP remain outstanding. Docker was offline.
+
+## Session handover — 2026-10-18 (auth audit incorporation)
+
+### Current objective
+Stop the signed-out login loop and keep authentication reliable when Auth is slow, failing, or refreshing, without making the proxy the only authorisation authority.
+
+### Confirmed root cause
+The flicker was a document reload of `/login?error=unavailable`, not a 307 redirect loop. The dev server logged repeated `GET` 200 responses with `Cache-Control: no-store`. Two causes were confirmed in code:
+
+- `proxy.ts` used to call `getUser()` before deciding that `/login` and `/auth/callback` are public. That is removed. Public routes return before any Auth call.
+- The login shell still rendered a brand link to `/` with prefetch enabled, and primary navigation links to protected routes. A protected prefetch that redirected back to login gave the browser another document to load. Protected prefetches now return 204, and links in the shell use `prefetch={false}`.
+
+### What changed
+- No Auth call when there is no Supabase auth cookie. A terminal refresh failure signs out once, then redirects. HTTP 429 and 500–599 are temporary unavailability, not sign-out.
+- Production sign-in and the OAuth callback require `NEXT_PUBLIC_APP_URL`. The callback does not exchange a code when the origin does not match.
+- Allow-list and `access_grants` stay in `resolveAccess()` for the server render. The proxy does not inject an identity header. `getClaims()` is not in the installed Auth SDK. Founder cookie and header paths stay absent.
+- Privacy copy no longer describes a founder cookie or development-only access. It does not claim portfolio rows exist in this branch.
+
+### Tests and verification
+| Check | Result |
+|-------|--------|
+| `node --experimental-strip-types --test src/lib/auth/auth.test.ts` | 10 passed |
+| Browser, 32 seconds on `http://localhost:3000/login?error=unavailable` | Stayed on that URL. 1 navigation, 17 static resources, no protected-route request. Dev log had no further `GET /login` during the wait. |
+| `npm run db:test` | not run — Docker engine offline |
+| Real Google OAuth, expired-token rotation, two tabs, 429/503 against Auth, Playwright, production browser | not run |
+
+### Blockers
+- Docker is offline, so `access_grants` pgTAP and My Wealth RLS are unverified here. My Wealth RLS lives on PR #11, which was not merged.
+- Google client configuration and `AQIL_AUTHORISED_USER_IDS` are outside Git, so a live OAuth round trip was not attempted.
+- A session cookie still produces two sequential `getUser()` calls: proxy refresh, then one React-cached server authorisation. That is the supported cookie-propagation pattern. A live two-tab rotation test was not run.
+
+### Next recommended step
+Re-run `npm run db:test` when Docker is up, then one real Google sign-in once the dashboard client and allow-list are set. Do not merge PR #11 or apply hosted migrations until that evidence exists.
+
+## Session handover — 2026-10-18 (auth final hardening)
+
+### Current objective
+Remove global sign-out from the proxy, correct privacy claims, and run the checks that can actually run on this machine.
+
+### Confirmed findings still true at b662596, and what changed
+- A bare HTTP 401 or 403 was classified as a terminal session, and the proxy then called `signOut()` (global by default in the installed SDK). That call is removed. Only a confirmed dead refresh token (`refresh_token_not_found`, `refresh_token_already_used`, `session_not_found`, or the matching message) is terminal, and the proxy only expires the local auth cookies.
+- Explicit sign-out now uses `scope: "local"`.
+- The installed GoTrue client refreshes inside the expiry margin only. A labelled mock fetch showed two `getUser()` calls on a current token make two user lookups and zero token refreshes. An expired token refreshed once. This is not a live rotation.
+- A database grant error now keeps the `next` path.
+- Next.js 16 prefetch is `next-router-prefetch` or `next-router-segment-prefetch`. A navigation (`sec-fetch-mode: navigate`) or a Server Action is not answered with 204.
+- `getClaims()` is still absent. No identity header was added.
+
+### Tests
+| Check | Result |
+|-------|--------|
+| `npm run test:auth` | 13 passed (3 of them are mock Auth HTTP, labelled in the test name) |
+| Production `next build` | passed |
+| Local `supabase test db` on 127.0.0.1 | 75 pgTAP passed, including `access_grants_rls.test.sql`. Windows had reserved ports 54321–54329, so the stack was started on temporary local ports and `config.toml` was restored afterwards. |
+| Playwright laptop project against `next start` on port 3010 | 25 passed, 1 failed. The failure is `/auth/callback?error=access_denied` landing on `error=unavailable` because this build had no `NEXT_PUBLIC_APP_URL`. CI bakes that URL in at build time. |
+| Production login idle, 300 seconds | Stayed on `/login?error=unavailable`. 1 document request. Footer prefetch of `/privacy` and `/tos` only. No protected-route request. |
+| Dev login via 127.0.0.1 | 6 document loads. The dev log shows Next blocked HMR from 127.0.0.1. That is not an Auth redirect loop. |
+| Client static chunks | no `SERVICE_ROLE`, `client_secret` or `sb_secret_` match |
+| Real Google OAuth, second identity, two tabs, live 429/503, revoked refresh | not run. No `.env` or `.env.local` is present, so there is no configured Google client or allow-list. |
+| My Wealth RLS | not on this branch |
+
+### PR #11 rebase, not done here
+- `load-snapshot.ts` still returns the synthetic fixture when `getUser()` has no user, after the old founder-cookie gate.
+- That branch's `founder-access.ts` still accepts the founder cookie, the founder header, and a non-production open gate.
+- `my_wealth_rls.test.sql` has 3 tests (cross-user read, cross-user insert, anon select). It does not cover update, delete, or the other wealth tables.
+- There is no portfolio mutation server action on that branch.
+
+### Verdict
+Not safe for real founder financial data. Do not merge PR #11 onto this until the fixture fallback and founder cookie are gone and the wealth RLS file has been run. Do not apply hosted migrations.
+
+### Next recommended step
+Merge PR #12 only after its CI is green. Then rebase PR #11, delete the fixture fallback and cookie gate, and re-run wealth pgTAP. A live Google round trip still needs the dashboard client and `AQIL_AUTHORISED_USER_IDS`.
+
+

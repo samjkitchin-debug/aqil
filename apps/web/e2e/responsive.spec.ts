@@ -1,7 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-const routes = ["/", "/explore", "/calendar", "/learn", "/research", "/my-wealth"];
+const publicRoutes = ["/login", "/privacy", "/tos"];
+const privateRoutes = ["/", "/explore", "/calendar", "/learn", "/research", "/my-wealth"];
 
 async function expectNoHorizontalOverflow(page: Page) {
   const metrics = await page.evaluate(() => {
@@ -40,10 +41,20 @@ async function expectNoHorizontalOverflow(page: Page) {
 }
 
 test.describe("responsive shell", () => {
-  for (const route of routes) {
+  for (const route of publicRoutes) {
     test(`renders ${route} without horizontal overflow`, async ({ page }) => {
       await page.goto(route);
       await expect(page.getByRole("main")).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+    });
+  }
+
+  for (const route of privateRoutes) {
+    test(`requires sign-in for ${route}`, async ({ page }) => {
+      await page.goto(route);
+      await expect(page).toHaveURL(/\/login/);
+      await expect(page.getByRole("button", { name: "Continue with Google" })).toBeVisible();
+      await expect(page.getByTestId("research-insight")).toHaveCount(0);
       await expectNoHorizontalOverflow(page);
     });
   }
@@ -67,8 +78,8 @@ test.describe("responsive shell", () => {
     }
 
     await nav.getByRole("link", { name: "Explore" }).click();
-    await expect(page).toHaveURL(/\/explore$/);
-    await expect(page.getByRole("heading", { level: 1, name: "Explore" })).toBeVisible();
+    await expect(page).toHaveURL(/\/login\?/);
+    await expect(page.getByRole("heading", { level: 1, name: "Sign in" })).toBeVisible();
   });
 
   test("keyboard user can reach skip link and main content", async ({ page }) => {

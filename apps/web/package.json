@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test:forward-contract": "node --experimental-strip-types --test src/lib/forward/validate-forward-horizon.test.ts",
+    "test:auth": "node --experimental-strip-types --test src/lib/auth/auth.test.ts src/lib/auth/refresh-ownership.mock.test.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

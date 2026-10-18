@@ -26,6 +26,7 @@ export function PrimaryNav() {
               <li key={item.href} className="min-w-0 md:flex-none">
                 <Link
                   href={item.href}
+                  prefetch={false}
                   className={[
                     "aq-nav-link",
                     active ? "aq-nav-link--active" : "aq-nav-link--idle",

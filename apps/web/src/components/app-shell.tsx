@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { PrimaryNav } from "@/components/primary-nav";
+import { SiteFooter } from "@/components/site-footer";
 import { PageContainer } from "@/components/ui/page-container";
 import { SkipLink } from "@/components/ui/skip-link";
 
@@ -18,19 +19,21 @@ export function AppShell({ title, children }: AppShellProps) {
           <div className="flex min-h-[var(--layout-header-height)] items-center justify-between gap-[var(--space-3)]">
             <Link
               href="/"
+              prefetch={false}
               className="aq-brand-title text-brand-navy font-semibold tracking-tight"
             >
               Aqil
             </Link>
-            <p className="aq-shell-page-title hidden text-muted sm:block">
-              {title}
-            </p>
+            <p className="aq-shell-page-title hidden text-muted sm:block">{title}</p>
           </div>
         </PageContainer>
       </header>
 
       <main className="aq-shell-main" id="main-content" tabIndex={-1}>
-        <PageContainer>{children}</PageContainer>
+        <PageContainer>
+          {children}
+          <SiteFooter />
+        </PageContainer>
       </main>
 
       <div className="aq-shell-nav-host">

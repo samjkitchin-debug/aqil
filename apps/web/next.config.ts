@@ -12,26 +12,15 @@ const nextConfig: NextConfig = {
     },
   },
   async headers() {
-    return [
-      {
-        source: "/my-wealth/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "private, no-store, max-age=0",
-          },
-        ],
-      },
-      {
-        source: "/api/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "private, no-store, max-age=0",
-          },
-        ],
-      },
-    ];
+    const privateNoStore = {
+      key: "Cache-Control",
+      value: "private, no-store, max-age=0",
+    };
+    const privateRoutes = ["/", "/explore", "/calendar", "/learn", "/research", "/my-wealth", "/api/:path*"];
+    return privateRoutes.map((source) => ({
+      source,
+      headers: [privateNoStore],
+    }));
   },
 };
 
