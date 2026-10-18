@@ -3,6 +3,7 @@ begin;
 
 select plan(3);
 
+-- Constraint fixture only. This row does not verify the BLS publication calendar.
 insert into forward.catalyst_events (
   event_id, category, subject_type, subject_id, title, scheduled_at, date_precision, status,
   source_id, source_locator, first_observed_at, last_verified_at, payload, evidence_class
@@ -58,6 +59,23 @@ select throws_ok(
   '23514',
   null,
   'an outcome cannot award forecasting skill'
+);
+
+select lives_ok(
+  $$
+    insert into forward.event_outcomes (
+      event_id, scenario_id, observed_at, payload, content_hash, source_id, evidence_class
+    ) values (
+      'bls:empsit:2026-10',
+      'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+      timestamptz '2026-11-06 13:31:00+00',
+      '{"evidence_class":"verified_release_outcome","forecasting_skill":null}'::jsonb,
+      'first',
+      'bls_cps_unemployment_rate',
+      'verified_release_outcome'
+    )
+  $$,
+  'a first release outcome can omit a forecasting score'
 );
 
 select * from finish();
