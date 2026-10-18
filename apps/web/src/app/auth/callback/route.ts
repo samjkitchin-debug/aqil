@@ -19,6 +19,8 @@ export async function GET(request: Request) {
   const configuredOrigin = resolved.origin;
   const code = url.searchParams.get("code");
   const providerError = url.searchParams.get("error");
+  const cookieStore = await cookies();
+  const nextPath = url.searchParams.get("next") ?? cookieStore.get("aqil-auth-next")?.value ?? null;
   const originMatches = configuredOrigin === url.origin;
   const exchangeAttempted =
     !providerError && Boolean(code) && isSupabaseConfigured() && originMatches;
@@ -27,7 +29,6 @@ export async function GET(request: Request) {
 
   let exchangeOk = false;
   if (exchangeAttempted && code) {
-    const cookieStore = await cookies();
     const supabase = createServerClient(
       requirePublicEnv("NEXT_PUBLIC_SUPABASE_URL"),
       requirePublicEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
@@ -64,9 +65,10 @@ export async function GET(request: Request) {
     configuredOrigin,
     providerError,
     code,
-    next: url.searchParams.get("next"),
+    next: nextPath,
     exchangeOk,
   });
+  response.cookies.set("aqil-auth-next", "", { path: "/", maxAge: 0 });
   response.headers.set("Location", destination);
   return response;
 }

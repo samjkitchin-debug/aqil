@@ -25,7 +25,7 @@ AQ-023,G2,portfolio,Build manual holdings and transactions UI,AQ-022;AQ-004,Vali
 AQ-024,G2,portfolio,Compute valuations and documented price freshness,AQ-010;AQ-022,"No missing-price fill, valuation dated and sourced",Must,R3,M,Not started,,,
 AQ-025,G2,portfolio,"Implement XIRR, TWR conditional availability, gains",AQ-022;AQ-024,Known fixtures match independently computed reference,Must,R3,L,Not started,,,
 AQ-026,G2,portfolio,Implement cashflow-matched global passive benchmark,AQ-025,Cashflow and FX dates match; execution/cost assumptions visible,Must,R3,L,Not started,,,
-AQ-027,G2,portfolio,Create My Wealth calm dashboard,AQ-023;AQ-026,Separates savings/gains; benchmark and unknown states,Must,R1,M,Not started,,,
+AQ-027,G2,portfolio,Create My Wealth calm dashboard,AQ-023;AQ-026,Separates savings/gains; benchmark and unknown states,Must,R1,M,In progress,"Local migration 20261018210000 and my_wealth_rls pgTAP passed 2026-10-18 on temporary ports. Wealth unit tests 10 passed. Hosted migration not applied. Performance is unavailable.",npm run test:db still requires TCP 54322 which Windows excludes,Do not apply 20261018210000 until the founder approves
 AQ-028,G2,privacy,Test multiuser isolation and data export/delete policies,AQ-006;AQ-021,"Tenant denial via routes, views, storage, exports",Must,R3,M,Not started,,,
 AQ-029,G2,imports,CSV statement import with dedup and preview,AQ-022,"Idempotent import, ambiguous transactions held for review",Should,R3,L,Not started,,,
 AQ-030,G3,methods,Create methodology registry and scientific status ladder,AQ-013,"Origin, universe, equation, limitations and rights fields",Must,R2,M,Not started,,,

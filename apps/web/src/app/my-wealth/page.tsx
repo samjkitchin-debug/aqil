@@ -2,20 +2,28 @@ import { Suspense } from "react";
 
 import { AppShell } from "@/components/app-shell";
 import { PrivatePage } from "@/components/auth/private-page";
-import { PlaceholderPanel } from "@/components/placeholder-panel";
+import { MyWealthView } from "@/components/wealth/my-wealth-view";
+import { loadWealthSnapshot } from "@/lib/wealth/load-snapshot";
 
-export default function MyWealthPage() {
+async function WealthBody({ error }: { error: string | null }) {
+  const load = await loadWealthSnapshot();
+  return (
+    <PrivatePage nextPath="/my-wealth">
+      <MyWealthView load={load} error={error} />
+    </PrivatePage>
+  );
+}
+
+export default async function MyWealthPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const params = await searchParams;
   return (
     <AppShell title="My wealth">
       <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
-        <PrivatePage nextPath="/my-wealth">
-          <div data-testid="wealth-empty">
-            <PlaceholderPanel
-              heading="My wealth"
-              body="No holdings are recorded for this account. Portfolio figures appear only after you enter them while signed in. Demonstration fixtures are not shown here."
-            />
-          </div>
-        </PrivatePage>
+        <WealthBody error={params.error ?? null} />
       </Suspense>
     </AppShell>
   );

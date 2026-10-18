@@ -8,7 +8,7 @@ This section supersedes older sentences below that say authentication or hosted 
 
 - Live app: `https://aqil-tau.vercel.app`. The founder completed Google sign-in on this deployment.
 - Ordinary access is any verified Google account. The allow-list and `access_grants` gate are removed. See ADR 020.
-- Hosted project `ojvswermsbbaltjohqph` has exactly five migrations: `20261017103000`, `20261017110000`, `20261017120000`, `20261017140000`, `20261017180000`.
+- Hosted project `ojvswermsbbaltjohqph` has exactly five migrations: `20261017103000`, `20261017110000`, `20261017120000`, `20261017140000`, `20261017180000`. Local files `20261018200000` and `20261018210000` are not applied to that host.
 - Workflow: localhost → local tests → local commit → deliberate push to `main` → existing Vercel integration. No `vercel link` and no `vercel deploy`.
 - Next implementation cycles are in `docs/CURSOR_SESSION_HANDOVER.md`. Do not start them from this alignment note.
 

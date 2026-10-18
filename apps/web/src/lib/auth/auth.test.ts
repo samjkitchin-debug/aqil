@@ -4,7 +4,12 @@ import test from "node:test";
 
 import { createServerClient } from "@supabase/ssr";
 
-import { oauthCallbackDestination } from "./oauth-callback.ts";
+import {
+  callbackOrigin,
+  oauthCallbackDestination,
+  oauthCallbackUrl,
+  oauthRedirectStaysOnOrigin,
+} from "./oauth-callback.ts";
 import { isPublicPath } from "./paths.ts";
 import { applyAuthCookies, hasPkceVerifierCookie } from "./pkce-cookie.ts";
 import { safeNextPath } from "./safe-next.ts";
@@ -51,7 +56,32 @@ test("oauth callback rejects mismatched origins and failed exchanges", () => {
   );
   assert.match(
     oauthCallbackDestination({ ...base, requestOrigin: "https://evil.example", configuredOrigin: "http://localhost:3000" }),
-    /rejected_redirect/,
+    /^http:\/\/localhost:3000\/login\?error=rejected_redirect$/,
+  );
+  assert.equal(
+    oauthCallbackDestination({
+      ...base,
+      configuredOrigin: "https://aqil-sams-projects-ea6a4d7b.vercel.app",
+      code: null,
+      exchangeOk: false,
+    }),
+    "http://localhost:3000/login?error=rejected_redirect",
+  );
+  assert.equal(oauthCallbackUrl("http://localhost:3000"), "http://localhost:3000/auth/callback");
+  assert.equal(callbackOrigin("http://localhost:3000", "https://aqil-tau.vercel.app"), "http://localhost:3000");
+  assert.equal(
+    oauthRedirectStaysOnOrigin(
+      "https://example.supabase.co/auth/v1/authorize?redirect_to=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcallback",
+      "http://localhost:3000",
+    ),
+    true,
+  );
+  assert.equal(
+    oauthRedirectStaysOnOrigin(
+      "https://example.supabase.co/auth/v1/authorize?redirect_to=https%3A%2F%2Faqil-sams-projects-ea6a4d7b.vercel.app%2Flogin",
+      "http://localhost:3000",
+    ),
+    false,
   );
   assert.match(oauthCallbackDestination({ ...base, providerError: "access_denied", exchangeOk: false }), /provider_denied/);
   assert.match(oauthCallbackDestination({ ...base, code: null, exchangeOk: false }), /missing_code/);

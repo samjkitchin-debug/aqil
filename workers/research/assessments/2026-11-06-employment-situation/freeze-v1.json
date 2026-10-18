@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "frozen_at": "2026-10-18T03:29:56.902129+00:00",
+  "payload_hash": "960e9817ee58661a5c671fd6efd2c08d0ba81700b4d8ca86677c866af7ff1727",
+  "payload": {
+    "evidence_class": "verified_real_event",
+    "assessment_kind": "baseline_only",
+    "event_id": "bls:empsit:2026-10",
+    "series_id": "LNS14000000",
+    "method_id": "SAHM_UNEMPLOYMENT_GAP",
+    "method_version": "1.0.1",
+    "config_id": "sahm_published_v1",
+    "release_at": "2026-11-06T13:30:00+00:00",
+    "schedule_verification": "source_unavailable",
+    "evaluation_period": "2026-10-01",
+    "statement": "No directional unemployment-rate forecast was made.",
+    "no_directional_forecast": true,
+    "sahm_threshold_available": false,
+    "sahm_unavailable_reason": "missing months for Sahm calculation: 2025-10-01 Official footnote: 2025-M10: Data unavailable due to the 2025 lapse in appropriations.",
+    "october_rate_that_reaches_0_50": null,
+    "baseline": {
+      "period": "2026-09-01",
+      "unemployment_rate": "4.2"
+    },
+    "observations": [
+      {
+        "period": "2024-01-01",
+        "value": "3.7"
+      },
+      {
+        "period": "2024-02-01",
+        "value": "3.9"
+      },
+      {
+        "period": "2024-03-01",
+        "value": "3.9"
+      },
+      {
+        "period": "2024-04-01",
+        "value": "3.9"
+      },
+      {
+        "period": "2024-05-01",
+        "value": "3.9"
+      },
+      {
+        "period": "2024-06-01",
+        "value": "4.1"
+      },
+      {
+        "period": "2024-07-01",
+        "value": "4.2"
+      },
+      {
+        "period": "2024-08-01",
+        "value": "4.2"
+      },
+      {
+        "period": "2024-09-01",
+        "value": "4.1"
+      },
+      {
+        "period": "2024-10-01",
+        "value": "4.1"
+      },
+      {
+        "period": "2024-11-01",
+        "value": "4.2"
+      },
+      {
+        "period": "2024-12-01",
+        "value": "4.1"
+      },
+      {
+        "period": "2025-01-01",
+        "value": "4.0"
+      },
+      {
+        "period": "2025-02-01",
+        "value": "4.2"
+      },
+      {
+        "period": "2025-03-01",
+        "value": "4.2"
+      },
+      {
+        "period": "2025-04-01",
+        "value": "4.2"
+      },
+      {
+        "period": "2025-05-01",
+        "value": "4.3"
+      },
+      {
+        "period": "2025-06-01",
+        "value": "4.1"
+      },
+      {
+        "period": "2025-07-01",
+        "value": "4.3"
+      },
+      {
+        "period": "2025-08-01",
+        "value": "4.3"
+      },
+      {
+        "period": "2025-09-01",
+        "value": "4.4"
+      },
+      {
+        "period": "2025-11-01",
+        "value": "4.5"
+      },
+      {
+        "period": "2025-12-01",
+        "value": "4.4"
+      },
+      {
+        "period": "2026-01-01",
+        "value": "4.3"
+      },
+      {
+        "period": "2026-02-01",
+        "value": "4.4"
+      },
+      {
+        "period": "2026-03-01",
+        "value": "4.3"
+      },
+      {
+        "period": "2026-04-01",
+        "value": "4.3"
+      },
+      {
+        "period": "2026-05-01",
+        "value": "4.3"
+      },
+      {
+        "period": "2026-06-01",
+        "value": "4.2"
+      },
+      {
+        "period": "2026-07-01",
+        "value": "4.1"
+      },
+      {
+        "period": "2026-08-01",
+        "value": "4.1"
+      },
+      {
+        "period": "2026-09-01",
+        "value": "4.2"
+      }
+    ],
+    "retrieved_at": "2026-10-18T03:29:56.902129+00:00",
+    "source_uri": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+    "limitations": [
+      "This is not a forecast of the October unemployment rate.",
+      "The Sahm threshold was not calculated because an official input is missing.",
+      "A later release cannot turn this record into a prospective Sahm forecast.",
+      "This record does not change strategic allocation targets and names no ETF."
+    ]
+  }
+}

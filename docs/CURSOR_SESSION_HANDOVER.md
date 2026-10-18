@@ -535,4 +535,42 @@ Consolidate the repository around the live app without a new feature, a GitHub p
 ### Not verified here
 A fresh local Google round trip, refresh, navigation and sign-out were not repeated. The founder already completed live sign-in. Two Google identities were not compared in the browser.
 
+## Session handover — 2026-10-18 execution
+
+### Current objective
+Integrate the November employment baseline, land a first truthful My Wealth slice, and stop localhost Google sign-in from falling through to an old Vercel domain.
+
+### Git
+- Branch: `alignment/2026-10-18`
+- Parent of this work: local alignment commit `d9fe77b` (not on `origin/main`)
+- `origin/main`: `6f47bdb`. Live site `https://aqil-tau.vercel.app` still serves that commit.
+- No push. No Vercel deployment. No hosted migration. `supabase/config.toml` ports were restored to 54321/54322/54320/54323.
+
+### What changed
+- OAuth `redirect_to` is exactly `{origin}/auth/callback`. The in-app path is the short-lived `aqil-auth-next` cookie. A localhost request is not sent to a configured foreign origin.
+- November employment freeze is in the tree. Recorded hash `960e9817ee58661a5c671fd6efd2c08d0ba81700b4d8ca86677c866af7ff1727`. `baseline_only`, Sahm threshold unavailable, September 2026 rate 4.2, schedule `source_unavailable`. October 2025 was not invented.
+- My Wealth: accounts, append-only valuations, native currency, dated FX, emergency reserve excluded, contribution gaps, own-row RLS. Signed-out `/my-wealth` redirects to login. Until the hosted migration is applied, the page says storage is pending.
+
+### Tests and verification
+| Check | Result |
+|---|---|
+| `npm run typecheck` and `npm run lint` in `apps/web` | pass |
+| `npm run test:auth` | 13 pass |
+| `npm run test:wealth` | 10 pass |
+| `uv run pytest`, `ruff check`, `ruff format --check` in `workers/research` | 85 passed, 7 skipped; Ruff clean |
+| Local `supabase test db` after moving off Windows-excluded ports | 81 pgTAP passed, including `my_wealth_rls` and `verified_prospective_assessment`. Stack stopped. `config.toml` restored. |
+| `GET http://localhost:3000/auth/google` | 307 to Supabase with `redirect_to=http://localhost:3000/auth/callback`, PKCE verifier cookies, and `aqil-auth-next`. No old Vercel host. |
+| Browser open of that URL | Google account page. Encoded `redirect_to` is `http://localhost:3000/auth/callback`. |
+| `apps/web/.env.local` | `NEXT_PUBLIC_APP_URL=http://localhost:3000` |
+| Signed-out `GET /my-wealth` | 307 to `/login?error=signed_out&next=%2Fmy-wealth` |
+| Full Google account selection, refresh, navigation and sign-out on localhost | not completed. The browser stopped at the Google account page. |
+| `npm run test:db` | not used. It still refuses anything other than `127.0.0.1:54322`, and Windows excludes TCP 54316–54415. |
+
+### Blockers
+- Hosted Auth site URL was not changed. If Supabase rejects a redirect, it can still fall back to the old preview domain. Dashboard change, not a config push: site URL `https://aqil-tau.vercel.app`, allow `https://aqil-tau.vercel.app/**` and `http://localhost:3000/**`, remove the old preview wildcards.
+- Wealth tables are not on the hosted database. Do not apply `20261018210000` or `20261018200000` until the founder approves. Applying them before the open M5 migrations would trap those earlier timestamps.
+
+### Next recommended step
+Founder completes one localhost Google sign-in and confirms the browser returns to `http://localhost:3000`. Then decide whether to update the hosted Auth site URL and, separately, whether to apply the two local migrations.
+
 
