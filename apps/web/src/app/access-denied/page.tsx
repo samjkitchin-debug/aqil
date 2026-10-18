@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
+import { AppShell } from "@/components/app-shell";
 import { resolveAccess } from "@/lib/auth/access";
 
-export default async function AccessDeniedPage() {
+async function AccessDeniedRedirect(): Promise<React.ReactNode> {
   const access = await resolveAccess();
   if (access.status === "authenticated_authorised") {
     redirect("/");
@@ -14,4 +16,15 @@ export default async function AccessDeniedPage() {
         ? "unavailable"
         : "signed_out";
   redirect(`/login?error=${reason}`);
+  return null;
+}
+
+export default function AccessDeniedPage() {
+  return (
+    <AppShell title="Access denied">
+      <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
+        <AccessDeniedRedirect />
+      </Suspense>
+    </AppShell>
+  );
 }
