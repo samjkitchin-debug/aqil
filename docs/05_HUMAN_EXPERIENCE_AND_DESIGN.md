@@ -71,7 +71,14 @@ Every important research outcome has `Original forecast`, `Evidence at the time`
 Each new component must justify itself rather than duplicate an existing pattern. UI does not perform its own investment calculations or generate claims.
 
 ## 10. Token discipline
-`design/tokens.css` is the initial token authority. Central CSS vars and named Tailwind theme aliases; do not use raw `#hex`, `rgb()`, `hsl()`, arbitrary spacing or independent chart colours inside individual components. Exception list is explicitly reviewed (e.g. SVG embedded branding from legal licensed supplier); new semantic needs amend tokens rather than local patches. Design tokens are implementation proposals and can be validated/tuned *centrally*, not page by page.
+`docs/design/tokens.css` is the design authority. `apps/web/src/styles/tokens.css` must stay aligned with it. Components use semantic tokens and the shared Tailwind aliases. Do not use raw `#hex`, `rgb()`, `hsl()`, or one-off spacing and radii in `apps/web/src` outside the token files. `npm run check:tokens` enforces that. New semantic needs amend the token files, not a page.
+
+**How an execution session uses the design system:**
+- Every page composes `AppShell` (`apps/web/src/components/app-shell.tsx`), which owns the header, brand, page title, footer, skip link and `PrimaryNav`. Do not copy a header or navigation into a page.
+- Page files establish the route, load data through a server module, and compose feature components inside `PrivatePage` when the route is signed-in.
+- Feature presentation lives in `apps/web/src/components/<feature>/`. Shared layout primitives live in `components/ui/`.
+- Copy is UK English and sentence case. Empty, loading and unavailable states say what is missing. They do not invent figures.
+- Local component CSS may set layout, and it must consume tokens such as `var(--space-3)` and `text-muted`.
 
 ## 11. User-research and design thinking cycles
 **Discover:** 8–12 qualitative conversations across experience levels (initial target), capture jobs and confusion points. **Define:** problem statement, observable success/failure and prohibited implications. **Sketch:** low fidelity before polished screens. **Prototype:** same story at three depth levels, one investment lesson, one portfolio snapshot with missing data, one failed forecast. **Test:** tasks and teach-back, accessibility walkthrough, what people *misunderstood*. **Refine:** adjust navigation/content system, not core epistemic facts; repeat.

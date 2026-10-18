@@ -1,6 +1,5 @@
 export type AccessStatus =
   | "authenticated_authorised"
-  | "authenticated_denied"
   | "signed_out"
   | "temporarily_unavailable"
   | "terminal_invalid_session";

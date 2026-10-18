@@ -32,6 +32,8 @@ A client `SIGNED_OUT` event does not by itself reclassify an ambiguous server se
 
 **Control flow:** rethrow framework redirects (`NEXT_REDIRECT` and equivalents). Catch only typed domain errors. A broad `catch` must not turn a redirect into a false logout or drop `next`.
 
+**Application access (18 October 2026):** a verified Google user may open the signed-in application. Identity is `auth.users.id`. There is no founder allow-list, no `AQIL_AUTHORISED_USER_IDS` check, and no `access_grants` gate. Different Google accounts stay separate. Row Level Security isolates user-owned data. Google is the only enabled provider. OAuth starts at `GET /auth/google`, which sets the PKCE verifier cookie on the same redirect the browser follows. The callback is `/auth/callback`. Sign-out uses local scope. `NEXT_PUBLIC_APP_URL` must be the origin in use: `http://localhost:3000` locally and `https://aqil-tau.vercel.app` in production. Do not send a local callback to production, or a production callback to localhost.
+
 ## 3. Supabase SSR and cookies
 
 - Use `@supabase/ssr` cookie adapters; cookies may be **written** only in Route Handlers or Server Actions.

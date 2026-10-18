@@ -26,7 +26,14 @@ aqil/
 3. Confirm data classification: `synthetic`, `public_rights_verified`, `rights_restricted`, `private_financial` or `unknown`.
 4. Determine risk class **R0 UI**, **R1 content**, **R2 methodology**, **R3 financial ledger/security/regulatory**. The higher class controls tests, review and rollout.
 5. For R2/R3, present impact analysis, original vs changed algorithm/data contracts, historical replay consequences, rollback, migration and security impact **before** implementation/deployment.
-6. Work as a bounded feature branch; don't opportunistically refactor distant components.
+6. Develop on localhost. Commit locally when a change is coherent. Push to GitHub `main` only as a deliberate release. The existing GitHub → Vercel integration deploys that push. Do not push to review formatting, and do not use `vercel link` or `vercel deploy`. A short-lived branch or worktree is a tool, not a required ceremony.
+
+**Execution checklist**
+
+- Before coding: read the relevant canonical docs, inspect the existing module, reuse `AppShell` and tokens, and name what must not change.
+- While coding: keep route pages thin; put calculations in pure functions; keep research methods versioned; do not copy business rules into components; do not let research mutate portfolio targets; do not present synthetic fixtures as real holdings.
+- After coding: run the relevant local tests and a production build when the web app changed; review localhost, including empty and error states; do not commit secrets; update the existing backlog and handover when behaviour changed.
+- Deploy only with founder approval: confirm migration order, push `main`, let Vercel deploy, then verify the live application. A green mock or an unmerged branch is not a finished feature.
 
 ## 3. Change control and blast-radius containment
 | Change class | Examples | Minimum controls |
@@ -121,8 +128,13 @@ Prettier; component screenshot diffs; GitHub org secret-scanning push protection
 15. LLM provider invocation cannot access sensitive portfolio details by default.
 
 ## 8. Release discipline
-- `dev`, `preview`, `staging`, `production` separate keys and data; synthetic seeds never appear unlabelled on production.
-- Protected main, pull requests with change class/impact/acceptance, code review even if self-review, no direct prod DDL or ad hoc secret injection.
+
+**Canonical path:** develop and review on localhost → run the relevant local checks → commit → when the founder approves a release, push the tested commit to GitHub `main` → Vercel Production deploys from that integration → verify the live site. A feature is finished when the founder can use it, not when it exists only on a branch.
+
+Vercel Hobby bills builds. Open pull requests currently receive Vercel preview deployments (the Vercel check on PRs #9–#14 succeeded). To stop preview builds without affecting production: in the existing Vercel project, either turn off Preview deployments, or set the Ignored Build Step so a `preview` environment exits 0 (skip) and production exits 1 (build). Do not create a second project, run `vercel link`, or run `vercel deploy`.
+
+- Local, preview and production use separate public keys where a preview exists. Synthetic seeds never appear unlabelled on production.
+- No direct production DDL and no ad hoc secret injection. Hosted migrations need an explicit approval after `supabase test db` has passed for the same files. Pull requests remain available for risky or parallel work; they are not required for every founder-only change.
 - Record **build identity** (git SHA, migration versions, dependency lock hashes) in release notes or deployment log.
 - Every production release has migration plan, backup check, staging fixtures, telemetry, **rollback procedure**, feature flags where needed and release notes.
 - Post-deploy **smoke tests**: health route, auth boundary (when live), one read-only public page, migration version match.

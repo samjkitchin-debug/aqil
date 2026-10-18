@@ -1,6 +1,16 @@
 # AQIL — Execution Roadmap and Stage Gates
 
-**Last reconciled:** 17 October 2026 · **Git baseline:** `main` @ `92560cc` (PR #1 merged; CI run 38992659234 green on `main`).
+**Last reconciled:** 18 October 2026 · **Git baseline:** `origin/main` @ `6f47bdb`. Local alignment work is not on `origin/main` until a deliberate push.
+
+## Operating baseline (18 October 2026)
+
+This section supersedes older sentences below that say authentication or hosted Supabase has not started.
+
+- Live app: `https://aqil-tau.vercel.app`. The founder completed Google sign-in on this deployment.
+- Ordinary access is any verified Google account. The allow-list and `access_grants` gate are removed. See ADR 020.
+- Hosted project `ojvswermsbbaltjohqph` has exactly five migrations: `20261017103000`, `20261017110000`, `20261017120000`, `20261017140000`, `20261017180000`.
+- Workflow: localhost → local tests → local commit → deliberate push to `main` → existing Vercel integration. No `vercel link` and no `vercel deploy`.
+- Next implementation cycles are in `docs/CURSOR_SESSION_HANDOVER.md`. Do not start them from this alignment note.
 
 ## Progress register
 
@@ -20,10 +30,10 @@
 | GitHub CI (web / database / research) | **Verified** | Green on `main` post-merge |
 | Versioned JSON schemas (files) | **Implemented — unverified** | `docs/schemas/` mirrored in `packages/contracts/`; **no CI schema validator yet** |
 | Claim verifier fail-closed | **Implemented — unverified** | `workers/research/.../claim_verifier.py` + pytest; registry not built |
-| Auth doctrine | **Verified (document)** | `AUTH_AND_SESSION_DOCTRINE.md`; **no auth UI or private routes** |
+| Auth doctrine | **Superseded by the operating baseline** | Google sign-in is live. See ADR 020 and `AUTH_AND_SESSION_DOCTRINE.md` |
 | Information security standard | **Implemented — unverified** | `INFORMATION_SECURITY_STANDARD.md` + CI hardening **in working tree; not on `main` until merged** |
 | Static synthetic research story (PR1) | **Not started** | Research page is placeholder only |
-| Hosted Supabase | **Not started** | No migrations applied to hosted project; `db push` awaits explicit approval after CI pgTAP |
+| Hosted Supabase | **Superseded by the operating baseline** | Five foundation migrations are on `ojvswermsbbaltjohqph`. Later migrations are not applied |
 | G0 hard evidence (roadmap table) | **Not started** | Rights matrix, UCITS sample, macro source+revision, first hosted verify — see AQ-008–AQ-012 |
 
 **G0 gate remains open.** PR1 repository foundation is largely **verified**; **G0 exit criteria** (data feasibility + hosted migration verification) are **not** satisfied.

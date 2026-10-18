@@ -22,3 +22,4 @@
 | 017 | No graph/vector DB at first | relational representation adequate for MVP | measured complexity/quality improvement |
 | 018 | CI, migrations, security fixtures and restore drill from day one | prevent rebuild and data loss | never revoke |
 | 019 | Server-side Supabase SSR session authority; doctrine in AUTH_AND_SESSION_DOCTRINE.md | prevent auth drift, refresh races and PWA logout bugs | only via ADR if identity model changes |
+| 020 | Any verified Google account may open Aqil. Identity is `auth.users.id`. The founder allow-list and `access_grants` gate are superseded (18 October 2026) and must not be reintroduced for ordinary access | one user should sign in without an operator step; RLS still isolates private rows | a future explicit sharing or admin role, by a new ADR |

@@ -1,5 +1,7 @@
 # Cursor session handover (template)
 
+**Latest session:** 18 October 2026, alignment. Read the last block first. Earlier blocks are history and include superseded allow-list instructions.
+
 Copy this block at the **end** of a substantive session (or into the PR description). Keep it factual; no completion claims without evidence.
 
 ```text
@@ -492,5 +494,45 @@ Not safe for real founder financial data. Do not merge PR #11 onto this until th
 
 ### Next recommended step
 Merge PR #12 only after its CI is green. Then rebase PR #11, delete the fixture fallback and cookie gate, and re-run wealth pgTAP. A live Google round trip still needs the dashboard client and `AQIL_AUTHORISED_USER_IDS`.
+
+---
+
+## Session handover — 2026-10-18 alignment
+
+This block supersedes the allow-list instructions above. PR #12 is already merged. Google sign-in works on the live site. The founder confirmed that sign-in.
+
+### Current objective
+Consolidate the repository around the live app without a new feature, a GitHub push, or a Vercel deployment.
+
+### Git
+- Local branch: `alignment/2026-10-18`, parent `origin/main` `6f47bdb`.
+- `origin/main`: `6f47bdb781a544edbdc68275bf3f11276589cd70`.
+- Live site still serves that commit. This alignment commit is local only.
+- No push. No Vercel deployment. No hosted migration.
+
+### What changed
+- Removed the unused allow-list module, the unapplied `20261018180000_access_grants` migration, its pgTAP file, and the generated `access_grants` type.
+- Added a regression test that `access.ts` and `proxy.ts` do not consult an allow-list or `access_grants`.
+- Recorded the live workflow, ADR 020, the three product pillars, and the five hosted migrations in the existing docs.
+- Replaced a gitignored env example that contained a service-role JWT and a Google client secret with placeholders, and allowed `.env.example` to be committed.
+
+### Hosted migrations
+`list_migrations` on `ojvswermsbbaltjohqph` returned only:
+`20261017103000`, `20261017110000`, `20261017120000`, `20261017140000`, `20261017180000`.
+
+### Tests this session
+| Check | Result |
+|---|---|
+| `npm run typecheck` | pass |
+| `npm run lint` | pass |
+| `npm run test:auth` | 13 pass |
+| `npm run check:tokens` | pass |
+| `npm run build` | pass |
+| Playwright `e2e/auth.spec.ts` desktop-wide against localhost:3000 | 9 pass, signed-out only |
+| `uv run ruff check`, `ruff format --check`, `pytest` in `workers/research` | ruff pass; 74 passed, 7 skipped |
+| `npm run test:db` | fail. Local container `supabase_db_ojvswermsbbaltjohqph` cannot bind TCP 54322 |
+
+### Not verified here
+A fresh local Google round trip, refresh, navigation and sign-out were not repeated. The founder already completed live sign-in. Two Google identities were not compared in the browser.
 
 

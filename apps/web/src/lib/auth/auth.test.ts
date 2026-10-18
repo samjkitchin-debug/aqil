@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { createServerClient } from "@supabase/ssr";
 
-import { isAllowlisted, isForeignUserId, parseAuthorisedUserIds } from "./allowlist.ts";
 import { oauthCallbackDestination } from "./oauth-callback.ts";
 import { isPublicPath } from "./paths.ts";
 import { applyAuthCookies, hasPkceVerifierCookie } from "./pkce-cookie.ts";
@@ -18,25 +18,14 @@ import {
   shouldContactAuthServer,
 } from "./session-policy.ts";
 
-const FOUNDER = "11111111-1111-4111-8111-111111111111";
-const OTHER = "22222222-2222-4222-8222-222222222222";
-
-test("empty allow-list authorises nobody", () => {
-  const allow = parseAuthorisedUserIds(undefined);
-  assert.equal(isAllowlisted(FOUNDER, allow), false);
-  assert.equal(parseAuthorisedUserIds("not-a-uuid").size, 0);
-});
-
-test("allow-list accepts only explicit uuids", () => {
-  const allow = parseAuthorisedUserIds(` ${FOUNDER.toUpperCase()}, ${OTHER} `);
-  assert.equal(isAllowlisted(FOUNDER, allow), true);
-  assert.equal(isAllowlisted("33333333-3333-4333-8333-333333333333", allow), false);
-});
-
-test("foreign user ids are rejected", () => {
-  assert.equal(isForeignUserId(OTHER, FOUNDER), true);
-  assert.equal(isForeignUserId(FOUNDER, FOUNDER), false);
-  assert.equal(isForeignUserId(null, FOUNDER), false);
+test("ordinary access does not consult an allow-list or access grants", () => {
+  const access = readFileSync(new URL("./access.ts", import.meta.url), "utf8");
+  const proxy = readFileSync(new URL("../../proxy.ts", import.meta.url), "utf8");
+  for (const source of [access, proxy]) {
+    assert.equal(source.includes("access_grants"), false);
+    assert.equal(source.includes("AQIL_AUTHORISED_USER_IDS"), false);
+    assert.equal(source.includes("isAllowlisted"), false);
+  }
 });
 
 test("safe next rejects open redirects", () => {

@@ -1,7 +1,8 @@
 import "server-only";
 
 /**
- * Server-only secrets and configuration. Never import this module from client components.
+ * Server-only secrets. Never import this module from client components.
+ * No application route calls these helpers. Ordinary sign-in uses the anon key.
  */
 
 export function getServiceRoleKey(): string | undefined {

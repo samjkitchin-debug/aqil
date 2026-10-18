@@ -96,8 +96,8 @@ Severity: **C** critical, **H** high, **M** medium, **L** low. Status: **Open**,
 
 | ID | Risk | Sev | Mitigation | Owner | Status |
 |----|------|-----|------------|-------|--------|
-| R1 | Auth not implemented; private routes undefined | H | Google via Supabase Auth; explicit allow-list or `access_grants`; proxy refreshes cookies only on private routes and does not call global sign-out. A bare HTTP 401/403 does not clear the session. Explicit sign-out uses local scope. Local pgTAP on 2026-10-18: 75 passed, including access_grants. Not an ISO 27001 certification. Live OAuth, two-tab rotation and hosted migration were not demonstrated | Engineering | Mitigated (partial) |
-| R2 | Hosted DB has no migrations applied; manual drift risk | M | `db push` only after CI pgTAP + explicit approval; never `test db --linked` | Founder | Mitigated (process) |
+| R1 | Signed-in routes must not leak another user's private data | H | Google via Supabase Auth is application access. There is no allow-list. `auth.uid()` and RLS isolate `user_settings`. Research and forward schemas are revoked from `anon`, `authenticated` and `service_role`. The proxy does not call global sign-out. This is not an ISO 27001 certification. Two-tab rotation was not re-tested on 18 October 2026 | Engineering | Mitigated (partial) |
+| R2 | Hosted schema drifts from Git | M | Five foundation migrations are applied on `ojvswermsbbaltjohqph`. Further `db push` only after `supabase test db` for the same files and explicit approval. Never `test db --linked` | Founder | Mitigated (process) |
 | R3 | Service role imported client-side | C | `server-only` boundary; CI grep / review checklist | Engineering | Mitigated (partial — no automated bundle scan yet) |
 | R4 | Default Supabase table grants (`TRUNCATE`, `TRIGGER`) | H | `REVOKE ALL` pattern + pgTAP negatives on `user_settings` | Engineering | Mitigated |
 | R5 | Dev-only npm audit highs (`braces` chain) | L | Track; `npm audit --omit=dev` in CI; no reckless `audit fix --force` | Engineering | Accepted |

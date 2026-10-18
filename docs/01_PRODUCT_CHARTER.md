@@ -19,6 +19,12 @@
 
 All five derive from a shared research/data foundation. The interface is calm; the hidden system is demanding.
 
+**Current build sequence (18 October 2026).** The next product work is three pillars, in dependency order, not a new charter:
+
+1. **My Wealth** — the founder's actual holdings, accounts, targets and contributions, with minimal typing and no synthetic rows shown as real.
+2. **Forward intelligence** — authoritative sources, versioned methods, frozen pre-event evidence and honest outcome review. A frozen baseline is not demonstrated forecasting skill.
+3. **Deploy Capital** — "I have a sum to invest. Which approved ETF should receive it, how much, and why?" V1 is a deterministic gap to the investor's own targets. It does not trade, and research must not silently change those targets.
+
 ## Audience and jobs to be done
 - **Curious commuter:** 'Make sense of what matters globally in five minutes, and show the links between apparently unrelated developments.'
 - **First-time investor:** 'Show me why patience, low costs, saving and diversification matter, in language I can understand and without assuming spare cash.'

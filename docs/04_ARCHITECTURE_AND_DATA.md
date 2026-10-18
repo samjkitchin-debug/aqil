@@ -25,6 +25,8 @@ Scheduled Python worker(s) (uv, Pydantic, Polars or pandas, NumPy, pytest)
   └─ audit/outage/cost/detection reporting
 ```
 
+**Operating baseline (18 October 2026).** Next.js 16.4.2, React 19.3.0, TypeScript strict, `@supabase/ssr` 0.12.x and `supabase-js` 2.118.x. Python research worker on 3.13 with uv, Pydantic, httpx, psycopg, pytest and Ruff. Tests in the web app use `node:test` and Playwright, not Vitest. Tailwind 4 is the utility layer over `apps/web/src/styles/tokens.css`. One shell: `AppShell`. Hosting is the existing Vercel project `aqil` at `https://aqil-tau.vercel.app`, deploying only from GitHub `main`. Database is Supabase project `ojvswermsbbaltjohqph`. The web app does not call the service-role key. Local review uses `http://localhost:3000`.
+
 **No FastAPI required initially.** Next.js server handlers provide UI APIs. When interactive heavy Python inference and trusted external integrations demand a separately scalable API, add FastAPI *behind the existing versioned contracts*, not through a total rewrite. PostgreSQL is not a search index for huge raw corpus; use object storage and selective full text; search/vector index only after measured need. No graph DB for v1: causal edges in PostgreSQL relational tables.
 
 ## Recommended baseline stack (validate current compatibility before installing)

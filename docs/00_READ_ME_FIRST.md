@@ -12,7 +12,7 @@ A coordinated specification for Aqil: a calm, evidence-led, long-horizon wealth 
 5. `05_HUMAN_EXPERIENCE_AND_DESIGN.md` — people-first UX, Aptos/navy/gold design tokens; `RESPONSIVE_LAYOUT_CONTRACT.md` — shell and PWA layout gates.
 6. `06_ENGINEERING_DISCIPLINE.md` — how to instruct Cursor, test, review, release.
 7. `INFORMATION_SECURITY_STANDARD.md` — security-by-design requirements, threat model and control tiers (not certification).
-8. `AUTH_AND_SESSION_DOCTRINE.md` — server-side auth, SSR cookies, PWA session recovery (when auth ships).
+8. `AUTH_AND_SESSION_DOCTRINE.md` — server-side auth, SSR cookies, PWA session recovery. Google sign-in is live.
 9. `DOCUMENTATION_AUTHORITY.md` — canonical vs reference docs; `sausage-transfer/` is historical only.
 10. `AGENT_OPERATING_RULES.md` — non-negotiable rules for every agent session.
 11. `CURSOR_COLLABORATION_WORKFLOW.md` — agent workflow summary.
