@@ -7,6 +7,7 @@ from datetime import UTC, date, datetime
 from typing import Literal
 
 from aqil_research.adapters.registry import AdapterRegistry
+from aqil_research.contracts.observation import EconomicObservation
 from aqil_research.methods.protocol import MethodContext
 from aqil_research.methods.registry import MethodRegistry
 from aqil_research.persistence.calculation_normalize import normalize_calculation_payload
@@ -21,6 +22,7 @@ from aqil_research.sources.rights_gate import (
     assert_rights_for_ingest,
     assert_rights_for_replay,
     resolve_research_rights,
+    resolve_research_rights_by_dataset,
 )
 from aqil_research.vintages.store import ObservationStore, content_snapshot_hash
 
@@ -123,7 +125,16 @@ def execute_research_run(
         for optional_id in request.optional_adapter_ids:
             adapter = adapter_registry.get(optional_id)
             adapter_ids.append(adapter.identity.adapter_id)
-            outcome = ingest_from_adapter(store, adapter, rights, optional=True)
+            try:
+                adapter_rights = resolve_research_rights(
+                    rights_records,
+                    source_id=adapter.identity.source_id,
+                    dataset_id=adapter.identity.dataset_id,
+                )
+            except RightsGateError as exc:
+                ingest_notes.append(str(exc))
+                continue
+            outcome = ingest_from_adapter(store, adapter, adapter_rights, optional=True)
             if outcome.block_reason:
                 ingest_notes.append(outcome.block_reason)
             if outcome.fetch and outcome.fetch.errors:
@@ -132,9 +143,16 @@ def execute_research_run(
     if not adapter_ids and request.primary_adapter_id:
         adapter_ids.append(request.primary_adapter_id)
 
+    method = method_registry.get(request.method_id)
+    required_dataset_ids = method.required_dataset_ids()
     try:
-        assert_rights_for_replay(rights)
-        assert_rights_for_analysis(rights)
+        for dataset_id in required_dataset_ids:
+            dataset_rights = resolve_research_rights_by_dataset(
+                rights_records,
+                dataset_id=dataset_id,
+            )
+            assert_rights_for_replay(dataset_rights)
+            assert_rights_for_analysis(dataset_rights)
     except RightsGateError as exc:
         return _failed_run(
             request,
@@ -146,19 +164,28 @@ def execute_research_run(
         )
 
     evaluation_period = date.fromisoformat(request.evaluation_period)
-    if request.replay_frozen_observations:
-        by_period = {
-            obs.period_start: obs
-            for obs in store.all_observations()
-            if obs.dataset_id == request.dataset_id
-        }
-    else:
-        by_period = store.as_of(request.dataset_id, request.decision_at, request.analysis_mode)
-    as_of_snapshot_hash = content_snapshot_hash(
-        tuple(by_period[period] for period in sorted(by_period)),
-    )
+    vintage_history_ids = getattr(method, "vintage_history_dataset_ids", lambda: ())()
+    all_vintages_by_dataset: dict[str, tuple[EconomicObservation, ...]] = {}
+    for dataset_id in vintage_history_ids:
+        all_vintages_by_dataset[dataset_id] = tuple(
+            obs for obs in store.all_observations() if obs.dataset_id == dataset_id
+        )
 
-    method = method_registry.get(request.method_id)
+    inputs_by_dataset: dict[str, dict[date, EconomicObservation]] = {}
+    combined_rows: list[EconomicObservation] = []
+    for dataset_id in required_dataset_ids:
+        if request.replay_frozen_observations:
+            by_period = {
+                obs.period_start: obs
+                for obs in store.all_observations()
+                if obs.dataset_id == dataset_id
+            }
+        else:
+            by_period = store.as_of(dataset_id, request.decision_at, request.analysis_mode)
+        inputs_by_dataset[dataset_id] = by_period
+        for period in sorted(by_period):
+            combined_rows.append(by_period[period])
+    as_of_snapshot_hash = content_snapshot_hash(tuple(combined_rows))
     try:
         config = method_registry.parse_config(request.method_id, request.method_config)
     except Exception as exc:
@@ -173,11 +200,17 @@ def execute_research_run(
             method=method,
         )
 
+    primary_dataset_id = (
+        request.dataset_id
+        if request.dataset_id in inputs_by_dataset
+        else required_dataset_ids[0]
+    )
     context = MethodContext(
-        inputs_by_dataset={request.dataset_id: by_period},
+        inputs_by_dataset=inputs_by_dataset,
         evaluation_period=evaluation_period,
         analysis_mode=request.analysis_mode,
-        primary_dataset_id=request.dataset_id,
+        primary_dataset_id=primary_dataset_id,
+        all_vintages_by_dataset=all_vintages_by_dataset,
     )
     try:
         execution = method.run(context, config)
@@ -199,7 +232,12 @@ def execute_research_run(
         wanted = frozenset(execution.observation_ids)
         cited_from_as_of = tuple(
             sorted(
-                (obs for obs in by_period.values() if obs.observation_id in wanted),
+                (
+                    obs
+                    for by_period in inputs_by_dataset.values()
+                    for obs in by_period.values()
+                    if obs.observation_id in wanted
+                ),
                 key=lambda row: row.observation_id,
             ),
         )
@@ -225,7 +263,7 @@ def execute_research_run(
         executed_at=wall_clock,
         execution_status=execution_status,
         dataset_id=request.dataset_id,
-        input_dataset_ids=[request.dataset_id],
+        input_dataset_ids=list(required_dataset_ids),
         source_id=rights.source_id,
         rights_record_id=rights.source_id,
         analysis_mode=request.analysis_mode,

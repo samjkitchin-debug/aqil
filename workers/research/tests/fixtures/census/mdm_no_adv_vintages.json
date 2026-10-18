@@ -1,0 +1,23 @@
+{
+  "vintages": [
+    {
+      "provider_vintage_date": "2024-08-28",
+      "earliest_model_available_at": "2024-08-28T14:15:00+00:00",
+      "data": [
+        ["cell_value", "time", "category_code", "data_type_code", "seasonally_adj"],
+        ["500000", "2024-06", "MDM", "NO", "yes"],
+        ["500000", "2024-07", "MDM", "NO", "yes"]
+      ]
+    },
+    {
+      "provider_vintage_date": "2024-09-25",
+      "earliest_model_available_at": "2024-09-25T14:20:00+00:00",
+      "data": [
+        ["cell_value", "time", "category_code", "data_type_code", "seasonally_adj"],
+        ["500000", "2024-06", "MDM", "NO", "yes"],
+        ["510000", "2024-07", "MDM", "NO", "yes"],
+        ["520000", "2024-08", "MDM", "NO", "yes"]
+      ]
+    }
+  ]
+}

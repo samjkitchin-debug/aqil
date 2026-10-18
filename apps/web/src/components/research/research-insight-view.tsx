@@ -9,7 +9,17 @@ type Props = {
   compact?: boolean;
 };
 
+function macroPanels(summary: ResearchInsightV1["calculation_summary"]) {
+  if (!summary || typeof summary !== "object") return null;
+  const labour = (summary as Record<string, unknown>).labour;
+  const credit = (summary as Record<string, unknown>).business_credit;
+  const manufacturing = (summary as Record<string, unknown>).manufacturing_demand;
+  if (!labour && !credit && !manufacturing) return null;
+  return { labour, credit, manufacturing };
+}
+
 export function ResearchInsightView({ insight, source, compact = false }: Props) {
+  const panels = macroPanels(insight.calculation_summary);
   const isPreview = insight.publication_status !== "not_eligible";
   const bannerLabel =
     source === "fixture"
@@ -35,8 +45,29 @@ export function ResearchInsightView({ insight, source, compact = false }: Props)
         <>
           <UnemploymentSparkline
             points={insight.chart_points ?? []}
-            label="US seasonally adjusted unemployment rate"
+            label={
+              insight.method_id === "MACRO_CONDITIONS_PANEL"
+                ? "Sahm gap (percentage points)"
+                : "US seasonally adjusted unemployment rate"
+            }
           />
+
+          {panels && (
+            <>
+              <h3 className="research-section-title">Labour, credit and manufacturing</h3>
+              <p className="research-body" data-testid="macro-conditions-panels">
+                Combined read from distinct official sources. Not an earnings or ETF-return
+                predictor; no allocation changes are generated.
+              </p>
+              <ul className="research-body">
+                {panels.labour ? <li>Labour market (Sahm rule component)</li> : null}
+                {panels.credit ? <li>Business credit (SLOOS C&amp;I standards)</li> : null}
+                {panels.manufacturing ? (
+                  <li>Manufacturing demand (Census advance new orders)</li>
+                ) : null}
+              </ul>
+            </>
+          )}
 
           <h3 className="research-section-title">Why it matters</h3>
           <p className="research-body">{insight.why_it_matters}</p>
