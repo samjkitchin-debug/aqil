@@ -34,6 +34,7 @@
 | Playwright auth and responsive | 105 pass, including 320 and 390 |
 | `npm run test:research` | 85 pass, 7 skipped. Ruff clean. Freeze file not edited |
 | Local `supabase test db` | 81 pass, including `my_wealth_rls` and `verified_prospective_assessment` |
+| Generated types | first main CI failed the type diff. `database.generated.ts` was regenerated from the local public schema and pushed as a follow-up |
 | Signed-in My Wealth with the live snapshot | not opened. The agent browser had no Google session |
 | Saxo history request | not completed. Refresh token expired |
 
