@@ -1,9 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { createServerClient } from "@supabase/ssr";
+
 import { isAllowlisted, isForeignUserId, parseAuthorisedUserIds } from "./allowlist.ts";
 import { oauthCallbackDestination } from "./oauth-callback.ts";
 import { isPublicPath } from "./paths.ts";
+import { applyAuthCookies, hasPkceVerifierCookie } from "./pkce-cookie.ts";
 import { safeNextPath } from "./safe-next.ts";
 import {
   classifyAuthFailure,
@@ -116,6 +119,66 @@ test("public routes stay reachable without a session", () => {
   assert.equal(isPublicPath("/privacy"), true);
   assert.equal(isPublicPath("/tos"), true);
   assert.equal(isPublicPath("/auth/callback"), true);
+  assert.equal(isPublicPath("/auth/google"), true);
   assert.equal(isPublicPath("/research"), false);
   assert.equal(isPublicPath("/my-wealth"), false);
+});
+
+test("oauth start keeps the pkce verifier on the same response the browser follows", async () => {
+  const stored: { name: string; value: string }[] = [];
+  const redirectCookies: { name: string; value: string }[] = [];
+  const supabase = createServerClient("https://example.supabase.co", "public-anon-key", {
+    cookies: {
+      getAll() {
+        return stored;
+      },
+      setAll(cookiesToSet) {
+        applyAuthCookies(
+          {
+            set(name, value) {
+              redirectCookies.push({ name, value });
+              const index = stored.findIndex((item) => item.name === name);
+              if (index >= 0) stored[index] = { name, value };
+              else stored.push({ name, value });
+            },
+          },
+          cookiesToSet,
+        );
+      },
+    },
+  });
+  const started = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: "https://aqil-tau.vercel.app/auth/callback?next=%2F",
+      skipBrowserRedirect: true,
+    },
+  });
+  assert.equal(started.error, null);
+  assert.equal(hasPkceVerifierCookie(redirectCookies.map((cookie) => cookie.name)), true);
+
+  const callback = createServerClient("https://example.supabase.co", "public-anon-key", {
+    cookies: {
+      getAll() {
+        return redirectCookies;
+      },
+      setAll() {},
+    },
+  });
+  const exchanged = await callback.auth.exchangeCodeForSession("not-a-real-code");
+  assert.notEqual(exchanged.error?.code, "pkce_code_verifier_not_found");
+});
+
+test("a callback without the pkce verifier fails before a session is created", async () => {
+  const callback = createServerClient("https://example.supabase.co", "public-anon-key", {
+    cookies: {
+      getAll() {
+        return [];
+      },
+      setAll() {},
+    },
+  });
+  const exchanged = await callback.auth.exchangeCodeForSession("not-a-real-code");
+  assert.equal(exchanged.error?.code, "pkce_code_verifier_not_found");
+  assert.equal(exchanged.data.session, null);
 });

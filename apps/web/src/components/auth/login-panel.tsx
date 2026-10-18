@@ -2,7 +2,6 @@
 
 import { useSearchParams } from "next/navigation";
 
-import { signInWithGoogle } from "@/lib/auth/actions";
 import { safeNextPath } from "@/lib/auth/safe-next";
 
 const ERRORS: Record<string, string> = {
@@ -34,7 +33,7 @@ export function LoginPanel() {
           {message}
         </p>
       ) : null}
-      <form action={signInWithGoogle} className="mt-[var(--space-6)]">
+      <form action="/auth/google" method="get" className="mt-[var(--space-6)]">
         <input type="hidden" name="next" value={nextPath} />
         <button
           type="submit"
