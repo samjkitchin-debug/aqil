@@ -19,6 +19,7 @@ export async function createAccount(formData: FormData): Promise<void> {
   const supabase = await createSupabaseServerClient();
   const name = String(formData.get("name") ?? "").trim();
   const provider = String(formData.get("provider") ?? "manual");
+  if (provider === "saxo") redirect("/my-wealth?error=save_failed");
   const environment = String(formData.get("environment") ?? "live");
   const currency = String(formData.get("currency") ?? "SGD").toUpperCase();
   const { error } = await supabase.from("wealth_accounts").insert({

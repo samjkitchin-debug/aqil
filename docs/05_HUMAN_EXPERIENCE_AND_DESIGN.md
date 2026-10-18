@@ -12,8 +12,8 @@ Design for four broad, overlapping *use situations*, not patronising skill label
 
 Validate these with real user interviews. Interview at least novice, experienced investor and low-accessibility/low-confidence readers; recruit across a range of incomes and age groups without stereotyping. Test tasks and teach-back, not opinions about an attractive mockup.
 
-## 2. Navigation (hypothesis to user-test)
-**Today** daily high-quality briefing; **Explore** economic themes and causal connections; **Learn** financial literacy and compounding; **My Wealth** (private, optional) plan/holdings/benchmarks; **Research** deep methods, hypotheses, lab and accountability. On mobile, reduce primary controls while retaining full destination access via an accessible menu. Public reading requires no login; invite account creation only where saving, portfolio or other useful function needs it.
+## 2. Navigation
+Implemented primary destinations are **Today**, **My Wealth** and **Intelligence**. Desktop places them in the sticky header. Narrow screens place the same three in one bottom bar. Intelligence keeps Upcoming (`/calendar`), Evidence (`/research`) and Exposures (`/explore`) as in-page links so a catalyst and its sources stay in one section. Learn remains available from the footer. Sign out sits in the header and is not grouped with education. An earlier six-item hypothesis (Today, Explore, Learn, My Wealth, Research, plus a separate calendar) is retired for the chrome: those jobs still exist, and their routes remain. Public legal pages require no login. Private portfolio and research pages do.
 
 ## 3. One knowledge object, three legitimate reading depths
 The UI is a projection of **one approved versioned research object**, not three conflicting model answers:
@@ -44,7 +44,9 @@ Path: why saving matters → emergency buffer and high-interest debt → what ow
 ## 6. My Wealth
 First screen asks: 'How is my long-term plan progressing?' Then show contribution rhythm, invested holdings, value **as of** dated prices, benchmark, allocation and overlap, goals, data coverage and errors/unknowns.
 
-Mandatory distinctions: deposits vs gains; nominal vs inflation-adjusted; realised vs unrealised; time-weighted vs money-weighted; public research vs personally executed trades; paper experiments vs actual portfolio. Missing FX or price -> transparent unavailable result, never made-up zero or interpolated value presented as fact.
+The implemented page leads with the broker-reported account value, then cash and the largest holding, then holdings ranked by value. A historical chart and a time-weighted return appear only when Saxo has actually returned them. The chart is account value, including contributions. It is not labelled investment return. Price result, currency result and costs stay separate, and a component that was not retrieved is omitted. Positive and negative colours are for results, not for cash or ordinary amounts. Technical provenance sits in source details. A material gap stays visible in one plain sentence.
+
+Mandatory distinctions: deposits vs gains; nominal vs inflation-adjusted; realised vs unrealised; time-weighted vs money-weighted; public research vs personally executed trades; paper experiments vs actual portfolio. Missing FX or price -> transparent unavailable result, never made-up zero or interpolated value presented as fact. The current account value and the latest historical observation are different instants.
 
 Avoid instant 'Buy/Sell' affordances. A portfolio-based research context can say: 'You already hold indirect exposure to this theme through global equities'; regulated personal recommendation boundary reviewed before public expansion.
 

@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 
-import { SignOutControl } from "@/components/auth/sign-out-control";
 import { resolveAccess } from "@/lib/auth/access";
 
 type Props = {
@@ -22,10 +21,5 @@ export async function PrivatePage({ nextPath, children }: Props) {
       </p>
     );
   }
-  return (
-    <>
-      <SignOutControl />
-      {children}
-    </>
-  );
+  return children;
 }

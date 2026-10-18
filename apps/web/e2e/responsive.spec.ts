@@ -64,20 +64,16 @@ test.describe("responsive shell", () => {
     const nav = page.getByRole("navigation", { name: "Primary" });
     await expect(nav).toBeVisible();
 
-    for (const label of [
-      "Today",
-      "Explore",
-      "Calendar",
-      "My wealth",
-      "Learn",
-      "Research",
-    ]) {
+    for (const label of ["Today", "My Wealth", "Intelligence"]) {
       const link = nav.getByRole("link", { name: label });
       await expect(link).toBeVisible();
       await expect(link).toBeEnabled();
     }
 
-    await nav.getByRole("link", { name: "Explore" }).click();
+    await expect(nav.getByRole("link", { name: "Explore" })).toHaveCount(0);
+    await expect(nav.getByRole("link", { name: "Learn" })).toHaveCount(0);
+
+    await nav.getByRole("link", { name: "My Wealth" }).click();
     await expect(page).toHaveURL(/\/login\?/);
     await expect(page.getByRole("heading", { level: 1, name: "Sign in" })).toBeVisible();
   });

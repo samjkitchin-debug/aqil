@@ -118,6 +118,7 @@ Update this table when risks close or new subsystems ship.
 - **Secrets:** only in environment or host secret store; rotate on exposure; separate anon vs service role vs OAuth client secrets per environment.
 - **Production access:** no shared passwords; no direct SQL on production without recorded change; migrations only from merged Git.
 - **Client storage:** no private financial data in `localStorage`/public SW caches; sensitive responses `Cache-Control: private, no-store`.
+- **Broker tokens:** local development may encrypt Saxo tokens in gitignored files. Production must not rely on that disk. No token, account identifier or holding value in logs or Git. Read-only GET allow-list only. The live credential's trading permission is a separate Saxo-side risk until a trading-disabled application replaces it.
 
 ---
 

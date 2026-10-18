@@ -1,3 +1,4 @@
+import { BrokerSection, saxoErrorMessage } from "@/components/wealth/broker-section";
 import { createAccount, recordHolding, saveTargets } from "@/lib/wealth/actions";
 import { consolidate, liveInvestable, monetaryGaps, type Target } from "@/lib/wealth/allocation";
 import { convertMinor, formatMinor } from "@/lib/wealth/money";
@@ -15,15 +16,21 @@ function label(assetClass: string): string {
   return CLASSES.find(([value]) => value === assetClass)?.[1] ?? assetClass;
 }
 
-export function MyWealthView({ load, error }: { load: WealthLoad; error: string | null }) {
+export function MyWealthView({
+  load,
+  error,
+  connectEnabled,
+}: {
+  load: WealthLoad;
+  error: string | null;
+  connectEnabled: boolean;
+}) {
+  const broker = load.status === "unauthorized" ? null : load.broker;
   if (load.status === "storage_pending") {
     return (
-      <section className="max-w-prose" data-testid="wealth-pending">
-        <h1 className="aq-panel-heading font-semibold text-foreground">My wealth</h1>
-        <p className="mt-[var(--space-3)] text-muted">
-          Portfolio storage is not on this database yet. Nothing has been invented in its place.
-        </p>
-      </section>
+      <div data-testid="wealth-pending">
+        <BrokerSection broker={broker} error={error} connectEnabled={connectEnabled} heading="h1" />
+      </div>
     );
   }
 
@@ -58,18 +65,26 @@ export function MyWealthView({ load, error }: { load: WealthLoad; error: string 
           BigInt(0),
         )
       : [];
+  const showRecorded = !broker || holdings.length > 0 || (snapshot?.accounts.length ?? 0) > 0;
 
   return (
     <div className="grid gap-[var(--space-6)]">
+      {broker ? <BrokerSection broker={broker} error={error} connectEnabled={connectEnabled} heading="h1" /> : null}
+      {showRecorded ? (
+        <>
       <section>
-        <h1 className="aq-panel-heading font-semibold text-foreground">My wealth</h1>
+        {broker ? (
+          <h2 className="font-semibold text-foreground">Recorded outside Saxo</h2>
+        ) : (
+          <h1 className="aq-page-title">My wealth</h1>
+        )}
         <p className="mt-[var(--space-3)] text-muted">
           {total.status === "total"
-            ? `Investable total ${formatMinor(total.amountMinor, total.currency)}. Emergency reserves are excluded.`
-            : "A combined total is unavailable. Native amounts are shown separately."}
+            ? `Recorded investable total ${formatMinor(total.amountMinor, total.currency)}. Emergency reserves are excluded.`
+            : "A combined total of recorded accounts is unavailable. Native amounts are shown separately."}
         </p>
-        <p className="mt-[var(--space-3)] text-muted">Performance is unavailable until a full cashflow history exists.</p>
-        {error ? <p className="mt-[var(--space-3)] text-foreground">That entry could not be saved.</p> : null}
+        {broker ? null : <BrokerSection broker={broker} error={error} connectEnabled={connectEnabled} heading="h2" />}
+        {error && !saxoErrorMessage(error) ? <p className="mt-[var(--space-3)] text-foreground">That entry could not be saved.</p> : null}
         {snapshot && snapshot.quarantined.length > 0 ? (
           <p className="mt-[var(--space-3)] text-foreground">
             Some holdings have an unknown classification and are not included.
@@ -77,7 +92,7 @@ export function MyWealthView({ load, error }: { load: WealthLoad; error: string 
         ) : null}
       </section>
 
-      {holdings.length === 0 ? (
+      {holdings.length === 0 && !broker ? (
         <p data-testid="wealth-empty" className="text-muted">
           No holdings are recorded for this account.
         </p>
@@ -137,7 +152,6 @@ export function MyWealthView({ load, error }: { load: WealthLoad; error: string 
             <select name="provider" className="mt-[var(--space-1)] block w-full border border-border bg-surface p-[var(--space-2)]">
               <option value="manual">Manual</option>
               <option value="cash">Cash</option>
-              <option value="saxo">Saxo</option>
               <option value="other">Other</option>
             </select>
           </label>
@@ -227,6 +241,8 @@ export function MyWealthView({ load, error }: { load: WealthLoad; error: string 
           </button>
         </form>
       </section>
+        </>
+      ) : null}
     </div>
   );
 }

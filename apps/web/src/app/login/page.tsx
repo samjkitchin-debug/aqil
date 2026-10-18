@@ -5,11 +5,8 @@ import { LoginPanel } from "@/components/auth/login-panel";
 
 function LoginFallback() {
   return (
-    <section className="max-w-prose" aria-labelledby="login-heading">
-      <h1 id="login-heading" className="aq-panel-heading font-semibold text-foreground">
-        Sign in
-      </h1>
-      <p className="mt-[var(--space-3)] text-muted">
+    <section className="max-w-prose" aria-labelledby="page-title">
+      <p className="text-muted">
         Aqil uses Google through Supabase Auth. Your Supabase user id is your identity.
       </p>
     </section>

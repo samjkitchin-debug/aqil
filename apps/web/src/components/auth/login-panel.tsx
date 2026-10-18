@@ -20,24 +20,18 @@ export function LoginPanel() {
   const message = ERRORS[params.get("error") ?? ""] ;
 
   return (
-    <section className="max-w-prose" aria-labelledby="login-heading">
-      <h1 id="login-heading" className="aq-panel-heading font-semibold text-foreground">
-        Sign in
-      </h1>
-      <p className="mt-[var(--space-3)] text-muted">
+    <section className="max-w-prose" aria-labelledby="page-title">
+      <p className="text-muted">
         Aqil uses Google through Supabase Auth. Your Supabase user id is your identity.
       </p>
       {message ? (
-        <p className="mt-[var(--space-4)] text-foreground" data-testid="login-error">
+        <p className="mt-[var(--space-4)] text-foreground" role="alert" data-testid="login-error">
           {message}
         </p>
       ) : null}
       <form action="/auth/google" method="get" className="mt-[var(--space-6)]">
         <input type="hidden" name="next" value={nextPath} />
-        <button
-          type="submit"
-          className="rounded-lg bg-brand-navy px-[var(--space-4)] py-[var(--space-2)] text-inverse"
-        >
+        <button type="submit" className="aq-button">
           Continue with Google
         </button>
       </form>

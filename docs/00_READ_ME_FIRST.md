@@ -35,6 +35,7 @@ A coordinated specification for Aqil: a calm, evidence-led, long-horizon wealth 
 - Source-first collection; verified typed observations and claims; deterministic calculations; AI restricted to bounded investigations, structured synthesis and contradiction search; human publication approval initially.
 - Append-only primary research forecasts, portfolio journal events and outcome reviews with amendments rather than destructive edits; named promotion/rollback gates for research methodology.
 - Manual portfolio ledger and CSV later; broker read-only much later. No automatic trading.
+- **18 October 2026.** Local read-only Saxo retrieval is in the repository. Production Connect Saxo is switched off until hosted token storage exists. The sentence above is the original ground-zero decision. The current boundary is in `04_ARCHITECTURE_AND_DATA.md`.
 - Design tokens, component reuse, responsive/a11y tests, editorial review and financial fixtures are mandatory from first commit.
 
 ## Ground-zero decisions deliberately *not* made

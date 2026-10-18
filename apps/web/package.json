@@ -11,6 +11,7 @@
     "test:forward-contract": "node --experimental-strip-types --test src/lib/forward/validate-forward-horizon.test.ts",
     "test:auth": "node --experimental-strip-types --test src/lib/auth/auth.test.ts src/lib/auth/refresh-ownership.mock.test.ts",
     "test:wealth": "node --experimental-strip-types --test src/lib/wealth/allocation.test.ts",
+    "test:saxo": "node --experimental-strip-types --test src/lib/saxo/sim-guard.test.ts src/lib/saxo/redact.test.ts src/lib/saxo/portfolio.test.ts src/lib/saxo/performance.test.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

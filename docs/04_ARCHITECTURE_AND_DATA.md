@@ -95,6 +95,18 @@ Forecast origins, methodological approvals, original source hashes and journal e
 - Show portfolio return independently of deposits: since-inception XIRR with root/convergence checks; TWR only with sufficient interim valuations; realised/unrealised gains separate; inflation-adjusted scenarios not guarantees.
 - Manual import then broker CSV then authorised read-only broker OAuth/statement integrations; do not request brokerage credentials in-app or allow trade execution.
 
+## Saxo read-only connection (18 October 2026)
+
+Saxo is authoritative for positions and account values that come from Saxo. Aqil normalises those responses into one internal view. A manual re-entry of the same brokerage account is not a second portfolio. Other institutions can have their own sources later. Manual entry is for accounts Saxo does not hold.
+
+Each read keeps account identity, instrument identity, native and reporting currencies, quantity, broker-reported values, valuation basis, observation time, retrieval time and provenance. A closed-market zero quote is not a price. A client total is not added to an account total. Buying power is not cash. Net positions are the holding lines. Trade lots stay behind those lines. Live and simulation files are separate. A live snapshot is never replaced by a simulation snapshot.
+
+Local development stores an encrypted token and the last good snapshot under `apps/web/.local/`, which Git ignores. That disk is not production persistence. The hosted database does not yet have wealth tables or a token vault, so production does not offer Connect Saxo. The live Saxo application credential was created with trading permission. Aqil allow-lists specific GET requests and refuses orders, transfers and other mutations. OAuth token exchange is a POST to Saxo's authorisation host, not a trade. A trading-disabled Saxo application is required before long-term hosted token storage.
+
+`GET /hist/v4/performance/timeseries` is the documented source for `Balance_AccountValue` and `TimeWeighted_Accumulated`. The API standard periods are AllTime, Month, Quarter and Year. Saxo's own example shows accumulated time-weighted values as fractions, not percentages. The local live session had expired at close-out, so this account's series was not retrieved. Rendering the current portfolio does not depend on that endpoint. The value series includes deposits and withdrawals and is not investment return. The current balance and a historical point are different instants and are not spliced together.
+
+Not built, and kept separate from observed records when they are added: a transaction warehouse, benchmark engine, original-plan counterfactuals, model portfolios, goal projections and fund-structure attribution.
+
 ## Virtual portfolio and evaluation correctness
 `experiment_definition` locks methodology, universe, weights and decision rules, market as-of, fees, FX, cashflows and evaluation before first simulated fill. Fill model: first valid executable subsequent market session, no lookahead, account for spreads, fees, slippage/rounding, holidays and missing quotes. Do not invent a fill if data missing. Evaluations reproduce from versioned price/provider inputs; freeze old results, append evaluation revisions on source corrections.
 

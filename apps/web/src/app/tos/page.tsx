@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <AppShell title="Terms of service">
+    <AppShell title="Terms of service" showHeading={false}>
       <LegalDocument title="Terms of service" lastUpdated="18 October 2026">
         <LegalSection title="Agreement">
           <LegalParagraph>

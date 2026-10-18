@@ -31,17 +31,19 @@ Use in Playwright and manual QA (not separate layouts):
 |--------|-------|-------------|
 | Small phone | 320px | Overflow, nav fit, minimum readable body |
 | Large phone | 390–480px | Primary mobile PWA |
-| Tablet | 768px | Gutters, nav relocation to static footer band |
+| Tablet | 768px | Gutters, primary navigation moves into the header |
 | Laptop | 1024–1440px | Desktop reading width |
 | Large desktop | 1920px+ | Max-width centring |
 
 ## Shell behaviour
 
-- **Mobile-first:** bottom sticky primary nav with safe-area padding; header sticky with safe-area top.
-- **Tablet and up (`48rem`):** nav band is static (still below main); wider gutters.
+- **Narrow screens (under `48rem`):** sticky header with the wordmark and, when signed in, Sign out. The same three primary links (Today, My Wealth, Intelligence) are a fixed one-row bar at the bottom, with safe-area padding. The shell is at least `100dvh`, and main content is padded so the bar does not cover the footer. The bar hides while the on-screen keyboard obscures the visual viewport. Labels do not ellipsise.
+- **Tablet and up (`48rem`):** those three links sit in the sticky header. There is no bottom bar and no navigation after the footer.
+- **Intelligence routes** (`/calendar`, `/research`, `/explore`) add a section nav under the page title: Upcoming, Evidence, Exposures.
+- **One page title.** `AppShell` renders the `h1` unless `showHeading` is false because the page already has one (legal documents, My wealth).
 - **No horizontal overflow** on shell routes; layout must size correctly at 320px without relying on `overflow-x: clip` to hide content.
 - **Skip link** to `#main-content`; visible on keyboard focus.
-- **Touch:** nav links meet `--layout-touch-target-min` on narrow viewports.
+- **Touch:** primary links, Sign out and the primary button meet `--layout-touch-target-min`.
 - **Zoom / text scaling:** relative units and `rem` tokens; no fixed pixel typography in components.
 
 ## PWA

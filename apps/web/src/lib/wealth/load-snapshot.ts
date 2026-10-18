@@ -4,7 +4,10 @@ import { connection } from "next/server";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+import { readBrokerPortfolio } from "@/lib/saxo/sim-session";
+
 import { parseAssetClass, type AssetClass, type Environment } from "./allocation";
+import type { BrokerPortfolioView } from "@/lib/saxo/portfolio";
 
 export type WealthAccount = {
   id: string;
@@ -40,9 +43,9 @@ export type WealthSnapshot = {
 
 export type WealthLoad =
   | { status: "unauthorized" }
-  | { status: "storage_pending" }
-  | { status: "empty" }
-  | { status: "ok"; snapshot: WealthSnapshot };
+  | { status: "storage_pending"; broker: BrokerPortfolioView | null }
+  | { status: "empty"; broker: BrokerPortfolioView | null }
+  | { status: "ok"; snapshot: WealthSnapshot; broker: BrokerPortfolioView | null };
 
 function relationMissing(error: { code?: string; message?: string } | null): boolean {
   if (!error) return false;
@@ -66,8 +69,9 @@ export async function loadWealthSnapshot(): Promise<WealthLoad> {
   ]);
 
   const errors = [accountsRes.error, instrumentsRes.error, valuationsRes.error, targetsRes.error, fxRes.error, profileRes.error];
-  if (errors.some(relationMissing)) return { status: "storage_pending" };
-  if (errors.some(Boolean)) return { status: "empty" };
+  const broker = await readBrokerPortfolio(auth.user.id);
+  if (errors.some(relationMissing)) return { status: "storage_pending", broker };
+  if (errors.some(Boolean)) return { status: "empty", broker };
 
   const accounts: WealthAccount[] = (accountsRes.data ?? []).map((row) => ({
     id: row.id,
@@ -78,7 +82,7 @@ export async function loadWealthSnapshot(): Promise<WealthLoad> {
     sourceStatus: row.source_status,
   }));
   if (accounts.length === 0 && (valuationsRes.data ?? []).length === 0) {
-    return { status: "empty" };
+    return { status: "empty", broker };
   }
 
   const accountById = new Map(accounts.map((account) => [account.id, account]));
@@ -115,6 +119,7 @@ export async function loadWealthSnapshot(): Promise<WealthLoad> {
 
   return {
     status: "ok",
+    broker,
     snapshot: {
       reportingCurrency: profileRes.data?.reporting_currency ?? "SGD",
       accounts,

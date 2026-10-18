@@ -39,7 +39,7 @@ async function ResearchDetail() {
 
 export default function ResearchPage() {
   return (
-    <AppShell title="Research">
+    <AppShell title="Intelligence">
       <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
         <PrivatePage nextPath="/research">
       <Suspense fallback={<ResearchEmptyState reason="missing" />}>

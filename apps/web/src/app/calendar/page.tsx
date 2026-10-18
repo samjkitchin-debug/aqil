@@ -22,15 +22,12 @@ async function CalendarBody() {
 
 export default function CalendarPage() {
   return (
-    <AppShell title="Calendar">
+    <AppShell title="Intelligence">
       <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
         <PrivatePage nextPath="/calendar">
-      <h1 className="aq-panel-heading mb-[var(--space-4)] font-semibold text-foreground">
-        Calendar
-      </h1>
       <p className="research-body mb-[var(--space-4)]">
-        30–90 day catalyst view for the vetted ETF research universe. Filter controls will
-        expand as coverage grows.
+        Upcoming catalysts for the vetted ETF universe, over the next 30–90 days. Filter
+        controls will expand as coverage grows.
       </p>
       <Suspense fallback={<ResearchEmptyState reason="missing" />}>
         <CalendarBody />

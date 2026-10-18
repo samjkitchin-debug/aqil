@@ -19,11 +19,18 @@
 
 All five derive from a shared research/data foundation. The interface is calm; the hidden system is demanding.
 
-**Current build sequence (18 October 2026).** The next product work is three pillars, in dependency order, not a new charter:
+**Current delivery (18 October 2026).** The five ideas above remain the long-term product. Current delivery is wealth-first. Research must not silently change the investor's targets.
 
-1. **My Wealth** — the founder's actual holdings, accounts, targets and contributions, with minimal typing and no synthetic rows shown as real.
-2. **Forward intelligence** — authoritative sources, versioned methods, frozen pre-event evidence and honest outcome review. A frozen baseline is not demonstrated forecasting skill.
-3. **Deploy Capital** — "I have a sum to invest. Which approved ETF should receive it, how much, and why?" V1 is a deterministic gap to the investor's own targets. It does not trade, and research must not silently change those targets.
+The closed loop is: **My Wealth** establishes what is actually held and what it is worth; **Deploy Capital** supports a disciplined decision about new money; **Forward Intelligence** may later inform alternatives; My Wealth then compares the result with benchmarks and frozen counterfactuals. Account-value growth is not investment return. A hypothetical fund-structure saving is not realised profit. A projection is not a guarantee.
+
+Indicative order. Later items are not built:
+
+1. Trustworthy live Saxo portfolio.
+2. Secure hosted persistence and historical evidence.
+3. Strategic targets and Deploy Capital V1: an approved ETF, a monetary gap, and a reason. No automatic trades.
+4. Benchmarks, contributions and long-term planning foundations.
+5. Prospective model portfolios and fund-structure attribution.
+6. Forward Intelligence only where it can change a real decision, and only with evaluation. The November employment baseline is a prospective-methodology exercise. It does not prove forecasting skill.
 
 ## Audience and jobs to be done
 - **Curious commuter:** 'Make sense of what matters globally in five minutes, and show the links between apparently unrelated developments.'
@@ -69,7 +76,9 @@ A core research object answers:
 - Potential future broker recommendations: editorial comparisons with compensation/conflicts clearly disclosed; no affiliate-led ranking masquerading as independent research.
 
 ## Product experiences
-**Today:** curated brief with one main idea, why it matters, uncertainty and links to related themes. **Explore:** causal connections, country strategy, timelines, theme maps. **Learn:** concise lessons and a scenario-based compounding tool. **My Wealth:** private positions, contribution-vs-growth, actual returns, consistent benchmark and goals. **Research:** full provenance, methods, hypotheses, portfolio experiments, scorecard, failed results and challenge mechanism.
+Primary navigation is three destinations: **Today**, **My Wealth** and **Intelligence**.
+
+**Today** is the landing page: one material development, portfolio exceptions, and the next catalyst. It does not invent a feed. **My Wealth** (`/my-wealth`) is private positions, contribution versus growth, allocation, targets and unknowns. **Deploy Capital** is a task inside My Wealth, not a fourth destination. **Intelligence** opens on upcoming catalysts (`/calendar`). Evidence stays at `/research` and vetted exposures at `/explore`, both as section navigation, not separate products. **Learn** (`/learn`) is contextual literacy, linked from the footer, not from the account control. Sign out is the account control until settings exist.
 
 ## Success measures
 1. Human understanding: can a reader accurately explain the conclusion **and** key uncertainty?

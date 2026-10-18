@@ -1,3 +1,5 @@
+import { StatusLine } from "@/components/ui/status-line";
+
 type Props = {
   reason: "missing" | "invalid" | "unauthorized";
 };
@@ -14,9 +16,9 @@ export function ResearchEmptyState({ reason }: Props) {
     <div className="research-banner" data-testid="research-empty-state">
       <h2 className="research-headline">Macro intelligence pending</h2>
       <p className="research-body">{message}</p>
-      <p className="research-meta">
+      <StatusLine tone="limitation">
         Public publication remains blocked until evidence requirements are met.
-      </p>
+      </StatusLine>
     </div>
   );
 }

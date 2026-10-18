@@ -1,6 +1,8 @@
 # AQIL — Research Crown Jewel: Evidence, Methods, Signals, Hypotheses and Learning
 **Build intent:** An auditable research workflow that uses existing published methodologies before trying experimental AI extensions. No process may claim a predictive edge without prospective evidence.
 
+**18 October 2026.** New macro-method work waits until it has a clear decision value for My Wealth or Deploy Capital. The November employment baseline remains a frozen prospective exercise. It is not evidence of forecasting skill.
+
 ## 1. Scientific chain of custody
 Aqil's chain is `source → extract → verify → observation → event/indicator → causal candidate → applied named method → competing scenario → market-expectations check → eligible exposure analysis → registered forecast → paper experiment → independent evaluation → versioned learning`. Every arrow has a validator; any failing critical step stops publication or produces a visibly qualified research note.
 

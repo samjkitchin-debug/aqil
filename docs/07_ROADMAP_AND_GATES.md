@@ -1,16 +1,17 @@
 # AQIL — Execution Roadmap and Stage Gates
 
-**Last reconciled:** 18 October 2026 · **Git baseline:** `origin/main` @ `6f47bdb`. Local alignment work is not on `origin/main` until a deliberate push.
+**Last reconciled:** 18 October 2026 · **Git baseline:** the end-of-day release on `main`. See `docs/CURSOR_SESSION_HANDOVER.md` for the SHA.
 
 ## Operating baseline (18 October 2026)
 
-This section supersedes older sentences below that say authentication or hosted Supabase has not started.
+This section supersedes older sentences below that say authentication, hosted Supabase or broker access has not started.
 
-- Live app: `https://aqil-tau.vercel.app`. The founder completed Google sign-in on this deployment.
+- Live app: `https://aqil-tau.vercel.app`. Google sign-in is the production access path.
 - Ordinary access is any verified Google account. The allow-list and `access_grants` gate are removed. See ADR 020.
-- Hosted project `ojvswermsbbaltjohqph` has exactly five migrations: `20261017103000`, `20261017110000`, `20261017120000`, `20261017140000`, `20261017180000`. Local files `20261018200000` and `20261018210000` are not applied to that host.
-- Workflow: localhost → local tests → local commit → deliberate push to `main` → existing Vercel integration. No `vercel link` and no `vercel deploy`.
-- Next implementation cycles are in `docs/CURSOR_SESSION_HANDOVER.md`. Do not start them from this alignment note.
+- Hosted project `ojvswermsbbaltjohqph` has exactly five migrations: `20261017103000`, `20261017110000`, `20261017120000`, `20261017140000`, `20261017180000`. Local files `20261018200000` and `20261018210000` are not applied. Do not apply them until the founder approves that batch, and do not apply older M5 timestamps after them.
+- Local Saxo reads are real and read-only. Production does not offer Connect Saxo until encrypted, owner-scoped token storage exists. See ADR 021–024.
+- Workflow: localhost → local tests → reviewed commit → one push to `main` → the existing GitHub to Vercel integration. No Vercel CLI deploy, no second Vercel project, no preview build created for its own sake.
+- Next product order: trustworthy Saxo portfolio, then secure persistence and historical evidence, then Deploy Capital V1, then benchmarks and planning foundations, then model portfolios and fund-structure attribution, then evaluated Forward Intelligence. M5 and M6 stay deferred until a wealth decision needs them. The November employment baseline does not prove forecasting skill.
 
 ## Progress register
 

@@ -9,10 +9,7 @@ export default function LearnPage() {
     <AppShell title="Learn">
       <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
         <PrivatePage nextPath="/learn">
-          <PlaceholderPanel
-            heading="Learn"
-            body="Structured learning paths on macro research, risk and disciplined long-horizon investing will be added with product documentation."
-          />
+          <PlaceholderPanel body="Structured learning paths on macro research, risk and disciplined long-horizon investing will be added with product documentation." />
         </PrivatePage>
       </Suspense>
     </AppShell>
