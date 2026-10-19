@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
 import { ResearchEmptyState } from "@/components/research/research-empty-state";
+import { ResearchStoryView } from "@/components/research/research-story-view";
 import { ForwardResearchDetail } from "@/components/forward/forward-research-detail";
 import { ResearchInsightView } from "@/components/research/research-insight-view";
 import { loadForwardHorizonBundle } from "@/lib/forward/load-forward-horizon";
@@ -27,14 +28,11 @@ async function ResearchDetail() {
     );
   }
 
-  const reason =
-    loaded.status === "invalid"
-      ? "invalid"
-      : loaded.status === "unauthorized"
-        ? "unauthorized"
-        : "missing";
+  if (loaded.status === "unauthorized") {
+    return <ResearchEmptyState reason="unauthorized" />;
+  }
 
-  return <ResearchEmptyState reason={reason} />;
+  return <ResearchStoryView />;
 }
 
 export default function ResearchPage() {
