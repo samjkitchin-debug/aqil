@@ -1,23 +1,60 @@
 {
   "fixture_kind": "synthetic_research_story",
   "schema_version": "1.0",
-  "label": "SYNTHETIC — not investment research",
+  "label": "Synthetic demonstration — not live market intelligence",
   "research_version_id": "rv-synthetic-g0-001",
   "story_id": "story-synthetic-g0-001",
-  "status": "scaffold_only",
+  "status": "synthetic_demonstration",
   "updated_at": "2026-10-16T00:00:00Z",
+  "sources": [
+    {
+      "source_id": "src:synthetic:demo-policy-release-001",
+      "title": "Illustrative policy release excerpt (fixture)",
+      "primary_url": "https://example.invalid/aqil/synthetic/demo-policy-release-001",
+      "observed_at": "2026-09-15T14:00:00Z",
+      "evidence_kind": "synthetic_fixture"
+    },
+    {
+      "source_id": "src:synthetic:demo-indicator-vintage-001",
+      "title": "Illustrative labour-market indicator vintage (fixture)",
+      "primary_url": "https://example.invalid/aqil/synthetic/demo-indicator-vintage-001",
+      "observed_at": "2026-09-05T12:30:00Z",
+      "evidence_kind": "synthetic_fixture"
+    }
+  ],
+  "correction": {
+    "correction_id": "corr-synthetic-g0-001",
+    "corrected_at": "2026-10-14T09:00:00Z",
+    "summary": "An earlier draft of this demonstration used the wrong illustrative release date for the policy excerpt. The citation list and connected analysis now reference the corrected vintage.",
+    "supersedes_research_version_id": "rv-synthetic-g0-000"
+  },
   "quick_read": {
-    "headline": "Placeholder briefing shell",
-    "summary": "This fixture validates structure only. No macro event, forecast or ETF implication is asserted.",
-    "material_uncertainty": "Not applicable — synthetic scaffold."
+    "headline": "Illustrative briefing: policy wording shifted before a labour print",
+    "summary": "This quick read walks through how a synthetic policy excerpt and a synthetic indicator vintage might be read together. No recession call, market forecast or product implication is asserted.",
+    "material_uncertainty": "Both inputs are fixtures. Real publication would require verified primary sources and an approved method card.",
+    "source_ids": [
+      "src:synthetic:demo-policy-release-001",
+      "src:synthetic:demo-indicator-vintage-001"
+    ]
   },
   "connected_analysis": {
-    "body": "Connected analysis depth will reference verified source_claim_ids when AQ-015 is implemented.",
-    "source_claim_ids": []
+    "body": "The connected layer links the illustrative policy wording to the illustrative unemployment-rate vintage without claiming causality is settled. It highlights where corroboration would be required before any investable narrative.",
+    "causal_links": [
+      "Illustrative policy wording → possible labour-market interpretation (contested in this fixture)",
+      "Indicator vintage timing → limits what a historical replay may claim"
+    ],
+    "source_ids": [
+      "src:synthetic:demo-policy-release-001",
+      "src:synthetic:demo-indicator-vintage-001"
+    ]
   },
   "research_detail": {
-    "method_card_ids": [],
-    "forecast_contract_ids": [],
+    "method_summary": "Full research depth shows the method placeholder: rules-only comparator, explicit vintage handling and dependency on the same source identifiers as the shorter layers.",
+    "audit_notes": "Status is synthetic_demonstration. Evidence is insufficient for publication. Citations resolve to labelled fixture URLs only.",
+    "source_ids": [
+      "src:synthetic:demo-policy-release-001",
+      "src:synthetic:demo-indicator-vintage-001"
+    ],
     "insufficient_evidence": true
   },
   "navigation": {
