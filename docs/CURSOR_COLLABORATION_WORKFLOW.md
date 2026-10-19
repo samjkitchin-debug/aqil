@@ -40,6 +40,21 @@ Authoritative register: **`docs/07_BUILD_BACKLOG.csv`** (see `docs/07_ROADMAP_AN
 
 Use the template in `docs/06_ENGINEERING_DISCIPLINE.md` §10.
 
+## Branch housekeeping
+
+Two branches stay:
+
+- `main` is production. Leave it untouched until a deliberate release.
+- `work/aqil-autonomous-build` is the active development branch. Ordinary sequential work happens here.
+
+A temporary branch and worktree are allowed only while agents must edit in parallel. After the tested work is integrated:
+
+1. Confirm the temporary branch is reachable from `work/aqil-autonomous-build`, or that its patch is already there.
+2. Confirm the worktree has no uncommitted files that are not on the development branch.
+3. Remove the temporary worktree, then delete the local branch with an ordinary `git branch -d`.
+4. Do not force-delete a branch that still has a commit the development branch does not contain.
+5. Do not delete a remote branch, and do not create a new permanent branch for a routine milestone.
+
 ## Project rules
 
 Repository enforcement: `.cursor/rules/aqil-engineering.mdc` (must stay aligned with this workflow).
