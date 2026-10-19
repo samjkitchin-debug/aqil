@@ -153,6 +153,41 @@ test("a commit that loses the generation discards the new tokens", async () => {
   assert.equal(saved?.ciphertext.includes("should-not-persist"), false);
 });
 
+test("a thrown refresh releases the claim", async () => {
+  const ciphertext = sealTokens(original, key);
+  const store = storeWith(ciphertext);
+  await assert.rejects(
+    () =>
+      rotateHostedTokens({
+        sessionUserId: "owner-1",
+        ownerUserId: "owner-1",
+        environment: "live",
+        store,
+        encryptionKey: key,
+        refresh: async () => {
+          throw new Error("socket closed");
+        },
+      }),
+    /socket closed/,
+  );
+  const saved = await store.read("owner-1", "live");
+  assert.equal(saved?.status, "idle");
+  assert.equal(saved?.ciphertext, ciphertext);
+  const retried = await rotateHostedTokens({
+    sessionUserId: "owner-1",
+    ownerUserId: "owner-1",
+    environment: "live",
+    store,
+    encryptionKey: key,
+    refresh: async () => ({
+      ok: true,
+      tokens: { ...original, accessToken: "access-retry", refreshToken: "refresh-retry" },
+    }),
+  });
+  assert.equal(retried.ok, true);
+  assert.equal((await store.read("owner-1", "live"))?.status, "idle");
+});
+
 test("the sql claim updates only an idle matching generation", async () => {
   const statements: string[] = [];
   let calls = 0;

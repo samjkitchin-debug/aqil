@@ -99,28 +99,38 @@ export async function rotateHostedTokens(input: {
   if (!current) return { ok: false, reason: "missing" };
   const claim = await input.store.claim(input.ownerUserId, input.environment, current.generation);
   if (!claim.ok) return { ok: false, reason: "conflict" };
-  const opened = openTokens(current.ciphertext, input.encryptionKey);
-  if (!opened) {
-    await input.store.abort(input.ownerUserId, input.environment, claim.generation);
-    return { ok: false, reason: "unreadable" };
+  const release = () => input.store.abort(input.ownerUserId, input.environment, claim.generation);
+  try {
+    const opened = openTokens(current.ciphertext, input.encryptionKey);
+    if (!opened) {
+      await release();
+      return { ok: false, reason: "unreadable" };
+    }
+    const refreshed = await input.refresh(opened.refreshToken);
+    if (!refreshed.ok) {
+      await release();
+      return { ok: false, reason: "refresh_failed" };
+    }
+    const ciphertext = sealTokens(refreshed.tokens, input.encryptionKey);
+    const committed = await input.store.commit(
+      input.ownerUserId,
+      input.environment,
+      claim.generation,
+      ciphertext,
+    );
+    if (!committed) {
+      await release();
+      return { ok: false, reason: "discarded" };
+    }
+    return { ok: true, tokens: refreshed.tokens, generation: claim.generation };
+  } catch (error) {
+    try {
+      await release();
+    } catch {
+      // The original failure is the one the caller must see.
+    }
+    throw error;
   }
-  const refreshed = await input.refresh(opened.refreshToken);
-  if (!refreshed.ok) {
-    await input.store.abort(input.ownerUserId, input.environment, claim.generation);
-    return { ok: false, reason: "refresh_failed" };
-  }
-  const ciphertext = sealTokens(refreshed.tokens, input.encryptionKey);
-  const committed = await input.store.commit(
-    input.ownerUserId,
-    input.environment,
-    claim.generation,
-    ciphertext,
-  );
-  if (!committed) {
-    await input.store.abort(input.ownerUserId, input.environment, claim.generation);
-    return { ok: false, reason: "discarded" };
-  }
-  return { ok: true, tokens: refreshed.tokens, generation: claim.generation };
 }
 
 export type SqlExecutor = (statement: string, params: readonly unknown[]) => Promise<Record<string, unknown>[]>;

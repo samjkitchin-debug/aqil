@@ -61,15 +61,16 @@ Money-weighted return was absent from the retrieved v4 performance response. Cor
 - My Wealth cockpit: standard account value and open-position or time-weighted result sit with cash, investment count, largest holding and connection. The Saxo account-value chart is full width only when at least two points exist.
 - Deploy Capital V1: `deployCapital` in `apps/web/src/lib/capital/deploy.ts`. It reuses `monetaryGaps` and `allocateExternalContribution`. Missing targets, a zero or missing budget, an empty approved list, or a missing foreign-exchange rate stay unconfigured or unavailable. Whole units leave a remainder. No order is created. `/my-wealth/deploy` shows a labelled example and a not-configured block. Those figures are not the founder's account and the page does not read the Saxo snapshot.
 - Hosted vault: `saxo_token_vault` and append-only `saxo_source_units` in unapplied migration `20261020120000_saxo_hosted_vault.sql`. Ciphertext is granted to `service_role` only. `rotateHostedTokens` claims a generation before calling Saxo; the loser does not refresh or persist. The local file vault is still the running store. Nothing in the OAuth routes was switched over, and no archive was copied.
+- Review fixes: a thrown refresh or commit releases the vault claim. A one-unit top-up that integer gaps cannot assign stays in the unallocated amount. A foreign-currency buy is sized from the converted total, so per-unit rounding cannot spend more than the budget.
 - Wealth valuation and event inserts in that same unapplied migration now require the instrument to belong to the same owner. This was a cross-owner reference hole in `20261018210000`. It is not applied on the host.
 
 ## 6. Tests this session
 
 | Check | Result |
 |---|---|
-| `npm run test:capital` | 9 pass, 0 fail |
+| `npm run test:capital` | 11 pass, 0 fail |
 | `npm run test:wealth` | 20 pass, 0 fail |
-| `npm run test:saxo` | 41 pass, 0 fail |
+| `npm run test:saxo` | 42 pass, 0 fail |
 | `npm run typecheck` | pass |
 | `npm run lint` | pass after `prefer-const` in `deploy.ts` |
 | `npm run check:tokens` | pass |

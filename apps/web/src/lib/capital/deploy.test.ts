@@ -151,3 +151,48 @@ test("listed instruments are filled in order and a per-unit cost is kept", () =>
   assert.equal(result.instruments[1]?.spendMinor, 40n);
   assert.equal(result.unallocatedMinor, 10n);
 });
+
+test("a balanced book keeps a one-unit top-up as unallocated cash", () => {
+  const result = deployCapital(
+    input({
+      classValues: [
+        { assetClass: "global_equity", currency: "SGD", amountMinor: 5000n },
+        { assetClass: "cash_investable", currency: "SGD", amountMinor: 5000n },
+      ],
+      targets: [
+        { assetClass: "global_equity", targetWeightBps: 5000 },
+        { assetClass: "cash_investable", targetWeightBps: 5000 },
+      ],
+      additionalCashMinor: 1n,
+      instruments: [
+        { ...equity, priceMinor: 1n },
+        {
+          id: "example-cash",
+          name: "Example cash instrument",
+          assetClass: "cash_investable",
+          currency: "SGD",
+          minimumUnit: 1n,
+          priceMinor: 1n,
+        },
+      ],
+    }),
+  );
+  assert.equal(result.exposures.every((row) => row.deploymentMinor === 0n), true);
+  assert.equal(result.instruments.length, 0);
+  assert.equal(result.unallocatedMinor, 1n);
+});
+
+test("converted unit totals stay inside the budget", () => {
+  const result = deployCapital(
+    input({
+      additionalCashMinor: 40n,
+      instruments: [{ ...equity, currency: "USD", priceMinor: 3n }],
+      fx: [{ baseCurrency: "USD", quoteCurrency: "SGD", rate: "1.499" }],
+    }),
+  );
+  const planned = result.instruments.find((row) => row.status === "planned");
+  assert.equal(planned?.units, 9n);
+  assert.equal(planned?.spendMinor, 40n);
+  assert.equal(result.unallocatedMinor, 0n);
+  assert.ok((planned?.spendMinor ?? 0n) <= 40n);
+});

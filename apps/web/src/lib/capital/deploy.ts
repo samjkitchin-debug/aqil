@@ -137,6 +137,48 @@ function weightBps(amounts: readonly bigint[]): number[] {
   return weights;
 }
 
+/** Spend is the converted total, so per-unit rounding cannot exceed the remaining budget. */
+function largestAffordable(
+  nativePerUnit: bigint,
+  minimumUnit: bigint,
+  currency: string,
+  reportingCurrency: string,
+  fx: readonly FxRate[],
+  remaining: bigint,
+): { units: bigint; spendMinor: bigint } | { reason: string } | null {
+  if (nativePerUnit <= BigInt(0) || minimumUnit <= BigInt(0) || remaining <= BigInt(0)) return null;
+  const quote = (steps: bigint) =>
+    toReporting(steps * minimumUnit * nativePerUnit, currency, reportingCurrency, fx);
+  const first = quote(BigInt(1));
+  if (!first.ok) return { reason: first.reason };
+  if (first.amountMinor <= BigInt(0) || first.amountMinor > remaining) return null;
+  let high = BigInt(1);
+  while (high < 1_000_000n) {
+    const next = quote(high * BigInt(2));
+    if (!next.ok) return { reason: next.reason };
+    if (next.amountMinor > remaining) break;
+    high *= BigInt(2);
+  }
+  let low = high + BigInt(1);
+  let best = high;
+  high *= BigInt(2);
+  while (low <= high) {
+    const mid = (low + high) / BigInt(2);
+    const total = quote(mid);
+    if (!total.ok) return { reason: total.reason };
+    if (total.amountMinor > BigInt(0) && total.amountMinor <= remaining) {
+      best = mid;
+      low = mid + BigInt(1);
+    } else {
+      high = mid - BigInt(1);
+    }
+  }
+  const spend = quote(best);
+  if (!spend.ok) return { reason: spend.reason };
+  if (spend.amountMinor > remaining) return null;
+  return { units: best * minimumUnit, spendMinor: spend.amountMinor };
+}
+
 function sideFor(gapMinor: bigint): ExposureSide {
   if (gapMinor > BigInt(0)) return "underweight";
   if (gapMinor < BigInt(0)) return "overweight";
@@ -176,12 +218,31 @@ function deployInstruments(
         });
         continue;
       }
-      const unitCost = price.amountMinor + cost.amountMinor;
-      if (unitCost <= BigInt(0) || remaining < unitCost * instrument.minimumUnit) continue;
-      const affordable = remaining / unitCost;
-      const units = (affordable / instrument.minimumUnit) * instrument.minimumUnit;
-      if (units <= BigInt(0)) continue;
-      const spend = units * unitCost;
+      const nativePerUnit = instrument.priceMinor + costAmount;
+      const fitted = largestAffordable(
+        nativePerUnit,
+        instrument.minimumUnit,
+        instrument.currency,
+        reportingCurrency,
+        fx,
+        remaining,
+      );
+      if (!fitted) continue;
+      if ("reason" in fitted) {
+        lines.push({
+          id: instrument.id,
+          name: instrument.name,
+          assetClass: instrument.assetClass,
+          currency: instrument.currency,
+          status: "unavailable",
+          reason: fitted.reason,
+          units: null,
+          spendMinor: null,
+        });
+        continue;
+      }
+      const units = fitted.units;
+      const spend = fitted.spendMinor;
       remaining -= spend;
       lines.push({
         id: instrument.id,
@@ -272,11 +333,12 @@ export function deployCapital(input: DeployCapitalInput): DeployCapitalResult {
   }
 
   const deployed = deployInstruments(allocated, input.instruments, input.reportingCurrency, input.fx);
+  const allocatedSum = allocated.reduce((sum, row) => sum + row.amountMinor, BigInt(0));
   return {
     reportingCurrency: input.reportingCurrency,
     missing,
     exposures,
     instruments: deployed.lines,
-    unallocatedMinor: deployed.unallocatedMinor,
+    unallocatedMinor: deployed.unallocatedMinor + (budget - allocatedSum),
   };
 }
