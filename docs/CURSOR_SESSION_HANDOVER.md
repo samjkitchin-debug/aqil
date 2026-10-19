@@ -59,7 +59,7 @@ Money-weighted return was absent from the retrieved v4 performance response. Cor
 ## 5. What this session added
 
 - My Wealth cockpit: standard account value and open-position or time-weighted result sit with cash, investment count, largest holding and connection. The Saxo account-value chart is full width only when at least two points exist.
-- Deploy Capital V1: `deployCapital` in `apps/web/src/lib/capital/deploy.ts`. It reuses `monetaryGaps` and `allocateExternalContribution`. Missing targets, a zero or missing budget, an empty approved list, or a missing foreign-exchange rate stay unconfigured or unavailable. Whole units leave a remainder. No order is created. `/my-wealth/deploy` shows a labelled example and a not-configured block. Those figures are not the founder's account and the page does not read the Saxo snapshot.
+- Deploy Capital reads the saved Saxo snapshot when you are signed in. Only reported cash enters the class calculation. Holdings stay unclassified and are listed, not assigned to an asset class. Buying power is not cash. Targets, a budget, approved instruments and FX are used only when they were saved. The example block remains and is labelled as made up. No order is sent.
 - Hosted vault: `saxo_token_vault` and append-only `saxo_source_units` in unapplied migration `20261020120000_saxo_hosted_vault.sql`. Ciphertext is granted to `service_role` only. `rotateHostedTokens` claims a generation before calling Saxo; the loser does not refresh or persist. The local file vault is still the running store. Nothing in the OAuth routes was switched over, and no archive was copied.
 - Review fixes: a thrown refresh or commit releases the vault claim. A one-unit top-up that integer gaps cannot assign stays in the unallocated amount. A foreign-currency buy is sized from the converted total, so per-unit rounding cannot spend more than the budget.
 - Wealth valuation and event inserts in that same unapplied migration now require the instrument to belong to the same owner. This was a cross-owner reference hole in `20261018210000`. It is not applied on the host.
@@ -68,15 +68,15 @@ Money-weighted return was absent from the retrieved v4 performance response. Cor
 
 | Check | Result |
 |---|---|
-| `npm run test:capital` | 11 pass, 0 fail |
+| `npm run test:capital` | 14 pass, 0 fail (11 calculation, 3 snapshot mapping) |
 | `npm run test:wealth` | 20 pass, 0 fail |
-| `npm run test:saxo` | 42 pass, 0 fail |
+| `npm run test:saxo` | 42 pass, 0 fail, including the hosted vault rotation tests |
 | `npm run typecheck` | pass |
-| `npm run lint` | pass after `prefer-const` in `deploy.ts` |
+| `npm run lint` | pass |
 | `npm run check:tokens` | pass |
-| `npm run build` | pass. Route `/my-wealth/deploy` is in the build |
-| Browser | Agent browser opened `/my-wealth` and `/my-wealth/deploy` and was redirected to Google sign-in. The example was not rendered. Saxo authorisation was not opened |
-| `supabase test db` | not run. Docker was not running. The new pgTAP file is unexecuted |
+| `npm run build` | pass. `/my-wealth` and `/my-wealth/deploy` are in the build |
+| Browser | Signed-out agent browser. `/my-wealth` and `/my-wealth/deploy` redirect to Google sign-in. At 390px the primary links sit in the bottom bar. Signed-in holdings were not opened. Saxo authorisation was not opened |
+| `supabase test db` | Blocked. Docker is not running, so the local database was not started and pgTAP was not executed |
 
 Node printed `MODULE_TYPELESS_PACKAGE_JSON` while loading the tests. That is an existing runtime notice. Do not add `"type": "module"` to silence it.
 
@@ -85,7 +85,7 @@ Not re-run: `test:auth`, Playwright, research tests.
 ## 7. Security and engineering
 
 - No Saxo call, token refresh, hosted migration, push or production deployment was made.
-- The in-process refresh map still does not protect two server processes. The new hosted claim does, and it is not wired to the live session.
+- If the process dies after Saxo has rotated the refresh token and before the new ciphertext is stored, the claim stays `refreshing` and the new token is gone. The stored token is the previous one, which Saxo will reject. Recovery is a new localhost sign-in after the stuck row is set back to idle. The lost token cannot be reconstructed. A thrown error in a live process does release the claim. That path is tested. The crash path is not.
 - The live Saxo application credential can still trade at Saxo. Aqil does not send trading requests.
 - Plaintext discovery JSON remains on disk and is gitignored.
 - Google sign-in behaviour was not changed. The agent browser had no session.
@@ -101,7 +101,7 @@ Not re-run: `test:auth`, Playwright, research tests.
 
 ## 9. First task when development resumes
 
-Read this note. Do not refresh Saxo or resume the eight aggregated months unless that is the task. The next useful product step is to sign in locally and judge the cockpit and the deploy-capital example. The next security step is a local database test of the unapplied migrations, still without `db push`.
+Read this note. Sign in once at `http://localhost:3000/my-wealth` with Google, then open Deploy capital, before treating the signed-in screens as checked. Do not refresh Saxo unless that is the task. Start Docker and run `supabase test db` before any hosted migration. Do not `db push`.
 
 ## Commands
 

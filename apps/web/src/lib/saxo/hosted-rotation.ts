@@ -77,6 +77,12 @@ type RefreshOutcome =
 /**
  * One Saxo refresh for a claimed generation.
  * A caller that loses the claim does not call Saxo and does not persist.
+ *
+ * If the process dies after Saxo has rotated the refresh token and before commit,
+ * abort never runs. The row stays `refreshing`, the new token existed only in that
+ * process, and the stored ciphertext is the previous refresh token. Saxo will reject
+ * that previous token. Recovery is a new localhost sign-in after a service-role
+ * reset of the stuck row to idle. There is no way to reconstruct the lost token.
  */
 export async function rotateHostedTokens(input: {
   sessionUserId: string;

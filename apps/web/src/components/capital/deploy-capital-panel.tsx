@@ -1,5 +1,8 @@
-import { exampleDeployment, unconfiguredDeployment } from "@/lib/capital/example";
-import { deployCapital, type ClassExposure, type DeployCapitalResult } from "@/lib/capital/deploy";
+import { deployCapital, type ClassExposure, type DeployCapitalResult, type FxRate } from "@/lib/capital/deploy";
+import { exampleDeployment } from "@/lib/capital/example";
+import { deploymentFromPortfolio, type PortfolioDeployment } from "@/lib/capital/from-portfolio";
+import { formatRetrievedAt, type BrokerPortfolioView } from "@/lib/saxo/portfolio";
+import type { Target } from "@/lib/wealth/allocation";
 import { formatMinor } from "@/lib/wealth/money";
 
 const CLASS_LABELS: Record<ClassExposure["assetClass"], string> = {
@@ -15,15 +18,13 @@ function weight(bps: number): string {
   return `${whole}.${fraction}%`;
 }
 
-function ResultTable({ result }: { result: DeployCapitalResult }) {
+function ResultTable({ result, completeNote }: { result: DeployCapitalResult; completeNote: string }) {
   return (
     <div className="grid gap-[var(--space-4)]">
       {result.missing.length > 0 ? (
-        <p>
-          Not configured: {result.missing.join(", ")}.
-        </p>
+        <p>Not configured: {result.missing.join(", ")}.</p>
       ) : (
-        <p className="text-muted">Targets, budget and approved instruments were supplied for this illustration.</p>
+        <p className="text-muted">{completeNote}</p>
       )}
       {result.exposures.length > 0 ? (
         <div className="overflow-x-auto">
@@ -90,27 +91,66 @@ function ResultTable({ result }: { result: DeployCapitalResult }) {
   );
 }
 
-export function DeployCapitalPanel() {
+export function DeployCapitalPanel({
+  broker,
+  targets,
+  fx,
+}: {
+  broker: BrokerPortfolioView | null;
+  targets: readonly Target[] | null;
+  fx: readonly FxRate[];
+}) {
+  const account: PortfolioDeployment = deploymentFromPortfolio(broker, {
+    targets,
+    fx,
+    instruments: null,
+    additionalCashMinor: null,
+  });
+  const accountResult = account.canCalculate ? deployCapital(account.input) : null;
   const exampleResult = deployCapital(exampleDeployment);
-  const unconfiguredResult = deployCapital(unconfiguredDeployment);
   return (
     <div className="grid gap-[var(--space-6)]" data-testid="deploy-capital">
       <section className="grid gap-[var(--space-3)]">
         <h1 className="aq-page-title">Deploy capital</h1>
         <p className="text-muted">
-          This is a read-only illustration. It does not read your Saxo account, and it will not place a trade.
+          Read only. Reported cash from the saved Saxo snapshot can be used. Holdings stay unclassified until you classify them. No order is sent.
         </p>
+      </section>
+      <section className="grid gap-[var(--space-3)]" data-testid="deploy-account">
+        <h2 className="text-foreground">Saved snapshot</h2>
+        {account.available ? (
+          <p className="text-muted">
+            {account.environment === "simulation" ? "Simulation account" : "Live account"}. Last retrieved{" "}
+            {account.retrievedAt ? formatRetrievedAt(account.retrievedAt) : "at an unknown time"}.
+          </p>
+        ) : (
+          <p className="text-muted">No saved Saxo snapshot is available for this sign-in.</p>
+        )}
+        {account.limitations.map((limitation) => (
+          <p key={limitation} className="text-muted">{limitation}</p>
+        ))}
+        {account.observedHoldings.length > 0 ? (
+          <ul className="grid gap-[var(--space-2)]">
+            {account.observedHoldings.map((holding, index) => (
+              <li key={`${holding.name}-${index}`}>
+                {holding.name}: {holding.valueLabel}. {holding.reason}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {accountResult ? (
+          <ResultTable
+            result={accountResult}
+            completeNote="The saved snapshot and the saved preferences were both present."
+          />
+        ) : null}
       </section>
       <section className="grid gap-[var(--space-3)]" data-testid="deploy-example">
         <h2 className="text-foreground">Example allocation</h2>
         <p className="text-muted">
           The amounts below are made up so the calculation can be inspected. They are not your holdings.
         </p>
-        <ResultTable result={exampleResult} />
-      </section>
-      <section className="grid gap-[var(--space-3)]" data-testid="deploy-unconfigured">
-        <h2 className="text-foreground">Your preferences</h2>
-        <ResultTable result={unconfiguredResult} />
+        <ResultTable result={exampleResult} completeNote="This example supplied its own targets, budget and instrument." />
       </section>
     </div>
   );
