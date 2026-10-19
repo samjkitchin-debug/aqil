@@ -149,3 +149,60 @@ test("holdings that do not add up to the account value do not invent a compositi
   assert.equal(panel.largest, null);
   assert.equal(panel.holdings[0]?.weightLabel, null);
 });
+
+test("open-position loss uses negative tone and label", () => {
+  const broker = portfolio();
+  broker.holdings = broker.holdings.map((holding) => ({ ...holding, profitLoss: "-4" }));
+  broker.holdings[0] = { ...broker.holdings[0], profitLoss: "-6" };
+  const panel = buildWealthPanel({ broker, link: "active", error: null });
+  assert.equal(panel.openPosition?.label, "Open-position loss");
+  assert.equal(panel.openPosition?.tone, "negative");
+  assert.match(panel.openPosition?.amount ?? "", /^-/);
+  assert.equal(panel.holdings[0]?.tone, "negative");
+});
+
+test("account value chart is omitted when Saxo returns fewer than two points", () => {
+  const panel = buildWealthPanel({
+    broker: portfolio({
+      performance: {
+        status: "ok",
+        source: "saxo",
+        scope: "client",
+        period: "Month",
+        currency: "SGD",
+        retrievedAt: "2026-10-18T07:35:05.317Z",
+        fieldGroups: ["Balance_AccountValue"],
+        accountValue: [{ date: "2026-10-18", value: "110" }],
+        timeWeightedAccumulated: [],
+        returnUnit: "fraction",
+      },
+    }),
+    link: "active",
+    error: null,
+  });
+  assert.equal(panel.chart, null);
+});
+
+test("reconnect is distinct from a saved snapshot", () => {
+  const reconnect = buildWealthPanel({ broker: portfolio(), link: "expired", error: "no_session" });
+  assert.equal(reconnect.freshness.connection, "reconnect");
+  assert.equal(reconnect.freshness.connectionLabel, "Reconnect Saxo");
+
+  const saved = buildWealthPanel({ broker: portfolio(), link: "refreshable", error: null });
+  assert.equal(saved.freshness.connection, "saved");
+  assert.equal(saved.freshness.connectionLabel, "Saved snapshot");
+
+  const connected = buildWealthPanel({ broker: portfolio(), link: "active", error: null });
+  assert.equal(connected.freshness.connection, "connected");
+  assert.equal(connected.freshness.connectionLabel, "Saxo is connected");
+});
+
+test("simulation environment is labelled separately from live", () => {
+  const panel = buildWealthPanel({
+    broker: portfolio({ environment: "simulation" }),
+    link: "active",
+    error: null,
+  });
+  assert.equal(panel.simulation, true);
+  assert.equal(panel.freshness.environment, "Simulation account");
+});

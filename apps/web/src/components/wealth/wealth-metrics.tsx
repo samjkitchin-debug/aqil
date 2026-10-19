@@ -1,9 +1,9 @@
 import type { WealthPanel } from "@/lib/wealth/panel";
 
-export function WealthMetrics({ panel, wide = false }: { panel: WealthPanel; wide?: boolean }) {
+export function WealthMetrics({ panel }: { panel: WealthPanel }) {
   const largest = panel.largest;
   return (
-    <section className={wide ? "aq-meters aq-meters--row" : "aq-meters"} aria-label="Account figures">
+    <section className="aq-meters" aria-label="Account figures">
       <article className="aq-meter">
         <h2 className="aq-kicker">Cash balance</h2>
         <p className="aq-meter-value aq-num">{panel.cash ?? "Unavailable"}</p>

@@ -38,15 +38,20 @@ export function BrokerPanel({
           ) : null}
         </div>
       </div>
-      <div className={panel.chart ? "aq-stage aq-stage--chart" : "aq-stage"}>
-        <PortfolioCommand panel={panel} notice={notice} />
-        {panel.chart ? (
-          <ValueChart points={panel.chart.points} from={panel.chart.from} to={panel.chart.to} currency={panel.chart.currency} />
-        ) : (
+      <div className="aq-cockpit">
+        <div className="aq-cockpit-primary">
+          <PortfolioCommand panel={panel} notice={notice} />
           <WealthMetrics panel={panel} />
-        )}
+        </div>
+        {panel.chart ? (
+          <ValueChart
+            points={panel.chart.points}
+            from={panel.chart.from}
+            to={panel.chart.to}
+            currency={panel.chart.currency}
+          />
+        ) : null}
       </div>
-      {panel.chart ? <WealthMetrics panel={panel} wide /> : null}
       <CompositionPanel panel={panel} />
       <HoldingsBoard holdings={panel.holdings} />
       <AccountDetails panel={panel} connectEnabled={connectEnabled} />
