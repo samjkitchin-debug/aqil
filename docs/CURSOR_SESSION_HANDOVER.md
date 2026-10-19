@@ -7,7 +7,8 @@
 
 ## 1. Repository
 
-- Branch `work/aqil-autonomous-build`. Do not push, merge to GitHub `main`, or deploy until the founder asks.
+- Branch `work/aqil-autonomous-build` at `a63a746`. Do not push, merge to GitHub `main`, or deploy until the founder asks.
+- Local branch housekeeping on 20 October 2026 removed integrated agent and milestone branches. `main` was not moved. Branches with unmerged commits were kept: `auth/google-foundation`, `docs/consolidation-2026-10-18`, `m5/live-intelligence-coverage`, `m6/research-methods`, `my-wealth/portfolio-slice` and `research/employment-situation-2026-11`. The Sahm worktree still has an uncommitted test edit.
 - Phase 1 remains the parent checkpoint `85427dd`. The My Wealth cockpit rework is `2481fa8` on `work/my-wealth-cockpit`.
 - Deploy Capital is `6d0328b` on `work/deploy-capital`, merged as `b7589e6`.
 - The hosted token vault is `11853b0` on `work/saxo-token-vault`, merged as `d2179bb`.
