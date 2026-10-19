@@ -11,7 +11,7 @@
     "test:forward-contract": "node --experimental-strip-types --test src/lib/forward/validate-forward-horizon.test.ts",
     "test:auth": "node --experimental-strip-types --test src/lib/auth/auth.test.ts src/lib/auth/refresh-ownership.mock.test.ts",
     "test:wealth": "node --experimental-strip-types --test src/lib/wealth/allocation.test.ts src/lib/wealth/panel.test.ts",
-    "test:capital": "node --experimental-strip-types --test src/lib/capital/deploy.test.ts src/lib/capital/from-portfolio.test.ts",
+    "test:capital": "node --experimental-strip-types --test src/lib/capital/deploy.test.ts src/lib/capital/from-portfolio.test.ts src/lib/capital/policy.test.ts",
     "test:saxo": "node --experimental-strip-types --test src/lib/saxo/sim-guard.test.ts src/lib/saxo/redact.test.ts src/lib/saxo/portfolio.test.ts src/lib/saxo/performance.test.ts src/lib/saxo/link-state.test.ts src/lib/saxo/acquire.test.ts src/lib/saxo/current-account.test.ts src/lib/saxo/history.test.ts src/lib/saxo/hosted-rotation.test.ts",
     "test:e2e": "playwright test"
   },

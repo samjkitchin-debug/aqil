@@ -7,7 +7,7 @@
 
 ## 1. Repository
 
-- Branch `work/aqil-autonomous-build` at `a63a746`. Do not push, merge to GitHub `main`, or deploy until the founder asks.
+- Branch `work/aqil-autonomous-build` at `3ca01da` plus the policy type fix. Do not push, merge to GitHub `main`, or deploy until the founder asks.
 - Local branch housekeeping on 20 October 2026 removed integrated agent and milestone branches. `main` was not moved. Branches with unmerged commits were kept: `auth/google-foundation`, `docs/consolidation-2026-10-18`, `m5/live-intelligence-coverage`, `m6/research-methods`, `my-wealth/portfolio-slice` and `research/employment-situation-2026-11`. The Sahm worktree still has an uncommitted test edit.
 - Phase 1 remains the parent checkpoint `85427dd`. The My Wealth cockpit rework is `2481fa8` on `work/my-wealth-cockpit`.
 - Deploy Capital is `6d0328b` on `work/deploy-capital`, merged as `b7589e6`.
@@ -60,7 +60,7 @@ Money-weighted return was absent from the retrieved v4 performance response. Cor
 ## 5. What this session added
 
 - My Wealth cockpit: standard account value and open-position or time-weighted result sit with cash, investment count, largest holding and connection. The Saxo account-value chart is full width only when at least two points exist.
-- Deploy Capital reads the saved Saxo snapshot when you are signed in. Only reported cash enters the class calculation. Holdings stay unclassified and are listed, not assigned to an asset class. Buying power is not cash. Targets, a budget, approved instruments and FX are used only when they were saved. The example block remains and is labelled as made up. No order is sent.
+- Deploy Capital can save an explicit investment policy for the signed-in user at `apps/web/.local/investment-policy/{userId}.json`. Targets must total 10,000 basis points. A blank budget stays unconfigured. A holding enters the class total only after the founder assigns its class. Reported cash remains investable cash. The example block stays labelled as made up. No order is sent. The hosted wealth tables are still not written.
 - Hosted vault: `saxo_token_vault` and append-only `saxo_source_units` in unapplied migration `20261020120000_saxo_hosted_vault.sql`. Ciphertext is granted to `service_role` only. `rotateHostedTokens` claims a generation before calling Saxo; the loser does not refresh or persist. The local file vault is still the running store. Nothing in the OAuth routes was switched over, and no archive was copied.
 - Review fixes: a thrown refresh or commit releases the vault claim. A one-unit top-up that integer gaps cannot assign stays in the unallocated amount. A foreign-currency buy is sized from the converted total, so per-unit rounding cannot spend more than the budget.
 - Wealth valuation and event inserts in that same unapplied migration now require the instrument to belong to the same owner. This was a cross-owner reference hole in `20261018210000`. It is not applied on the host.
@@ -69,15 +69,17 @@ Money-weighted return was absent from the retrieved v4 performance response. Cor
 
 | Check | Result |
 |---|---|
-| `npm run test:capital` | 14 pass, 0 fail (11 calculation, 3 snapshot mapping) |
+| `npm run test:capital` | 17 pass, 0 fail |
 | `npm run test:wealth` | 20 pass, 0 fail |
 | `npm run test:saxo` | 42 pass, 0 fail, including the hosted vault rotation tests |
+| `npm run test:auth` | 13 pass, 0 fail |
+| `npm run test:db` | pass. 7 files, 89 tests, including `saxo_token_vault_rls.test.sql`. Local disposable database only. Hosted Supabase was not changed |
 | `npm run typecheck` | pass |
 | `npm run lint` | pass |
 | `npm run check:tokens` | pass |
 | `npm run build` | pass. `/my-wealth` and `/my-wealth/deploy` are in the build |
 | Browser | Signed-out agent browser. `/my-wealth` and `/my-wealth/deploy` redirect to Google sign-in. At 390px the primary links sit in the bottom bar. Signed-in holdings were not opened. Saxo authorisation was not opened |
-| `supabase test db` | Blocked. Docker is not running, so the local database was not started and pgTAP was not executed |
+| `supabase test db` | Passed locally as `npm run test:db`: 89 tests, 0 failures. Not applied to the hosted project |
 
 Node printed `MODULE_TYPELESS_PACKAGE_JSON` while loading the tests. That is an existing runtime notice. Do not add `"type": "module"` to silence it.
 

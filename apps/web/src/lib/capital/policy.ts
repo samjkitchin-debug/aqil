@@ -63,6 +63,16 @@ export function additionalCashMinorFromMajor(
   }
 }
 
+export function investableClass(value: string): InvestableClass | null {
+  try {
+    const assetClass = parseAssetClass(value);
+    if (assetClass === "emergency_reserve") return null;
+    return assetClass;
+  } catch {
+    return null;
+  }
+}
+
 export function parseStoredInstrument(row: unknown): StoredInstrument | null {
   if (!row || typeof row !== "object" || Array.isArray(row)) return null;
   const source = row as Record<string, unknown>;
@@ -72,13 +82,8 @@ export function parseStoredInstrument(row: unknown): StoredInstrument | null {
   const minimumUnit = String(source.minimumUnit ?? "").trim();
   const priceMajor = String(source.priceMajor ?? "").trim();
   if (!id || !name || !currency || !minimumUnit || !priceMajor) return null;
-  let assetClass: InvestableClass;
-  try {
-    assetClass = parseAssetClass(String(source.assetClass ?? "")) as InvestableClass;
-    if (assetClass === "emergency_reserve") return null;
-  } catch {
-    return null;
-  }
+  const assetClass = investableClass(String(source.assetClass ?? ""));
+  if (!assetClass) return null;
   const costMajorPerUnit = String(source.costMajorPerUnit ?? "").trim();
   return {
     id,
@@ -117,15 +122,11 @@ export function parseStoredPolicy(raw: unknown): StoredInvestmentPolicy | null {
   for (const row of source.targets) {
     if (!row || typeof row !== "object" || Array.isArray(row)) return null;
     const item = row as Record<string, unknown>;
-    try {
-      const assetClass = parseAssetClass(String(item.assetClass ?? "")) as InvestableClass;
-      if (assetClass === "emergency_reserve") return null;
+    const assetClass = investableClass(String(item.assetClass ?? ""));
+    if (!assetClass) return null;
       const targetWeightBps = Number(item.targetWeightBps);
       if (!Number.isInteger(targetWeightBps)) return null;
       targets.push({ assetClass, targetWeightBps });
-    } catch {
-      return null;
-    }
   }
   const additionalCashMajor =
     source.additionalCashMajor === null
@@ -147,13 +148,9 @@ export function parseStoredPolicy(raw: unknown): StoredInvestmentPolicy | null {
   const holdingClasses: Record<string, InvestableClass> = {};
   for (const [key, value] of Object.entries(source.holdingClasses as Record<string, unknown>)) {
     if (!key.trim()) continue;
-    try {
-      const assetClass = parseAssetClass(String(value ?? "")) as InvestableClass;
-      if (assetClass === "emergency_reserve") return null;
+      const assetClass = investableClass(String(value ?? ""));
+      if (!assetClass) return null;
       holdingClasses[key] = assetClass;
-    } catch {
-      return null;
-    }
   }
   return {
     version: POLICY_VERSION,

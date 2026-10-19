@@ -4,9 +4,10 @@ import { redirect } from "next/navigation";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-import { parseAssetClass, type InvestableClass } from "../wealth/allocation.ts";
+import type { InvestableClass } from "../wealth/allocation.ts";
 import {
   assertPolicyTargets,
+  investableClass,
   parseAdditionalCashMajor,
   parseStoredInstrument,
   targetsFromPercentFields,
@@ -28,13 +29,9 @@ function parseHoldingClasses(formData: FormData): Record<string, InvestableClass
     const key = decodeURIComponent(name.slice("holding_class__".length));
     const selected = String(value ?? "").trim();
     if (!key || !selected) continue;
-    try {
-      const assetClass = parseAssetClass(selected) as InvestableClass;
-      if (assetClass === "emergency_reserve") continue;
+      const assetClass = investableClass(selected);
+      if (!assetClass) continue;
       holdingClasses[key] = assetClass;
-    } catch {
-      continue;
-    }
   }
   return holdingClasses;
 }
