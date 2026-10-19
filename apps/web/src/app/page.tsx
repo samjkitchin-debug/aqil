@@ -4,6 +4,7 @@ import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
 import { ResearchEmptyState } from "@/components/research/research-empty-state";
 import { ResearchInsightView } from "@/components/research/research-insight-view";
+import { TodaySyntheticStoryTangentLink } from "@/components/research/today-story-tangent-link";
 import { ForwardHorizonSection } from "@/components/forward/forward-horizon-section";
 import { loadForwardHorizonBundle } from "@/lib/forward/load-forward-horizon";
 import { loadFounderResearchInsight } from "@/lib/research/load-founder-insight";
@@ -28,7 +29,12 @@ async function MacroIntelligenceSection() {
         ? "unauthorized"
         : "missing";
 
-  return <ResearchEmptyState reason={reason} />;
+  return (
+    <>
+      <ResearchEmptyState reason={reason} />
+      {reason !== "unauthorized" ? <TodaySyntheticStoryTangentLink /> : null}
+    </>
+  );
 }
 
 async function HorizonSection() {
