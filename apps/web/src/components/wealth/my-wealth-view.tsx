@@ -26,10 +26,11 @@ export function MyWealthView({
   connectEnabled: boolean;
 }) {
   const broker = load.status === "unauthorized" ? null : load.broker;
+  const link = load.status === "unauthorized" ? "unknown" : load.link;
   if (load.status === "storage_pending") {
     return (
       <div data-testid="wealth-pending">
-        <BrokerSection broker={broker} error={error} connectEnabled={connectEnabled} heading="h1" />
+        <BrokerSection broker={broker} link={link} error={error} connectEnabled={connectEnabled} heading="h1" />
       </div>
     );
   }
@@ -69,13 +70,12 @@ export function MyWealthView({
 
   return (
     <div className="grid gap-[var(--space-6)]">
-      {broker ? <BrokerSection broker={broker} error={error} connectEnabled={connectEnabled} heading="h1" /> : null}
+      {broker ? <BrokerSection broker={broker} link={link} error={error} connectEnabled={connectEnabled} heading="h1" /> : null}
       {showRecorded ? (
-        <>
+        <details className="aq-recorded" open={broker ? undefined : true}>
+      <summary className={broker ? undefined : "sr-only"}>{broker ? "Accounts recorded outside Saxo" : "Recorded accounts"}</summary>
       <section>
-        {broker ? (
-          <h2 className="font-semibold text-foreground">Recorded outside Saxo</h2>
-        ) : (
+        {broker ? null : (
           <h1 className="aq-page-title">My wealth</h1>
         )}
         <p className="mt-[var(--space-3)] text-muted">
@@ -83,7 +83,7 @@ export function MyWealthView({
             ? `Recorded investable total ${formatMinor(total.amountMinor, total.currency)}. Emergency reserves are excluded.`
             : "A combined total of recorded accounts is unavailable. Native amounts are shown separately."}
         </p>
-        {broker ? null : <BrokerSection broker={broker} error={error} connectEnabled={connectEnabled} heading="h2" />}
+        {broker ? null : <BrokerSection broker={broker} link={link} error={error} connectEnabled={connectEnabled} heading="h2" />}
         {error && !saxoErrorMessage(error) ? <p className="mt-[var(--space-3)] text-foreground">That entry could not be saved.</p> : null}
         {snapshot && snapshot.quarantined.length > 0 ? (
           <p className="mt-[var(--space-3)] text-foreground">
@@ -241,7 +241,7 @@ export function MyWealthView({
           </button>
         </form>
       </section>
-        </>
+        </details>
       ) : null}
     </div>
   );

@@ -3,6 +3,7 @@ import "server-only";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
+import { classifySaxoLink, type SaxoLinkState } from "./link-state";
 import { repairStoredPortfolio, type BrokerPortfolioView } from "./portfolio";
 import type { SaxoEnvironment, SaxoTokens } from "./sim-guard";
 import { decryptJson, encryptJson } from "./token-crypto";
@@ -77,6 +78,44 @@ async function readStoredSession(
   } catch {
     return null;
   }
+}
+
+type SessionClock = { accessExpiresAt: number; refreshExpiresAt: number };
+
+async function probeSessionClock(
+  userId: string,
+  environment: SaxoEnvironment,
+  file: string,
+  encryptionKey: Buffer,
+): Promise<{ status: "ok"; clock: SessionClock } | { status: "absent" } | { status: "unreadable" }> {
+  try {
+    const decrypted = decryptJson(await readFile(file, "utf8"), encryptionKey);
+    if (!decrypted || typeof decrypted !== "object") return { status: "unreadable" };
+    const parsed = decrypted as StoredSession;
+    if (parsed.userId !== userId || parsed.environment !== environment) return { status: "unreadable" };
+    if (!parsed.accessToken || !parsed.refreshToken) return { status: "unreadable" };
+    return {
+      status: "ok",
+      clock: { accessExpiresAt: parsed.accessExpiresAt, refreshExpiresAt: parsed.refreshExpiresAt },
+    };
+  } catch (error) {
+    if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") return { status: "absent" };
+    return { status: "unreadable" };
+  }
+}
+
+/** Reports whether a saved Saxo sign-in can still be used. Tokens stay on the server. */
+export async function readSaxoLinkState(
+  userId: string,
+  environment: SaxoEnvironment,
+  encryptionKey: Buffer,
+  nowMs: number,
+): Promise<SaxoLinkState> {
+  const specific = await probeSessionClock(userId, environment, sessionPath(userId, environment), encryptionKey);
+  const chosen = specific.status === "absent" ? await probeSessionClock(userId, environment, sessionPath(userId), encryptionKey) : specific;
+  if (chosen.status === "absent") return "absent";
+  if (chosen.status === "unreadable") return "unknown";
+  return classifySaxoLink(chosen.clock, nowMs);
 }
 
 export async function readSaxoSession(

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { connection } from "next/server";
 import { cache } from "react";
 
 import { classifyAuthFailure, type AccessStatus } from "@/lib/auth/session-policy";
@@ -24,6 +25,7 @@ function rethrowRedirect(error: unknown): void {
 }
 
 async function resolveAccessOnce(): Promise<AccessResolution> {
+  await connection();
   if (!isSupabaseConfigured()) return { status: "temporarily_unavailable" };
 
   try {

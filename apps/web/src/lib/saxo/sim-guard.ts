@@ -19,18 +19,38 @@ const ALLOWED_GET_PREFIXES = [
   "/port/v1/users/me",
   "/port/v1/accounts/me",
   "/port/v1/accounts",
+  "/port/v1/accountgroups",
   "/port/v1/balances/me",
   "/port/v1/balances",
   "/port/v1/positions/me",
   "/port/v1/positions",
   "/port/v1/netpositions/me",
   "/port/v1/netpositions",
+  "/port/v1/closedpositions",
+  "/port/v1/exposure",
+  "/port/v1/orders",
   "/ref/v1/instruments/details",
+  "/ref/v1/exchanges",
   "/trade/v1/infoprices",
+  "/chart/v3/charts",
+  "/hist/v1/transactions",
+  "/hist/v3/positions",
+  "/hist/v3/accountvalues",
+  "/hist/v3/perf",
+  "/hist/v4/performance/summary",
   "/hist/v4/performance/timeseries",
+  "/cs/v1/audit/orderactivities",
+  "/cs/v1/reports/bookings",
+  "/cs/v1/reports/trades",
+  "/cs/v1/reports/closedPositions",
+  "/cs/v1/reports/aggregatedAmounts",
+  "/ca/v2/events",
 ] as const;
 
-const BLOCKED_GET_MARKERS = ["order", "withdraw", "transfer", "subscription", "trade/v2"];
+/** Reads of open orders and order history. Every other order path stays refused. */
+const ORDER_READ_PREFIXES = ["/port/v1/orders", "/cs/v1/audit/orderactivities"] as const;
+
+const BLOCKED_GET_MARKERS = ["withdraw", "transfer", "subscription", "trade/v2"];
 
 export function saxoDiscoveryAllowed(input: {
   nodeEnv: string | undefined;
@@ -154,6 +174,7 @@ export function saxoReadUrl(pathAndQuery: string, environment: SaxoEnvironment =
   const pathOnly = pathAndQuery.split("?")[0] ?? "";
   const lower = pathOnly.toLowerCase();
   if (BLOCKED_GET_MARKERS.some((marker) => lower.includes(marker))) return null;
+  if (lower.includes("order") && !orderReadAllowed(pathOnly)) return null;
   const allowed = ALLOWED_GET_PREFIXES.some(
     (prefix) => pathOnly === prefix || pathOnly.startsWith(`${prefix}/`),
   );
@@ -214,6 +235,18 @@ export function saxoInstrumentRefs(body: unknown): SaxoInstrumentRef[] {
     found.push({ uic, assetType });
   });
   return found;
+}
+
+export function saxoEndpointFamily(pathAndQuery: string): string | null {
+  const pathOnly = pathAndQuery.split("?")[0] ?? "";
+  const match = ALLOWED_GET_PREFIXES.filter((prefix) => pathOnly === prefix || pathOnly.startsWith(`${prefix}/`)).sort(
+    (left, right) => right.length - left.length,
+  )[0];
+  return match ?? null;
+}
+
+function orderReadAllowed(pathOnly: string): boolean {
+  return ORDER_READ_PREFIXES.some((prefix) => pathOnly === prefix || pathOnly.startsWith(`${prefix}/`));
 }
 
 function arrayData(body: unknown): unknown[] {

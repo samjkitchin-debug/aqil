@@ -171,6 +171,30 @@ test("a fresh snapshot is not replaced by the legacy zero repair", () => {
   assert.equal(repairStoredPortfolio(fresh).retrievedAt, fresh.retrievedAt);
 });
 
+test("account currency market value is the base-currency field", () => {
+  const view = normaliseSaxoPortfolio({
+    environment: "live",
+    retrievedAt: "2026-10-19T00:00:00.000Z",
+    pagesComplete: true,
+    accountsBody: { Data: [{ AccountKey: "key-1", AccountId: "hidden", Currency: "SGD" }] },
+    clientBalance: null,
+    accountBalances: [{ AccountKey: "key-1", Currency: "SGD", CashBalance: 1, TotalValue: 17 }],
+    positionsBody: { Data: [] },
+    netPositionsBody: {
+      Data: [
+        {
+          DisplayAndFormat: { Symbol: "VWRA:xlon", Description: "World", Currency: "USD" },
+          NetPositionBase: { AccountId: "hidden", Amount: 2, AssetType: "Etf", Uic: 21 },
+          NetPositionView: { CurrentPrice: 10, MarketValue: 100, MarketValueInBaseCurrency: 16 },
+        },
+      ],
+    },
+  });
+  assert.equal(view.holdings[0]?.marketValue, "16");
+  assert.equal(view.holdings[0]?.currency, "SGD");
+  assert.equal(view.holdings[0]?.tradingCurrency, "USD");
+});
+
 test("token payload round-trips and rejects a changed ciphertext", () => {
   const key = saxoEncryptionKey(Buffer.alloc(32, 7).toString("base64"));
   assert.ok(key);

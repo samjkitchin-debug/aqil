@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
 @import "../styles/layout.css";
+@import "../styles/wealth.css";
 @import "../styles/research.css";
 @import "../styles/legal.css";
 @import "../styles/forward.css";

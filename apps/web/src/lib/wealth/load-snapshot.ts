@@ -4,7 +4,9 @@ import { connection } from "next/server";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-import { readBrokerPortfolio } from "@/lib/saxo/sim-session";
+import type { SaxoLinkState } from "@/lib/saxo/link-state";
+import { readBrokerPortfolio, readSaxoLinkState } from "@/lib/saxo/sim-session";
+import { saxoEncryptionKey } from "@/lib/saxo/token-crypto";
 
 import { parseAssetClass, type AssetClass, type Environment } from "./allocation";
 import type { BrokerPortfolioView } from "@/lib/saxo/portfolio";
@@ -43,9 +45,9 @@ export type WealthSnapshot = {
 
 export type WealthLoad =
   | { status: "unauthorized" }
-  | { status: "storage_pending"; broker: BrokerPortfolioView | null }
-  | { status: "empty"; broker: BrokerPortfolioView | null }
-  | { status: "ok"; snapshot: WealthSnapshot; broker: BrokerPortfolioView | null };
+  | { status: "storage_pending"; broker: BrokerPortfolioView | null; link: SaxoLinkState }
+  | { status: "empty"; broker: BrokerPortfolioView | null; link: SaxoLinkState }
+  | { status: "ok"; snapshot: WealthSnapshot; broker: BrokerPortfolioView | null; link: SaxoLinkState };
 
 function relationMissing(error: { code?: string; message?: string } | null): boolean {
   if (!error) return false;
@@ -70,8 +72,12 @@ export async function loadWealthSnapshot(): Promise<WealthLoad> {
 
   const errors = [accountsRes.error, instrumentsRes.error, valuationsRes.error, targetsRes.error, fxRes.error, profileRes.error];
   const broker = await readBrokerPortfolio(auth.user.id);
-  if (errors.some(relationMissing)) return { status: "storage_pending", broker };
-  if (errors.some(Boolean)) return { status: "empty", broker };
+  const encryptionKey = saxoEncryptionKey(process.env.SAXO_TOKEN_ENCRYPTION_KEY);
+  const link: SaxoLinkState = encryptionKey
+    ? await readSaxoLinkState(auth.user.id, broker?.environment ?? "live", encryptionKey, Date.now())
+    : "unknown";
+  if (errors.some(relationMissing)) return { status: "storage_pending", broker, link };
+  if (errors.some(Boolean)) return { status: "empty", broker, link };
 
   const accounts: WealthAccount[] = (accountsRes.data ?? []).map((row) => ({
     id: row.id,
@@ -82,7 +88,7 @@ export async function loadWealthSnapshot(): Promise<WealthLoad> {
     sourceStatus: row.source_status,
   }));
   if (accounts.length === 0 && (valuationsRes.data ?? []).length === 0) {
-    return { status: "empty", broker };
+    return { status: "empty", broker, link };
   }
 
   const accountById = new Map(accounts.map((account) => [account.id, account]));
@@ -120,6 +126,7 @@ export async function loadWealthSnapshot(): Promise<WealthLoad> {
   return {
     status: "ok",
     broker,
+    link,
     snapshot: {
       reportingCurrency: profileRes.data?.reporting_currency ?? "SGD",
       accounts,

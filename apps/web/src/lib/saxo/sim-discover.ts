@@ -5,7 +5,7 @@ import path from "node:path";
 
 import { catalogueJson, type FieldObservation } from "./redact.ts";
 import { saxoArtifactDir, readSaxoSession, writeSaxoSession } from "./sim-session.ts";
-import { requestSaxoToken } from "./sim-http.ts";
+import { refreshSaxoTokens } from "./refresh-flight.ts";
 import {
   saxoAccountRefs,
   saxoClientKey,
@@ -38,19 +38,17 @@ export async function discoverSaxoSimulation(input: {
 
   let accessToken = session.accessToken;
   if (session.accessExpiresAt <= input.nowMs + 15_000) {
-    const refreshed = await requestSaxoToken(
-      {
-        grant: "refresh_token",
-        environment: input.environment,
-        refreshToken: session.refreshToken,
-        appKey: input.appKey,
-        appSecret: input.appSecret,
-        redirectUri: input.redirectUri,
-      },
-      fetch,
-    );
+    const refreshed = await refreshSaxoTokens({
+      userId: input.userId,
+      environment: input.environment,
+      refreshToken: session.refreshToken,
+      appKey: input.appKey,
+      appSecret: input.appSecret,
+      redirectUri: input.redirectUri,
+      fetchImpl: fetch,
+      persist: (tokens) => writeSaxoSession(input.userId, input.environment, tokens, input.encryptionKey, input.nowMs),
+    });
     if (!refreshed.ok) return { ok: false, reason: "refresh_failed" };
-    await writeSaxoSession(input.userId, input.environment, refreshed.tokens, input.encryptionKey, input.nowMs);
     accessToken = refreshed.tokens.accessToken;
   }
 

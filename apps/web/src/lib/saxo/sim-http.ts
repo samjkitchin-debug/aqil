@@ -1,3 +1,4 @@
+import { saxoErrorCode } from "./errors.ts";
 import { parseSaxoTokenResponse, saxoEndpoints, type SaxoEnvironment, type SaxoTokens } from "./sim-guard.ts";
 
 type FetchLike = (input: string, init: { method: string; headers: Record<string, string>; body: string }) => Promise<{
@@ -17,13 +18,13 @@ export async function requestSaxoToken(
     redirectUri: string;
   },
   fetchImpl: FetchLike,
-): Promise<{ ok: true; tokens: SaxoTokens } | { ok: false; status: number }> {
+): Promise<{ ok: true; tokens: SaxoTokens } | { ok: false; status: number; errorCode: string | null }> {
   const body = new URLSearchParams({ grant_type: input.grant, redirect_uri: input.redirectUri });
   if (input.grant === "authorization_code") {
-    if (!input.code) return { ok: false, status: 0 };
+    if (!input.code) return { ok: false, status: 0, errorCode: null };
     body.set("code", input.code);
   } else {
-    if (!input.refreshToken) return { ok: false, status: 0 };
+    if (!input.refreshToken) return { ok: false, status: 0, errorCode: null };
     body.set("refresh_token", input.refreshToken);
   }
   const basic = Buffer.from(`${input.appKey}:${input.appSecret}`, "utf8").toString("base64");
@@ -38,14 +39,22 @@ export async function requestSaxoToken(
       body: body.toString(),
     });
   } catch {
-    return { ok: false, status: 0 };
+    return { ok: false, status: 0, errorCode: null };
   }
-  if (!response.ok) return { ok: false, status: response.status };
+  if (!response.ok) {
+    let errorCode: string | null = null;
+    try {
+      errorCode = saxoErrorCode(await response.json());
+    } catch {
+      errorCode = null;
+    }
+    return { ok: false, status: response.status, errorCode };
+  }
   try {
     const tokens = parseSaxoTokenResponse(await response.json());
-    if (!tokens) return { ok: false, status: response.status };
+    if (!tokens) return { ok: false, status: response.status, errorCode: null };
     return { ok: true, tokens };
   } catch {
-    return { ok: false, status: response.status };
+    return { ok: false, status: response.status, errorCode: null };
   }
 }

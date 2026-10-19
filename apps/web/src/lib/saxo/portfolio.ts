@@ -334,11 +334,11 @@ function valuationFrom(
   marketValue: string | null;
   basis: "live" | "broker-market-value" | null;
 } {
-  const liveValue = numberText(prices, "MarketValue");
+  const baseValue = numberText(prices, "MarketValueInBaseCurrency");
   const livePrice = numberText(prices, "CurrentPrice");
   const price = livePrice !== null && livePrice !== "0" ? livePrice : null;
-  if (liveValue !== null && liveValue !== "0") {
-    return { price, marketValue: liveValue, basis: "live" };
+  if (baseValue !== null && baseValue !== "0") {
+    return { price, marketValue: baseValue, basis: "live" };
   }
   if (collateralAmount && collateralAmount !== "0") {
     return { price, marketValue: collateralAmount, basis: "broker-market-value" };
