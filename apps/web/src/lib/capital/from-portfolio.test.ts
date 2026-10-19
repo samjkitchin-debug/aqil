@@ -3,6 +3,7 @@ import test from "node:test";
 
 import type { BrokerPortfolioView } from "../saxo/portfolio.ts";
 import { deploymentFromPortfolio } from "./from-portfolio.ts";
+import { brokerHoldingKey } from "./holding-key.ts";
 
 function broker(overrides: Partial<BrokerPortfolioView> = {}): BrokerPortfolioView {
   return {
@@ -42,7 +43,7 @@ function broker(overrides: Partial<BrokerPortfolioView> = {}): BrokerPortfolioVi
   };
 }
 
-const none = { targets: null, fx: [], instruments: null, additionalCashMinor: null };
+const none = { targets: null, fx: [], instruments: null, additionalCashMinor: null, holdingClasses: {} };
 
 test("reported cash is used and unclassified holdings are left out", () => {
   const result = deploymentFromPortfolio(broker(), none);
@@ -82,4 +83,16 @@ test("a missing snapshot does not invent an account", () => {
   assert.equal(result.available, false);
   assert.equal(result.input.classValues.length, 0);
   assert.match(result.limitations[0] ?? "", /No saved Saxo snapshot/);
+});
+
+test("a classified holding is included in the class total", () => {
+  const holding = broker().holdings[0];
+  assert.ok(holding);
+  const key = brokerHoldingKey(holding);
+  const result = deploymentFromPortfolio(broker(), {
+    ...none,
+    holdingClasses: { [key]: "global_equity" },
+  });
+  assert.equal(result.input.classValues.some((row) => row.assetClass === "global_equity" && row.amountMinor === 8000n), true);
+  assert.match(result.observedHoldings[0]?.reason ?? "", /included/);
 });

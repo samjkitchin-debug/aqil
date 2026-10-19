@@ -3,16 +3,14 @@ import { Suspense } from "react";
 import { AppShell } from "@/components/app-shell";
 import { PrivatePage } from "@/components/auth/private-page";
 import { DeployCapitalPanel } from "@/components/capital/deploy-capital-panel";
+import { readInvestmentPolicy } from "@/lib/capital/policy-file";
+import { emptyInvestmentPolicy, formDefaultsFromStored } from "@/lib/capital/policy";
 import { loadWealthSnapshot } from "@/lib/wealth/load-snapshot";
-import type { Target } from "@/lib/wealth/allocation";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 async function DeployBody() {
   const load = await loadWealthSnapshot();
   const broker = load.status === "unauthorized" ? null : load.broker;
-  const targets: Target[] | null =
-    load.status === "ok"
-      ? load.snapshot.targets.filter((target): target is Target => target.assetClass !== "emergency_reserve")
-      : null;
   const fx =
     load.status === "ok"
       ? load.snapshot.fx.map((rate) => ({
@@ -21,7 +19,15 @@ async function DeployBody() {
           rate: rate.rate,
         }))
       : [];
-  return <DeployCapitalPanel broker={broker} targets={targets && targets.length > 0 ? targets : null} fx={fx} />;
+  const reportingCurrency =
+    broker?.accounts.find((account) => account.currency)?.currency ??
+    (load.status === "ok" ? load.snapshot.reportingCurrency : "SGD");
+  const supabase = await createSupabaseServerClient();
+  const { data: auth } = await supabase.auth.getUser();
+  const policy = auth.user
+    ? await readInvestmentPolicy(auth.user.id, reportingCurrency)
+    : { runtime: emptyInvestmentPolicy(), form: formDefaultsFromStored(null) };
+  return <DeployCapitalPanel broker={broker} fx={fx} policy={policy} />;
 }
 
 export default function DeployCapitalPage() {
