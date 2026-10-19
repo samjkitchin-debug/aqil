@@ -126,7 +126,7 @@ function weightBps(amounts: readonly bigint[]): number[] {
   const total = amounts.reduce((sum, amount) => sum + amount, BigInt(0));
   if (total === BigInt(0)) return amounts.map(() => 0);
   const weights = amounts.map((amount) => Number((amount * BigInt(10000)) / total));
-  let drift = 10000 - weights.reduce((sum, weight) => sum + weight, 0);
+  const drift = 10000 - weights.reduce((sum, weight) => sum + weight, 0);
   if (drift !== 0) {
     let index = 0;
     for (let i = 1; i < amounts.length; i += 1) {
@@ -249,7 +249,7 @@ export function deployCapital(input: DeployCapitalInput): DeployCapitalResult {
   const exposures: ClassExposure[] = classValues.map((row, index) => {
     const target = targets.find((item) => item.assetClass === row.assetClass);
     const gap = gaps.find((item) => item.assetClass === row.assetClass);
-    const gapMinor = gap?.gapMinor ?? BigInt(0);
+    const gapMinor = target ? (gap?.gapMinor ?? BigInt(0)) : -row.currentMinor;
     return {
       assetClass: row.assetClass,
       currentMinor: row.currentMinor,

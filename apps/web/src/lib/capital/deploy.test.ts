@@ -115,6 +115,24 @@ test("an empty approved list is not configured", () => {
   assert.equal(result.exposures[0]?.deploymentMinor, 10001n);
 });
 
+test("a held class with no target is overweight and receives no new cash", () => {
+  const result = deployCapital(
+    input({
+      classValues: [
+        { assetClass: "global_equity", currency: "SGD", amountMinor: 0n },
+        { assetClass: "thematic_technology", currency: "SGD", amountMinor: 5000n },
+      ],
+      additionalCashMinor: 1000n,
+      instruments: [equity],
+    }),
+  );
+  const thematic = result.exposures.find((row) => row.assetClass === "thematic_technology");
+  assert.equal(thematic?.targetWeightBps, 0);
+  assert.equal(thematic?.side, "overweight");
+  assert.equal(thematic?.deploymentMinor, 0n);
+  assert.equal(result.instruments.some((row) => row.assetClass === "thematic_technology"), false);
+});
+
 test("listed instruments are filled in order and a per-unit cost is kept", () => {
   const result = deployCapital(
     input({

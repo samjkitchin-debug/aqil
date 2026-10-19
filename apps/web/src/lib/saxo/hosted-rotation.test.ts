@@ -4,6 +4,7 @@ import test from "node:test";
 import { saxoEncryptionKey } from "./token-crypto.ts";
 import {
   createMemoryVaultStore,
+  createSqlVaultStore,
   rotateHostedTokens,
   sealTokens,
   type VaultStore,
@@ -150,4 +151,31 @@ test("a commit that loses the generation discards the new tokens", async () => {
   const saved = await store.read("owner-1", "live");
   assert.equal(saved?.ciphertext, ciphertext);
   assert.equal(saved?.ciphertext.includes("should-not-persist"), false);
+});
+
+test("the sql claim updates only an idle matching generation", async () => {
+  const statements: string[] = [];
+  let calls = 0;
+  const store = createSqlVaultStore(async (statement) => {
+    statements.push(statement);
+    calls += 1;
+    if (calls === 1) return [{ generation: 4 }];
+    return [];
+  });
+  const claim = await store.claim("owner-1", "live", 3);
+  assert.deepEqual(claim, { ok: true, generation: 4 });
+  assert.match(statements[0] ?? "", /generation = \$3/);
+  assert.match(statements[0] ?? "", /status = 'idle'/);
+  const missed = await store.claim("owner-1", "simulation", 3);
+  assert.deepEqual(missed, { ok: false });
+  const read = await createSqlVaultStore(async () => [
+    {
+      user_id: "owner-1",
+      environment: "live",
+      ciphertext: "v1.bm9uY2U.Y2lwaGVy",
+      generation: "2",
+      status: "idle",
+    },
+  ]).read("owner-1", "live");
+  assert.equal(read?.generation, 2);
 });

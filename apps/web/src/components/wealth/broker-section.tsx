@@ -40,6 +40,11 @@ export function BrokerSection({
       <section className="aq-wealth">
         {heading === "h1" ? <Title className="aq-wealth-title">My wealth</Title> : null}
         {message ? <p>{message}</p> : null}
+        <p>
+          <a className="aq-quiet-link" href="/my-wealth/deploy">
+            Deploy capital
+          </a>
+        </p>
         {connectEnabled ? (
           <p>
             <a className="aq-button" href="/auth/saxo?environment=live">

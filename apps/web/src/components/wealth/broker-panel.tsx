@@ -31,6 +31,9 @@ export function BrokerPanel({
           <a className="aq-quiet-link" href="#holdings">
             View holdings
           </a>
+          <a className="aq-quiet-link" href="/my-wealth/deploy">
+            Deploy capital
+          </a>
           {connectEnabled ? (
             <a className={action.attention ? "aq-pill aq-pill--attention" : "aq-pill"} href={action.href}>
               {action.label}

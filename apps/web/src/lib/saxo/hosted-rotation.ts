@@ -123,6 +123,75 @@ export async function rotateHostedTokens(input: {
   return { ok: true, tokens: refreshed.tokens, generation: claim.generation };
 }
 
+export type SqlExecutor = (statement: string, params: readonly unknown[]) => Promise<Record<string, unknown>[]>;
+
+function asGeneration(value: unknown): number | null {
+  if (typeof value === "number" && Number.isInteger(value) && value > 0) return value;
+  if (typeof value === "string" && /^[1-9]\d*$/.test(value)) {
+    const parsed = Number(value);
+    return Number.isSafeInteger(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function rowFromSql(record: Record<string, unknown>): VaultRow | null {
+  const generation = asGeneration(record.generation);
+  if (
+    typeof record.user_id !== "string" ||
+    (record.environment !== "live" && record.environment !== "simulation") ||
+    typeof record.ciphertext !== "string" ||
+    generation === null ||
+    (record.status !== "idle" && record.status !== "refreshing")
+  ) {
+    return null;
+  }
+  return {
+    userId: record.user_id,
+    environment: record.environment,
+    ciphertext: record.ciphertext,
+    generation,
+    status: record.status,
+  };
+}
+
+/**
+ * Compare-and-swap statements for saxo_token_vault.
+ * The executor must be a service-role client created only after assertVaultOwner.
+ */
+export function createSqlVaultStore(execute: SqlExecutor): VaultStore {
+  return {
+    async read(userId, environment) {
+      const rows = await execute(
+        "select user_id, environment, ciphertext, generation, status from public.saxo_token_vault where user_id = $1 and environment = $2",
+        [userId, environment],
+      );
+      return rows[0] ? rowFromSql(rows[0]) : null;
+    },
+    async claim(userId, environment, expectedGeneration) {
+      const rows = await execute(
+        "update public.saxo_token_vault set generation = generation + 1, status = 'refreshing' where user_id = $1 and environment = $2 and generation = $3 and status = 'idle' returning generation",
+        [userId, environment, expectedGeneration],
+      );
+      const generation = asGeneration(rows[0]?.generation);
+      return generation === null ? { ok: false } : { ok: true, generation };
+    },
+    async commit(userId, environment, generation, ciphertext) {
+      if (!ciphertext.startsWith("v1.")) return false;
+      const rows = await execute(
+        "update public.saxo_token_vault set ciphertext = $4, status = 'idle' where user_id = $1 and environment = $2 and generation = $3 and status = 'refreshing' returning generation",
+        [userId, environment, generation, ciphertext],
+      );
+      return rows.length === 1;
+    },
+    async abort(userId, environment, generation) {
+      await execute(
+        "update public.saxo_token_vault set status = 'idle' where user_id = $1 and environment = $2 and generation = $3 and status = 'refreshing'",
+        [userId, environment, generation],
+      );
+    },
+  };
+}
+
 /** In-memory stand-in for the hosted compare-and-swap. Claims are serialised per row. */
 export function createMemoryVaultStore(initial: VaultRow): VaultStore {
   let row: VaultRow | null = { ...initial };

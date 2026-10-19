@@ -1,17 +1,20 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 19 October 2026, Phase 1 close-out  
-**Parent:** `c9ea596afbcdb1e81a995fd592cdf9d73a6c58ba` on `alignment/2026-10-18`  
-**Checkpoint:** this Phase 1 close-out is committed locally on `work/aqil-autonomous-build` and has not been pushed. Production, hosted migrations and Saxo LIVE stay unchanged.
+**Last updated:** 20 October 2026, local Phase 2 slice  
+**Parent:** `2481fa862d2ff38fe1b79d5cabc1835cbd22c891` on `work/aqil-autonomous-build`  
+**Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo LIVE stay unchanged.
 
 ## 1. Repository
 
-- Branch `alignment/2026-10-18`. HEAD `c9ea596` is “Align generated database types with the local wealth schema.”
-- Phase 1 Saxo modules, the My Wealth panel and these documentation edits are the local checkpoint on `work/aqil-autonomous-build`. Do not push, merge or deploy until the founder asks.
+- Branch `work/aqil-autonomous-build`. Do not push, merge to GitHub `main`, or deploy until the founder asks.
+- Phase 1 remains the parent checkpoint `85427dd`. The My Wealth cockpit rework is `2481fa8` on `work/my-wealth-cockpit`.
+- Deploy Capital is `6d0328b` on `work/deploy-capital`, merged as `b7589e6`.
+- The hosted token vault is `11853b0` on `work/saxo-token-vault`, merged as `d2179bb`.
 - Production stays the existing Vercel deployment from GitHub `main`. It was not touched.
-- Hosted Supabase `ojvswermsbbaltjohqph` still has five migrations. `20261018200000` and `20261018210000` are local only. Do not apply them without founder approval.
-- One shared shell. Primary navigation is Today, My Wealth and Intelligence. My Wealth is the instrument panel already in the working tree: the headline is the standard account value when it matches cash plus holdings. Open-position gain is Saxo’s result since the positions were opened, not a period return. The page reads the saved snapshot and does not call Saxo on load.
+- Hosted Supabase `ojvswermsbbaltjohqph` still has five migrations. `20261018200000`, `20261018210000` and `20261020120000` are local only. Do not apply them without founder approval.
+- One shared shell. Primary navigation is Today, My Wealth and Intelligence. Deploy capital is `/my-wealth/deploy`, not a fourth destination.
+- My Wealth still reads the saved snapshot and does not call Saxo on load. The headline is the standard account value when it matches cash plus holdings. Open-position gain is Saxo's result since the positions were opened, not a period return.
 
 ## 2. Phase 1 completed
 
@@ -22,17 +25,17 @@ Accepted as the local foundation for current portfolio data, booked financial hi
 - Source responses are encrypted local archive units. A later partial does not erase an earlier version.
 - Historical acquisition can resume from the manifest. See the exception in section 4 before resuming aggregated amounts.
 - My Wealth remains compatible with the current snapshot.
-- Latest complete windows, checked by decrypting the local archive on 19 October 2026: 312 transactions, 628 nested bookings, 534 booking-report rows, 140 trade-report rows, 89 historical closed positions, 88 closed-position report rows, 501 account-value observations. Coverage begins 13 November 2024. The AllTime body includes Saxo’s time-weighted block.
+- Latest complete windows, checked by decrypting the local archive on 19 October 2026: 312 transactions, 628 nested bookings, 534 booking-report rows, 140 trade-report rows, 89 historical closed positions, 88 closed-position report rows, 501 account-value observations. Coverage begins 13 November 2024. The AllTime body includes Saxo's time-weighted block.
 
 ## 3. Where the local data is
 
 All of this is gitignored under `apps/web/.local/`.
 
-- `saxo-vault/` — encrypted OAuth session. This close-out did not refresh or replace it.
+- `saxo-vault/` — encrypted OAuth session. This session did not refresh or replace it.
 - `saxo-source/{owner}/live/manifest.bin` — encrypted acquisition manifest, 301 entries.
-- `saxo-source/{owner}/live/units/` — 283 encrypted units. All 283 decrypted with the local key.
+- `saxo-source/{owner}/live/units/` — 283 encrypted units.
 - `saxo-portfolio/` — plaintext presentation snapshot for My Wealth. It has no OAuth token.
-- `saxo-discovery/` — leftover plaintext discovery responses from the earlier catalogue. The plaintext session file was removed. The vault remains the credential.
+- `saxo-discovery/` — leftover plaintext discovery responses from the earlier catalogue.
 
 Archive filenames use the owner id and, for an account balance, a 16-character hash. They do not contain account keys or tokens.
 
@@ -53,49 +56,54 @@ The QBTS NYSE/NASDAQ activity on 27 July 2026 is not fully reconciled between th
 
 Money-weighted return was absent from the retrieved v4 performance response. Corporate-action events and chart history returned HTTP 403. Continuous daily instrument-level attribution is not validated. Two booking-report months contain exactly 50 rows, the old page size, so those two months should be rechecked before a hosted copy treats every booking-report window as fully paged. The accepted booking-report total remains 534 latest-complete rows.
 
-## 5. Tests this close-out
+## 5. What this session added
+
+- My Wealth cockpit: standard account value and open-position or time-weighted result sit with cash, investment count, largest holding and connection. The Saxo account-value chart is full width only when at least two points exist.
+- Deploy Capital V1: `deployCapital` in `apps/web/src/lib/capital/deploy.ts`. It reuses `monetaryGaps` and `allocateExternalContribution`. Missing targets, a zero or missing budget, an empty approved list, or a missing foreign-exchange rate stay unconfigured or unavailable. Whole units leave a remainder. No order is created. `/my-wealth/deploy` shows a labelled example and a not-configured block. Those figures are not the founder's account and the page does not read the Saxo snapshot.
+- Hosted vault: `saxo_token_vault` and append-only `saxo_source_units` in unapplied migration `20261020120000_saxo_hosted_vault.sql`. Ciphertext is granted to `service_role` only. `rotateHostedTokens` claims a generation before calling Saxo; the loser does not refresh or persist. The local file vault is still the running store. Nothing in the OAuth routes was switched over, and no archive was copied.
+- Wealth valuation and event inserts in that same unapplied migration now require the instrument to belong to the same owner. This was a cross-owner reference hole in `20261018210000`. It is not applied on the host.
+
+## 6. Tests this session
 
 | Check | Result |
 |---|---|
-| `npm run test:saxo` | 36 pass, 0 fail |
-| `npm run test:wealth` | 16 pass, 0 fail |
+| `npm run test:capital` | 9 pass, 0 fail |
+| `npm run test:wealth` | 20 pass, 0 fail |
+| `npm run test:saxo` | 41 pass, 0 fail |
 | `npm run typecheck` | pass |
-| `npm run lint` | pass, no findings |
+| `npm run lint` | pass after `prefer-const` in `deploy.ts` |
+| `npm run check:tokens` | pass |
+| `npm run build` | pass. Route `/my-wealth/deploy` is in the build |
+| Browser | Agent browser opened `/my-wealth` and `/my-wealth/deploy` and was redirected to Google sign-in. The example was not rendered. Saxo authorisation was not opened |
+| `supabase test db` | not run. Docker was not running. The new pgTAP file is unexecuted |
 
-Node printed `MODULE_TYPELESS_PACKAGE_JSON` while loading the tests. That is an existing runtime notice. Do not add `"type": "module"` to silence it. The two earlier lint warnings belonged to a gitignored probe script, which was removed.
+Node printed `MODULE_TYPELESS_PACKAGE_JSON` while loading the tests. That is an existing runtime notice. Do not add `"type": "module"` to silence it.
 
-Not re-run: `test:auth`, `check:tokens`, `build`, Playwright, research tests, `supabase test db`.
+Not re-run: `test:auth`, Playwright, research tests.
 
-## 6. Security and engineering
+## 7. Security and engineering
 
-- No Saxo call, token refresh, migration, push or deployment was made.
-- Refresh coalescing does not protect two server processes.
+- No Saxo call, token refresh, hosted migration, push or production deployment was made.
+- The in-process refresh map still does not protect two server processes. The new hosted claim does, and it is not wired to the live session.
 - The live Saxo application credential can still trade at Saxo. Aqil does not send trading requests.
-- Plaintext discovery JSON remains on disk and is gitignored. It is not the source archive.
-- Google sign-in and the My Wealth snapshot path were not changed.
+- Plaintext discovery JSON remains on disk and is gitignored.
+- Google sign-in behaviour was not changed. The agent browser had no session.
 
-## 7. Approved boundary of the next phase
+## 8. Still requires the founder
 
-Phase 2 is secure hosted Saxo connectivity and financial-data persistence. Do not start it inside a close-out. Do not enable production Saxo LIVE while investigating it.
+- Apply `20261018200000`, `20261018210000` and `20261020120000` only after a local `supabase test db` pass on those files.
+- Decide when localhost OAuth should write the hosted vault instead of the file vault.
+- Create a trading-disabled Saxo application before any hosted token is stored.
+- Do not enable production Saxo LIVE.
+- Do not copy `apps/web/.local` archives into the hosted source-unit table until that copy is explicitly approved.
+- Supply allocation targets, an approved instrument list and a budget before Deploy Capital can describe the real account. The example must not be treated as that account.
 
-Phase 2 is:
+## 9. First task when development resumes
 
-- Encrypted hosted OAuth token storage.
-- Refresh-token rotation that is safe across server processes.
-- Authenticated ownership enforcement and Supabase RLS.
-- Secure account, financial-source and historical persistence.
-- A review of the pending wealth migrations before any of them is applied.
-- A controlled copy of verified local source data into hosted storage.
-- Explicit verification before production Saxo LIVE is enabled.
-
-Keep acquiring and preserving the full read-only financial record. Keep the presentation selective. The eight aggregated months are a resumable local item. They do not block Phase 2, and they are not complete.
-
-## 8. First task when development resumes
-
-Read this note and the Saxo section of `docs/04_ARCHITECTURE_AND_DATA.md`. Before any broker call, read the encrypted session expiry locally. If the refresh has lapsed, ask for one localhost sign-in at `http://localhost:3000/auth/saxo?environment=live` and do not start a second refresh beside it. Then start Phase 2 at hosted token storage. When the aggregated months are resumed, select the eight windows whose newest unit is partial, including those whose latest complete body is still 50 rows.
+Read this note. Do not refresh Saxo or resume the eight aggregated months unless that is the task. The next useful product step is to sign in locally and judge the cockpit and the deploy-capital example. The next security step is a local database test of the unapplied migrations, still without `db push`.
 
 ## Commands
 
-From `apps/web`: `npm run typecheck`, `npm run lint`, `npm run test:saxo`, `npm run test:wealth`, `npm run test:auth`, `npm run build`.  
+From `apps/web`: `npm run typecheck`, `npm run lint`, `npm run test:saxo`, `npm run test:wealth`, `npm run test:capital`, `npm run test:auth`, `npm run build`.  
 From the repo root: `npm run check:tokens`, `npm run test:research`.  
-Database tests need the local Supabase ports recorded in the previous close-out. Do not apply hosted migrations.
+Database tests need a running local Supabase. Do not apply hosted migrations.
