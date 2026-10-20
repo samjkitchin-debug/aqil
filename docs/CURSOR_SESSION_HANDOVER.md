@@ -1,13 +1,13 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 20 October 2026, local Phase 2 slice  
-**Parent:** `2481fa862d2ff38fe1b79d5cabc1835cbd22c891` on `work/aqil-autonomous-build`  
+**Last updated:** 21 October 2026, Sprint 3 integration  
+**Parent:** `2f59591` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo LIVE stay unchanged.
 
 ## 1. Repository
 
-- Branch `work/aqil-autonomous-build`. The journal workflow merge is `45eda97`, followed by the benchmark type fix. Do not push or deploy until the founder asks.
+- Branch `work/aqil-autonomous-build` at `2f59591`. Sprint 3 is integrated: the manual journal is `3295686`, merged as `45eda97`, and the cashflow-matched passive baseline is `071fd28`. `work/journal-workflow` and `work/benchmark-baseline` are gone. Do not push or deploy until the founder asks.
 - Local branch housekeeping on 20 October 2026 removed integrated agent and milestone branches. `main` was not moved. Branches with unmerged commits were kept: `auth/google-foundation`, `docs/consolidation-2026-10-18`, `m5/live-intelligence-coverage`, `m6/research-methods`, `my-wealth/portfolio-slice` and `research/employment-situation-2026-11`. The Sahm worktree still has an uncommitted test edit.
 - Phase 1 remains the parent checkpoint `85427dd`. The My Wealth cockpit rework is `2481fa8` on `work/my-wealth-cockpit`.
 - Deploy Capital is `6d0328b` on `work/deploy-capital`, merged as `b7589e6`.
@@ -80,14 +80,16 @@ Money-weighted return was absent from the retrieved v4 performance response. Cor
 | `npm run test:db` | pass. 9 files, 134 tests, including the journal and cross-user isolation files. Local disposable database only. Hosted Supabase was not changed |
 | `npm run typecheck` | pass |
 | `npm run lint` | pass |
-| `npm run check:tokens` | pass |
+| `npm run check:tokens` | pass, re-run 21 October 2026 |
+| `npm run test:benchmark` | 14 pass, 0 fail, re-run 21 October 2026 |
+| `npm run test:wealth` | 57 pass, 0 fail, re-run 21 October 2026 |
 | `npm run build` | pass. `/my-wealth` and `/my-wealth/deploy` are in the build |
 | Browser | Signed-out agent browser. `/my-wealth` and `/my-wealth/deploy` redirect to Google sign-in. At 390px the primary links sit in the bottom bar. Signed-in holdings were not opened. Saxo authorisation was not opened |
 | `supabase test db` | Passed locally as `npm run test:db`: 89 tests, 0 failures. Not applied to the hosted project |
 
 Node printed `MODULE_TYPELESS_PACKAGE_JSON` while loading the tests. That is an existing runtime notice. Do not add `"type": "module"` to silence it.
 
-Not re-run: `test:auth`, Playwright, research tests.
+Not re-run on 21 October 2026: `test:research`, `test:db`, `build`, Playwright, and the signed-in browser. `test:auth` was re-run and passed.
 
 ## 7. Security and engineering
 
@@ -108,10 +110,10 @@ Not re-run: `test:auth`, Playwright, research tests.
 
 ## 9. First task when development resumes
 
-Read this note. Sign in once at `http://localhost:3000/my-wealth` with Google, then open Deploy capital, before treating the signed-in screens as checked. Do not refresh Saxo unless that is the task. Start Docker and run `supabase test db` before any hosted migration. Do not `db push`.
+Sprint 3 is on the branch. Do not select another backlog set until the founder asks. Sign in once at `http://localhost:3000/my-wealth` with Google, then open the journal and Deploy capital, before treating the signed-in screens as checked. Do not refresh Saxo unless that is the task. Start Docker and run `supabase test db` before any hosted migration. Do not `db push`.
 
 ## Commands
 
-From `apps/web`: `npm run typecheck`, `npm run lint`, `npm run test:saxo`, `npm run test:wealth`, `npm run test:capital`, `npm run test:auth`, `npm run build`.  
+From `apps/web`: `npm run typecheck`, `npm run lint`, `npm run test:saxo`, `npm run test:wealth`, `npm run test:benchmark`, `npm run test:capital`, `npm run test:learn`, `npm run test:story`, `npm run test:auth`, `npm run build`.  
 From the repo root: `npm run check:tokens`, `npm run test:research`.  
 Database tests need a running local Supabase. Do not apply hosted migrations.
