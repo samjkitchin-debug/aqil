@@ -1,13 +1,21 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 21 October 2026, Sprint 3 integration  
+**Last updated:** 21 October 2026, product acceptance  
 **Parent:** `2f59591` on `work/aqil-autonomous-build`  
-**Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo LIVE stay unchanged.
+**Checkpoint:** local only at `f391d71`. Not pushed. Production, hosted migrations and Saxo LIVE stay unchanged.
+
+## Product acceptance, 21 October 2026
+
+Signed-in routes were not opened. The agent browser was redirected to Google sign-in for `/`, and at 390px the primary links sit in the bottom bar. Privacy and terms remain public links. Saxo authorisation was not opened.
+
+Unit and build checks on `f391d71`: `test:wealth` 57, `test:capital` 17, `test:benchmark` 14, `test:saxo` 42, `test:auth` 13, `test:learn` 6, `test:story` 4, research pytest 48 on the touched files, typecheck, lint, token check and production build all passed. `npm run test:db` did not run because Docker was not running. The last local database pass was 9 files and 134 tests.
+
+Usable only after Google sign-in, and not yet confirmed in this browser: My Wealth from the saved Saxo snapshot, Deploy Capital policy, the investment journal, Learn, and the synthetic story. The benchmark and passive baseline are tested functions and are not on a page. The hosted token vault is unapplied. A process crash after Saxo rotates a refresh token still loses that token.
 
 ## 1. Repository
 
-- Branch `work/aqil-autonomous-build` at `2f59591`. Sprint 3 is integrated: the manual journal is `3295686`, merged as `45eda97`, and the cashflow-matched passive baseline is `071fd28`. `work/journal-workflow` and `work/benchmark-baseline` are gone. Do not push or deploy until the founder asks.
+- Branch `work/aqil-autonomous-build` at `f391d71`. Sprint 3 is integrated: the manual journal is `3295686`, merged as `45eda97`, and the cashflow-matched passive baseline is `071fd28`. Do not push or deploy until the founder asks.
 - Local branch housekeeping on 20 October 2026 removed integrated agent and milestone branches. `main` was not moved. Branches with unmerged commits were kept: `auth/google-foundation`, `docs/consolidation-2026-10-18`, `m5/live-intelligence-coverage`, `m6/research-methods`, `my-wealth/portfolio-slice` and `research/employment-situation-2026-11`. The Sahm worktree still has an uncommitted test edit.
 - Phase 1 remains the parent checkpoint `85427dd`. The My Wealth cockpit rework is `2481fa8` on `work/my-wealth-cockpit`.
 - Deploy Capital is `6d0328b` on `work/deploy-capital`, merged as `b7589e6`.
