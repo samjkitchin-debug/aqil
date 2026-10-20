@@ -2,75 +2,55 @@ import { Suspense } from "react";
 
 import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
-import { ResearchEmptyState } from "@/components/research/research-empty-state";
 import { ResearchInsightView } from "@/components/research/research-insight-view";
-import { TodaySyntheticStoryTangentLink } from "@/components/research/today-story-tangent-link";
-import { ForwardHorizonSection } from "@/components/forward/forward-horizon-section";
-import { loadForwardHorizonBundle } from "@/lib/forward/load-forward-horizon";
+import { SourcedUpdatesPanel } from "@/components/research/sourced-updates-panel";
 import { loadFounderResearchInsight } from "@/lib/research/load-founder-insight";
+import { loadSourcedUpdates } from "@/lib/research/load-sourced-updates";
 
-async function MacroIntelligenceSection() {
-  const loaded = await loadFounderResearchInsight();
+async function TodayBriefing() {
+  const sourced = await loadSourcedUpdates();
+  const updates = sourced.status === "ok" ? sourced.updates : [];
 
-  if (loaded.status === "ok") {
-    return (
-      <ResearchInsightView
-        insight={loaded.insight}
-        source={loaded.source}
-        compact
-      />
-    );
-  }
-
-  const reason =
-    loaded.status === "invalid"
-      ? "invalid"
-      : loaded.status === "unauthorized"
-        ? "unauthorized"
-        : "missing";
-
-  return (
-    <>
-      <ResearchEmptyState reason={reason} />
-      {reason !== "unauthorized" ? <TodaySyntheticStoryTangentLink /> : null}
-    </>
-  );
+  return <SourcedUpdatesPanel updates={updates} variant="briefing" />;
 }
 
-async function HorizonSection() {
-  const loaded = await loadForwardHorizonBundle();
-  if (loaded.status === "ok") {
-    return <ForwardHorizonSection bundle={loaded.bundle} source={loaded.source} compact />;
+async function SahmPreviewBlock() {
+  const loaded = await loadFounderResearchInsight();
+  if (loaded.status !== "ok") {
+    return null;
   }
-  return null;
+
+  return (
+    <section
+      aria-labelledby="sahm-preview-heading"
+      className="mt-[var(--space-6)]"
+      data-testid="sahm-internal-preview"
+    >
+      <h2 id="sahm-preview-heading" className="research-section-title">
+        Internal preview
+      </h2>
+      <ResearchInsightView insight={loaded.insight} source={loaded.source} compact />
+    </section>
+  );
 }
 
 export default function TodayPage() {
   return (
     <AppShell title="Today">
       <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
-      <PrivatePage nextPath="/">
-      <section aria-labelledby="horizon-heading" className="mb-[var(--space-6)]">
-        <h2 id="horizon-heading" className="research-section-title sr-only">
-          On the horizon
-        </h2>
-        <Suspense fallback={null}>
-          <HorizonSection />
-        </Suspense>
-      </section>
-      <section aria-labelledby="macro-intelligence-heading">
-        <h2 id="macro-intelligence-heading" className="research-section-title">
-          Macro intelligence
-        </h2>
-        <Suspense
-          fallback={
-            <ResearchEmptyState reason="missing" />
-          }
-        >
-          <MacroIntelligenceSection />
-        </Suspense>
-      </section>
-      </PrivatePage>
+        <PrivatePage nextPath="/">
+          <section aria-labelledby="sourced-briefing-heading">
+            <h2 id="sourced-briefing-heading" className="research-section-title">
+              Sourced briefing
+            </h2>
+            <Suspense fallback={<p className="research-body">Loading sourced updates…</p>}>
+              <TodayBriefing />
+            </Suspense>
+          </section>
+          <Suspense fallback={null}>
+            <SahmPreviewBlock />
+          </Suspense>
+        </PrivatePage>
       </Suspense>
     </AppShell>
   );

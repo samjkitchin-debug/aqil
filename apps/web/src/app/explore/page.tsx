@@ -2,22 +2,14 @@ import { Suspense } from "react";
 
 import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
-import { ForwardEtfExplore } from "@/components/forward/forward-etf-explore";
-import { ResearchEmptyState } from "@/components/research/research-empty-state";
-import { loadForwardHorizonBundle } from "@/lib/forward/load-forward-horizon";
+import { EXPLORE_EMPTY_COPY } from "@/lib/research/present-sourced-updates";
 
-async function ExploreForward() {
-  const loaded = await loadForwardHorizonBundle();
-  if (loaded.status === "ok") {
-    return <ForwardEtfExplore bundle={loaded.bundle} />;
-  }
-  const reason =
-    loaded.status === "unauthorized"
-      ? "unauthorized"
-      : loaded.status === "invalid"
-        ? "invalid"
-        : "missing";
-  return <ResearchEmptyState reason={reason} />;
+function ExploreEmpty() {
+  return (
+    <div className="research-banner" data-testid="explore-empty">
+      <p className="research-body">{EXPLORE_EMPTY_COPY}</p>
+    </div>
+  );
 }
 
 export default function ExplorePage() {
@@ -25,9 +17,9 @@ export default function ExplorePage() {
     <AppShell title="Intelligence">
       <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
         <PrivatePage nextPath="/explore">
-      <Suspense fallback={<ResearchEmptyState reason="missing" />}>
-        <ExploreForward />
-      </Suspense>
+          <Suspense fallback={<ExploreEmpty />}>
+            <ExploreEmpty />
+          </Suspense>
         </PrivatePage>
       </Suspense>
     </AppShell>
