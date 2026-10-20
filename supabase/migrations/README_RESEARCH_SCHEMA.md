@@ -10,7 +10,7 @@ Private persistence for the M1 intelligence engine. **Not** listed in `supabase/
 | Worker access | `research_writer` least-privilege role | `INSERT` + `SELECT` on research tables; `EXECUTE` on `try_insert_observation` only |
 | API clients | Must not read research history | No schema `USAGE` for `anon` / `authenticated` |
 
-**Independent review:** pgTAP asserts role privileges on all six tables. This is intentionally **not** the same as `public.user_settings` (RLS + narrow grants).
+**Independent review:** pgTAP asserts role privileges on the research tables, including `sourced_updates`. This is intentionally **not** the same as `public.user_settings` (RLS + narrow grants).
 
 **BYPASSRLS:** `BYPASSRLS` (e.g. Supabase `service_role`) bypasses **row-level security policies only**. It does **not** bypass ordinary table `GRANT`/`REVOKE` privileges. This migration does **not** grant `service_role` any rights on `research.*`, so the service role cannot read or write research tables unless a future migration explicitly grants it.
 
@@ -24,12 +24,14 @@ Private persistence for the M1 intelligence engine. **Not** listed in `supabase/
 4. `research_runs` — immutable analytical runs
 5. `research_run_datasets` — per-dataset rights/snapshot per run
 6. `research_run_observations` — evidence links
+7. `sourced_updates` — append-only sourced items (title, canonical URL, publication time, retrieval). Repeat fetch identity is `source_id` plus `content_hash`. A correction is a new row via `correction_of`. Status is only `sourced`.
 
 ## Transaction boundaries
 
 - **Observations:** call `research.try_insert_observation(...)`. On `conflict`, the existing row is unchanged and a row is inserted into `observation_conflicts` in the **same** transaction. `COMMIT` persists both; `ROLLBACK` drops uncommitted inserts and conflict rows together.
 - **Large batches:** to keep conflict evidence when aborting a batch, commit conflict outcomes (or each `try_insert_observation` call) before rolling back unrelated work.
 - **Research runs:** insert `research_runs`, then `research_run_datasets`, then `research_run_observations` in one transaction.
+- **Sourced updates:** insert a row. The same `source_id` and `content_hash` conflicts. Set `correction_of` on a new row to correct an earlier one. Do not update or delete.
 
 ## Functions
 

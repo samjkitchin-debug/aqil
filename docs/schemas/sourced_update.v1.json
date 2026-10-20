@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/sourced_update.v1.json",
+  "title": "Sourced update v1",
+  "description": "A retrieved source item: source identity, title, canonical URL, publication time and retrieval time. Status is sourced. This is not an investment conclusion. Identity for a repeat fetch is source_id plus content_hash. There is no user id.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "update_id",
+    "source_id",
+    "title",
+    "canonical_url",
+    "published_at",
+    "retrieved_at",
+    "retrieval_id",
+    "content_hash",
+    "correction_of",
+    "status"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "update_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "source_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "User-independent source identity from the rights register."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "canonical_url": {
+      "type": "string",
+      "pattern": "^https://\\S+$"
+    },
+    "published_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Publication time stated by the source. Null when the source does not state one."
+    },
+    "retrieved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "retrieval_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "research.source_retrievals.retrieval_id for this fetch."
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 hex of the canonical sourced item."
+    },
+    "correction_of": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Earlier update_id this row corrects. Null when this row is not a correction."
+    },
+    "status": {
+      "const": "sourced"
+    }
+  }
+}

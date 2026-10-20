@@ -49,6 +49,38 @@ def test_method_card_fixture_matches_schema() -> None:
     MethodCard.model_validate(payload)
 
 
+def test_sourced_update_schema_matches_model_and_mirror() -> None:
+    from datetime import UTC, datetime
+
+    from aqil_research.contracts.sourced_update import SourcedUpdate, sourced_update_field_names
+
+    schema = _schema("sourced_update.v1.json")
+    mirror = json.loads(
+        (REPO_ROOT / "packages" / "contracts" / "schemas" / "sourced_update.v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert mirror == schema
+    assert sourced_update_field_names() == tuple(schema["required"])
+    assert tuple(SourcedUpdate.model_fields) == tuple(schema["required"])
+
+    row = SourcedUpdate(
+        update_id="aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        source_id="bls_employment_situation_archive",
+        title="Employment situation",
+        canonical_url="https://www.bls.gov/news.release/empsit.htm",
+        published_at=datetime(2025, 2, 7, 13, 30, tzinfo=UTC),
+        retrieved_at=datetime(2025, 2, 7, 14, 0, tzinfo=UTC),
+        retrieval_id="11111111-1111-4111-8111-111111111111",
+        content_hash="a" * 64,
+    )
+    payload = row.model_dump(mode="json")
+    jsonschema.validate(payload, schema)
+    payload["status"] = "inferred"
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(payload, schema)
+
+
 def test_source_claim_schema_rejects_incomplete_payload() -> None:
     with pytest.raises(jsonschema.ValidationError):
         jsonschema.validate({"schema_version": "1.0"}, _schema("source_claim.v1.json"))
