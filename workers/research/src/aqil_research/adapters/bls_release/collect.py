@@ -121,6 +121,20 @@ def collect_bls_releases(
             http_status=_http_status(adapter),
         )
 
+    storable_drafts = drafts
+    try:
+        from aqil_research.pipeline.sourced_update_gate import gate_publication_drafts
+    except ImportError:
+        # Without publication gates: persist sourced updates only after a successful feed
+        # read (hard fetch failures return above without writing rows).
+        pass
+    else:
+        storable_drafts = gate_publication_drafts(
+            storable_drafts,
+            ingest_errors=errors,
+            retrieved_at=now,
+        )
+
     body = adapter._last_fetch.body if adapter._last_fetch else b""
     fingerprint = adapter.response_fingerprint(body) if body else None
     endpoint_host = "www.bls.gov" if live else None
@@ -130,7 +144,7 @@ def collect_bls_releases(
         adapter=adapter,
         retrieved_at=now,
         collection_mode=collection_mode,
-        drafts=drafts,
+        drafts=storable_drafts,
         response_fingerprint=fingerprint,
         endpoint_host=endpoint_host,
         http_status=diag.http_status if diag else None,

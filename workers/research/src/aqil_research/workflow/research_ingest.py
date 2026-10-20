@@ -22,6 +22,18 @@ class ResearchIngestOutcome:
     publications_outcome: str | None = None
 
 
+def _publication_fixture_for_ingest(live: bool, fixture_path: str | None) -> Path | None:
+    """Use the ingest fixture for publications only when it is a feed file."""
+    if live:
+        return None
+    if fixture_path is None:
+        return None
+    path = Path(fixture_path)
+    if path.suffix.lower() not in {".rss", ".xml", ".atom"}:
+        return None
+    return path
+
+
 def _invoke_optional_bls_publication_ingest(
     conn: psycopg.Connection,
     *,
@@ -29,23 +41,27 @@ def _invoke_optional_bls_publication_ingest(
     fixture_path: str | None,
     collected_at: datetime,
 ) -> tuple[bool, str | None]:
-    """Hook for `collect_bls_releases` when the publication adapter branch merges.
-
-    If `aqil_research.collection.publications` is absent, this is a no-op and series
-    ingest still succeeds.
-    """
+    """Run BLS publication collection when the adapter is present."""
     try:
-        from aqil_research.collection.publications import collect_bls_releases
+        from aqil_research.adapters.bls_release import (
+            PostgresSourcedUpdateStore,
+            collect_bls_releases,
+        )
     except ImportError:
         return False, None
+
+    pub_fixture = _publication_fixture_for_ingest(live, fixture_path)
+    if not live and pub_fixture is None:
+        return False, None
+
+    store = PostgresSourcedUpdateStore(conn)
     result = collect_bls_releases(
-        conn=conn,
+        store,
         live=live,
-        fixture_path=fixture_path,
-        collected_at=collected_at,
+        fixture_path=pub_fixture,
+        retrieved_at=collected_at,
     )
-    outcome = getattr(result, "outcome", None)
-    return True, str(outcome) if outcome is not None else "completed"
+    return True, str(result.outcome)
 
 
 def run_research_ingest(
