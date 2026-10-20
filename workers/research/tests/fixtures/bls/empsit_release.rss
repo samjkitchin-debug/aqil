@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Employment Situation</title>
+    <link>https://www.bls.gov/feed/empsit.rss</link>
+    <description>Employment Situation news releases from the U.S. Bureau of Labor Statistics</description>
+    <item>
+      <title>Employment Situation Summary</title>
+      <link>https://www.bls.gov/news.release/empsit.nr0.htm</link>
+      <pubDate>Fri, 03 Oct 2025 08:30:00 EST</pubDate>
+      <guid isPermaLink="true">https://www.bls.gov/news.release/empsit.nr0.htm</guid>
+    </item>
+    <item>
+      <title>Employment Situation Summary</title>
+      <link>https://www.bls.gov/news.release/archives/empsit_09052025.htm</link>
+      <pubDate>Fri, 05 Sep 2025 08:30:00 EST</pubDate>
+      <guid isPermaLink="true">https://www.bls.gov/news.release/archives/empsit_09052025.htm</guid>
+    </item>
+  </channel>
+</rss>
