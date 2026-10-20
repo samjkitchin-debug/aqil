@@ -256,7 +256,7 @@ export function compareCashflowMatchedPassive(input: CashflowMatchedInput): Cash
   };
 }
 
-function unavailable(reason: string): CashflowMatchedComparison {
+function unavailable(reason: string): { status: "unavailable"; reason: string } {
   return { status: "unavailable", reason };
 }
 
@@ -311,7 +311,7 @@ function applyEntryCost(amountMinor: bigint, cost: Decimal): bigint {
   return roundHalfAway(amountMinor * (basis - cost.value), basis);
 }
 
-function grossForExit(amountMinor: bigint, cost: Decimal): { status: "available"; amountMinor: bigint } | CashflowMatchedComparison {
+function grossForExit(amountMinor: bigint, cost: Decimal): { status: "available"; amountMinor: bigint } | { status: "unavailable"; reason: string } {
   const basis = 10_000n * cost.scale;
   const keep = basis - cost.value;
   if (keep <= 0n) return unavailable("Exit cost is invalid.");
@@ -322,7 +322,7 @@ function findLevel(
   series: readonly BenchmarkLevel[],
   occurredOn: string,
   currency: string,
-): { status: "available"; occurredOn: string; level: string; parsed: Decimal } | CashflowMatchedComparison {
+): { status: "available"; occurredOn: string; level: string; parsed: Decimal } | { status: "unavailable"; reason: string } {
   const sameCurrency = series.filter((level) => level.currency === currency);
   const onDate = sameCurrency.filter((level) => level.occurredOn === occurredOn);
   if (onDate.length > 1) return unavailable(`Benchmark level is ambiguous on ${occurredOn}.`);
@@ -348,7 +348,7 @@ function convertToBenchmark(
   occurredOn: string,
   rates: readonly DatedFxRate[],
   kind: "cashflow" | "valuation",
-): { status: "available"; amountMinor: bigint; fxDate: string | null } | CashflowMatchedComparison {
+): { status: "available"; amountMinor: bigint; fxDate: string | null } | { status: "unavailable"; reason: string } {
   if (fromCurrency === toCurrency) {
     return { status: "available", amountMinor, fxDate: null };
   }
@@ -384,7 +384,7 @@ function unitsForAmount(
   amountMinor: bigint,
   level: Decimal,
   currency: string,
-): { status: "available"; unitsScaled: bigint } | CashflowMatchedComparison {
+): { status: "available"; unitsScaled: bigint } | { status: "unavailable"; reason: string } {
   const exponent = currencyExponent(currency);
   const denominator = level.value * 10n ** BigInt(exponent);
   if (denominator <= 0n) return unavailable("Benchmark level is invalid.");
@@ -396,7 +396,7 @@ function amountForUnits(
   unitsScaled: bigint,
   level: Decimal,
   currency: string,
-): { status: "available"; amountMinor: bigint } | CashflowMatchedComparison {
+): { status: "available"; amountMinor: bigint } | { status: "unavailable"; reason: string } {
   const exponent = currencyExponent(currency);
   const numerator = unitsScaled * level.value * 10n ** BigInt(exponent);
   const denominator = UNIT_SCALE * level.scale;

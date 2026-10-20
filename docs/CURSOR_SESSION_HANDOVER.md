@@ -7,7 +7,7 @@
 
 ## 1. Repository
 
-- Branch `work/aqil-autonomous-build`. The ten-task integration is the latest local commit after `5585d2f`. Do not push, merge to GitHub `main`, or deploy until the founder asks.
+- Branch `work/aqil-autonomous-build`. The journal workflow merge is `45eda97`, followed by the benchmark type fix. Do not push or deploy until the founder asks.
 - Local branch housekeeping on 20 October 2026 removed integrated agent and milestone branches. `main` was not moved. Branches with unmerged commits were kept: `auth/google-foundation`, `docs/consolidation-2026-10-18`, `m5/live-intelligence-coverage`, `m6/research-methods`, `my-wealth/portfolio-slice` and `research/employment-situation-2026-11`. The Sahm worktree still has an uncommitted test edit.
 - Phase 1 remains the parent checkpoint `85427dd`. The My Wealth cockpit rework is `2481fa8` on `work/my-wealth-cockpit`.
 - Deploy Capital is `6d0328b` on `work/deploy-capital`, merged as `b7589e6`.
@@ -63,7 +63,7 @@ Money-weighted return was absent from the retrieved v4 performance response. Cor
 - Deploy Capital can save an explicit investment policy for the signed-in user at `apps/web/.local/investment-policy/{userId}.json`. Targets must total 10,000 basis points. A blank budget stays unconfigured. A holding enters the class total only after the founder assigns its class. Reported cash remains investable cash. The example block stays labelled as made up. No order is sent. The hosted wealth tables are still not written.
 - Hosted vault: `saxo_token_vault` and append-only `saxo_source_units` in unapplied migration `20261020120000_saxo_hosted_vault.sql`. Ciphertext is granted to `service_role` only. `rotateHostedTokens` claims a generation before calling Saxo; the loser does not refresh or persist. The local file vault is still the running store. Nothing in the OAuth routes was switched over, and no archive was copied.
 - Review fixes: a thrown refresh or commit releases the vault claim. A one-unit top-up that integer gaps cannot assign stays in the unallocated amount. A foreign-currency buy is sized from the converted total, so per-unit rounding cannot spend more than the budget.
-- Journal replay covers buy, sell, fee, transfer, distribution and split in minor units. A missing price or FX rate stays unavailable. The new journal table is unapplied on the host.
+- `/my-wealth/journal` accepts manual entries and a CSV preview. Values appear only with a supplied price. Money-weighted return appears only when the cashflows solve. Time-weighted return stays unavailable without interim valuations. The benchmark comparison stays unavailable unless a series, foreign exchange and costs are supplied.
 - Learn shows a labelled compounding illustration. The research page shows one synthetic story, with citations and a correction, when no founder insight is loaded. Research helpers fail closed on a stale feed, reject an incomplete method card, and collapse ten copies of one announcement into one cluster.
 
 ## 6. Tests this session

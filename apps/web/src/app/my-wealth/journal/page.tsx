@@ -16,21 +16,31 @@ async function JournalBody({
   const params = await searchParams;
   const access = await resolveAccess();
   if (access.status !== "authenticated_authorised") return null;
+  let panel: {
+    summary: ReturnType<typeof summariseJournal>;
+    prices: Awaited<ReturnType<typeof readJournalFile>>["prices"];
+    rates: Awaited<ReturnType<typeof readJournalFile>>["rates"];
+  } | null = null;
   try {
     const file = await readJournalFile(access.userId);
-    const summary = summariseJournal(file, safeQueryDate(params.asOf));
-    return (
-      <JournalPanel
-        summary={summary}
-        prices={file.prices}
-        rates={file.rates}
-        error={params.error ?? null}
-        draftId={randomUUID()}
-      />
-    );
+    panel = {
+      summary: summariseJournal(file, safeQueryDate(params.asOf)),
+      prices: file.prices,
+      rates: file.rates,
+    };
   } catch {
-    return <p className="text-foreground">The journal could not be read.</p>;
+    panel = null;
   }
+  if (!panel) return <p className="text-foreground">The journal could not be read.</p>;
+  return (
+    <JournalPanel
+      summary={panel.summary}
+      prices={panel.prices}
+      rates={panel.rates}
+      error={params.error ?? null}
+      draftId={randomUUID()}
+    />
+  );
 }
 
 export default function InvestmentJournalPage({
