@@ -1,9 +1,26 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 21 October 2026, product acceptance  
-**Parent:** `2f59591` on `work/aqil-autonomous-build`  
-**Checkpoint:** local only at `f391d71`. Not pushed. Production, hosted migrations and Saxo LIVE stay unchanged.
+**Last updated:** 21 October 2026, Today and Intelligence proof  
+**Parent:** `d667781` on `work/aqil-autonomous-build`  
+**Checkpoint:** proof run at `d667781` (merge `058cb36` is in that history). Not pushed. Production scheduling, hosted migrations and Saxo authorisation stay unapplied.
+
+## Today and Intelligence proof, 21 October 2026
+
+The slice is not operational. No new source was added.
+
+`npm run research:ingest` ran from the repo root against local Postgres `127.0.0.1:54322` as `research_worker`. It was a live attempt, not a fixture. The command printed `ingest_mode=live`, `bls_outcome=failed_fetch`, `received=0`, `new=0`, `unchanged=0`, `publications_outcome=failed_fetch`, and `Series fetch unusable; inspect provider payload`. It wrote no new `research.source_retrievals` row, so this run has no stored retrieval timestamp.
+
+Queried as `research_worker` before `npm run test:db` reset the local database:
+
+- `research.economic_observations`: 36, all on retrieval `1fedaa87-f3e8-411d-ae14-d488ee3a262e`. That retrieval is `collection_mode=fixture`, `source_id=bls_cps_unemployment_rate`, `retrieved_at=2025-06-01T12:00:00Z`, `recorded_at=2026-10-20T22:28:12Z`. New observations from this run: 0.
+- `research.sourced_updates`: 0. No `source_id`, title, canonical URL, `published_at` or `retrieved_at` was stored.
+
+A later non-persisting read of the same adapters, at `2026-10-20T22:59:01Z`, was not written to the database. The series call returned HTTP 200, BLS status `REQUEST_SUCCEEDED`, 44 observations and `partial=true`. The gate raised `feed freshness is interrupted; ingest blocked (no silent backfill)`. The Employment Situation feed returned `fetch_failed` / HTTP 403, with 0 drafts. Those figures are not stored observations.
+
+Signed-in rendering was not verified. Opening `http://localhost:3000` stopped at `http://localhost:3000/login?error=signed_out&next=%2F` with the heading Sign in and the button Continue with Google. Google login was not completed. `/auth/saxo` was not opened. What signed-in Today and Intelligence show was not seen.
+
+Checks on `d667781`: research pytest 40 passed, 0 failed; `test:wealth` 57 passed, 0 failed; `test:capital` 17 passed, 0 failed; `test:auth` 13 passed, 0 failed; `test:sourced-updates` 4 passed, 0 failed; `npx tsc --noEmit` passed; lint passed with 1 warning and 0 errors (`today-story-tangent-path.ts` unused `_searchParams`); `check:tokens` passed; `npm run build` passed. `npm run test:db` then reset the local database and passed 10 files, 159 tests. That reset was local only. Hosted Supabase was not migrated. Production scheduling was not turned on.
 
 ## Product acceptance, 21 October 2026
 
@@ -118,7 +135,7 @@ Not re-run on 21 October 2026: `test:research`, `test:db`, `build`, Playwright, 
 
 ## 9. First task when development resumes
 
-Sprint 3 is on the branch. Do not select another backlog set until the founder asks. Sign in once at `http://localhost:3000/my-wealth` with Google, then open the journal and Deploy capital, before treating the signed-in screens as checked. Do not refresh Saxo unless that is the task. Start Docker and run `supabase test db` before any hosted migration. Do not `db push`.
+The Today and Intelligence slice is not operational. The 21 October live ingest stored no publication and no new series observations. Do not schedule production ingest or apply the hosted migration until a live retrieval succeeds and its timestamp is recorded. AQ-009, AQ-010, AQ-018, AQ-019 and AQ-032 onward stay blocked. Do not open Saxo authorisation unless that is the task. Do not `db push`.
 
 ## Commands
 
