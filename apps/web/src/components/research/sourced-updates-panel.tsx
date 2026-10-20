@@ -1,0 +1,83 @@
+import Link from "next/link";
+
+import {
+  formatRetrievedAt,
+  latestRetrievedAt,
+  presentSourcedUpdates,
+  SOURCED_UPDATES_EMPTY_COPY,
+} from "@/lib/research/present-sourced-updates";
+import type { SourcedUpdateV1 } from "@/lib/research/sourced-update";
+
+type Props = {
+  updates: SourcedUpdateV1[];
+  variant: "briefing" | "evidence";
+};
+
+export function SourcedUpdatesPanel({ updates, variant }: Props) {
+  if (updates.length === 0) {
+    return (
+      <div className="research-banner" data-testid="sourced-updates-empty">
+        <p className="research-body">{SOURCED_UPDATES_EMPTY_COPY}</p>
+      </div>
+    );
+  }
+
+  const rows = presentSourcedUpdates(updates);
+  const lastRetrieval = latestRetrievedAt(updates);
+
+  return (
+    <section data-testid="sourced-updates-panel">
+      <p className="research-meta" data-testid="sourced-updates-freshness">
+        {rows.length} sourced {rows.length === 1 ? "update" : "updates"}
+        {lastRetrieval ? (
+          <>
+            {" "}
+            · Last successful retrieval {formatRetrievedAt(lastRetrieval)}
+          </>
+        ) : null}
+      </p>
+      <ul className="forward-horizon-list">
+        {rows.map((row) => (
+          <li key={row.update.update_id} className="forward-horizon-item">
+            <div className="forward-horizon-item-head">
+              <span className="forward-horizon-date">
+                {row.publishedLabel ?? "Publication time not stated"}
+              </span>
+              <span className="forward-horizon-materiality">{row.providerLabel}</span>
+            </div>
+            <h3 className="forward-horizon-title">
+              <Link href={row.update.canonical_url} rel="noopener noreferrer" target="_blank">
+                {row.update.title}
+              </Link>
+            </h3>
+            <p className="research-meta">
+              Retrieved {row.retrievedLabel} · Status {row.update.status}
+            </p>
+            {variant === "evidence" ? (
+              <dl className="research-meta mt-[var(--space-2)]">
+                <div>
+                  <dt>Source id</dt>
+                  <dd>{row.update.source_id}</dd>
+                </div>
+                <div>
+                  <dt>Retrieval id</dt>
+                  <dd>{row.update.retrieval_id}</dd>
+                </div>
+                <div>
+                  <dt>Content hash</dt>
+                  <dd>{row.update.content_hash.slice(0, 16)}…</dd>
+                </div>
+                {row.update.correction_of ? (
+                  <div>
+                    <dt>Correction of</dt>
+                    <dd>{row.update.correction_of}</dd>
+                  </div>
+                ) : null}
+              </dl>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}

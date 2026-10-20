@@ -2,20 +2,16 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
-  TODAY_STORY_QUERY_KEY,
-  TODAY_STORY_QUERY_VALUE,
+  DEV_STORY_PATH,
   researchStoryHrefFromToday,
   shouldShowReturnToToday,
 } from "./today-story-tangent-path.ts";
 
-test("Today links to the synthetic story with a return marker", () => {
-  const href = researchStoryHrefFromToday();
-  assert.equal(href, `/research?${TODAY_STORY_QUERY_KEY}=${TODAY_STORY_QUERY_VALUE}`);
+test("development story route is explicit", () => {
+  assert.equal(researchStoryHrefFromToday(), DEV_STORY_PATH);
+  assert.equal(researchStoryHrefFromToday(), "/dev/story");
 });
 
-test("return link appears only when the story was opened from Today", () => {
-  assert.equal(shouldShowReturnToToday({}), false);
-  assert.equal(shouldShowReturnToToday({ from: "explore" }), false);
-  assert.equal(shouldShowReturnToToday({ from: TODAY_STORY_QUERY_VALUE }), true);
-  assert.equal(shouldShowReturnToToday({ from: ["today", "other"] }), true);
+test("return link is not used on the evidence route", () => {
+  assert.equal(shouldShowReturnToToday({ from: "today" }), false);
 });
