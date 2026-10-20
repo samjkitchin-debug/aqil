@@ -1,0 +1,12 @@
+{
+  "status": "REQUEST_SUCCEEDED",
+  "responseTime": 0,
+  "Results": {
+    "series": [
+      {
+        "seriesID": "LNS14000000",
+        "data": []
+      }
+    ]
+  }
+}

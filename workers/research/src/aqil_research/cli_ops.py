@@ -14,6 +14,7 @@ from aqil_research.insight.io import DEFAULT_WEB_INSIGHT_PATH, write_insight
 from aqil_research.persistence.connection import research_connection
 from aqil_research.persistence.runs import load_research_run
 from aqil_research.workflow.collect_and_run import collect_and_run_sahm
+from aqil_research.workflow.research_ingest import run_research_ingest
 
 
 def register_collect_parsers(sub: argparse._SubParsersAction) -> None:
@@ -64,6 +65,62 @@ def register_collect_parsers(sub: argparse._SubParsersAction) -> None:
         help="Write forward-horizon.v1.json for the web app",
     )
     demo.add_argument("--skip-db", action="store_true", help="Only export JSON bundle")
+
+    ingest = sub.add_parser(
+        "ingest",
+        help=(
+            "Ingest permitted sources into the local research database "
+            "(live BLS series by default)"
+        ),
+    )
+    ingest.add_argument(
+        "--fixture",
+        type=Path,
+        default=None,
+        help="Offline BLS fixture path (CI/tests; default is live BLS API)",
+    )
+    ingest.add_argument("--start-year", type=int, default=None)
+    ingest.add_argument("--end-year", type=int, default=None)
+    ingest.add_argument("--format", choices=["text", "json"], default="text")
+
+
+def run_ingest(args: argparse.Namespace) -> int:
+    live = args.fixture is None
+    try:
+        outcome = run_research_ingest(
+            live=live,
+            fixture_path=args.fixture,
+            start_year=args.start_year,
+            end_year=args.end_year,
+        )
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+
+    result = outcome.bls_unemployment
+    payload = {
+        "bls_unemployment": result.model_dump(mode="json"),
+        "publications_attempted": outcome.publications_attempted,
+        "publications_outcome": outcome.publications_outcome,
+    }
+    if args.format == "json":
+        print(json.dumps(payload, indent=2, default=str))
+    else:
+        mode = "live" if live else "fixture"
+        print(f"ingest_mode={mode} bls_outcome={result.outcome}")
+        print(
+            f"received={result.observations_received} "
+            f"new={result.observations_newly_stored} unchanged={result.observations_unchanged}",
+        )
+        if outcome.publications_attempted:
+            print(f"publications_outcome={outcome.publications_outcome}")
+        print(result.next_recommended_action)
+
+    if result.outcome in ("failed_rights", "failed_fetch", "failed_validation"):
+        return 5
+    if result.conflicts_detected:
+        return 6
+    return 0
 
 
 def run_collect(args: argparse.Namespace) -> int:

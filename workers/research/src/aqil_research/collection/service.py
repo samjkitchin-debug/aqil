@@ -10,6 +10,10 @@ from aqil_research.adapters.bls.adapter import BlsAdapterConfig, BlsUnemployment
 from aqil_research.adapters.protocol import ProviderAdapter
 from aqil_research.collection.fingerprint import fetch_fingerprint
 from aqil_research.collection.models import CollectionResult
+from aqil_research.collection.series_fetch_gate import (
+    SeriesFetchNotUsableError,
+    assert_series_fetch_usable_for_ingest,
+)
 from aqil_research.persistence.observation_store import PostgresDatasetObservationStore
 from aqil_research.persistence.retrieval import (
     find_retrieval_by_fingerprint,
@@ -219,6 +223,38 @@ def _collect_postgres(
             ),
             PostgresDatasetObservationStore(conn, dataset_id),
         )
+
+    if fetch.observations:
+        try:
+            assert_series_fetch_usable_for_ingest(
+                source_id=rights.source_id,
+                retrieved_at=now,
+                fetch_succeeded=True,
+                partial_payload=fetch.partial,
+            )
+        except SeriesFetchNotUsableError as exc:
+            ingest_notes.append(str(exc))
+            return (
+                CollectionResult(
+                    source_id=rights.source_id,
+                    dataset_id=dataset_id,
+                    provider_id="bls",
+                    adapter_id=identity.adapter_id,
+                    adapter_version=identity.adapter_version,
+                    collected_at=now,
+                    collection_mode=collection_mode,  # type: ignore[arg-type]
+                    outcome="failed_fetch",
+                    rights_record_id=rights.source_id,
+                    rights_decision_summary=_rights_summary(rights),
+                    data_provenance="latest_revised",
+                    warnings=warnings,
+                    ingest_notes=ingest_notes,
+                    http_status=_http_status(adapter),
+                    provider_status=_provider_status(adapter),
+                    next_recommended_action="Series fetch unusable; inspect provider payload",
+                ),
+                PostgresDatasetObservationStore(conn, dataset_id),
+            )
 
     if fingerprint is not None:
         existing = find_retrieval_by_fingerprint(conn, dataset_id, fingerprint)

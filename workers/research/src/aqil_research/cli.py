@@ -118,6 +118,10 @@ def main(argv: list[str] | None = None) -> int:
         from aqil_research.cli_ops import run_forward_demo
 
         return run_forward_demo(args)
+    if args.command == "ingest":
+        from aqil_research.cli_ops import run_ingest
+
+        return run_ingest(args)
     return 1
 
 

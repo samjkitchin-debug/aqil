@@ -15,7 +15,8 @@
     "db:test": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-db-tests.ps1 -Mode TestOnly",
     "db:types": "npx supabase gen types typescript --local --schema public > apps/web/src/types/database.generated.ts",
     "test:db": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-db-tests.ps1",
-    "research:preview": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-research-preview.ps1"
+    "research:preview": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-research-preview.ps1",
+    "research:ingest": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-research-ingest.ps1"
   },
   "devDependencies": {
     "supabase": "2.121.0"
