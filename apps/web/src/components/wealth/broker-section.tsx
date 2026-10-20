@@ -41,6 +41,11 @@ export function BrokerSection({
         {heading === "h1" ? <Title className="aq-wealth-title">My wealth</Title> : null}
         {message ? <p>{message}</p> : null}
         <p>
+          <a className="aq-quiet-link" href="/my-wealth/journal">
+            Investment journal
+          </a>
+        </p>
+        <p>
           <a className="aq-quiet-link" href="/my-wealth/deploy">
             Deploy capital
           </a>
