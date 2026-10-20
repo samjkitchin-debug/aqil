@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from aqil_research.adapters.bls_release.adapter import (
@@ -16,8 +16,15 @@ from aqil_research.adapters.bls_release.constants import (
     DATASET_ID,
     SOURCE_ID,
 )
+from aqil_research.adapters.bls_release.normalize import SourcedUpdateDraft, content_hash_for_item
 from aqil_research.adapters.bls_release.store import SourcedUpdateStore
 from aqil_research.collection.models import CollectionOutcome
+from aqil_research.pipeline.feed_freshness import (
+    FeedFreshnessPolicy,
+    FeedFreshnessState,
+    FeedPollSnapshot,
+)
+from aqil_research.pipeline.sourced_update_gate import PublicationItem, gate_sourced_updates
 from aqil_research.sources.rights import (
     RightsOperation,
     find_source_rights,
@@ -25,6 +32,9 @@ from aqil_research.sources.rights import (
     source_usable,
 )
 from aqil_research.sources.rights_gate import RightsGateError, assert_rights_for_ingest
+
+# A poll older than this is not fresh enough to store publication items.
+_PUBLICATION_FEED_MAX_AGE = timedelta(hours=6)
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,6 +62,7 @@ def collect_bls_releases(
     live: bool = False,
     fixture_path: Path | str | None = None,
     retrieved_at: datetime | None = None,
+    feed_snapshot: FeedPollSnapshot | None = None,
 ) -> BlsReleaseCollectResult:
     """Fetch, normalise and persist BLS Employment Situation publication items."""
     now = retrieved_at or datetime.now(tz=UTC)
@@ -121,18 +132,30 @@ def collect_bls_releases(
             http_status=_http_status(adapter),
         )
 
-    storable_drafts = drafts
-    try:
-        from aqil_research.pipeline.sourced_update_gate import gate_publication_drafts
-    except ImportError:
-        # Without publication gates: persist sourced updates only after a successful feed
-        # read (hard fetch failures return above without writing rows).
-        pass
-    else:
-        storable_drafts = gate_publication_drafts(
-            storable_drafts,
-            ingest_errors=errors,
-            retrieved_at=now,
+    storable_drafts, freshness = _drafts_after_sourced_update_gate(
+        drafts,
+        ingest_errors=errors,
+        retrieved_at=now,
+        feed_snapshot=feed_snapshot,
+    )
+    if freshness is not FeedFreshnessState.FRESH:
+        return BlsReleaseCollectResult(
+            outcome="failed_validation",
+            source_id=SOURCE_ID,
+            dataset_id=DATASET_ID,
+            adapter_id=ADAPTER_ID,
+            adapter_version=ADAPTER_VERSION,
+            collected_at=now,
+            collection_mode=collection_mode,
+            retrieval_id=None,
+            updates_received=len(drafts),
+            updates_newly_stored=0,
+            updates_unchanged=0,
+            rights_decision_summary="rights permitted for ingest",
+            next_recommended_action=(
+                f"Feed freshness is {freshness.value}; no sourced updates stored"
+            ),
+            http_status=_http_status(adapter),
         )
 
     body = adapter._last_fetch.body if adapter._last_fetch else b""
@@ -213,3 +236,72 @@ def _failed(
 def _http_status(adapter: BlsEmpsitReleaseAdapter) -> int | None:
     fetch = adapter._last_fetch
     return fetch.diagnostics.http_status if fetch is not None else None
+
+
+def _drafts_after_sourced_update_gate(
+    drafts: tuple[SourcedUpdateDraft, ...],
+    *,
+    ingest_errors: tuple[object, ...],
+    retrieved_at: datetime,
+    feed_snapshot: FeedPollSnapshot | None,
+) -> tuple[tuple[SourcedUpdateDraft, ...], FeedFreshnessState]:
+    """Call gate_sourced_updates and keep only the drafts it accepts.
+
+    A poll that has just succeeded is fresh. A caller can pass an older
+    snapshot; a stale, interrupted or never-polled feed stores nothing.
+    """
+    partial = bool(ingest_errors)
+    snapshot = feed_snapshot or FeedPollSnapshot(
+        source_id=SOURCE_ID,
+        last_success_at=None if partial else retrieved_at,
+        last_attempt_at=retrieved_at,
+        last_attempt_succeeded=not partial,
+        partial_payload=partial,
+    )
+    items = tuple(
+        PublicationItem(
+            title=draft.title,
+            canonical_url=draft.canonical_url,
+            published_at=draft.published_at,
+            retrieved_at=retrieved_at,
+            source_id=SOURCE_ID,
+        )
+        for draft in drafts
+    )
+    gated = gate_sourced_updates(
+        items,
+        snapshot,
+        FeedFreshnessPolicy(max_age=_PUBLICATION_FEED_MAX_AGE),
+        now=retrieved_at,
+    )
+    if gated.freshness is not FeedFreshnessState.FRESH:
+        return (), gated.freshness
+
+    accepted: list[SourcedUpdateDraft] = []
+    for item in gated.accepted:
+        match = next(
+            (
+                draft
+                for draft in drafts
+                if draft.title == item.title
+                and draft.canonical_url == item.canonical_url
+                and draft.published_at == item.published_at
+            ),
+            None,
+        )
+        if match is not None:
+            accepted.append(match)
+            continue
+        accepted.append(
+            SourcedUpdateDraft(
+                title=item.title,
+                canonical_url=item.canonical_url,
+                published_at=item.published_at,
+                content_hash=content_hash_for_item(
+                    title=item.title,
+                    canonical_url=item.canonical_url,
+                    published_at=item.published_at,
+                ),
+            )
+        )
+    return tuple(accepted), gated.freshness
