@@ -100,4 +100,4 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run pytest
         env:
-          RESEARCH_DATABASE_URL: postgresql://research_worker:research_worker@127.0.0.1:54322/postgres
+          RESEARCH_DATABASE_URL: postgresql://research_worker:research_worker@127.0.0.1:55432/postgres

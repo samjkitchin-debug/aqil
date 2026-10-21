@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-DEFAULT_LOCAL_URL = "postgresql://research_worker:research_worker@127.0.0.1:54322/postgres"
+DEFAULT_LOCAL_URL = "postgresql://research_worker:research_worker@127.0.0.1:55432/postgres"
 
 
 def research_database_url() -> str | None:

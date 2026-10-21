@@ -61,8 +61,8 @@ function Assert-LocalSupabaseDatabase {
   $ErrorActionPreference = "Continue"
   $status = & npx --yes supabase status -o env 2>&1 | Out-String
   $ErrorActionPreference = $previousErrorAction
-  if ($status -notmatch '127\.0\.0\.1:54322') {
-    Write-Error "Refusing database tests: expected local Supabase at 127.0.0.1:54322. Use npm run test:db or start local stack first. Do not run pgTAP against hosted (`supabase test db --linked`)."
+  if ($status -notmatch '127\.0\.0\.1:55432') {
+    Write-Error "Refusing database tests: expected local Supabase at 127.0.0.1:55432. Use npm run test:db or start local stack first. Do not run pgTAP against hosted (`supabase test db --linked`)."
   }
 }
 

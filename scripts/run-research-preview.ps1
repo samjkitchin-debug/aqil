@@ -5,7 +5,7 @@ Set-Location $root
 
 & powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-db-tests.ps1 -Mode Full
 
-$env:RESEARCH_DATABASE_URL = "postgresql://research_worker:research_worker@127.0.0.1:54322/postgres"
+$env:RESEARCH_DATABASE_URL = "postgresql://research_worker:research_worker@127.0.0.1:55432/postgres"
 $runId = "founder-preview-" + (Get-Date -Format "yyyyMMdd-HHmm")
 
 Set-Location (Join-Path $root "workers\research")

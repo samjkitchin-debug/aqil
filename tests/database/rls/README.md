@@ -11,4 +11,4 @@ Implementation: [`supabase/tests/database/`](../../../supabase/tests/database/).
 
 Tests use synthetic users (`user_a@aqil.test`, `user_b@aqil.test`) and `tests.authenticate_as` / `tests.clear_authentication` — not the `postgres` superuser role for RLS assertions. `current_user` is asserted as `authenticated` or `anon` on those paths.
 
-`scripts/run-db-tests.ps1` refuses to run pgTAP unless the local database URL is `127.0.0.1:54322`.
+`scripts/run-db-tests.ps1` refuses to run pgTAP unless the local database URL is `127.0.0.1:55432`.

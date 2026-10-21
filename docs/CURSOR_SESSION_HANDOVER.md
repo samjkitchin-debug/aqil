@@ -1,8 +1,8 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 21 October 2026, controlled consolidation  
-**Parent:** `2f8a353` on `work/aqil-autonomous-build`  
+**Last updated:** 21 October 2026, local series persistence  
+**Parent:** `8028725` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
 
 ## Consolidation, 21 October 2026
@@ -11,11 +11,11 @@ The audited HEAD was `2f8a353`. This note is the consolidation on that parent.
 
 Live BLS series request window was 2023 through 2026. The response was HTTP 200, `REQUEST_SUCCEEDED`, 45 monthly points and no annual rows. Parsed usable observations: 44. `missing_months` had been `missing value for 2025-10-01` because the value is `-` with footnote code 9, "Data unavailable due to the 2025 lapse in appropriations." That is an official absence, not a pagination failure and not an unreleased month. September 2026 is the latest returned month. October 2026 is not yet due. The freshness gate still rejects a genuinely partial or stale payload. An officially unavailable month no longer sets `partial`. After the correction, the same live read is `partial=false` with 44 observations. October 2025 is not stored as a number.
 
-Persistence did not run. On 21 October 2026 Docker Desktop 29.8.2 was started. `npm run test:db` reached a local reset and then failed: Windows excludes TCP 54253–54352, so port 54322 cannot bind. The container `supabase_db_ojvswermsbbaltjohqph` is created and not running. No live rows were written, and the database was not reset after a retrieval. Founder action, from an elevated PowerShell: `net stop winnat`, then `net start winnat`, then start Docker Desktop and run `npm run test:db` before `npm run research:ingest`. Do not reset the database after that ingest. Do not use `supabase test db --linked`.
+Local Supabase now uses database port 55432, API port 55421, and shadow port 55420. Those ports sit outside the Windows exclusion 54253–54352. `npm run test:db` passed first: 10 files, 159 tests, on disposable local Postgres only. The live ingest then stored retrieval `acb7a909-2650-4d50-8fc2-89be29aff7aa` at `2026-10-21T08:11:51.888853Z`, HTTP 200, `REQUEST_SUCCEEDED`, window 2023–2026, 44 observations from January 2023 to September 2026. October 2025 has no row. Unit percent, latest revised, seasonally adjusted, monthly, observed, geography US. A second ingest reported `unchanged=44` and `new=0`. The database was not reset after that retrieval. Do not use `supabase test db --linked`.
 
-The Employment Situation RSS returned HTTP 403. The existing parser accepts RSS and Atom only, so the HTML archive was not scraped. Today loads `research.sourced_updates` and does not load `research.economic_observations`, so the 44 monthly observations would not appear as the briefing even after a successful series ingest. Signed-in Today was not opened.
+The Employment Situation RSS still returns HTTP 403. The existing parser accepts RSS and Atom only, so the HTML archive was not scraped. `research.sourced_updates` has 0 rows. Today now also reads the latest live `research.economic_observations` retrieval and presents it as a historical monthly series, with the October 2025 gap named and nothing filled in. The agent browser opened `http://localhost:3000/` and stopped at Google sign-in, so the signed-in rendering was not seen.
 
-Local checks on `593f496`: typecheck passed, lint passed with one existing unused-argument warning, Saxo 42, Wealth 57, Capital 17, Benchmark 14, Learn 6, Story 4, sourced updates 4 and auth 13 passed, token check passed, and the production build passed. Research pytest was 147 passed and 8 skipped. GitHub Actions has not run. `npm run test:db` did not pass. The web CI job includes those unit commands, but that workflow has not run on GitHub.
+`npm run test:db` on port 55432 passed: 10 files, 159 tests. BLS adapter tests: 11 passed. Series briefing tests: 2 passed. Sourced-update presentation tests: 4 passed. Web typecheck passed. GitHub Actions has not run. Do not reset this local database.
 
 Branches retained: `m5/live-intelligence-coverage` is an ancestor of `m6/research-methods`. Neither is merged. Their migrations use timestamps that must not follow `20261018200000`. `research/employment-situation-2026-11` stays checked out at `C:/Users/gamer/aqil-sahm`. Its migration file matches development. The worktree status shows a modified test file whose blob equals HEAD `ff959c35a41d3ad57ac842c5bec9ed625bc55502`; it was not touched. `auth/google-foundation` is patch-equivalent and was not merged. `my-wealth/portfolio-slice` and `docs/consolidation-2026-10-18` were not merged. No remote branch was deleted. `apps/web/apps web.zip` is gitignored. It contains `.env.local`. The live `apps/web/.env.local` also exists. The zip was not opened for values and was not deleted.
 

@@ -5,7 +5,7 @@ import { connection } from "next/server";
 import type { SourcedUpdateV1 } from "@/lib/research/sourced-update";
 
 const DEFAULT_RESEARCH_DATABASE_URL =
-  "postgresql://research_worker:research_worker@127.0.0.1:54322/postgres";
+  "postgresql://research_worker:research_worker@127.0.0.1:55432/postgres";
 
 const LIST_LIMIT = 24;
 

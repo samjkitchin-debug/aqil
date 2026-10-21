@@ -5,7 +5,15 @@ import { AppShell } from "@/components/app-shell";
 import { ResearchInsightView } from "@/components/research/research-insight-view";
 import { SourcedUpdatesPanel } from "@/components/research/sourced-updates-panel";
 import { loadFounderResearchInsight } from "@/lib/research/load-founder-insight";
+import { SeriesBriefing } from "@/components/research/series-briefing";
+import { loadSeriesBriefing } from "@/lib/research/load-series-briefing";
 import { loadSourcedUpdates } from "@/lib/research/load-sourced-updates";
+
+async function SeriesBlock() {
+  const loaded = await loadSeriesBriefing();
+  if (loaded.status !== "ok") return null;
+  return <SeriesBriefing series={loaded.series} />;
+}
 
 async function TodayBriefing() {
   const sourced = await loadSourcedUpdates();
@@ -45,6 +53,9 @@ export default function TodayPage() {
             </h2>
             <Suspense fallback={<p className="research-body">Loading sourced updates…</p>}>
               <TodayBriefing />
+            </Suspense>
+            <Suspense fallback={null}>
+              <SeriesBlock />
             </Suspense>
           </section>
           <Suspense fallback={null}>
