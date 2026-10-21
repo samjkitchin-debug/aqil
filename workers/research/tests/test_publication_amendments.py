@@ -14,8 +14,6 @@ from db_guard import open_isolated_test_database
 
 pytestmark = pytest.mark.integration
 
-_URL = "https://www.ecb.europa.eu/press/govcdec/otherdec/2026/html/example.en.html"
-
 
 @pytest.fixture(scope="module")
 def require_db() -> str:
@@ -24,23 +22,32 @@ def require_db() -> str:
 
 def test_same_official_page_links_the_earlier_copy(require_db: str) -> None:
     now = datetime(2026, 10, 22, 12, 0, tzinfo=UTC)
+    page = f"https://www.ecb.europa.eu/press/govcdec/otherdec/2026/html/{uuid4().hex}.en.html"
+    first_hash = uuid4().hex + uuid4().hex
+    second_hash = uuid4().hex + uuid4().hex
     with psycopg.connect(require_db) as conn:
         retrieval_id = _retrieval(conn, now)
-        first = _row(retrieval_id, now, "a" * 64, "First title")
+        first = _row(retrieval_id, now, first_hash, "First title", page)
         _insert(conn, first)
-        second = link_amendment(conn, _row(retrieval_id, now, "b" * 64, "Corrected title"))
+        second = link_amendment(
+            conn,
+            _row(retrieval_id, now, second_hash, "Corrected title", page),
+        )
         assert second.correction_of == first.update_id
         _insert(conn, second)
         rows = conn.execute(
             """
             select content_hash, correction_of::text
             from research.sourced_updates
-            where canonical_url = %s
+            where retrieval_id = %s
             order by content_hash
             """,
-            (_URL,),
+            (retrieval_id,),
         ).fetchall()
-    assert rows == [("a" * 64, None), ("b" * 64, first.update_id)]
+    assert rows == sorted(
+        [(first_hash, None), (second_hash, first.update_id)],
+        key=lambda row: row[0],
+    )
 
 
 def _retrieval(conn: psycopg.Connection, now: datetime) -> str:
@@ -63,12 +70,18 @@ def _retrieval(conn: psycopg.Connection, now: datetime) -> str:
     return str(row[0])
 
 
-def _row(retrieval_id: str, now: datetime, content_hash: str, title: str) -> SourcedUpdate:
+def _row(
+    retrieval_id: str,
+    now: datetime,
+    content_hash: str,
+    title: str,
+    page: str,
+) -> SourcedUpdate:
     return SourcedUpdate(
         update_id=str(uuid4()),
         source_id="ecb_monetary_press",
         title=title,
-        canonical_url=_URL,
+        canonical_url=page,
         published_at=now,
         retrieved_at=now,
         retrieval_id=retrieval_id,

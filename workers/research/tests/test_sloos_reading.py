@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import psycopg
@@ -26,10 +26,9 @@ def require_db() -> str:
 
 
 def test_a_revised_value_is_a_new_run(require_db: str, tmp_path: Path) -> None:
-    moment = datetime(2026, 10, 22, 13, 0, tzinfo=UTC)
-    later = datetime(2026, 10, 23, 13, 0, tzinfo=UTC)
     with psycopg.connect(require_db) as conn:
         period = _next_quarter(conn)
+        moment, later = _decision_times(conn, period)
         _collect(conn, tmp_path / "first.json", period, "11.8", "2026-08-03", moment)
         original = record_sloos_reading(conn, decision_at=moment)
         again = record_sloos_reading(conn, decision_at=later)
@@ -58,6 +57,17 @@ def test_a_revised_value_is_a_new_run(require_db: str, tmp_path: Path) -> None:
     assert second.publication_allowed is False
     assert second.investment_implication == "no_action"
     assert stored == (1,)
+
+
+def _decision_times(conn: psycopg.Connection, period: str) -> tuple[datetime, datetime]:
+    year_text, quarter_text = period.split("-Q")
+    period_start = datetime(int(year_text), (int(quarter_text) - 1) * 3 + 1, 1, tzinfo=UTC)
+    row = conn.execute("select max(executed_at) from research.research_runs").fetchone()
+    latest = row[0] if row else None
+    if latest is not None and latest.tzinfo is None:
+        latest = latest.replace(tzinfo=UTC)
+    base = period_start if latest is None or latest < period_start else latest
+    return base + timedelta(days=1), base + timedelta(days=2)
 
 
 def _next_quarter(conn: psycopg.Connection) -> str:

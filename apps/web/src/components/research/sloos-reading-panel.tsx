@@ -1,5 +1,9 @@
 import {
+  calculatedDifferenceCopy,
+  conditionalImplicationCopy,
   directionPhrase,
+  observedSharesCopy,
+  publicationGateCopy,
   quarterStartingLabel,
   sloosLimitationCopy,
   sloosMonitorCopy,
@@ -19,18 +23,30 @@ export function SloosReadingPanel({ reading }: Props) {
       </h2>
       <p className="research-body">{reading.narrative}</p>
       <p className="research-meta">
-        Net tightening share {reading.sharePercent} percent for the quarter starting{" "}
+        Method result: net tightening share {reading.sharePercent} percent for the quarter starting{" "}
         {quarterStartingLabel(reading.observationPeriod)}. Direction:{" "}
         {directionPhrase(reading.directionLabel)}.
       </p>
+      {reading.previousPeriod && reading.previousSharePercent ? (
+        <>
+          <h3 className="research-section-title">Observed values</h3>
+          <p className="research-body">
+            {observedSharesCopy(
+              quarterStartingLabel(reading.observationPeriod),
+              reading.sharePercent,
+              quarterStartingLabel(reading.previousPeriod),
+              reading.previousSharePercent,
+            )}
+          </p>
+          <h3 className="research-section-title">Calculated difference</h3>
+          <p className="research-body">
+            {calculatedDifferenceCopy(reading.sharePercent, reading.previousSharePercent)}
+          </p>
+        </>
+      ) : null}
       <h3 className="research-section-title">Why it matters</h3>
       <p className="research-body">{whyItMatters(reading.directionLabel, reading.interpretation)}</p>
-      {reading.previousPeriod && reading.previousSharePercent ? (
-        <p className="research-meta">
-          Previous stored quarter, starting {quarterStartingLabel(reading.previousPeriod)}:{" "}
-          {reading.previousSharePercent} percent. That is another stored reading, not a forecast.
-        </p>
-      ) : null}
+      <p className="research-body">{conditionalImplicationCopy()}</p>
       <h3 className="research-section-title">What remains uncertain</h3>
       <p className="research-body">{sloosLimitationCopy(reading.limitations)}</p>
       <h3 className="research-section-title">What to monitor</h3>
@@ -71,10 +87,7 @@ export function SloosReadingPanel({ reading }: Props) {
           <dd>{reading.payloadHash.slice(0, 16)}…</dd>
         </div>
       </dl>
-      <p className="research-meta">
-        Not an investment conclusion. No price target, expected return, or fund recommendation is
-        made. Publication remains closed.
-      </p>
+      <p className="research-meta">{publicationGateCopy()}</p>
     </section>
   );
 }

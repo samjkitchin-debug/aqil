@@ -1,4 +1,8 @@
-"""Census Bureau EITS M3 advance API client (optional API key)."""
+"""Census Bureau advance durable-goods API client.
+
+The dataset is ``timeseries/eits/advm3``. Census requires a key for every
+Data API query. A missing key is refused here, before any request.
+"""
 
 from __future__ import annotations
 
@@ -8,9 +12,12 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-# Documented timeseries endpoint for the advance M3 release.
-# Low-volume access does not require a key; a key may be supplied for higher quotas.
-CENSUS_M3_ADV_BASE = "https://api.census.gov/data/timeseries/eits/m3/adv"
+# Current documented dataset. The older /timeseries/eits/m3/adv path now 302s.
+CENSUS_M3_ADV_BASE = "https://api.census.gov/data/timeseries/eits/advm3"
+
+
+class CensusKeyRequired(RuntimeError):
+    """The Census Data API will not answer without a key."""
 
 
 def fetch_mdm_no_timeseries() -> list[list[str]]:
@@ -22,8 +29,12 @@ def fetch_mdm_no_timeseries() -> list[list[str]]:
         "for": "us:*",
     }
     api_key = os.environ.get("CENSUS_API_KEY", "").strip()
-    if api_key:
-        params["key"] = api_key
+    if not api_key:
+        raise CensusKeyRequired(
+            "CENSUS_API_KEY is not set. Census requires a key for every Data API "
+            "query. No request was sent.",
+        )
+    params["key"] = api_key
     url = f"{CENSUS_M3_ADV_BASE}?{urlencode(params)}"
     request = Request(
         url,
