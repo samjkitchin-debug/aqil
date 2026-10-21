@@ -31,6 +31,7 @@ def test_default_steps_are_official_live_sources() -> None:
         "bls_employment_situation_archive",
         "bls_cpi_archive",
         "federal_reserve_monetary_press",
+        "ecb_monetary_press",
         "bls_ics_schedule",
     ]
 

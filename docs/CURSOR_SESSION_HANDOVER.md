@@ -1,8 +1,8 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 22 October 2026, test isolation and CPI coverage  
-**Parent:** `922f15f` on `work/aqil-autonomous-build`  
+**Last updated:** 22 October 2026, pgTAP isolation and ECB policy coverage  
+**Parent:** `a47aebc` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
 
 ## Test isolation incident, 22 October 2026
@@ -21,7 +21,48 @@ What remains in the development database:
 
 `test_collect_and_run_fixture_e2e` returned `completed_insufficient` because the shared store's latest month was the live September 2026 observation, and the October 2025 gap makes that Sahm window incomplete. The fallback flag does not choose an earlier month, and the gate correctly refused a sufficient result. On the disposable database `aqil_research_test` the same test passes. That was contamination, not a weaker gate.
 
-Research tests now require `AQIL_RESEARCH_TEST_DATABASE_URL`, accept only the loopback database `aqil_research_test`, and check `research.test_isolation_marker` before any write. A missing URL, the development URL, a hosted host, or the database name `postgres` fails before connecting. `npm run test:research` prepares that disposable database from the schema only. It does not reset the database named `postgres`. `npm run test:db` still resets port 55432 and was not run.
+Research tests now require `AQIL_RESEARCH_TEST_DATABASE_URL`, accept only the loopback database `aqil_research_test`, and check `research.test_isolation_marker` before any write. A missing URL, the development URL, a hosted host, or the database name `postgres` fails before connecting. `npm run test:research` prepares that disposable database from the schema only. It does not reset the database named `postgres`.
+
+`npm run test:db` no longer calls `supabase db reset`. It requires `AQIL_PGTAP_DATABASE_URL` for loopback database `aqil_pgtap_test`, rejects the database named `postgres`, hosted hosts, and ports 5432 and 6543, then checks `research.pgtap_isolation_marker` before pgTAP. A deliberate development URL and a hosted URL failed before any drop. The suite on `aqil_pgtap_test` was 10 files, 159 tests, pass. Development live observations remained 44. CI may still reset its own ephemeral database.
+
+## ECB policy coverage, 22 October 2026
+
+The ECB press RSS `https://www.ecb.europa.eu/rss/press.html` returned HTTP 200 `application/rss+xml`. The file also contains speeches and interviews. Those paths are not stored. The copyright page permits free use of information taken directly from the site when it is reproduced accurately and the ECB is cited. Working papers and occasional papers still need written authorisation and are not in this selection.
+
+The first refresh stored 3 live items, retrieved 21 October 2026, 21:46 UTC:
+
+- “Meeting of 9-10 September 2026”, published 8 October 2026, 11:30 UTC, `https://www.ecb.europa.eu/press/accounts/2026/html/ecb.mg261008~a10153d090.en.html`
+- “Results of the September 2026 survey on credit terms and conditions in euro-denominated securities financing and OTC derivatives markets (SESFOD)”, published 7 October 2026, 08:00 UTC
+- “Decisions taken by the Governing Council of the ECB (in addition to decisions setting interest rates)”, published 2 October 2026, 13:00 UTC
+
+Signed-in Today showed 42 sourced publications. The 8 October account is under “Published in the last 14 days”, labelled European Central Bank. Evidence shows source id `ecb_monetary_press`, retrieval `bc4f2855-9ae4-4e8b-b302-31c8f49b9d90`, and the official accounts URL. The speech “Diagnostic Challenges for ECB Monetary Policy” is not shown. The synthetic Microsoft fixture is not shown. The second refresh stored 0 new ECB rows. `correction_of` is empty because none of these pages changed. A later hash for the same official URL becomes a new row linked to the earlier row. The earlier row is not overwritten. No publisher correction was present in this feed.
+
+## Source coverage
+
+| Source | State |
+| --- | --- |
+| BLS Employment Situation publications | Connected and operational. 12 live rows. |
+| BLS CPI publications | Connected and operational. 12 live rows. |
+| BLS unemployment observations | Connected and operational. 44 live observations, January 2023 to September 2026. October 2025 is absent. |
+| Federal Reserve monetary-policy press | Connected and operational. 15 live rows. |
+| BLS release calendar | Connected and operational. 27 future confirmed rows. |
+| ECB monetary-policy press | Connected and operational. 3 live rows. Speeches and interviews excluded. |
+| SLOOS C&I standards | Rights cleared and implemented. No live observations stored. |
+| Census advance durable-goods orders | Rights cleared and implemented. No live observations stored. |
+| BEA news schedule | Rights row exists. No machine-readable feed was identified. RSS returned HTTP 404. |
+| FRED ALFRED UNRATE | Restricted. API terms prohibit retention. |
+| Near-term forward spread | Blocked. Formula and input are unresolved. |
+| Vanguard and iShares holdings | Restricted. Automated collection prohibited. |
+
+## Readiness for interpretation
+
+Do not present a live analytical conclusion yet. The unemployment method has 44 live observations, but the latest month is not a sufficient Sahm window because October 2025 was not published. SLOOS, Census advance orders, and the macro-conditions method have no live observations, so they stay experimental. Publication rows are sourced records, not method inputs.
+
+The smallest next demonstration is one live Census advance durable-goods retrieval, or one live SLOOS retrieval, followed by the existing method on that vintage only. The screen should state the measured change, the economic meaning already encoded in that method, the retrieval and observation ids, what later revision or release would contradict it, and that a portfolio conclusion still needs an instrument mapping. Do not add a forecast.
+
+Recurring releases should later be shown as compact trends and comparable series. That presentation was not built.
+
+Research pytest on `aqil_research_test` was 178 passed. Web presentation tests were 11 passed. Typecheck passed. ESLint reported the existing unused-argument warning in `today-story-tangent-path.ts`. GitHub Actions has not run.
 
 ## CPI coverage and refresh, 22 October 2026
 

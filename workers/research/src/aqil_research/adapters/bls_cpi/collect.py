@@ -26,6 +26,7 @@ from aqil_research.adapters.bls_release.parse import parse_publication_feed
 from aqil_research.adapters.protocol import ProviderIdentity
 from aqil_research.contracts.sourced_update import SourcedUpdate
 from aqil_research.persistence.retrieval import insert_source_retrieval
+from aqil_research.pipeline.amendments import link_amendment
 from aqil_research.pipeline.feed_freshness import (
     FeedFreshnessPolicy,
     FeedFreshnessState,
@@ -131,17 +132,20 @@ def collect_bls_cpi(
     unchanged = 0
     for item in gated.accepted:
         content_hash = _content_hash(item.title, item.canonical_url, item.published_at)
-        row = SourcedUpdate(
-            update_id=str(uuid4()),
-            source_id=SOURCE_ID,
-            title=item.title,
-            canonical_url=item.canonical_url,
-            published_at=item.published_at,
-            retrieved_at=now,
-            retrieval_id=str(retrieval_id),
-            content_hash=content_hash,
-            correction_of=None,
-            status="sourced",
+        row = link_amendment(
+            conn,
+            SourcedUpdate(
+                update_id=str(uuid4()),
+                source_id=SOURCE_ID,
+                title=item.title,
+                canonical_url=item.canonical_url,
+                published_at=item.published_at,
+                retrieved_at=now,
+                retrieval_id=str(retrieval_id),
+                content_hash=content_hash,
+                correction_of=None,
+                status="sourced",
+            ),
         )
         if _insert_update(conn, row):
             inserted += 1

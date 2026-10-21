@@ -2,9 +2,9 @@
 
 PostgreSQL schema for Aqil is managed via **Git-tracked** SQL in [`supabase/migrations/`](../supabase/migrations/).
 
-- **Full local gate:** `npm run test:db` (start stack, reset migrations, pgTAP with localhost guard).
-- **Replay only:** `npm run db:reset` (start stack, reset migrations).
-- **pgTAP only:** `npm run db:test` (localhost guard; stack must already be up from `test:db` or `db:reset`).
+- **Full local gate:** `npm run test:db` prepares database `aqil_pgtap_test` from the current schema and runs pgTAP there. It does not run `supabase db reset` and does not drop the development database named `postgres`.
+- **Replay only:** `npm run db:reset` recreates `aqil_pgtap_test` only.
+- **pgTAP only:** `npm run db:test` refuses to run unless `aqil_pgtap_test` has the disposable marker.
 - **Full G0 local gate:** `powershell -File scripts/verify-g0-local.ps1` (needs ~15+ GiB free on `C:` for Docker images).
 - **Types:** `npm run db:types` generates `apps/web/src/types/database.generated.ts`.
 

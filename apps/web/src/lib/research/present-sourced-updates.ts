@@ -15,6 +15,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   bls_ics_schedule: "U.S. Bureau of Labor Statistics",
   federal_reserve_monetary_press: "Federal Reserve Board",
   bls_cpi_archive: "U.S. Bureau of Labor Statistics",
+  ecb_monetary_press: "European Central Bank",
 };
 
 /** A publisher date inside this window can be shown as a recent publication. */

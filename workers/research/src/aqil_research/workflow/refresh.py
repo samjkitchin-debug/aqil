@@ -7,6 +7,7 @@ Cadence, when the command is used:
 - Employment Situation publications: daily
 - Consumer Price Index publications: daily
 - Federal Reserve monetary-policy press: daily
+- ECB monetary-policy press: daily
 - BLS release calendar: daily
 - Unemployment series: weekly, and skipped when a live retrieval is newer
 
@@ -31,6 +32,7 @@ CADENCE = {
     "bls_employment_situation_archive": "daily",
     "bls_cpi_archive": "daily",
     "federal_reserve_monetary_press": "daily",
+    "ecb_monetary_press": "daily",
     "bls_ics_schedule": "daily",
     "bls_cps_unemployment_rate": "weekly",
 }
@@ -83,6 +85,7 @@ def default_refresh_steps() -> tuple[RefreshStep, ...]:
         ("bls_employment_situation_archive", _refresh_bls_publications),
         ("bls_cpi_archive", _refresh_bls_cpi),
         ("federal_reserve_monetary_press", _refresh_fed_press),
+        ("ecb_monetary_press", _refresh_ecb_press),
         ("bls_ics_schedule", _refresh_bls_calendar),
     )
 
@@ -161,6 +164,19 @@ def _refresh_fed_press(now: datetime) -> SourceRefreshResult:
         result = collect_fed_monetary_press(conn, live=True, retrieved_at=now)
     return SourceRefreshResult(
         "federal_reserve_monetary_press",
+        result.outcome,
+        inserted=result.inserted,
+        unchanged=result.unchanged,
+    )
+
+
+def _refresh_ecb_press(now: datetime) -> SourceRefreshResult:
+    from aqil_research.adapters.ecb_press.collect import collect_ecb_monetary_press
+
+    with research_connection() as conn:
+        result = collect_ecb_monetary_press(conn, live=True, retrieved_at=now)
+    return SourceRefreshResult(
+        "ecb_monetary_press",
         result.outcome,
         inserted=result.inserted,
         unchanged=result.unchanged,

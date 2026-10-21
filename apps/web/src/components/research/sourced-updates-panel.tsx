@@ -97,6 +97,11 @@ function PublicationGroup({
             <p className="research-meta">
               Retrieved {row.retrievedLabel} · Status {row.update.status}
             </p>
+            {row.update.correction_of ? (
+              <p className="research-meta">
+                Corrects an earlier copy of this official page. The earlier copy is kept.
+              </p>
+            ) : null}
             {variant === "evidence" ? (
               <dl className="research-meta mt-[var(--space-2)]">
                 <div>

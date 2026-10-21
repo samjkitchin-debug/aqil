@@ -13,6 +13,7 @@ from aqil_research.adapters.bls_release.adapter import BlsEmpsitReleaseAdapter
 from aqil_research.adapters.bls_release.normalize import SourcedUpdateDraft, to_sourced_update
 from aqil_research.contracts.sourced_update import SourcedUpdate
 from aqil_research.persistence.retrieval import insert_source_retrieval
+from aqil_research.pipeline.amendments import link_amendment
 from aqil_research.sources.rights import SourceRightsRecord
 
 
@@ -150,6 +151,7 @@ class PostgresSourcedUpdateStore:
                 retrieval_id=str(retrieval_id),
                 retrieved_at=retrieved_at,
             )
+            row = link_amendment(self._conn, row)
             was_new = _insert_sourced_update(self._conn, row)
             if was_new:
                 inserted += 1
