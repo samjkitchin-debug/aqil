@@ -12,6 +12,7 @@ export const EXPLORE_EMPTY_COPY =
 const PROVIDER_LABELS: Record<string, string> = {
   bls_cps_unemployment_rate: "U.S. Bureau of Labor Statistics",
   bls_employment_situation_archive: "U.S. Bureau of Labor Statistics",
+  bls_ics_schedule: "U.S. Bureau of Labor Statistics",
 };
 
 export function providerLabelForSource(sourceId: string): string {
@@ -23,6 +24,9 @@ export function sortSourcedUpdatesByRecency(updates: SourcedUpdateV1[]): Sourced
   return [...updates].sort((a, b) => {
     const retrieved = Date.parse(b.retrieved_at) - Date.parse(a.retrieved_at);
     if (retrieved !== 0) return retrieved;
+    const publishedA = a.published_at === null ? Number.NEGATIVE_INFINITY : Date.parse(a.published_at);
+    const publishedB = b.published_at === null ? Number.NEGATIVE_INFINITY : Date.parse(b.published_at);
+    if (publishedA !== publishedB) return publishedB - publishedA;
     return b.update_id.localeCompare(a.update_id);
   });
 }

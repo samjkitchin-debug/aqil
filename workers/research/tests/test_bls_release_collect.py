@@ -23,6 +23,13 @@ FIXTURE = Path(__file__).parent / "fixtures" / "bls" / "empsit_release.rss"
 RETRIEVED = datetime(2025, 10, 17, 12, 0, tzinfo=UTC)
 
 
+def test_live_request_identifies_aqil_instead_of_the_http_library() -> None:
+    from aqil_research.adapters.bls_release.client import AQIL_RETRIEVAL_USER_AGENT
+
+    assert AQIL_RETRIEVAL_USER_AGENT.startswith("AqilResearch/")
+    assert "python-httpx" not in AQIL_RETRIEVAL_USER_AGENT.lower()
+
+
 def test_parse_fixture_rss() -> None:
     body = FIXTURE.read_bytes()
     items = parse_publication_feed(body, base_url=BLS_EMPSIT_RSS_URL)

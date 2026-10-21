@@ -102,6 +102,9 @@ def run_ingest(args: argparse.Namespace) -> int:
         "bls_unemployment": result.model_dump(mode="json"),
         "publications_attempted": outcome.publications_attempted,
         "publications_outcome": outcome.publications_outcome,
+        "calendar_outcome": outcome.calendar_outcome,
+        "calendar_new": outcome.calendar_new,
+        "calendar_unchanged": outcome.calendar_unchanged,
     }
     if args.format == "json":
         print(json.dumps(payload, indent=2, default=str))
@@ -114,6 +117,12 @@ def run_ingest(args: argparse.Namespace) -> int:
         )
         if outcome.publications_attempted:
             print(f"publications_outcome={outcome.publications_outcome}")
+        if outcome.calendar_outcome:
+            print(
+                f"calendar_outcome={outcome.calendar_outcome} "
+                f"calendar_new={outcome.calendar_new} "
+                f"calendar_unchanged={outcome.calendar_unchanged}",
+            )
         print(result.next_recommended_action)
 
     if result.outcome in ("failed_rights", "failed_fetch", "failed_validation"):

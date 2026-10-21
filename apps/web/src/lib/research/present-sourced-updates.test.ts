@@ -45,6 +45,19 @@ test("sorts by retrieved_at descending with stable tie-break", () => {
   const sorted = sortSourcedUpdatesByRecency([older, newer]);
   assert.equal(sorted[0]?.update_id, newer.update_id);
   assert.equal(sorted[1]?.update_id, older.update_id);
+  const sameRetrieval = sortSourcedUpdatesByRecency([
+    fixture({
+      update_id: "00000000-0000-4000-8000-000000000010",
+      retrieved_at: "2026-10-21T20:37:00.000Z",
+      published_at: "2026-01-09T13:30:00.000Z",
+    }),
+    fixture({
+      update_id: "00000000-0000-4000-8000-000000000011",
+      retrieved_at: "2026-10-21T20:37:00.000Z",
+      published_at: "2026-10-02T11:51:00.000Z",
+    }),
+  ]);
+  assert.equal(sameRetrieval[0]?.update_id, "00000000-0000-4000-8000-000000000011");
 });
 
 test("missing publication time stays blank in presentation", () => {

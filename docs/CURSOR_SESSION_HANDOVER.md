@@ -1,9 +1,17 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 21 October 2026, Today acceptance  
-**Parent:** `37a80d8` on `work/aqil-autonomous-build`  
+**Last updated:** 22 October 2026, sourced releases and confirmed calendar  
+**Parent:** `c306f1f` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Sourced releases and confirmed calendar, 22 October 2026
+
+The Employment Situation feed at `https://www.bls.gov/feed/empsit.rss` returns HTTP 403 to the default `python-httpx` agent and HTTP 200 to `AqilResearch/1.0`. That is the same registered source. The client now sends that name. Live ingest stored 12 sourced updates. The newest publication is 2 October 2026, 11:51 UTC, title “Both payroll employment (+29,000) and unemployment rate (4.2%) change little in September”, source `bls_employment_situation_archive`, retrieved 21 October 2026, 20:37 UTC. A second ingest reported `publications_outcome=unchanged`. Signed-in Today and Evidence showed the 12 releases, with the September release first. The historical series remains retrieval `acb7a909-2650-4d50-8fc2-89be29aff7aa`, 44 observations.
+
+The official BLS iCalendar states start times with `TZID=US-Eastern`. Twenty-seven future confirmed entries were stored in the existing `forward.catalyst_events` table. Employment Situation is scheduled 6 November 2026, 08:30 Eastern Time, last verified 21 October 2026, 20:38 UTC. A second ingest stored 0 new calendar rows and refreshed the verification time. Entries with no clock time were not stored. Migration `20261022120000_catalyst_verification_update.sql` grants update of the verification and schedule columns only. It was applied on a disposable database at port 56532, where `research_writer` could update `last_verified_at` and could not update `title`, and anon could not read the table. The same file was then applied to the preserved database on port 55432. `npm run test:db` was not run. The 44 observations remained.
+
+Signed-in Intelligence Upcoming listed those confirmed times. Desktop and a 390px Today view showed the releases and the series, with no horizontal overflow.
 
 ## Today acceptance, 21 October 2026
 

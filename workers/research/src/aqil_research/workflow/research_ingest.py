@@ -20,6 +20,9 @@ class ResearchIngestOutcome:
     bls_unemployment: CollectionResult
     publications_attempted: bool
     publications_outcome: str | None = None
+    calendar_outcome: str | None = None
+    calendar_new: int = 0
+    calendar_unchanged: int = 0
 
 
 def _publication_fixture_for_ingest(live: bool, fixture_path: str | None) -> Path | None:
@@ -85,6 +88,7 @@ def run_research_ingest(
             fixture_path=fixture_str,
             collected_at=now,
         )
+        calendar = _invoke_bls_calendar(conn, live=live, collected_at=now)
         bls_result, _store = collect_bls_unemployment(
             store_backend="postgres",
             collected_at=now,
@@ -99,4 +103,23 @@ def run_research_ingest(
         bls_unemployment=bls_result,
         publications_attempted=pubs_attempted,
         publications_outcome=pubs_outcome,
+        calendar_outcome=calendar.outcome,
+        calendar_new=calendar.stored_new,
+        calendar_unchanged=calendar.unchanged,
     )
+
+
+def _invoke_bls_calendar(
+    conn: psycopg.Connection,
+    *,
+    live: bool,
+    collected_at: datetime,
+):
+    from aqil_research.forward.collect_bls_calendar import (
+        CalendarCollectResult,
+        collect_bls_release_calendar,
+    )
+
+    if not live:
+        return CalendarCollectResult("not_attempted", 0, 0, 0, 0, 0, 0)
+    return collect_bls_release_calendar(conn, live=True, retrieved_at=collected_at)

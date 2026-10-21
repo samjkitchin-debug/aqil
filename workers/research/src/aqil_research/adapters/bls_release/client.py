@@ -21,6 +21,9 @@ ALLOWED_PATH_PREFIXES = (
     "/news.release/",
 )
 
+# BLS refuses the default httpx agent. Identify this retrieval; do not imitate a browser.
+AQIL_RETRIEVAL_USER_AGENT = "AqilResearch/1.0 (local research retrieval)"
+
 MAX_RESPONSE_BYTES = 2_000_000
 CONNECT_TIMEOUT_S = 10.0
 READ_TIMEOUT_S = 30.0
@@ -98,7 +101,13 @@ def fetch_empsit_publication_feed(
                 ),
                 follow_redirects=False,
             ) as client:
-                response = client.get(url, headers={"Accept": "*/*"})
+                response = client.get(
+                    url,
+                    headers={
+                        "Accept": "application/atom+xml, application/rss+xml, application/xml, */*",
+                        "User-Agent": AQIL_RETRIEVAL_USER_AGENT,
+                    },
+                )
             http_status = response.status_code
             raw = response.content
             response_bytes = len(raw)
