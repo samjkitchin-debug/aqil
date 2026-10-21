@@ -92,6 +92,7 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "forward.sec.edgar.completed_filings",
         "forward.company_ir.watchlist",
         "fed.press.monetary",
+        "bls.cpi.archive",
     }
     for record in records:
         assert record.terms_url in record.evidence_urls
@@ -104,7 +105,7 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
             "board.yield.ntfs",
         }:
             assert record.assessed_on.isoformat() == "2026-10-18"
-        elif record.dataset_id == "fed.press.monetary":
+        elif record.dataset_id in {"fed.press.monetary", "bls.cpi.archive"}:
             assert record.assessed_on.isoformat() == "2026-10-22"
         else:
             assert record.assessed_on.isoformat() == "2026-10-17"
@@ -141,9 +142,7 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
     assert not source_usable(board, RightsOperation.AI_MODEL_TRAINING)
 
     first_live = {
-        record.dataset_id
-        for record in records
-        if record.m1_role == M1Role.FIRST_LIVE_PROVIDER
+        record.dataset_id for record in records if record.m1_role == M1Role.FIRST_LIVE_PROVIDER
     }
     assert first_live == {
         "bls.ln.LNS14000000",

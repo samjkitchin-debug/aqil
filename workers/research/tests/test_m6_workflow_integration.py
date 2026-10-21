@@ -8,9 +8,10 @@ from pathlib import Path
 import psycopg
 import pytest
 
-from aqil_research.persistence.config import research_database_url_or_local_default
 from aqil_research.persistence.reproduce import verify_stored_run_replay
+from aqil_research.persistence.test_database import require_test_database_url
 from aqil_research.workflow.collect_and_run_macro import collect_and_run_macro_conditions
+from db_guard import open_isolated_test_database
 
 FIXTURES = Path(__file__).parent / "fixtures"
 BLS = FIXTURES / "bls" / "api_lns14000000_success.json"
@@ -18,23 +19,12 @@ SLOOS = FIXTURES / "fed_sloos" / "sublpdcils_n_q_bundle.json"
 CENSUS = FIXTURES / "census" / "mdm_no_adv_vintages.json"
 
 
-def _db_available() -> bool:
-    try:
-        with psycopg.connect(research_database_url_or_local_default(), connect_timeout=2) as conn:
-            with conn.cursor() as cur:
-                cur.execute("select 1")
-        return True
-    except Exception:
-        return False
-
-
 pytestmark = pytest.mark.integration
 
 
 @pytest.fixture(scope="module")
-def require_db() -> None:
-    if not _db_available():
-        pytest.skip("local Supabase not available")
+def require_db() -> str:
+    return open_isolated_test_database()
 
 
 def test_macro_conditions_fixture_e2e(require_db: None) -> None:
@@ -44,7 +34,7 @@ def test_macro_conditions_fixture_e2e(require_db: None) -> None:
     This fixture run must not commit observations or a research run beside it.
     """
     run_id = f"m6-macro-{int(datetime.now(tz=UTC).timestamp())}"
-    conn = psycopg.connect(research_database_url_or_local_default())
+    conn = psycopg.connect(require_test_database_url())
     try:
         with conn.cursor() as cur:
             cur.execute("select current_user")

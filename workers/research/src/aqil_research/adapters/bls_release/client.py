@@ -58,6 +58,7 @@ def fetch_empsit_publication_feed(
     live: bool,
     fixture_path: Path | None = None,
     use_archive_page: bool = False,
+    feed_url: str | None = None,
 ) -> BlsReleaseFetchResult:
     """Fetch RSS by default; optional archive HTML listing (same rights row)."""
     if not live:
@@ -80,7 +81,10 @@ def fetch_empsit_publication_feed(
             ),
         )
 
-    url = BLS_EMPSIT_ARCHIVE_URL if use_archive_page else BLS_EMPSIT_RSS_URL
+    if feed_url is not None:
+        url = feed_url
+    else:
+        url = BLS_EMPSIT_ARCHIVE_URL if use_archive_page else BLS_EMPSIT_RSS_URL
     _assert_url_allowed(url)
     attempts = 0
     http_status: int | None = None

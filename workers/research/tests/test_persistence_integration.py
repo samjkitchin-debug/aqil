@@ -6,7 +6,6 @@ import uuid
 from datetime import UTC, datetime
 from pathlib import Path
 
-import psycopg
 import pytest
 
 from aqil_research.adapters.fixture_ln_csv import FixtureLnCsvAdapter
@@ -14,7 +13,6 @@ from aqil_research.adapters.registry import AdapterRegistry
 from aqil_research.contracts.observation import AnalysisMode
 from aqil_research.methods.configs import SAHM_PUBLISHED
 from aqil_research.methods.registry import SAHM_METHOD_ID, default_method_registry
-from aqil_research.persistence.config import research_database_url_or_local_default
 from aqil_research.persistence.connection import research_connection
 from aqil_research.persistence.ingest import ingest_adapter_to_postgres
 from aqil_research.persistence.reproduce import recompute_stored_run
@@ -24,6 +22,7 @@ from aqil_research.pipeline.models import ResearchExecutionRequest
 from aqil_research.pipeline.orchestrate import execute_research_run
 from aqil_research.sources.rights import load_source_rights
 from aqil_research.vintages.store import InMemoryObservationStore
+from db_guard import open_isolated_test_database
 
 PROVIDERS = Path(__file__).parent / "fixtures" / "providers"
 SOURCE_ID = "bls_cps_unemployment_rate"
@@ -32,23 +31,12 @@ DECISION_AT = datetime(2025, 2, 1, 12, 0, tzinfo=UTC)
 EVALUATION = "2024-12-01"
 
 
-def _db_available() -> bool:
-    try:
-        with psycopg.connect(research_database_url_or_local_default(), connect_timeout=2) as conn:
-            with conn.cursor() as cur:
-                cur.execute("select 1")
-        return True
-    except Exception:
-        return False
-
-
 pytestmark = pytest.mark.integration
 
 
 @pytest.fixture(scope="module")
-def require_db() -> None:
-    if not _db_available():
-        pytest.skip("RESEARCH_DATABASE_URL / local Supabase not available")
+def require_db() -> str:
+    return open_isolated_test_database()
 
 
 def _sahm_request() -> ResearchExecutionRequest:

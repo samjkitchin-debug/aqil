@@ -1,9 +1,39 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 22 October 2026, repeatable refresh and Federal Reserve press  
-**Parent:** `92a783e` on `work/aqil-autonomous-build`  
+**Last updated:** 22 October 2026, test isolation and CPI coverage  
+**Parent:** `922f15f` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Test isolation incident, 22 October 2026
+
+`uv run pytest` ran the integration tests against the development database. Those tests called `research_database_url_or_local_default()`. With `RESEARCH_DATABASE_URL` unset, that function opens `postgresql://research_worker@127.0.0.1:55432/postgres` and `research_connection()` commits on success. The suite therefore wrote fixture observations, two research runs, and a frozen synthetic forward bundle into the database that holds the live BLS and Federal Reserve rows.
+
+The rows were not deleted. `research.economic_observations`, `research.research_runs` and `forward.forward_scenarios` are append-only or frozen. Safe options, none of which were applied: leave the rows and keep them out of the product screens; a later founder-approved presentation flag that does not rewrite hashes; do not reset the database, because a reset would destroy the live series. Disabling the immutability triggers to delete rows is not a safe option.
+
+What remains in the development database:
+
+- Genuine: 44 live unemployment observations on retrieval `acb7a909-2650-4d50-8fc2-89be29aff7aa`; 12 Employment Situation publications; 15 Federal Reserve press publications; 27 future `bls_ics_schedule` calendar rows. CPI added 12 further live publications after the incident.
+- Fixture observations: 87 rows with `collection_mode = 'fixture'`. Some pre-dated the incident. The suite increased that count. They are not shown on Today because the series loader requires `collection_mode = 'live'`.
+- Research runs: `immutability-run-129d829287f7` (`completed`) and `workflow-e2e-1792616393` (`completed_insufficient`). Neither is rendered as an Aqil conclusion.
+- Synthetic forward rows: `event:fixture:msft:fy26q2:earnings` (`synthetic_demonstration`, locator `synthetic://`) and one frozen scenario. Upcoming requires `bls_ics_schedule` and an `https://www.bls.gov/` locator, so the earnings fixture is not listed.
+- Test-generated calendar row that used a real-looking class: `event:verified:fed:fomc:2025-09-17`, evidence class `verified_schedule`, scheduled 17 September 2025. It is in the past and its source id is not `bls_ics_schedule`, so Upcoming does not list it.
+
+`test_collect_and_run_fixture_e2e` returned `completed_insufficient` because the shared store's latest month was the live September 2026 observation, and the October 2025 gap makes that Sahm window incomplete. The fallback flag does not choose an earlier month, and the gate correctly refused a sufficient result. On the disposable database `aqil_research_test` the same test passes. That was contamination, not a weaker gate.
+
+Research tests now require `AQIL_RESEARCH_TEST_DATABASE_URL`, accept only the loopback database `aqil_research_test`, and check `research.test_isolation_marker` before any write. A missing URL, the development URL, a hosted host, or the database name `postgres` fails before connecting. `npm run test:research` prepares that disposable database from the schema only. It does not reset the database named `postgres`. `npm run test:db` still resets port 55432 and was not run.
+
+## CPI coverage and refresh, 22 October 2026
+
+The Consumer Price Index Atom feed `https://www.bls.gov/feed/cpi.rss` returned HTTP 200. It is registered as `bls_cpi_archive` / `bls.cpi.archive` under the existing BLS terms. The first refresh stored 12 releases. The newest is “CPI for all items increases 0.6% in September; gasoline rises”, published 14 October 2026, 11:50 UTC, at `https://www.bls.gov/news.release/archives/cpi_10142026.htm`, retrieved 21 October 2026, 21:27 UTC. The second refresh stored 0 new CPI rows. Signed-in Today places that September CPI release under “Published in the last 14 days”, with the 13 October Board minutes. Evidence shows `bls_cpi_archive` and the BLS archive URL. The 44 live observations and 27 BLS calendar rows remained.
+
+An identical publication is unchanged. A changed title or link would be a new content hash and a new row. `correction_of` stays empty until a publisher identifies a correction. No correction was present in these feeds. BLS publication fetches retry transport failures and HTTP 5xx up to three times and do not retry HTTP 4xx. The Federal Reserve client now follows the same rule. The unemployment series stays on a weekly skip. Each source commits alone. A held advisory lock makes a second refresh return without writing.
+
+`npm run research:status` reads the latest `research.refresh_runs` row per source and does not poll. Production scheduling, not activated: one daily run of `npm run research:refresh` on a private operator host that can reach the research database, with `npm run research:status` for the result. No Windows task, Vercel cron, hosted migration, or new paid service. Founder approval is required before any of those are turned on.
+
+Recurring releases should later be shown as compact trends and comparable series rather than a long list of release cards. That redesign was not implemented.
+
+The research suite on `aqil_research_test` was 176 passed. Web presentation tests were 11 passed. Typecheck passed. Production build passed. ESLint reported one existing unused-argument warning in `today-story-tangent-path.ts`. `ruff format --check` still fails on modules this sprint did not edit. GitHub Actions has not run.
 
 ## Repeatable refresh and a second source, 22 October 2026
 

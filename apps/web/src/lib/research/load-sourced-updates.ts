@@ -2,12 +2,13 @@ import "server-only";
 
 import { connection } from "next/server";
 
+import { LIVE_PUBLICATION_FILTER } from "@/lib/research/operational-sources";
 import type { SourcedUpdateV1 } from "@/lib/research/sourced-update";
 
 const DEFAULT_RESEARCH_DATABASE_URL =
   "postgresql://research_worker:research_worker@127.0.0.1:55432/postgres";
 
-const LIST_LIMIT = 48;
+const LIST_LIMIT = 64;
 
 type DbRow = {
   update_id: string;
@@ -67,10 +68,13 @@ export async function loadSourcedUpdates(): Promise<LoadSourcedUpdatesResult> {
     await client.connect();
     try {
       const result = await client.query<DbRow>(
-        `select update_id, schema_version, source_id, title, canonical_url,
-                published_at, retrieved_at, retrieval_id, content_hash, correction_of, status
-         from research.sourced_updates
-         order by retrieved_at desc
+        `select u.update_id, u.schema_version, u.source_id, u.title, u.canonical_url,
+                u.published_at, u.retrieved_at, u.retrieval_id, u.content_hash,
+                u.correction_of, u.status
+         from research.sourced_updates u
+         join research.source_retrievals r on r.retrieval_id = u.retrieval_id
+         where ${LIVE_PUBLICATION_FILTER}
+         order by u.retrieved_at desc
          limit $1`,
         [LIST_LIMIT],
       );

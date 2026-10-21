@@ -2,6 +2,7 @@ import "server-only";
 
 import { connection } from "next/server";
 
+import { OPERATIONAL_CALENDAR_FILTER } from "@/lib/research/operational-sources";
 import type { VerifiedCatalyst } from "@/lib/research/present-verified-catalysts";
 
 const DEFAULT_RESEARCH_DATABASE_URL =
@@ -39,7 +40,7 @@ export async function loadVerifiedCatalysts(): Promise<VerifiedCatalyst[]> {
         `select event_id, title, scheduled_at, timezone, status, source_id,
                 source_locator, last_verified_at, date_precision
          from forward.catalyst_events
-         where evidence_class = 'verified_schedule'
+         where ${OPERATIONAL_CALENDAR_FILTER}
            and date_precision = 'confirmed'
            and scheduled_at > now()
          order by scheduled_at`,

@@ -18,27 +18,15 @@ from aqil_research.forward.persistence import (
     load_frozen_scenario,
     load_persisted_forward_horizon,
 )
-from aqil_research.persistence.config import research_database_url_or_local_default
 from aqil_research.persistence.connection import research_connection
-
-
-def _db_available() -> bool:
-    try:
-        with psycopg.connect(research_database_url_or_local_default(), connect_timeout=2) as conn:
-            with conn.cursor() as cur:
-                cur.execute("select 1")
-        return True
-    except Exception:
-        return False
-
+from db_guard import open_isolated_test_database
 
 pytestmark = pytest.mark.integration
 
 
 @pytest.fixture(scope="module")
-def require_db() -> None:
-    if not _db_available():
-        pytest.skip("local Supabase not available")
+def require_db() -> str:
+    return open_isolated_test_database()
 
 
 def _counts(conn: psycopg.Connection) -> dict[str, int]:

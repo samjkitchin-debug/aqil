@@ -126,6 +126,10 @@ def main(argv: list[str] | None = None) -> int:
         from aqil_research.cli_ops import run_refresh
 
         return run_refresh(args)
+    if args.command == "refresh-status":
+        from aqil_research.cli_ops import run_refresh_status
+
+        return run_refresh_status(args)
     return 1
 
 

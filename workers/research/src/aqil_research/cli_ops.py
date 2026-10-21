@@ -87,6 +87,50 @@ def register_collect_parsers(sub: argparse._SubParsersAction) -> None:
         help="Refresh registered live sources once. Does not install a schedule.",
     )
     refresh.add_argument("--format", choices=["text", "json"], default="text")
+    status = sub.add_parser(
+        "refresh-status",
+        help="Show the latest recorded refresh for each source. Does not poll.",
+    )
+    status.add_argument("--format", choices=["text", "json"], default="text")
+
+
+def run_refresh_status(args: argparse.Namespace) -> int:
+    from aqil_research.workflow.refresh import CADENCE, latest_refresh_status
+
+    try:
+        rows = latest_refresh_status()
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+    payload = {
+        "cadence": CADENCE,
+        "schedule": (
+            "Run npm run research:refresh once a day from a private operator host. "
+            "Do not install a Windows task or a hosted schedule without founder approval."
+        ),
+        "sources": [
+            {
+                "source_id": row[0],
+                "outcome": row[1],
+                "inserted": row[2],
+                "unchanged": row[3],
+                "finished_at": row[4].isoformat(),
+                "detail": row[5],
+                "cadence": CADENCE.get(row[0], "unspecified"),
+            }
+            for row in rows
+        ],
+    }
+    if args.format == "json":
+        print(json.dumps(payload))
+        return 0
+    print(payload["schedule"])
+    for source in payload["sources"]:
+        print(
+            f"{source['source_id']}: {source['outcome']} "
+            f"at {source['finished_at']} cadence={source['cadence']}"
+        )
+    return 0
 
 
 def run_refresh(args: argparse.Namespace) -> int:

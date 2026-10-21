@@ -8,24 +8,14 @@ from pathlib import Path
 import psycopg
 import pytest
 
-from aqil_research.persistence.config import research_database_url_or_local_default
 from aqil_research.persistence.connection import research_connection
 from aqil_research.workflow.research_ingest import run_research_ingest
+from db_guard import open_isolated_test_database
 
 FIXTURE = Path(__file__).parent / "fixtures" / "bls" / "api_lns14000000_success.json"
 BAD_FIXTURE = Path(__file__).parent / "fixtures" / "bls" / "api_empty_series.json"
 COLLECTED_AT = datetime(2025, 6, 1, 12, 0, tzinfo=UTC)
 DATASET_ID = "bls.ln.LNS14000000"
-
-
-def _db_available() -> bool:
-    try:
-        with psycopg.connect(research_database_url_or_local_default(), connect_timeout=2) as conn:
-            with conn.cursor() as cur:
-                cur.execute("select 1")
-        return True
-    except Exception:
-        return False
 
 
 def _observation_count(conn: psycopg.Connection) -> int:
@@ -42,9 +32,8 @@ pytestmark = pytest.mark.integration
 
 
 @pytest.fixture(scope="module")
-def require_db() -> None:
-    if not _db_available():
-        pytest.skip("local Supabase not available")
+def require_db() -> str:
+    return open_isolated_test_database()
 
 
 def test_fixture_ingest_is_idempotent(require_db: None) -> None:

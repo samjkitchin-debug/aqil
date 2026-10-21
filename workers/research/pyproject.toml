@@ -31,7 +31,7 @@ dev = [
 testpaths = ["tests"]
 pythonpath = ["src", "tests"]
 markers = [
-    "integration: requires local Supabase Postgres (RESEARCH_DATABASE_URL)",
+    "integration: requires AQIL_RESEARCH_TEST_DATABASE_URL for database aqil_research_test",
 ]
 
 [tool.ruff]

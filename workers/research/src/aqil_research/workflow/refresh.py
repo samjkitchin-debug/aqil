@@ -5,6 +5,7 @@ does not install a Windows task or a production schedule.
 
 Cadence, when the command is used:
 - Employment Situation publications: daily
+- Consumer Price Index publications: daily
 - Federal Reserve monetary-policy press: daily
 - BLS release calendar: daily
 - Unemployment series: weekly, and skipped when a live retrieval is newer
@@ -15,7 +16,7 @@ other sources still run. A second overlapping refresh does not write.
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
@@ -28,6 +29,7 @@ SERIES_INTERVAL = timedelta(days=7)
 
 CADENCE = {
     "bls_employment_situation_archive": "daily",
+    "bls_cpi_archive": "daily",
     "federal_reserve_monetary_press": "daily",
     "bls_ics_schedule": "daily",
     "bls_cps_unemployment_rate": "weekly",
@@ -50,16 +52,46 @@ class RefreshReport:
     sources: tuple[SourceRefreshResult, ...]
 
 
+RefreshStep = tuple[str, Callable[[datetime], SourceRefreshResult]]
+
+
+def latest_refresh_status() -> tuple[tuple[str, str, int, int, datetime, str], ...]:
+    """Latest recorded outcome for each source. Does not poll a provider."""
+    with research_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                select distinct on (source_id)
+                  source_id, outcome, inserted_count, unchanged_count, finished_at, detail
+                from research.refresh_runs
+                order by source_id, finished_at desc
+                """
+            )
+            rows = cur.fetchall()
+    return tuple(rows)
+
+
 def series_is_due(last_success: datetime | None, now: datetime) -> bool:
     if last_success is None:
         return True
     return now - last_success >= SERIES_INTERVAL
 
 
+def default_refresh_steps() -> tuple[RefreshStep, ...]:
+    """Live official feeds only. Fixture paths are not accepted."""
+    return (
+        ("bls_employment_situation_archive", _refresh_bls_publications),
+        ("bls_cpi_archive", _refresh_bls_cpi),
+        ("federal_reserve_monetary_press", _refresh_fed_press),
+        ("bls_ics_schedule", _refresh_bls_calendar),
+    )
+
+
 def run_registered_refresh(
     *,
     collected_at: datetime | None = None,
     include_series: bool = True,
+    steps: Sequence[RefreshStep] | None = None,
 ) -> RefreshReport:
     """Poll each registered live source once, under one advisory lock."""
     now = collected_at or datetime.now(tz=UTC)
@@ -67,11 +99,8 @@ def run_registered_refresh(
         if not _try_lock(lock_conn):
             return RefreshReport(now, True, ())
         try:
-            results = (
-                _run_one(now, "bls_employment_situation_archive", _refresh_bls_publications),
-                _run_one(now, "federal_reserve_monetary_press", _refresh_fed_press),
-                _run_one(now, "bls_ics_schedule", _refresh_bls_calendar),
-            )
+            chosen = steps if steps is not None else default_refresh_steps()
+            results = tuple(_run_one(now, source_id, action) for source_id, action in chosen)
             series = (
                 _run_one(now, "bls_cps_unemployment_rate", _refresh_series)
                 if include_series
@@ -109,6 +138,19 @@ def _refresh_bls_publications(now: datetime) -> SourceRefreshResult:
         str(result.outcome),
         inserted=result.updates_newly_stored,
         unchanged=result.updates_unchanged,
+    )
+
+
+def _refresh_bls_cpi(now: datetime) -> SourceRefreshResult:
+    from aqil_research.adapters.bls_cpi.collect import collect_bls_cpi
+
+    with research_connection() as conn:
+        result = collect_bls_cpi(conn, live=True, retrieved_at=now)
+    return SourceRefreshResult(
+        "bls_cpi_archive",
+        result.outcome,
+        inserted=result.inserted,
+        unchanged=result.unchanged,
     )
 
 
