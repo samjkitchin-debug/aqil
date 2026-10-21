@@ -1,0 +1,22 @@
+{
+  "series_id": "SUBLPDCILS_N.Q",
+  "observations": [
+    {
+      "period": "2024-Q2",
+      "value": "n.a.",
+      "vintage": "2024-08-05"
+    },
+    {
+      "period": "2024-Q3",
+      "value": "15.2",
+      "vintage": "2024-11-04",
+      "earliest_model_available_at": "2024-11-04T16:00:00+00:00"
+    },
+    {
+      "period": "2024-Q4",
+      "value": "0.0",
+      "vintage": "2025-02-03",
+      "earliest_model_available_at": "2025-02-03T15:00:00+00:00"
+    }
+  ]
+}

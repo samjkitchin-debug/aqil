@@ -7,7 +7,13 @@ from dataclasses import dataclass
 
 import psycopg
 
-from aqil_research.methods.configs import SAHM_PUBLISHED, SAHM_SENSITIVITY
+from aqil_research.methods.configs import (
+    CENSUS_ADV_ORDERS_PUBLISHED,
+    MACRO_CONDITIONS_PUBLISHED,
+    SAHM_PUBLISHED,
+    SAHM_SENSITIVITY,
+    SLOOS_CIL_PUBLISHED,
+)
 from aqil_research.methods.registry import default_method_registry
 from aqil_research.persistence.calculation_normalize import normalize_calculation_payload
 from aqil_research.persistence.observation_store import load_observations_by_ids
@@ -117,4 +123,12 @@ def _config_for_id(config_id: str) -> dict[str, object]:
         return SAHM_PUBLISHED.model_dump(mode="json")
     if config_id == SAHM_SENSITIVITY.config_id:
         return SAHM_SENSITIVITY.model_dump(mode="json")
+    published_panels = (
+        MACRO_CONDITIONS_PUBLISHED,
+        SLOOS_CIL_PUBLISHED,
+        CENSUS_ADV_ORDERS_PUBLISHED,
+    )
+    for panel in published_panels:
+        if config_id == panel["config_id"]:
+            return dict(panel)
     raise ValueError(f"unknown config_id for reproduction: {config_id}")

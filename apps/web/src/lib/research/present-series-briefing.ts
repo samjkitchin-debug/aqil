@@ -57,7 +57,7 @@ export function presentSeriesBriefing(series: LiveSeriesRetrieval): SeriesBriefi
   const first = periods[0] ?? series.latestPeriod;
   const last = periods[periods.length - 1] ?? series.latestPeriod;
   const gaps = unpublishedMonths(periods);
-  const provenance = series.seriesProvenance.replaceAll("_", " ");
+  const provenance = sentenceStart(series.seriesProvenance.replaceAll("_", " "));
   return {
     heading: "Historical monthly series",
     notice: "Stored economic data from one retrieval. Not a news announcement and not an investment conclusion.",
@@ -70,6 +70,11 @@ export function presentSeriesBriefing(series: LiveSeriesRetrieval): SeriesBriefi
         : `Not published in this retrieval: ${gaps.map(formatMonth).join(", ")}. Nothing was filled in.`,
     freshnessLine: `Retrieved ${formatRetrieved(series.retrievedAt)}.`,
   };
+}
+
+function sentenceStart(value: string): string {
+  if (value.length === 0) return value;
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function monthKey(isoDate: string): string {

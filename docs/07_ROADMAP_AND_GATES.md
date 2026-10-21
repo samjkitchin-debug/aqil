@@ -1,6 +1,6 @@
 # AQIL — Execution Roadmap and Stage Gates
 
-**Last reconciled:** 21 October 2026 · **Git baseline:** `work/aqil-autonomous-build` after `2f8a353`. See `docs/CURSOR_SESSION_HANDOVER.md`.
+**Last reconciled:** 21 October 2026 · **Git baseline:** `work/aqil-autonomous-build`. See `docs/CURSOR_SESSION_HANDOVER.md`.
 
 ## Operating baseline (18 October 2026)
 
@@ -11,7 +11,7 @@ This section supersedes older sentences below that say authentication, hosted Su
 - Hosted project `ojvswermsbbaltjohqph` has exactly five migrations: `20261017103000`, `20261017110000`, `20261017120000`, `20261017140000`, `20261017180000`. Local files `20261018200000` and `20261018210000` are not applied. Do not apply them until the founder approves that batch, and do not apply older M5 timestamps after them.
 - Local Saxo reads are real and read-only. Production does not offer Connect Saxo until encrypted, owner-scoped token storage exists. See ADR 021–024.
 - Workflow: localhost → local tests → reviewed commit → one push to `main` → the existing GitHub to Vercel integration. No Vercel CLI deploy, no second Vercel project, no preview build created for its own sake.
-- Next product order: one official series retrieved, stored and shown on Today; then the Employment Situation feed, without bypassing its HTTP 403; then a signed-in check. My Wealth, Deploy Capital and the journal stay supporting local capabilities. M5 and M6 are not merged. Their migrations use timestamps that must not be applied after `20261018200000`. The November employment baseline does not prove forecasting skill.
+- Next product order: a permitted Employment Situation publication feed, without bypassing its HTTP 403. The historical unemployment series is stored and shown on signed-in Today. SLOOS and Census methods are in the worker and are not on the page. M5's calendar UI and its timestamped migrations stay unmerged. The UI can load a fixture horizon, and `20261018100000` / `20261018140000` must not be applied after `20261018200000`. The path is one new migration after `20261021110000` that repeats only those additive constraint and `collection_runs` changes, then collectors that store `verified_schedule` rows. Intelligence continues to show only retrieved publication dates until that migration has passed local pgTAP without resetting the preserved database. The November employment baseline does not prove forecasting skill.
 
 ## Progress register
 

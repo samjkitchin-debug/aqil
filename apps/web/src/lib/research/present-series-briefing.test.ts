@@ -19,6 +19,10 @@ const series: LiveSeriesRetrieval = {
 test("a missing month inside the span is named and not filled", () => {
   assert.deepEqual(unpublishedMonths(series.periods), ["2025-10"]);
   const copy = presentSeriesBriefing(series);
+  assert.match(
+    copy.sourceLine,
+    /^Source bls_cps_unemployment_rate\. Dataset bls\.ln\.LNS14000000\. Latest revised, seasonally adjusted, percent\.$/,
+  );
   assert.match(copy.notice, /not a news announcement/i);
   assert.match(copy.gapLine ?? "", /October 2025/);
   assert.match(copy.gapLine ?? "", /Nothing was filled in/);

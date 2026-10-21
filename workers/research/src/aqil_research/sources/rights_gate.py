@@ -10,6 +10,20 @@ class RightsGateError(Exception):
     """Raised when a rights decision blocks an operation."""
 
 
+def resolve_research_rights_by_dataset(
+    records: tuple[SourceRightsRecord, ...],
+    *,
+    dataset_id: str,
+) -> SourceRightsRecord:
+    """Match dataset_id to exactly one enabled register row."""
+    matches = [row for row in records if row.dataset_id == dataset_id]
+    if not matches:
+        raise RightsGateError(f"no rights record for dataset_id={dataset_id}")
+    if len(matches) > 1:
+        raise RightsGateError(f"ambiguous rights records for dataset_id={dataset_id}")
+    return matches[0]
+
+
 def resolve_research_rights(
     records: tuple[SourceRightsRecord, ...],
     *,

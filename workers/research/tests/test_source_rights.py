@@ -80,11 +80,31 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "treasury.xml.daily_treasury_yield_curve",
         "fiscal.avg_interest_rates",
         "board.h15.treasury_yields",
+        "fed.sloos.SUBLPDCILS_N.Q",
+        "census.m3.adv.MDM.NO",
+        "board.yield.ntfs",
+        "forward.fomc.schedule",
+        "forward.bls.empsit.schedule",
+        "forward.etf.vwra.holdings",
+        "forward.etf.ishares.holdings",
+        "forward.bls.selected_releases.schedule",
+        "forward.bea.news.schedule",
+        "forward.sec.edgar.completed_filings",
+        "forward.company_ir.watchlist",
     }
     for record in records:
         assert record.terms_url in record.evidence_urls
         assert record.evidence_note
-        assert record.assessed_on.isoformat() == "2026-10-17"
+        if record.dataset_id.startswith("forward."):
+            assert record.assessed_on.isoformat() == "2026-10-18"
+        elif record.dataset_id in {
+            "fed.sloos.SUBLPDCILS_N.Q",
+            "census.m3.adv.MDM.NO",
+            "board.yield.ntfs",
+        }:
+            assert record.assessed_on.isoformat() == "2026-10-18"
+        else:
+            assert record.assessed_on.isoformat() == "2026-10-17"
 
     unemployment = by_dataset["bls.ln.LNS14000000"]
     assert unemployment.m1_role == M1Role.FIRST_LIVE_PROVIDER
@@ -117,8 +137,16 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
     assert source_usable(board, RightsOperation.REDISTRIBUTION)
     assert not source_usable(board, RightsOperation.AI_MODEL_TRAINING)
 
-    first_live = [record for record in records if record.m1_role == M1Role.FIRST_LIVE_PROVIDER]
-    assert first_live == [unemployment]
+    first_live = {
+        record.dataset_id
+        for record in records
+        if record.m1_role == M1Role.FIRST_LIVE_PROVIDER
+    }
+    assert first_live == {
+        "bls.ln.LNS14000000",
+        "fed.sloos.SUBLPDCILS_N.Q",
+        "census.m3.adv.MDM.NO",
+    }
     assert all(operation_allowed(unemployment, operation) for operation in FIRST_LIVE_OPERATIONS)
     assert unemployment.attribution == AttributionRequirement.REQUIRED
 

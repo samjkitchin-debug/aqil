@@ -1,9 +1,21 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 21 October 2026, local series persistence  
-**Parent:** `8028725` on `work/aqil-autonomous-build`  
+**Last updated:** 21 October 2026, Today acceptance  
+**Parent:** `37a80d8` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Today acceptance, 21 October 2026
+
+Signed-in Today at `http://localhost:3000/` showed the persisted retrieval `acb7a909-2650-4d50-8fc2-89be29aff7aa`. The panel read: 44 monthly observations, January 2023 to September 2026, latest observation September 2026 at 4.2 percent, October 2025 not published, retrieved 21 Oct 2026, 08:11 UTC. Source `bls_cps_unemployment_rate`, dataset `bls.ln.LNS14000000`. The sourced briefing said no sourced updates have been retrieved. The database still has that one live retrieval, 44 observations, and 0 `research.sourced_updates` rows. It was not reset.
+
+Intelligence Upcoming says no validated catalyst date has been retrieved. Evidence says no sourced updates have been retrieved. Exposures says no authoritative exposure mapping has been retrieved. Learn is labelled an illustration. Desktop and a 390px viewport both showed the series, with primary navigation at the bottom on the narrow width. No horizontal overflow. The Cursor browser console reported hydration mismatches on `data-cursor-ref`. Those attributes are not in the application source.
+
+SLOOS and Census advance-orders methods from `m6/research-methods` are now on this branch, including their rights-register rows. The freshness gate still blocks a partial live series fetch. Fixture collection is allowed only when `collection_mode` is `fixture`. The macro-conditions integration test rolls back, so it did not add fixture rows beside the live retrieval. Those methods are not rendered on Today.
+
+M5 is not merged. Its calendar page loads a forward-horizon bundle that can be a fixture, which would replace the current sourced-date gate. Its migrations `20261018100000` and `20261018140000` sort before `20261018200000` and must not be applied in that order. The integration path is a later additive migration, after `20261021110000`, containing only the constraint changes and `forward.collection_runs`, followed by collectors that persist `verified_schedule` rows. Do not run `npm run test:db` until that work is ready to reset a disposable database. This preserved database stays as it is.
+
+`my-wealth/portfolio-slice` is not merged. Its migration `20261018160000` would sort before the current wealth migrations, and its UI is an earlier slice beside the cockpit, journal and Deploy Capital already on this branch. `docs/consolidation-2026-10-18` would overwrite newer charter, roadmap and handover text. `auth/google-foundation` is patch-equivalent (`git cherry` marks all three commits `-`) and was not deleted. The Sahm worktree at `C:/Users/gamer/aqil-sahm` still shows a modified test file and was not touched. No remote branch was deleted and no pull request was closed.
 
 ## Consolidation, 21 October 2026
 
@@ -17,7 +29,7 @@ The Employment Situation RSS still returns HTTP 403. The existing parser accepts
 
 `npm run test:db` on port 55432 passed: 10 files, 159 tests. BLS adapter tests: 11 passed. Series briefing tests: 2 passed. Sourced-update presentation tests: 4 passed. Web typecheck passed. GitHub Actions has not run. Do not reset this local database.
 
-Branches retained: `m5/live-intelligence-coverage` is an ancestor of `m6/research-methods`. Neither is merged. Their migrations use timestamps that must not follow `20261018200000`. `research/employment-situation-2026-11` stays checked out at `C:/Users/gamer/aqil-sahm`. Its migration file matches development. The worktree status shows a modified test file whose blob equals HEAD `ff959c35a41d3ad57ac842c5bec9ed625bc55502`; it was not touched. `auth/google-foundation` is patch-equivalent and was not merged. `my-wealth/portfolio-slice` and `docs/consolidation-2026-10-18` were not merged. No remote branch was deleted. `apps/web/apps web.zip` is gitignored. It contains `.env.local`. The live `apps/web/.env.local` also exists. The zip was not opened for values and was not deleted.
+Branches retained: `m5/live-intelligence-coverage` is an ancestor of `m6/research-methods`. The M6 method code is integrated on development. The M5 calendar UI and both historical migrations are not. `research/employment-situation-2026-11` stays checked out at `C:/Users/gamer/aqil-sahm`. Its migration file matches development. The worktree status shows a modified test file whose blob equals HEAD `ff959c35a41d3ad57ac842c5bec9ed625bc55502`; it was not touched. `auth/google-foundation` is patch-equivalent and was not merged. `my-wealth/portfolio-slice` and `docs/consolidation-2026-10-18` were not merged. No remote branch was deleted. `apps/web/apps web.zip` is gitignored. It contains `.env.local`. The live `apps/web/.env.local` also exists. The zip was not opened for values and was not deleted.
 
 ## Today and Intelligence proof, 21 October 2026
 

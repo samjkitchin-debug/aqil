@@ -35,6 +35,8 @@ from aqil_research.sources.rights_gate import RightsGateError, assert_rights_for
 from aqil_research.vintages.store import InMemoryObservationStore, VintageConflictError
 
 BLS_SOURCE_ID = "bls_cps_unemployment_rate"
+SLOOS_SOURCE_ID = "federal_reserve_sloos_cil"
+CENSUS_SOURCE_ID = "census_adv_durable_goods"
 
 
 def _rights_summary(rights: SourceRightsRecord) -> str:
@@ -151,8 +153,71 @@ def collect_bls_unemployment(
     return _collect_memory(adapter, rights, now, collection_mode, warnings)
 
 
+def collect_registered_adapter(
+    *,
+    store_backend: str,
+    adapter: ProviderAdapter,
+    source_id: str,
+    collected_at: datetime | None = None,
+    live: bool = False,
+    conn: psycopg.Connection | None = None,
+) -> tuple[CollectionResult, object]:
+    """Collect any rights-registered adapter using the shared postgres/memory paths."""
+    now = collected_at or datetime.now(tz=UTC)
+    rights_records = load_source_rights()
+    rights = find_source_rights(rights_records, source_id=source_id)
+    if rights is None:
+        identity = adapter.identity
+        return (
+            CollectionResult(
+                source_id=source_id,
+                dataset_id=identity.dataset_id,
+                provider_id=identity.adapter_id.split("_")[0],
+                adapter_id=identity.adapter_id,
+                adapter_version=identity.adapter_version,
+                collected_at=now,
+                collection_mode="fixture" if not live else "live",
+                outcome="failed_rights",
+                rights_record_id=source_id,
+                rights_decision_summary="source not in register",
+                data_provenance="latest_revised",
+                next_recommended_action="Add source to SOURCE_RIGHTS.csv",
+            ),
+            InMemoryObservationStore(),
+        )
+    collection_mode = "fixture" if not live else "live"
+    warnings = _validate_adapter_rights(adapter, rights)
+    try:
+        assert_rights_for_ingest(rights, adapter)
+    except RightsGateError as exc:
+        identity = adapter.identity
+        return (
+            CollectionResult(
+                source_id=rights.source_id,
+                dataset_id=rights.dataset_id,
+                provider_id=identity.adapter_id,
+                adapter_id=identity.adapter_id,
+                adapter_version=identity.adapter_version,
+                collected_at=now,
+                collection_mode=collection_mode,  # type: ignore[arg-type]
+                outcome="failed_rights",
+                rights_record_id=rights.source_id,
+                rights_decision_summary=str(exc),
+                data_provenance="latest_revised",
+                warnings=warnings,
+                next_recommended_action="Resolve rights gate before retrying",
+            ),
+            InMemoryObservationStore(),
+        )
+    if store_backend == "postgres":
+        if conn is None:
+            raise ValueError("postgres collection requires an open connection")
+        return _collect_postgres(conn, adapter, rights, now, collection_mode, warnings)
+    return _collect_memory(adapter, rights, now, collection_mode, warnings)
+
+
 def _collect_memory(
-    adapter: BlsUnemploymentAdapter,
+    adapter: ProviderAdapter,
     rights: SourceRightsRecord,
     now: datetime,
     collection_mode: str,
@@ -189,7 +254,7 @@ def _collect_memory(
 
 def _collect_postgres(
     conn: psycopg.Connection,
-    adapter: BlsUnemploymentAdapter,
+    adapter: ProviderAdapter,
     rights: SourceRightsRecord,
     now: datetime,
     collection_mode: str,
@@ -224,7 +289,7 @@ def _collect_postgres(
             PostgresDatasetObservationStore(conn, dataset_id),
         )
 
-    if fetch.observations:
+    if collection_mode == "live" and fetch.observations:
         try:
             assert_series_fetch_usable_for_ingest(
                 source_id=rights.source_id,
@@ -345,7 +410,7 @@ def _collect_postgres(
 
 def _result_from_ingest(
     outcome: object,
-    adapter: BlsUnemploymentAdapter,
+    adapter: ProviderAdapter,
     rights: SourceRightsRecord,
     now: datetime,
     collection_mode: str,
@@ -422,11 +487,11 @@ def _result_from_ingest(
     return result, store
 
 
-def _http_status(adapter: BlsUnemploymentAdapter) -> int | None:
+def _http_status(adapter: ProviderAdapter) -> int | None:
     diag = getattr(adapter, "_last_diagnostics", None)
     return diag.http_status if diag is not None else None
 
 
-def _provider_status(adapter: BlsUnemploymentAdapter) -> str | None:
+def _provider_status(adapter: ProviderAdapter) -> str | None:
     diag = getattr(adapter, "_last_diagnostics", None)
     return diag.bls_status if diag is not None else None
