@@ -93,21 +93,23 @@ def _row_to_observation(
         return None, f"{period_raw}: non-numeric value {value_raw}"
 
     vintage_raw = item.get("vintage")
-    if vintage_raw:
+    revision_basis = str(item.get("revision_basis", "")).strip()
+    source_release = _optional_datetime(item.get("source_release_at"))
+    if revision_basis == "latest_revised" or not vintage_raw:
+        provider_vintage = (
+            date.fromisoformat(str(vintage_raw)) if vintage_raw else collection_vintage_date
+        )
+        provenance = SeriesProvenance.LATEST_REVISED
+        earliest = None
+        availability = AvailabilityPrecision.UNKNOWN
+    else:
         provider_vintage = date.fromisoformat(str(vintage_raw))
         provenance = SeriesProvenance.PROVIDER_VINTAGE
         model_available = item.get("earliest_model_available_at")
         earliest = (
-            datetime.fromisoformat(str(model_available))
-            if model_available is not None
-            else None
+            datetime.fromisoformat(str(model_available)) if model_available is not None else None
         )
         availability = AvailabilityPrecision.TIMESTAMP if earliest else AvailabilityPrecision.DATE
-    else:
-        provider_vintage = collection_vintage_date
-        provenance = SeriesProvenance.LATEST_REVISED
-        earliest = None
-        availability = AvailabilityPrecision.DATE
 
     default_id = _observation_id(period_start, provider_vintage)
     observation_id = str(item.get("observation_id") or default_id)
@@ -134,11 +136,21 @@ def _row_to_observation(
             availability_precision=availability,
             retrieved_at=retrieved_at,
             first_seen_at=retrieved_at,
+            source_release_at=source_release,
             source_locator=locator,
             adapter_version=adapter_version,
         ),
         None,
     )
+
+
+def _optional_datetime(value: object) -> datetime | None:
+    if value is None or value == "":
+        return None
+    parsed = datetime.fromisoformat(str(value))
+    if parsed.tzinfo is None:
+        raise ValueError("source_release_at must be timezone-aware")
+    return parsed
 
 
 def _quarter_start(period: str) -> date | None:
@@ -151,7 +163,18 @@ def _quarter_start(period: str) -> date | None:
     return date(year, month, 1)
 
 
-def _observation_id(period_start: date, vintage: date) -> str:
+def sloos_observation_id(
+    period_start: date,
+    vintage: date,
+    disambiguator: str = "",
+) -> str:
+    """Stable id for one period and vintage. A disambiguator separates a same-day change."""
     key = f"{SERIES_ID}:{period_start.isoformat()}:{vintage.isoformat()}"
+    if disambiguator:
+        key = f"{key}:{disambiguator}"
     digest = hashlib.sha256(key.encode("utf-8")).hexdigest()[:24]
     return f"sloos-{period_start.strftime('%Y%m')}-{digest}"
+
+
+def _observation_id(period_start: date, vintage: date) -> str:
+    return sloos_observation_id(period_start, vintage)

@@ -1,6 +1,6 @@
 # AQIL — Execution Roadmap and Stage Gates
 
-**Last reconciled:** 21 October 2026 · **Git baseline:** `work/aqil-autonomous-build`. See `docs/CURSOR_SESSION_HANDOVER.md`.
+**Last reconciled:** 22 October 2026 · **Git baseline:** `work/aqil-autonomous-build`. See `docs/CURSOR_SESSION_HANDOVER.md`.
 
 ## Operating baseline (18 October 2026)
 
@@ -11,7 +11,7 @@ This section supersedes older sentences below that say authentication, hosted Su
 - Hosted project `ojvswermsbbaltjohqph` has exactly five migrations: `20261017103000`, `20261017110000`, `20261017120000`, `20261017140000`, `20261017180000`. Local files `20261018200000` and `20261018210000` are not applied. Do not apply them until the founder approves that batch, and do not apply older M5 timestamps after them.
 - Local Saxo reads are real and read-only. Production does not offer Connect Saxo until encrypted, owner-scoped token storage exists. See ADR 021–024.
 - Workflow: localhost → local tests → reviewed commit → one push to `main` → the existing GitHub to Vercel integration. No Vercel CLI deploy, no second Vercel project, no preview build created for its own sake.
-- Next product order: one live observation series for a method that is already implemented. Census advance durable-goods orders and SLOOS C&I standards are rights-cleared and have no stored live observations. ECB monetary-policy press, accounts and Governing Council decisions are now stored beside Employment Situation, CPI and Federal Reserve press. A BEA growth release still needs a machine-readable feed. Exposures still needs a rights-cleared holdings file. Vanguard and iShares automated collection stay prohibited. Recurring releases should later be shown as compact trends; that presentation is not built. `npm run research:refresh` remains a manual local poll. `npm run test:db` writes only to database `aqil_pgtap_test`. Research tests write only to `aqil_research_test`. M5's fixture horizon UI stays unmerged.
+- Next product order: Census advance durable-goods orders remain blocked because the keyless API returned a missing-key page on 22 October 2026. SLOOS C&I standards now have 146 live observations and one unpublished reading on Intelligence Evidence. ECB monetary-policy press, accounts and Governing Council decisions are stored beside Employment Situation, CPI and Federal Reserve press. A BEA growth release still needs a machine-readable feed. Exposures still needs a rights-cleared holdings file. Vanguard and iShares automated collection stay prohibited. Recurring releases should later be shown as compact trends; that presentation is not built. `npm run research:refresh` remains a manual local poll. `npm run test:db` writes only to database `aqil_pgtap_test`. Research tests write only to `aqil_research_test`. M5's fixture horizon UI stays unmerged.
 
 ## Progress register
 

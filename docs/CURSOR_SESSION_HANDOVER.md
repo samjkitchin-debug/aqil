@@ -1,9 +1,21 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 22 October 2026, pgTAP isolation and ECB policy coverage  
-**Parent:** `a47aebc` on `work/aqil-autonomous-build`  
+**Last updated:** 22 October 2026, first SLOOS analytical reading  
+**Parent:** `2733e93` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## First verified macro reading, 22 October 2026
+
+Census advance durable-goods orders were not usable. `https://api.census.gov/data/timeseries/eits/m3/adv` returned HTTP 302 and then `missing_key.html`. No Census API key is configured, so no Census observations were stored. The macro-conditions method needs Census as well as labour and SLOOS, so it was not run. The unemployment series still has the October 2025 gap, so Sahm was not forced through.
+
+The Senior Loan Officer Opinion Survey method `SLOOS_CIL_LENDING_STANDARDS` 1.0.0 was selected. It needs one quarterly net-tightening observation. The old JSON address `https://www.federalreserve.gov/data/sloos/sloos-series.json` returned HTTP 404. The Board package `https://www.federalreserve.gov/datadownload/Output.aspx?rel=SLOOS&filetype=zip` returned HTTP 200. Series `SUBLPDCILS_N.Q` is the net percentage of domestic banks tightening standards for commercial and industrial loans to large and middle-market firms.
+
+The development database, which was not reset, now holds 146 live observations for dataset `fed.sloos.SUBLPDCILS_N.Q`, source `federal_reserve_sloos_cil`, provider `federal_reserve_board`. The span is 1990-Q2 through 2026-Q3 with no missing quarter. Retrieval was 21 October 2026, 22:19 UTC, host `www.federalreserve.gov`. Provenance is `latest_revised`. The package does not carry a historical vintage for each quarter, so this is not a point-in-time reconstruction. An unchanged value keeps its stored identity. A changed value is a new observation and a new research run. A second collect on the same file stored 0 new rows and did not add a second run.
+
+Run `fe62b229-c3ac-47b0-b8fd-d3c7982653b0`, payload hash `62829dc9bdf860e68f19ceeb175534034c4b3fcb5fd08c5c6efaa6c83a4ee26d`, cites observation `sloos-202607-f0aa32b315708b9091d3fa39`. The quarter starting 1 July 2026 has a net tightening share of 0.0 percent. That means the share of banks reporting tighter standards equals the share reporting easier standards. It does not mean every bank left standards unchanged. The previous stored quarter, starting 1 April 2026, is 8.1 percent. That comparison is another stored observation, not a method forecast. `publication_allowed` is false. `investment_implication` is `no_action`. The causal statement is that no causal mechanism is asserted. Intelligence Evidence shows the reading. Today does not. The 44 unemployment observations, 12 Employment Situation rows, 12 CPI rows, 15 Board press rows, 3 ECB rows and 27 future BLS calendar rows remained.
+
+Research pytest on `aqil_research_test` was 182 passed. Web presentation tests were 12 passed. Typecheck passed. Production build passed. ESLint reported the existing unused-argument warning in `today-story-tangent-path.ts`. Ruff was clean on the files this sprint edited. `ruff format --check` on the whole tree was not made green. GitHub Actions has not run. Signed-in Evidence showed the reading. Signed-in Today did not.
 
 ## Test isolation incident, 22 October 2026
 
@@ -47,8 +59,8 @@ Signed-in Today showed 42 sourced publications. The 8 October account is under â
 | Federal Reserve monetary-policy press | Connected and operational. 15 live rows. |
 | BLS release calendar | Connected and operational. 27 future confirmed rows. |
 | ECB monetary-policy press | Connected and operational. 3 live rows. Speeches and interviews excluded. |
-| SLOOS C&I standards | Rights cleared and implemented. No live observations stored. |
-| Census advance durable-goods orders | Rights cleared and implemented. No live observations stored. |
+| SLOOS C&I standards | Connected. 146 live observations, 1990-Q2 to 2026-Q3. One unpublished reading for 2026-Q3 at 0.0 percent. Latest revised file, not a vintage panel. |
+| Census advance durable-goods orders | Blocked. Keyless API returned a missing-key page on 22 October 2026. No observations stored. |
 | BEA news schedule | Rights row exists. No machine-readable feed was identified. RSS returned HTTP 404. |
 | FRED ALFRED UNRATE | Restricted. API terms prohibit retention. |
 | Near-term forward spread | Blocked. Formula and input are unresolved. |
@@ -56,9 +68,9 @@ Signed-in Today showed 42 sourced publications. The 8 October account is under â
 
 ## Readiness for interpretation
 
-Do not present a live analytical conclusion yet. The unemployment method has 44 live observations, but the latest month is not a sufficient Sahm window because October 2025 was not published. SLOOS, Census advance orders, and the macro-conditions method have no live observations, so they stay experimental. Publication rows are sourced records, not method inputs.
+One internal SLOOS reading is now stored and shown on Intelligence Evidence. It is not published and it is not an investment conclusion. The unemployment method still has 44 live observations, but the latest month is not a sufficient Sahm window because October 2025 was not published. Census advance orders and the macro-conditions method have no live observations. Publication rows remain sourced records, not method inputs.
 
-The smallest next demonstration is one live Census advance durable-goods retrieval, or one live SLOOS retrieval, followed by the existing method on that vintage only. The screen should state the measured change, the economic meaning already encoded in that method, the retrieval and observation ids, what later revision or release would contradict it, and that a portfolio conclusion still needs an instrument mapping. Do not add a forecast.
+The next demonstration needs a Census API key before advance durable-goods orders can be collected. Do not add a forecast, and do not treat the SLOOS file as a historical vintage panel.
 
 Recurring releases should later be shown as compact trends and comparable series. That presentation was not built.
 

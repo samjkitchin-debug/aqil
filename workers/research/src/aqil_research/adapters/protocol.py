@@ -23,6 +23,7 @@ class ProviderIdentity:
     adapter_version: str
     source_id: str
     dataset_id: str
+    provider_id: str = "bls"
 
 
 @dataclass(frozen=True, slots=True)

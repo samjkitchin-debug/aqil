@@ -9,6 +9,7 @@ Cadence, when the command is used:
 - Federal Reserve monetary-policy press: daily
 - ECB monetary-policy press: daily
 - BLS release calendar: daily
+- SLOOS C&I lending standards: each refresh, from the Board data package
 - Unemployment series: weekly, and skipped when a live retrieval is newer
 
 Each source uses its own database transaction. A failure is recorded and the
@@ -34,6 +35,7 @@ CADENCE = {
     "federal_reserve_monetary_press": "daily",
     "ecb_monetary_press": "daily",
     "bls_ics_schedule": "daily",
+    "federal_reserve_sloos_cil": "each_refresh",
     "bls_cps_unemployment_rate": "weekly",
 }
 
@@ -87,6 +89,7 @@ def default_refresh_steps() -> tuple[RefreshStep, ...]:
         ("federal_reserve_monetary_press", _refresh_fed_press),
         ("ecb_monetary_press", _refresh_ecb_press),
         ("bls_ics_schedule", _refresh_bls_calendar),
+        ("federal_reserve_sloos_cil", _refresh_sloos),
     )
 
 
@@ -193,6 +196,43 @@ def _refresh_bls_calendar(now: datetime) -> SourceRefreshResult:
         result.outcome,
         inserted=result.stored_new,
         unchanged=result.unchanged,
+    )
+
+
+def _refresh_sloos(now: datetime) -> SourceRefreshResult:
+    from aqil_research.adapters.fed_sloos.adapter import FedSloosAdapter, FedSloosAdapterConfig
+    from aqil_research.adapters.fed_sloos.parse import SOURCE_ID
+    from aqil_research.collection.service import collect_registered_adapter
+    from aqil_research.workflow.sloos_reading import load_sloos_priors, record_sloos_reading
+
+    with research_connection() as conn:
+        priors = load_sloos_priors(conn)
+        collected, _store = collect_registered_adapter(
+            store_backend="postgres",
+            adapter=FedSloosAdapter(
+                config=FedSloosAdapterConfig(live=True),
+                retrieved_at=now,
+                prior_points=priors,
+            ),
+            source_id=SOURCE_ID,
+            collected_at=now,
+            live=True,
+            conn=conn,
+        )
+    if collected.outcome in {"failed_fetch", "failed_rights", "conflicts"}:
+        return SourceRefreshResult(
+            "federal_reserve_sloos_cil",
+            collected.outcome,
+            detail=collected.next_recommended_action,
+        )
+    with research_connection() as conn:
+        reading = record_sloos_reading(conn, decision_at=now)
+    return SourceRefreshResult(
+        "federal_reserve_sloos_cil",
+        reading.status,
+        inserted=collected.observations_newly_stored,
+        unchanged=collected.observations_unchanged,
+        detail=reading.detail,
     )
 
 

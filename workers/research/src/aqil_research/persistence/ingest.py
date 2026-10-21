@@ -71,6 +71,10 @@ def ingest_adapter_to_postgres(
 def _endpoint_host(adapter: ProviderAdapter) -> str | None:
     if isinstance(adapter, BlsUnemploymentAdapter):
         return "api.bls.gov" if adapter.config.live else None
+    from aqil_research.adapters.fed_sloos.adapter import FedSloosAdapter
+
+    if isinstance(adapter, FedSloosAdapter):
+        return "www.federalreserve.gov" if adapter.config.live else None
     return None
 
 
@@ -85,6 +89,10 @@ def _diagnostics(
     http_status: int | None = None
     provider_status: str | None = None
     response_bytes: int | None = None
+    from aqil_research.adapters.fed_sloos.adapter import FedSloosAdapter
+
+    if isinstance(adapter, FedSloosAdapter):
+        series_ids = ["SUBLPDCILS_N.Q"]
     if isinstance(adapter, BlsUnemploymentAdapter):
         series_ids = ["LNS14000000"]
         year_start = adapter.config.start_year

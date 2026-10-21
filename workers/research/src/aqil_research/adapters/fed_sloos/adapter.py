@@ -1,4 +1,4 @@
-"""Federal Reserve SLOOS adapter for SUBLPDCILS_N.Q (fixture or live JSON bundle)."""
+"""Federal Reserve SLOOS adapter for SUBLPDCILS_N.Q (fixture or live package)."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from aqil_research.adapters.fed_sloos.parse import parse_sloos_payload
+from aqil_research.adapters.fed_sloos.stability import StoredSloosPoint, stabilise_sloos_vintages
 from aqil_research.adapters.protocol import (
     ProviderFailureCode,
     ProviderFetchError,
@@ -30,6 +31,7 @@ class FedSloosAdapterConfig:
 class FedSloosAdapter:
     config: FedSloosAdapterConfig
     retrieved_at: datetime | None = None
+    prior_points: tuple[StoredSloosPoint, ...] = ()
 
     @property
     def identity(self) -> ProviderIdentity:
@@ -40,6 +42,7 @@ class FedSloosAdapter:
             adapter_version=ADAPTER_VERSION,
             source_id=SOURCE_ID,
             dataset_id=DATASET_ID,
+            provider_id="federal_reserve_board",
         )
 
     def fetch(self) -> ProviderFetchResult:
@@ -74,7 +77,11 @@ class FedSloosAdapter:
             from aqil_research.adapters.fed_sloos.client import fetch_sloos_bundle
 
             try:
-                payload = fetch_sloos_bundle()
+                payload = stabilise_sloos_vintages(
+                    fetch_sloos_bundle(),
+                    self.prior_points,
+                    retrieved,
+                )
             except Exception as exc:  # noqa: BLE001 — surfaced as provider error
                 return ProviderFetchResult(
                     observations=(),

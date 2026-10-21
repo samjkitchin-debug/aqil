@@ -53,7 +53,10 @@ def _latest_revised_per_period(
         }:
             continue
         current = by_period.get(row.period_start)
-        if current is None or row.provider_vintage_date >= current.provider_vintage_date:
+        if current is None or (row.provider_vintage_date, row.retrieved_at) >= (
+            current.provider_vintage_date,
+            current.retrieved_at,
+        ):
             by_period[row.period_start] = row
     return by_period
 

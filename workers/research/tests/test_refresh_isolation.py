@@ -33,6 +33,7 @@ def test_default_steps_are_official_live_sources() -> None:
         "federal_reserve_monetary_press",
         "ecb_monetary_press",
         "bls_ics_schedule",
+        "federal_reserve_sloos_cil",
     ]
 
 

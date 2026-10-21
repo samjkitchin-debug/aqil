@@ -65,7 +65,7 @@ def insert_source_retrieval(
                 identity.source_id,
                 identity.dataset_id,
                 rights.source_id,
-                "bls",
+                identity.provider_id,
                 identity.adapter_id,
                 identity.adapter_version,
                 retrieved_at,
