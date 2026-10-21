@@ -49,11 +49,7 @@ def _load_macro_store() -> InMemoryObservationStore:
         retrieved_at=RETRIEVED,
     )
     for adapter in (bls, sloos, census):
-        record = next(
-            r
-            for r in rights
-            if r.source_id == adapter.identity.source_id
-        )
+        record = next(r for r in rights if r.source_id == adapter.identity.source_id)
         ingest_from_adapter(store, adapter, record, optional=False)
     return store
 
@@ -73,9 +69,7 @@ def test_census_mom_distinction() -> None:
         primary_dataset_id="census.m3.adv.MDM.NO",
         all_vintages_by_dataset={
             "census.m3.adv.MDM.NO": tuple(
-                obs
-                for obs in store.all_observations()
-                if obs.dataset_id == "census.m3.adv.MDM.NO"
+                obs for obs in store.all_observations() if obs.dataset_id == "census.m3.adv.MDM.NO"
             ),
         },
     )
@@ -89,6 +83,28 @@ def test_census_mom_distinction() -> None:
     calc = result.calculation or {}
     assert calc["initial_estimate_to_initial_estimate_pct_change"] == "4.00"
     assert calc["official_month_on_month_pct_change"] == "1.96"
+
+
+def test_one_census_vintage_is_not_a_revision_comparison() -> None:
+    store = _load_macro_store()
+    rows = tuple(
+        obs
+        for obs in store.all_observations()
+        if obs.dataset_id == "census.m3.adv.MDM.NO"
+        and obs.provider_vintage_date.isoformat() == "2024-09-25"
+    )
+    method = CensusAdvOrdersMethod()
+    context = MethodContext(
+        inputs_by_dataset={"census.m3.adv.MDM.NO": {row.period_start: row for row in rows}},
+        evaluation_period=date(2024, 8, 1),
+        analysis_mode=AnalysisMode.LATEST_REVISED,
+        primary_dataset_id="census.m3.adv.MDM.NO",
+        all_vintages_by_dataset={"census.m3.adv.MDM.NO": rows},
+    )
+    result = method.run(context, method.parse_config({"config_id": "test", "label": "test"}))
+    assert result.sufficiency == "insufficient"
+    assert result.missing_reason is not None
+    assert "one stored vintage" in result.missing_reason
 
 
 def test_sloos_zero_is_net_balance() -> None:
@@ -141,9 +157,7 @@ def test_macro_panel_blocks_forward_spread() -> None:
         primary_dataset_id="bls.ln.LNS14000000",
         all_vintages_by_dataset={
             "census.m3.adv.MDM.NO": tuple(
-                obs
-                for obs in store.all_observations()
-                if obs.dataset_id == "census.m3.adv.MDM.NO"
+                obs for obs in store.all_observations() if obs.dataset_id == "census.m3.adv.MDM.NO"
             ),
         },
     )

@@ -13,7 +13,7 @@ from aqil_research.contracts.observation import AnalysisMode
 from aqil_research.insight.build_sahm import build_sahm_insight
 from aqil_research.insight.models import ChartPoint, ResearchInsight
 from aqil_research.methods.configs import SAHM_PUBLISHED
-from aqil_research.methods.evaluation import sahm_window_complete
+from aqil_research.methods.evaluation import sahm_window_complete, sahm_window_refusal
 from aqil_research.methods.registry import SAHM_METHOD_ID, default_method_registry
 from aqil_research.persistence.reproduce import verify_stored_run_replay
 from aqil_research.persistence.runs import save_research_run
@@ -99,7 +99,9 @@ def collect_and_run_sahm(
                 analytical_payload_hash=None,
                 recompute_match=None,
                 insight=None,
-                warnings=tuple(warnings + ["Evaluation period insufficient for Sahm"]),
+                warnings=tuple(
+                    warnings + [sahm_window_refusal(set(by_period), evaluation)],
+                ),
             )
         eval_str = evaluation_period
     else:
@@ -114,11 +116,7 @@ def collect_and_run_sahm(
                     recompute_match=None,
                     insight=None,
                     warnings=tuple(
-                        warnings
-                        + [
-                            "Latest month lacks full Sahm window; "
-                            "pass evaluation period or fallback",
-                        ],
+                        warnings + [sahm_window_refusal(set(by_period), evaluation)],
                     ),
                 )
         eval_str = evaluation.isoformat()

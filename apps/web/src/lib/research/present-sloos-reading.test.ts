@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   calculatedDifferenceCopy,
+  describeStoredSloosSeries,
   directionPhrase,
   quarterStartingLabel,
   sloosLimitationCopy,
@@ -21,4 +22,16 @@ test("a positive SLOOS direction stays a survey description", () => {
     calculatedDifferenceCopy("0.0", "8.1"),
     "Calculated difference: The later stored share is 8.1 percentage points lower than the earlier stored share. This arithmetic comparison is separate from the method calculation. It is not a forecast.",
   );
+  const context = describeStoredSloosSeries([
+    { period: "2026-04-01", sharePercent: "8.1" },
+    { period: "2026-07-01", sharePercent: "0.0" },
+    { period: "2026-01-01", sharePercent: "-1.0" },
+  ]);
+  assert.match(
+    context?.history ?? "",
+    /1 quarter is net tightening, 1 quarter is net easing, and 1 quarter is a zero net balance/,
+  );
+  assert.match(context?.position ?? "", /at or below 2 of 3/);
+  assert.match(context?.contradiction ?? "", /later quarter above zero/);
+  assert.match(context?.position ?? "", /not a probability/);
 });

@@ -67,6 +67,13 @@ class CensusAdvOrdersMethod:
         if not prior_rows:
             return _insufficient(f"missing prior-month orders for {prior_period.isoformat()}")
 
+        vintage_dates = {row.provider_vintage_date for row in prior_rows}
+        if len(vintage_dates) < 2:
+            return _insufficient(
+                "the prior month has only one stored vintage, so an initial-versus-revised "
+                "comparison is unavailable",
+            )
+
         initial_prior = min(prior_rows, key=lambda row: row.provider_vintage_date)
         revised_prior = max(prior_rows, key=lambda row: row.provider_vintage_date)
 
@@ -148,7 +155,9 @@ def _pct_change(current: Decimal, prior: Decimal) -> Decimal:
 
 def _limitations() -> tuple[str, ...]:
     return (
-        "Advance estimates are revised in the full M3 release; vintages must be stored separately.",
+        "Each official release is stored as its own vintage. A later release that revises "
+        "a month is a new observation. One current response is not a revised-vintage comparison, "
+        "and historical vintages are not fabricated.",
         "Not an earnings or ETF-return forecasting model.",
         "Do not infer ETF allocation changes from this output.",
     )

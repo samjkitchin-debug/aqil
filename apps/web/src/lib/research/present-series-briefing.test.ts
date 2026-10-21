@@ -24,7 +24,8 @@ test("a missing month inside the span is named and not filled", () => {
     /^Source bls_cps_unemployment_rate\. Dataset bls\.ln\.LNS14000000\. Latest revised, seasonally adjusted, percent\.$/,
   );
   assert.match(copy.notice, /not a news announcement/i);
-  assert.match(copy.gapLine ?? "", /October 2025/);
+  assert.match(copy.gapLine ?? "", /Permanently missing: October 2025/);
+  assert.match(copy.gapLine ?? "", /did not publish this month/);
   assert.match(copy.gapLine ?? "", /Nothing was filled in/);
   assert.match(copy.latestLine, /December 2025, 4.1 percent/);
   assert.doesNotMatch(copy.notice, /conclusion is/);

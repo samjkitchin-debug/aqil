@@ -77,6 +77,14 @@ The macro worker exposes small protocols, not a plugin platform:
 - **Future matrices:** methods may attach validated parameter documents (scalars and rectangular decimal matrices) via `MethodParameterDocument`; this is not a general factor-weighting engine.
 - **ResearchRun** records a method **implementation hash** (for Sahm: SHA-256 of the `sahm.py` module bytes only—not transitive Python/runtime dependencies), **config hash**, **input snapshot hash** and a deterministic **analytical payload hash**. Publication remains a separate fail-closed gate from analytical completion.
 
+### Eligibility recorded on 22 October 2026
+
+The Sahm formula is unchanged: a 15-month window, a three-month average, and the minimum of the prior twelve three-month averages. October 2025 was not collected (BLS footnote 9, appropriations lapse). Every evaluation month from October 2025 through December 2026 includes that month and is permanently invalid. Nothing is interpolated. September 2025 can be a complete historical window, but it is not the current month. January 2027 is the next evaluation month that excludes October 2025. It becomes eligible only when November 2025 through January 2027 are all stored as real observations.
+
+Census advance durable goods still compares the first stored vintage of the prior month with a later stored vintage. One current API response does not supply that pair, so the method stays insufficient until a later official release is stored as a new vintage. Historical vintages are not fabricated. A Census API key is still required before any request.
+
+The SLOOS reading stays internal. `publication_allowed` remains false in the orchestrator. The Board file is the latest revised release, not a point-in-time panel. Claim and span verification are unverified. The method is not historically evaluated and has no human publication approval. Its investment implication is `no_action`. Counts of stored quarters are a position in that file, not a probability and not a forecast.
+
 ## 4. Signal detection: no autonomous conviction manufacture
 - **Collectors:** official/public data feeds and rights-approved discovery sources; source-specific release schedule.
 - **Normaliser:** entities, units, frequency, geography, geospatial/timeframe, published/available timestamps, revision, rights.

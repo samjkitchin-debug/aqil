@@ -47,6 +47,15 @@ export function SloosReadingPanel({ reading }: Props) {
       <h3 className="research-section-title">Why it matters</h3>
       <p className="research-body">{whyItMatters(reading.directionLabel, reading.interpretation)}</p>
       <p className="research-body">{conditionalImplicationCopy()}</p>
+      {reading.storedHistory && reading.storedPosition && reading.contradiction ? (
+        <>
+          <h3 className="research-section-title">Stored history</h3>
+          <p className="research-body">{reading.storedHistory}</p>
+          <p className="research-body">{reading.storedPosition}</p>
+          <h3 className="research-section-title">What could contradict this reading</h3>
+          <p className="research-body">{reading.contradiction}</p>
+        </>
+      ) : null}
       <h3 className="research-section-title">What remains uncertain</h3>
       <p className="research-body">{sloosLimitationCopy(reading.limitations)}</p>
       <h3 className="research-section-title">What to monitor</h3>

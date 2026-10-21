@@ -1,9 +1,21 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 22 October 2026, Census key blocker and SLOOS movement  
+**Last updated:** 22 October 2026, method eligibility  
 **Parent:** `2733e93` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Method eligibility, 22 October 2026
+
+Checkpoint `0d59cf4` records the Census key gate and the stored SLOOS move from 8.1 percent to 0.0 percent.
+
+October 2025 is a permanent CPS absence, not an outstanding release. The Sahm formula is unchanged. Evaluation months from October 2025 through December 2026 include that absence and are permanently invalid. September 2025 can be a complete historical window, but it is not treated as the current month. January 2027 is the next evaluation month that excludes October 2025. It stays ineligible until the real observations through that month exist. Nothing is interpolated.
+
+A Census response with one vintage of the prior month is insufficient for the initial-versus-revised comparison. Successive official releases must be stored as separate vintages. Historical vintages are not fabricated. The API key is still absent, and the endpoint was not called again.
+
+Evidence now counts the stored latest-revised SLOOS quarters: 146 quarters, 71 net tightening, 68 net easing and 7 zero. The latest 0.0 percent share is at or below 75 of those 146 quarters. A later quarter above or below zero would replace the balanced reading. Those counts are not a point-in-time history and not a probability. The publication gate stays closed: the orchestrator keeps `publication_allowed` false, the file is not a vintage panel, claim verification is incomplete, and the method has no historical evaluation or human publication approval. Signed-in Today names October 2025 as permanently missing. Research pytest was 188 passed. Web presentation tests were 12 passed. Typecheck, lint and the production build passed. Lint still warns about the existing unused `_searchParams`.
+
+No additional method was executed. Period-level change remains an interface demonstration. Macro-conditions still lacks a sufficient Sahm window and any Census observations.
 
 ## Census blocker and multi-signal readiness, 22 October 2026
 

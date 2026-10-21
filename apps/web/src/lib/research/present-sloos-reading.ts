@@ -18,6 +18,20 @@ export type SloosReadingView = {
   observationId: string;
   retrievedAt: string;
   analysisMode: string;
+  storedHistory: string | null;
+  storedPosition: string | null;
+  contradiction: string | null;
+};
+
+export type StoredQuarterShare = {
+  period: string;
+  sharePercent: string;
+};
+
+export type SloosStoredContext = {
+  history: string;
+  position: string;
+  contradiction: string;
 };
 
 const DIRECTION_LABELS: Record<string, string> = {
@@ -89,7 +103,41 @@ export function conditionalImplicationCopy(): string {
 }
 
 export function publicationGateCopy(): string {
-  return "Not an investment conclusion. No price target, expected return, or fund recommendation is made. Publication remains closed. This internal reading has not passed the publication gate.";
+  return "Not an investment conclusion. No price target, expected return, or fund recommendation is made. Publication remains closed. The stored file is the latest revised release, not a point-in-time history, and claim verification is not complete.";
+}
+
+export function describeStoredSloosSeries(
+  quarters: readonly StoredQuarterShare[],
+): SloosStoredContext | null {
+  const parsed = [...quarters]
+    .sort((left, right) => left.period.localeCompare(right.period))
+    .flatMap((row) => {
+      const tenths = _tenths(row.sharePercent);
+      return tenths === null ? [] : [{ tenths }];
+    });
+  const latest = parsed[parsed.length - 1];
+  if (!latest || parsed.length < 2) return null;
+  let tighter = 0;
+  let easier = 0;
+  let balanced = 0;
+  let atOrBelow = 0;
+  for (const row of parsed) {
+    if (row.tenths > 0) tighter += 1;
+    else if (row.tenths < 0) easier += 1;
+    else balanced += 1;
+    if (row.tenths <= latest.tenths) atOrBelow += 1;
+  }
+  return {
+    history: `Stored latest-revised file: ${parsed.length} quarters. ${quarterCount(tighter, "net tightening")}, ${quarterCount(easier, "net easing")}, and ${quarterCount(balanced, "a zero net balance")}.`,
+    position: `The latest share is at or below ${atOrBelow} of ${parsed.length} stored quarters. That count is a position in this file. It is not a point-in-time history and not a probability.`,
+    contradiction:
+      "A later quarter above zero would replace this reading with net tightening. A later quarter below zero would replace it with net easing. Either result would be a new observation.",
+  };
+}
+
+function quarterCount(count: number, label: string): string {
+  const noun = count === 1 ? "quarter is" : "quarters are";
+  return `${count} ${noun} ${label}`;
 }
 
 function _tenths(value: string): number | null {

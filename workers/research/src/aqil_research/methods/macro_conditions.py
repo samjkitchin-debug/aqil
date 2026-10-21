@@ -108,6 +108,7 @@ class MacroConditionsMethod:
             evaluation_period=census_period,
             analysis_mode=context.analysis_mode,
             primary_dataset_id=CENSUS_DATASET_ID,
+            all_vintages_by_dataset=context.all_vintages_by_dataset,
         )
         census_result = census_method.run(
             census_context,

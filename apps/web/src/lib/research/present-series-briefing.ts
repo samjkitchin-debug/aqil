@@ -64,12 +64,25 @@ export function presentSeriesBriefing(series: LiveSeriesRetrieval): SeriesBriefi
     sourceLine: `Source ${series.sourceId}. Dataset ${series.datasetId}. ${provenance}, ${series.seasonalAdjustment.replaceAll("_", " ")}, ${series.unit}.`,
     spanLine: `${periods.length} monthly observations from ${formatMonth(first)} to ${formatMonth(last)}.`,
     latestLine: `Latest observation in this retrieval: ${formatMonth(series.latestPeriod)}, ${series.latestRawValue} ${series.unit}.`,
-    gapLine:
-      gaps.length === 0
-        ? null
-        : `Not published in this retrieval: ${gaps.map(formatMonth).join(", ")}. Nothing was filled in.`,
+    gapLine: gaps.length === 0 ? null : gapSentence(gaps),
     freshnessLine: `Retrieved ${formatRetrieved(series.retrievedAt)}.`,
   };
+}
+
+function gapSentence(gaps: readonly string[]): string {
+  const permanent = gaps.filter((gap) => gap === "2025-10");
+  const other = gaps.filter((gap) => gap !== "2025-10");
+  const parts: string[] = [];
+  if (permanent.length > 0) {
+    parts.push(
+      "Permanently missing: October 2025. The Bureau of Labor Statistics did not publish this month.",
+    );
+  }
+  if (other.length > 0) {
+    parts.push(`Not published in this retrieval: ${other.map(formatMonth).join(", ")}.`);
+  }
+  parts.push("Nothing was filled in.");
+  return parts.join(" ");
 }
 
 function sentenceStart(value: string): string {

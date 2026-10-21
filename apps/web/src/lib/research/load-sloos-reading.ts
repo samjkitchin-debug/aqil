@@ -2,7 +2,10 @@ import "server-only";
 
 import { connection } from "next/server";
 
-import type { SloosReadingView } from "@/lib/research/present-sloos-reading";
+import {
+  describeStoredSloosSeries,
+  type SloosReadingView,
+} from "@/lib/research/present-sloos-reading";
 
 const DEFAULT_RESEARCH_DATABASE_URL =
   "postgresql://research_worker:research_worker@127.0.0.1:55432/postgres";
@@ -101,6 +104,22 @@ export async function loadSloosReading(): Promise<LoadSloosReadingResult> {
         [run.dataset_id, cited.period_start],
       );
       const prior = previous.rows[0] ?? null;
+      const history = await client.query<{ period_start: string; raw_value: string }>(
+        `select distinct on (o.period_start)
+                o.period_start::text as period_start, o.raw_value
+         from research.economic_observations o
+         join research.source_retrievals r using (retrieval_id)
+         where o.dataset_id = $1
+           and r.collection_mode = 'live'
+         order by o.period_start, o.provider_vintage_date desc nulls last, o.retrieved_at desc`,
+        [run.dataset_id],
+      );
+      const stored = describeStoredSloosSeries(
+        history.rows.map((row) => ({
+          period: row.period_start,
+          sharePercent: row.raw_value,
+        })),
+      );
       return {
         status: "ready",
         reading: {
@@ -121,6 +140,9 @@ export async function loadSloosReading(): Promise<LoadSloosReadingResult> {
           observationId: cited.observation_id,
           retrievedAt: cited.retrieved_at,
           analysisMode: run.analysis_mode,
+          storedHistory: stored?.history ?? null,
+          storedPosition: stored?.position ?? null,
+          contradiction: stored?.contradiction ?? null,
         },
       };
     } finally {

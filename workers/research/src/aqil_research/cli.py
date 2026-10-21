@@ -285,20 +285,17 @@ def _evaluate_and_run(
             print("evaluation-period must be the first day of a month.", file=sys.stderr)
             return by_period, None, None
         if not sahm_window_complete(by_period, evaluation):
-            print(
-                f"Insufficient months for Sahm at {evaluation.isoformat()}.",
-                file=sys.stderr,
-            )
+            from aqil_research.methods.evaluation import sahm_window_refusal
+
+            print(sahm_window_refusal(set(by_period), evaluation), file=sys.stderr)
             return by_period, None, None
     else:
         evaluation = max(by_period)
         if not sahm_window_complete(by_period, evaluation):
             if not args.allow_evaluation_fallback:
-                print(
-                    f"Latest month {evaluation.isoformat()} lacks a full Sahm window. "
-                    "Pass --allow-evaluation-fallback or --evaluation-period.",
-                    file=sys.stderr,
-                )
+                from aqil_research.methods.evaluation import sahm_window_refusal
+
+                print(sahm_window_refusal(set(by_period), evaluation), file=sys.stderr)
                 return by_period, None, None
             fallback = latest_sahm_evaluation_period(by_period)
             if fallback is None:
