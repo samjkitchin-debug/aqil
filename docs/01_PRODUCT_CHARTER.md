@@ -19,7 +19,7 @@
 
 All five derive from a shared research/data foundation. The interface is calm; the hidden system is demanding.
 
-**Current delivery (18 October 2026).** The five ideas above remain the long-term product. Current delivery is wealth-first. Research must not silently change the investor's targets.
+**Current delivery (21 October 2026).** The five ideas above remain the product, in that order. Investment intelligence is the organising purpose. My Wealth is a supporting pillar: it records what is held so intelligence can later be compared with a real account. Local My Wealth code is currently ahead of live intelligence. That is a sequencing fact, not a change of purpose. Research must not silently change the investor's targets.
 
 The closed loop is: **My Wealth** establishes what is actually held and what it is worth; **Deploy Capital** supports a disciplined decision about new money; **Forward Intelligence** may later inform alternatives; My Wealth then compares the result with benchmarks and frozen counterfactuals. Account-value growth is not investment return. A hypothetical fund-structure saving is not realised profit. A projection is not a guarantee.
 

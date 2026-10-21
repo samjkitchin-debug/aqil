@@ -27,6 +27,8 @@ Scheduled Python worker(s) (uv, Pydantic, Polars or pandas, NumPy, pytest)
 
 **Operating baseline (18 October 2026).** Next.js 16.4.2, React 19.3.0, TypeScript strict, `@supabase/ssr` 0.12.x and `supabase-js` 2.118.x. Python research worker on 3.13 with uv, Pydantic, httpx, psycopg, pytest and Ruff. Tests in the web app use `node:test` and Playwright, not Vitest. Tailwind 4 is the utility layer over `apps/web/src/styles/tokens.css`. One shell: `AppShell`. Hosting is the existing Vercel project `aqil` at `https://aqil-tau.vercel.app`, deploying only from GitHub `main`. Database is Supabase project `ojvswermsbbaltjohqph`. The web app does not call the service-role key. Local review uses `http://localhost:3000`.
 
+**What is actually running (21 October 2026).** The target record is PostgreSQL. Locally, `research:ingest` writes BLS observations into the local Postgres `research` schema as `research_worker`. It does not keep the series in a JSON file. My Wealth's saved snapshot, investment policy and manual journal are still gitignored files under `apps/web/.local/`. Those files are not the research store. Hosted Supabase does not yet receive the wealth or sourced-update migrations, and production does not run the research schedule. A passing local test is not hosted or signed-in verification.
+
 **No FastAPI required initially.** Next.js server handlers provide UI APIs. When interactive heavy Python inference and trusted external integrations demand a separately scalable API, add FastAPI *behind the existing versioned contracts*, not through a total rewrite. PostgreSQL is not a search index for huge raw corpus; use object storage and selective full text; search/vector index only after measured need. No graph DB for v1: causal edges in PostgreSQL relational tables.
 
 ## Recommended baseline stack (validate current compatibility before installing)
@@ -36,7 +38,7 @@ Scheduled Python worker(s) (uv, Pydantic, Polars or pandas, NumPy, pytest)
 - **Persistence/contract:** versioned JSON Schema (source-of-truth cross-language contracts), generated/validated Pydantic and Zod types as feasible, ISO-8601 UTC and timezone ID fields, migrations reviewed.
 - **Scheduling:** one durable worker with source-specific poll cadences and Postgres queue/lease semantics. Platform cron only triggers work; jobs retained in DB with idempotency keys. Multiple workers only after proven throughput. Don't rely on volatile cron invocation as evidence of completion.
 - **AI:** one model gateway with provider abstraction, structured responses, bounded token/web-search budgets, fixed tool allowlists, contextual sanitisation, source ID verification. AI agent is a bounded research task rather than a persistent digital employee.
-- **Testing/ops:** Vitest, Playwright, axe-core, SQL RLS tests, pytest fixtures, OWASP-aligned application checks, structured logs, error alerts, restored backup rehearsals.
+- **Testing/ops:** `node:test` in the web app, Playwright, axe-core, SQL RLS tests, pytest fixtures, OWASP-aligned application checks, structured logs, error alerts, restored backup rehearsals.
 - **Deployment:** provider-neutral frontend host, Supabase DB and smallest always-available scheduled worker sufficient; never assume free tiers permit commercial workloads or high-uptime tasks. Separate preview/staging/production.
 
 ## Domain modules with enforced boundaries

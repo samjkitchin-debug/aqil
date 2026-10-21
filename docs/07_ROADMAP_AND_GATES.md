@@ -1,6 +1,6 @@
 # AQIL — Execution Roadmap and Stage Gates
 
-**Last reconciled:** 18 October 2026 · **Git baseline:** the end-of-day release on `main`. See `docs/CURSOR_SESSION_HANDOVER.md` for the SHA.
+**Last reconciled:** 21 October 2026 · **Git baseline:** `work/aqil-autonomous-build` after `2f8a353`. See `docs/CURSOR_SESSION_HANDOVER.md`.
 
 ## Operating baseline (18 October 2026)
 
@@ -11,12 +11,13 @@ This section supersedes older sentences below that say authentication, hosted Su
 - Hosted project `ojvswermsbbaltjohqph` has exactly five migrations: `20261017103000`, `20261017110000`, `20261017120000`, `20261017140000`, `20261017180000`. Local files `20261018200000` and `20261018210000` are not applied. Do not apply them until the founder approves that batch, and do not apply older M5 timestamps after them.
 - Local Saxo reads are real and read-only. Production does not offer Connect Saxo until encrypted, owner-scoped token storage exists. See ADR 021–024.
 - Workflow: localhost → local tests → reviewed commit → one push to `main` → the existing GitHub to Vercel integration. No Vercel CLI deploy, no second Vercel project, no preview build created for its own sake.
-- Next product order: trustworthy Saxo portfolio, then secure persistence and historical evidence, then Deploy Capital V1, then benchmarks and planning foundations, then model portfolios and fund-structure attribution, then evaluated Forward Intelligence. M5 and M6 stay deferred until a wealth decision needs them. The November employment baseline does not prove forecasting skill.
+- Next product order: one official series retrieved, stored and shown on Today; then the Employment Situation feed, without bypassing its HTTP 403; then a signed-in check. My Wealth, Deploy Capital and the journal stay supporting local capabilities. M5 and M6 are not merged. Their migrations use timestamps that must not be applied after `20261018200000`. The November employment baseline does not prove forecasting skill.
 
 ## Progress register
 
 - **Authoritative item list:** `docs/07_BUILD_BACKLOG.csv` (columns include `verification_evidence`, `blockers`, `next_action`).
-- **Statuses:** Not started · In progress · Blocked · Implemented — unverified · Verified · Deferred.
+- **Statuses:** Not started · In progress · Blocked · Partial · Implemented — unverified · Verified · Deferred.
+- **Maturity, in evidence rather than a second register:** operational end-to-end, implemented and locally verified, implemented but unverified, partial, blocked, not implemented. Local tests are not hosted or signed-in verification.
 - **Session continuity:** `docs/CURSOR_SESSION_HANDOVER.md`.
 - **Product chain (do not shortcut):** source acquisition → validation and provenance → deterministic analysis → causal interpretation → evidence verification → publication → longitudinal evaluation. Facts, statistical relationships, causal hypotheses, investment implications and demonstrated predictive value remain **distinct** (`docs/03_RESEARCH_ENGINE_AND_METHODS.md` §1).
 
@@ -28,12 +29,12 @@ This section supersedes older sentences below that say authentication, hosted Su
 | Python research worker scaffold | **Verified** | CI research job: ruff, pytest |
 | Supabase migration + RLS/pgTAP | **Verified** | `20261017103000_create_user_settings.sql`; CI `supabase db reset` + `supabase test db`; types diff |
 | Local Docker database workflow | **Verified** | `scripts/run-db-tests.ps1`, `npm run test:db` (documented; re-run after env changes) |
-| GitHub CI (web / database / research) | **Verified** | Green on `main` post-merge |
+| GitHub CI (web / database / research) | **Verified** on `main` | Development adds Saxo, Wealth, Capital, Benchmark, Learn, Story and sourced-update commands to the web job. That CI run has not happened |
 | Versioned JSON schemas (files) | **Implemented — unverified** | `docs/schemas/` mirrored in `packages/contracts/`; **no CI schema validator yet** |
 | Claim verifier fail-closed | **Implemented — unverified** | `workers/research/.../claim_verifier.py` + pytest; registry not built |
 | Auth doctrine | **Superseded by the operating baseline** | Google sign-in is live. See ADR 020 and `AUTH_AND_SESSION_DOCTRINE.md` |
 | Information security standard | **Implemented — unverified** | `INFORMATION_SECURITY_STANDARD.md` + CI hardening **in working tree; not on `main` until merged** |
-| Static synthetic research story (PR1) | **Not started** | Research page is placeholder only |
+| Static synthetic research story (PR1) | **Implemented — unverified** | `/research` shows one labelled synthetic story. It is not live intelligence |
 | Hosted Supabase | **Superseded by the operating baseline** | Five foundation migrations are on `ojvswermsbbaltjohqph`. Later migrations are not applied |
 | G0 hard evidence (roadmap table) | **Not started** | Rights matrix, UCITS sample, macro source+revision, first hosted verify — see AQ-008–AQ-012 |
 

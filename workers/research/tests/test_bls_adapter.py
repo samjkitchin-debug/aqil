@@ -128,6 +128,93 @@ def test_offline_client_requires_fixture() -> None:
         fetch_timeseries("LNS14000000", 2022, 2024, live=False, fixture_payload=None)
 
 
+def _series_payload(points: list[dict[str, object]]) -> dict[str, object]:
+    return {
+        "status": "REQUEST_SUCCEEDED",
+        "Results": {"series": [{"seriesID": "LNS14000000", "data": points}]},
+    }
+
+
+def _month(
+    year: int, month: int, value: str, footnotes: list[dict[str, str]] | None = None
+) -> dict[str, object]:
+    point: dict[str, object] = {
+        "year": str(year),
+        "period": f"M{month:02d}",
+        "periodName": "Month",
+        "value": value,
+    }
+    if footnotes is not None:
+        point["footnotes"] = footnotes
+    return point
+
+
+def test_official_unavailable_month_is_not_an_interrupted_fetch() -> None:
+    points = [_month(2025, month, "4.0") for month in range(1, 13) if month != 10]
+    points.append(
+        _month(
+            2025,
+            10,
+            "-",
+            [{"code": "9", "text": "Data unavailable due to the 2025 lapse in appropriations."}],
+        ),
+    )
+    parsed = parse_bls_payload(
+        _series_payload(points),
+        adapter_version="test:1",
+        retrieved_at=RETRIEVED,
+        collection_vintage_date=VINTAGE,
+        start_year=2025,
+        end_year=2025,
+    )
+    assert parsed.unavailable_months == ("2025-10-01",)
+    assert parsed.missing_months == ()
+    assert all(row.period_start.isoformat() != "2025-10-01" for row in parsed.observations)
+    assert len(parsed.observations) == 11
+
+
+def test_dash_without_official_footnote_stays_partial() -> None:
+    points = [_month(2025, month, "4.0") for month in range(1, 13)]
+    points[9] = _month(2025, 10, "-")
+    parsed = parse_bls_payload(
+        _series_payload(points),
+        adapter_version="test:1",
+        retrieved_at=RETRIEVED,
+        collection_vintage_date=VINTAGE,
+        start_year=2025,
+        end_year=2025,
+    )
+    assert parsed.unavailable_months == ()
+    assert "missing value for 2025-10-01" in parsed.missing_months
+
+
+def test_absent_released_month_stays_partial() -> None:
+    points = [_month(2025, month, "4.0") for month in range(1, 13) if month != 10]
+    parsed = parse_bls_payload(
+        _series_payload(points),
+        adapter_version="test:1",
+        retrieved_at=RETRIEVED,
+        collection_vintage_date=VINTAGE,
+        start_year=2025,
+        end_year=2025,
+    )
+    assert "absent period 2025-10-01" in parsed.missing_months
+
+
+def test_unreleased_current_month_is_not_required() -> None:
+    points = [_month(2026, month, "4.0") for month in range(1, 10)]
+    parsed = parse_bls_payload(
+        _series_payload(points),
+        adapter_version="test:1",
+        retrieved_at=RETRIEVED,
+        collection_vintage_date=VINTAGE,
+        start_year=2026,
+        end_year=2026,
+    )
+    assert parsed.missing_months == ()
+    assert len(parsed.observations) == 9
+
+
 def test_conflict_preserves_first_value() -> None:
     payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
     parsed = parse_bls_payload(

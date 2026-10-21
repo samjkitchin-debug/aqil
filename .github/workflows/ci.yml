@@ -30,6 +30,13 @@ jobs:
       - run: npm run typecheck
       - run: npm run test:forward-contract
       - run: npm run test:auth
+      - run: npm run test:saxo
+      - run: npm run test:wealth
+      - run: npm run test:capital
+      - run: npm run test:benchmark
+      - run: npm run test:learn
+      - run: npm run test:story
+      - run: npm run test:sourced-updates
       - run: npm run lint
       - run: npm run build
         env:

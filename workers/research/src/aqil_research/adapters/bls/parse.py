@@ -31,6 +31,7 @@ class BlsParseResult:
     observations: tuple[EconomicObservation, ...]
     warnings: tuple[str, ...]
     missing_months: tuple[str, ...]
+    unavailable_months: tuple[str, ...] = ()
 
 
 def parse_bls_payload(
@@ -39,6 +40,8 @@ def parse_bls_payload(
     adapter_version: str,
     retrieved_at: datetime,
     collection_vintage_date: date,
+    start_year: int | None = None,
+    end_year: int | None = None,
 ) -> BlsParseResult:
     """Map BLS API results to latest-revised observations for one collection snapshot."""
     results = payload.get("Results")
@@ -51,6 +54,7 @@ def parse_bls_payload(
     warnings: list[str] = []
     observations: list[EconomicObservation] = []
     missing: list[str] = []
+    unavailable: list[str] = []
 
     for series in series_list:
         if not isinstance(series, dict):
@@ -71,7 +75,11 @@ def parse_bls_payload(
                 collection_vintage_date=collection_vintage_date,
             )
             if obs is None:
-                if warning:
+                if warning and warning.startswith("officially unavailable "):
+                    unavailable.append(warning.removeprefix("officially unavailable "))
+                elif warning and warning.startswith("skipped non-monthly "):
+                    warnings.append(warning)
+                elif warning:
                     missing.append(warning)
                 continue
             if warning:
@@ -82,11 +90,63 @@ def parse_bls_payload(
         raise ValueError("no usable monthly observations in BLS payload")
 
     deduped = _dedupe_by_period(observations, warnings)
+    if start_year is not None and end_year is not None:
+        observed = {row.period_start for row in deduped}
+        unavailable_dates = {date.fromisoformat(label) for label in unavailable}
+        for month_start in _required_months(start_year, end_year, retrieved_at):
+            if month_start in observed or month_start in unavailable_dates:
+                continue
+            missing.append(f"absent period {month_start.isoformat()}")
     return BlsParseResult(
         observations=tuple(deduped),
         warnings=tuple(warnings),
         missing_months=tuple(missing),
+        unavailable_months=tuple(unavailable),
     )
+
+
+def _officially_unavailable(point: dict[str, object]) -> bool:
+    """BLS marks a real month with '-' and a footnote when the figure was not published."""
+    notes = point.get("footnotes")
+    if not isinstance(notes, list):
+        return False
+    for note in notes:
+        if not isinstance(note, dict):
+            continue
+        if str(note.get("code", "")).strip() == "9":
+            return True
+        if "unavailable" in str(note.get("text", "")).lower():
+            return True
+    return False
+
+
+def _required_months(start_year: int, end_year: int, retrieved_at: datetime) -> list[date]:
+    """Months in the request that should already have been released.
+
+    The Employment Situation for a month is published during the following month.
+    The current calendar month is not required. An earlier month that is absent
+    from the payload is a gap.
+    """
+    latest_due = _previous_month(retrieved_at.date())
+    last = min(latest_due, date(end_year, 12, 1))
+    cursor = date(start_year, 1, 1)
+    months: list[date] = []
+    while cursor <= last:
+        months.append(cursor)
+        cursor = _next_month(cursor)
+    return months
+
+
+def _previous_month(day: date) -> date:
+    if day.month == 1:
+        return date(day.year - 1, 12, 1)
+    return date(day.year, day.month - 1, 1)
+
+
+def _next_month(day: date) -> date:
+    if day.month == 12:
+        return date(day.year + 1, 1, 1)
+    return date(day.year, day.month + 1, 1)
 
 
 def _point_to_observation(
@@ -104,6 +164,8 @@ def _point_to_observation(
     period_start = date(int(year), month, 1)
     raw = str(point.get("value", "")).strip()
     if raw in {"", "-"}:
+        if _officially_unavailable(point):
+            return None, f"officially unavailable {period_start.isoformat()}"
         return None, f"missing value for {period_start.isoformat()}"
     try:
         decimal_value = Decimal(raw)

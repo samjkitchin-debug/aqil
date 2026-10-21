@@ -1,0 +1,16 @@
+{
+  "autoRun": {
+    "allow_instructions": [
+      "Creating, editing and saving ordinary project source, tests, documentation and backlog files inside the open Aqil workspace is allowed.",
+      "The same ordinary edits are allowed inside an assigned Git worktree of this repository when that worktree is the agent workspace.",
+      "Read-only Git inspection and local test, typecheck, lint and build commands inside the workspace or that assigned worktree are allowed."
+    ],
+    "block_instructions": [
+      "Pushing, deploying, or changing production, including git push, Vercel deploy, and updates to GitHub main, must wait for approval.",
+      "Hosted database changes, including supabase db push, remote migrations, and hosted SQL that writes or changes schema, must wait for approval.",
+      "Changes to credentials, environment files, OAuth tokens, token vaults, or secret configuration must wait for approval.",
+      "Deleting financial archives, apps/web/.local, secrets, or sensitive configuration must wait for approval.",
+      "Destructive Git operations, including reset --hard, clean, force push, and deleting branches that are not confirmed merged, must wait for approval."
+    ]
+  }
+}

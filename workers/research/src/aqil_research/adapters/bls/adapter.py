@@ -89,6 +89,8 @@ class BlsUnemploymentAdapter:
                 adapter_version=f"{ADAPTER_ID}:{ADAPTER_VERSION}",
                 retrieved_at=retrieved,
                 collection_vintage_date=collection_vintage,
+                start_year=self.config.start_year,
+                end_year=self.config.end_year,
             )
         except (BlsClientError, ValueError) as exc:
             code = ProviderFailureCode.FETCH_FAILED

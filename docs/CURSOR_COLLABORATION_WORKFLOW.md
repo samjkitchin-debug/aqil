@@ -32,6 +32,7 @@ Authoritative register: **`docs/07_BUILD_BACKLOG.csv`** (see `docs/07_ROADMAP_AN
 | Not started | No implementation work |
 | In progress | Active development |
 | Blocked | Waiting on dependency, access or decision |
+| Partial | A slice works in code or a local read, and the end-to-end path does not |
 | Implemented — unverified | Code/docs exist; required tests or review not yet recorded |
 | Verified | Evidence from executed tests, CI, or accepted review |
 | Deferred | Consciously postponed with reason in `blockers` or roadmap |

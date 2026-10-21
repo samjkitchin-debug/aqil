@@ -1,9 +1,21 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 21 October 2026, Today and Intelligence proof  
-**Parent:** `d667781` on `work/aqil-autonomous-build`  
-**Checkpoint:** proof run at `d667781` (merge `058cb36` is in that history). Not pushed. Production scheduling, hosted migrations and Saxo authorisation stay unapplied.
+**Last updated:** 21 October 2026, controlled consolidation  
+**Parent:** `2f8a353` on `work/aqil-autonomous-build`  
+**Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Consolidation, 21 October 2026
+
+The audited HEAD was `2f8a353`. This note is the consolidation on that parent.
+
+Live BLS series request window was 2023 through 2026. The response was HTTP 200, `REQUEST_SUCCEEDED`, 45 monthly points and no annual rows. Parsed usable observations: 44. `missing_months` had been `missing value for 2025-10-01` because the value is `-` with footnote code 9, "Data unavailable due to the 2025 lapse in appropriations." That is an official absence, not a pagination failure and not an unreleased month. September 2026 is the latest returned month. October 2026 is not yet due. The freshness gate still rejects a genuinely partial or stale payload. An officially unavailable month no longer sets `partial`. After the correction, the same live read is `partial=false` with 44 observations. October 2025 is not stored as a number.
+
+Persistence did not run. Docker was not running, and `127.0.0.1:54322` refused the connection. No new retrieval timestamp was written. The Employment Situation feed returned HTTP 403. No release record was invented. Signed-in Today was not opened.
+
+Research pytest: 147 passed, 8 skipped. Web CI now also runs the Saxo, Wealth, Capital, Benchmark, Learn, Story and sourced-update commands. That workflow has not run on GitHub.
+
+Branches retained: `m5/live-intelligence-coverage` is an ancestor of `m6/research-methods`. Neither is merged. Their migrations use timestamps that must not follow `20261018200000`. `research/employment-situation-2026-11` stays checked out at `C:/Users/gamer/aqil-sahm`. Its migration file matches development. The worktree status shows a modified test file whose blob equals HEAD `ff959c35a41d3ad57ac842c5bec9ed625bc55502`; it was not touched. `auth/google-foundation` is patch-equivalent and was not merged. `my-wealth/portfolio-slice` and `docs/consolidation-2026-10-18` were not merged. No remote branch was deleted. `apps/web/apps web.zip` is gitignored. It contains `.env.local`. The live `apps/web/.env.local` also exists. The zip was not opened for values and was not deleted.
 
 ## Today and Intelligence proof, 21 October 2026
 
