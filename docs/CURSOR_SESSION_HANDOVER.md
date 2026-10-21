@@ -1,9 +1,21 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 22 October 2026, sourced releases and confirmed calendar  
-**Parent:** `c306f1f` on `work/aqil-autonomous-build`  
+**Last updated:** 22 October 2026, repeatable refresh and Federal Reserve press  
+**Parent:** `92a783e` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Repeatable refresh and a second source, 22 October 2026
+
+`npm run research:refresh` is the one local entrypoint. It takes a Postgres advisory lock, polls each source in its own transaction, and writes one `research.refresh_runs` row per source. A failed source does not cancel the others. It does not install a Windows scheduled task. Cadence when someone runs it: Employment Situation publications, Federal Reserve monetary-policy press and the BLS calendar daily; the unemployment series weekly, and skipped when the last live retrieval is newer than seven days.
+
+The first refresh stored 15 Federal Reserve press items from `https://www.federalreserve.gov/feeds/press_monetary.xml` (HTTP 200). Source `federal_reserve_monetary_press`, dataset `fed.press.monetary`. The newest is “Minutes of the Board's discount rate meetings on August 17, September 9, and September 16, 2026”, published 13 October 2026, 18:00 UTC, link `https://www.federalreserve.gov/newsevents/pressreleases/monetary20261013a.htm`, retrieved 21 October 2026, 20:58 UTC. The Board public-domain disclaimer is the rights basis, assessed 22 October 2026. A second refresh stored 0 new press items and left the 12 Employment Situation rows and 27 BLS calendar rows unchanged. The unemployment series was skipped as still fresh. The live series remains 44 observations, retrieval `acb7a909-2650-4d50-8fc2-89be29aff7aa`.
+
+Signed-in Today puts only the 13 October Board minutes under “Published in the last 14 days”. The 2 October Employment Situation release is under “Earlier publications”. The historical series and the next confirmed BLS time, 28 October 2026, 10:00 Eastern Time, are separate. Evidence shows `federal_reserve_monetary_press` and the original Board URL. Upcoming lists 27 BLS calendar rows and does not show the synthetic earnings fixture. Exposures still says no authoritative exposure mapping has been retrieved. Desktop and a 390px Today view had no horizontal overflow. Primary navigation sat at the bottom on the narrow width.
+
+The full research pytest run was pointed at the demonstration database. It appended fixture observations (36 to 87) and two `research.research_runs` rows, and it froze a synthetic forward scenario plus a past FOMC fixture event. Those scenario rows cannot be deleted. The 44 live observations, 12 BLS publications, 15 Board publications and 27 future BLS calendar rows remained. `test_collect_and_run_fixture_e2e` failed with `completed_insufficient`. `ruff format --check` still fails on files that were already unformatted. Web sourced-update tests: 9 passed. Typecheck passed. Production build passed. GitHub Actions has not run. Migration `20261022140000_research_refresh_runs.sql` was applied only to local port 55432.
+
+The next holdings contract is still missing. Automated collection from Vanguard and iShares remains prohibited. A permitted holdings file, not a new scraper, is what Exposures needs before any mapping is shown.
 
 ## Sourced releases and confirmed calendar, 22 October 2026
 

@@ -13,7 +13,11 @@ const PROVIDER_LABELS: Record<string, string> = {
   bls_cps_unemployment_rate: "U.S. Bureau of Labor Statistics",
   bls_employment_situation_archive: "U.S. Bureau of Labor Statistics",
   bls_ics_schedule: "U.S. Bureau of Labor Statistics",
+  federal_reserve_monetary_press: "Federal Reserve Board",
 };
+
+/** A publisher date inside this window can be shown as a recent publication. */
+export const RECENT_PUBLICATION_DAYS = 14;
 
 export function providerLabelForSource(sourceId: string): string {
   return PROVIDER_LABELS[sourceId] ?? sourceId;
@@ -104,4 +108,32 @@ export function presentSourcedUpdates(
   updates: SourcedUpdateV1[],
 ): SourcedUpdatePresentation[] {
   return sortSourcedUpdatesByRecency(updates).map(presentSourcedUpdate);
+}
+
+export function partitionPublications(
+  updates: SourcedUpdateV1[],
+  now: Date = new Date(),
+): { recent: SourcedUpdatePresentation[]; earlier: SourcedUpdatePresentation[] } {
+  const cutoff = now.getTime() - RECENT_PUBLICATION_DAYS * 24 * 60 * 60 * 1000;
+  const recent: SourcedUpdateV1[] = [];
+  const earlier: SourcedUpdateV1[] = [];
+  for (const row of updates) {
+    const published = row.published_at === null ? Number.NaN : Date.parse(row.published_at);
+    if (!Number.isNaN(published) && published >= cutoff && published <= now.getTime()) {
+      recent.push(row);
+    } else {
+      earlier.push(row);
+    }
+  }
+  const byPublished = (rows: SourcedUpdateV1[]) =>
+    [...rows].sort((a, b) => {
+      const aMs = a.published_at === null ? Number.NEGATIVE_INFINITY : Date.parse(a.published_at);
+      const bMs = b.published_at === null ? Number.NEGATIVE_INFINITY : Date.parse(b.published_at);
+      if (aMs !== bMs) return bMs - aMs;
+      return b.update_id.localeCompare(a.update_id);
+    });
+  return {
+    recent: byPublished(recent).map(presentSourcedUpdate),
+    earlier: byPublished(earlier).map(presentSourcedUpdate),
+  };
 }

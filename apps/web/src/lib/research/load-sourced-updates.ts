@@ -7,7 +7,7 @@ import type { SourcedUpdateV1 } from "@/lib/research/sourced-update";
 const DEFAULT_RESEARCH_DATABASE_URL =
   "postgresql://research_worker:research_worker@127.0.0.1:55432/postgres";
 
-const LIST_LIMIT = 24;
+const LIST_LIMIT = 48;
 
 type DbRow = {
   update_id: string;

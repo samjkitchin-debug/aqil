@@ -91,6 +91,7 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "forward.bea.news.schedule",
         "forward.sec.edgar.completed_filings",
         "forward.company_ir.watchlist",
+        "fed.press.monetary",
     }
     for record in records:
         assert record.terms_url in record.evidence_urls
@@ -103,6 +104,8 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
             "board.yield.ntfs",
         }:
             assert record.assessed_on.isoformat() == "2026-10-18"
+        elif record.dataset_id == "fed.press.monetary":
+            assert record.assessed_on.isoformat() == "2026-10-22"
         else:
             assert record.assessed_on.isoformat() == "2026-10-17"
 

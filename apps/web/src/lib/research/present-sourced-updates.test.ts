@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   formatOptionalPublishedAt,
   latestRetrievedAt,
+  partitionPublications,
   presentSourcedUpdates,
   sortSourcedUpdatesByRecency,
   SOURCED_UPDATES_EMPTY_COPY,
@@ -82,4 +83,32 @@ test("latest retrieval comes from the newest row", () => {
     }),
   ];
   assert.equal(latestRetrievedAt(rows), "2026-01-15T08:00:00.000Z");
+});
+
+test("a release from several weeks ago is not grouped as recent", () => {
+  const now = new Date("2026-10-22T00:00:00.000Z");
+  const groups = partitionPublications(
+    [
+      fixture({
+        update_id: "00000000-0000-4000-8000-000000000010",
+        source_id: "bls_employment_situation_archive",
+        published_at: "2026-10-02T11:51:00.000Z",
+      }),
+      fixture({
+        update_id: "00000000-0000-4000-8000-000000000011",
+        source_id: "federal_reserve_monetary_press",
+        published_at: "2026-10-13T18:00:00.000Z",
+        canonical_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20261013a.htm",
+      }),
+    ],
+    now,
+  );
+  assert.deepEqual(
+    groups.recent.map((row) => row.update.source_id),
+    ["federal_reserve_monetary_press"],
+  );
+  assert.deepEqual(
+    groups.earlier.map((row) => row.update.source_id),
+    ["bls_employment_situation_archive"],
+  );
 });

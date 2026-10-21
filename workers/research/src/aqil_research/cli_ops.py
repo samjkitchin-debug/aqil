@@ -69,8 +69,7 @@ def register_collect_parsers(sub: argparse._SubParsersAction) -> None:
     ingest = sub.add_parser(
         "ingest",
         help=(
-            "Ingest permitted sources into the local research database "
-            "(live BLS series by default)"
+            "Ingest permitted sources into the local research database (live BLS series by default)"
         ),
     )
     ingest.add_argument(
@@ -82,6 +81,48 @@ def register_collect_parsers(sub: argparse._SubParsersAction) -> None:
     ingest.add_argument("--start-year", type=int, default=None)
     ingest.add_argument("--end-year", type=int, default=None)
     ingest.add_argument("--format", choices=["text", "json"], default="text")
+
+    refresh = sub.add_parser(
+        "refresh",
+        help="Refresh registered live sources once. Does not install a schedule.",
+    )
+    refresh.add_argument("--format", choices=["text", "json"], default="text")
+
+
+def run_refresh(args: argparse.Namespace) -> int:
+    from aqil_research.workflow.refresh import CADENCE, run_registered_refresh
+
+    try:
+        report = run_registered_refresh()
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+    payload = {
+        "started_at": report.started_at.isoformat(),
+        "overlapped": report.overlapped,
+        "cadence": CADENCE,
+        "sources": [
+            {
+                "source_id": source.source_id,
+                "outcome": source.outcome,
+                "inserted": source.inserted,
+                "unchanged": source.unchanged,
+                "detail": source.detail,
+            }
+            for source in report.sources
+        ],
+    }
+    if args.format == "json":
+        print(json.dumps(payload))
+    elif report.overlapped:
+        print("Refresh already running. No sources were polled.")
+    else:
+        for source in report.sources:
+            print(
+                f"{source.source_id}: {source.outcome} "
+                f"inserted={source.inserted} unchanged={source.unchanged}"
+            )
+    return 0 if not report.overlapped else 0
 
 
 def run_ingest(args: argparse.Namespace) -> int:

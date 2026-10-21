@@ -3,7 +3,9 @@ import Link from "next/link";
 import {
   formatRetrievedAt,
   latestRetrievedAt,
-  presentSourcedUpdates,
+  partitionPublications,
+  RECENT_PUBLICATION_DAYS,
+  type SourcedUpdatePresentation,
   SOURCED_UPDATES_EMPTY_COPY,
 } from "@/lib/research/present-sourced-updates";
 import type { SourcedUpdateV1 } from "@/lib/research/sourced-update";
@@ -22,13 +24,13 @@ export function SourcedUpdatesPanel({ updates, variant }: Props) {
     );
   }
 
-  const rows = presentSourcedUpdates(updates);
+  const groups = partitionPublications(updates);
   const lastRetrieval = latestRetrievedAt(updates);
 
   return (
     <section data-testid="sourced-updates-panel">
       <p className="research-meta" data-testid="sourced-updates-freshness">
-        {rows.length} sourced {rows.length === 1 ? "update" : "updates"}
+        {updates.length} sourced {updates.length === 1 ? "publication" : "publications"}
         {lastRetrieval ? (
           <>
             {" "}
@@ -36,6 +38,48 @@ export function SourcedUpdatesPanel({ updates, variant }: Props) {
           </>
         ) : null}
       </p>
+      {groups.recent.length > 0 ? (
+        <PublicationGroup
+          testId="recent-publications"
+          label={`Published in the last ${RECENT_PUBLICATION_DAYS} days`}
+          rows={groups.recent}
+          variant={variant}
+        />
+      ) : (
+        <p className="research-body" data-testid="no-recent-publications">
+          No stored publication was published in the last {RECENT_PUBLICATION_DAYS} days.
+        </p>
+      )}
+      {groups.earlier.length > 0 ? (
+        <PublicationGroup
+          testId="earlier-publications"
+          label="Earlier publications"
+          note="These are the publishers' release dates. An older release is not a new announcement."
+          rows={groups.earlier}
+          variant={variant}
+        />
+      ) : null}
+    </section>
+  );
+}
+
+function PublicationGroup({
+  testId,
+  label,
+  note,
+  rows,
+  variant,
+}: {
+  testId: string;
+  label: string;
+  note?: string;
+  rows: SourcedUpdatePresentation[];
+  variant: "briefing" | "evidence";
+}) {
+  return (
+    <div data-testid={testId}>
+      <p className="research-meta">{label}</p>
+      {note ? <p className="research-body">{note}</p> : null}
       <ul className="forward-horizon-list">
         {rows.map((row) => (
           <li key={row.update.update_id} className="forward-horizon-item">
@@ -78,6 +122,6 @@ export function SourcedUpdatesPanel({ updates, variant }: Props) {
           </li>
         ))}
       </ul>
-    </section>
+    </div>
   );
 }
