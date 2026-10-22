@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<message:MessageGroup xmlns:message="http://www.SDMX.org/resources/SDMXML/schemas/v1_0/message" xmlns:common="http://www.SDMX.org/resources/SDMXML/schemas/v1_0/common" xmlns:frb="http://www.federalreserve.gov/structure/compact/common" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.SDMX.org/resources/SDMXML/schemas/v1_0/message SDMXMessage.xsd http://www.federalreserve.gov/structure/compact/common frb_common.xsd">
+  <message:Header xmlns:message="http://www.SDMX.org/resources/SDMXML/schemas/v1_0/message">
+    <message:ID>H8</message:ID>
+    <message:Test>false</message:Test>
+    <message:Name>H.8 Assets and Liabilities of Commercial Banks in the United States</message:Name>
+    <message:Prepared>2026-10-16T10:00:00</message:Prepared>
+    <message:Sender id="FRB">
+      <message:Name>Federal Reserve Board</message:Name>
+      <message:Contact>
+        <message:Name>Federal Reserve Board of Governors</message:Name>
+      </message:Contact>
+    </message:Sender>
+    <message:Source>The Data Download Program (DDP) application is being retired. During the week of November 9, the “Build Your Package” feature in the Data Download Program (DDP) will be removed in preparation for the eventual retirement of the DDP. For complete release data, please refer to data release pages. For customized data retrieval, please use the tools available through Federal Reserve Economic Data (FRED).</message:Source>
+  </message:Header>
+  <frb:DataSet id="H8" xmlns:kf="http://www.federalreserve.gov/structure/compact/H8_H8" xsi:schemaLocation="http://www.federalreserve.gov/structure/compact/H8_H8 H8_H8.xsd">
+    <kf:Series BG="CB" CATEGORY="A" CURRENCY="USD" FREQ="19" H8_UNITS="LEVEL" ITEM="1001" SA="SA" SERIES_NAME="B1001NCBA" UNIT="Currency" UNIT_MULT="1000000">
+      <frb:Annotations>
+        <common:Annotation>
+          <common:AnnotationType>Short Description</common:AnnotationType>
+          <common:AnnotationText>Bank credit, all commercial banks, seasonally adjusted</common:AnnotationText>
+        </common:Annotation>
+        <common:Annotation>
+          <common:AnnotationType>Long Description</common:AnnotationType>
+          <common:AnnotationText>Bank credit, all commercial banks, seasonally adjusted</common:AnnotationText>
+        </common:Annotation>
+      </frb:Annotations>
+      <frb:Obs OBS_STATUS="A" OBS_VALUE="567255.3" TIME_PERIOD="1973-01-03" />
+      <frb:Obs OBS_STATUS="A" OBS_VALUE="565505.4" TIME_PERIOD="1973-01-10" />
+      <frb:Obs OBS_STATUS="A" OBS_VALUE="565347.7" TIME_PERIOD="1973-01-17" />
+    </kf:Series>
+  </frb:DataSet>
+</message:MessageGroup>
