@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<message:MessageGroup xmlns:message="http://www.SDMX.org/resources/SDMXML/schemas/v1_0/message" xmlns:common="http://www.SDMX.org/resources/SDMXML/schemas/v1_0/common" xmlns:frb="http://www.federalreserve.gov/structure/compact/common" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.SDMX.org/resources/SDMXML/schemas/v1_0/message SDMXMessage.xsd http://www.federalreserve.gov/structure/compact/common frb_common.xsd">
+  <message:Header xmlns:message="http://www.SDMX.org/resources/SDMXML/schemas/v1_0/message">
+    <message:ID>H15</message:ID>
+    <message:Test>false</message:Test>
+    <message:Name>H.15 Selected Interest Rates</message:Name>
+    <message:Prepared>2026-10-21T15:40:05</message:Prepared>
+    <message:Sender id="FRB">
+      <message:Name>Federal Reserve Board</message:Name>
+      <message:Contact>
+        <message:Name>Banking Analysis Section</message:Name>
+        <message:Email>MA-BA-Releases@frb.gov</message:Email>
+      </message:Contact>
+    </message:Sender>
+    <message:Source>The Data Download Program (DDP) application is being retired. During the week of November 9, the “Build Your Package” feature in the Data Download Program (DDP) will be removed in preparation for the eventual retirement of the DDP. For complete release data, please refer to data release pages. For customized data retrieval, please use the tools available through Federal Reserve Economic Data (FRED).</message:Source>
+  </message:Header>
+  <frb:DataSet id="H15" xmlns:kf="http://www.federalreserve.gov/structure/compact/H15_H15" xsi:schemaLocation="http://www.federalreserve.gov/structure/compact/H15_H15 H15_H15.xsd">
+    
+<kf:Series CURRENCY="NA" FREQ="9" INSTRUMENT="FF" MATURITY="O" SERIES_NAME="RIFSPFF_N.B" UNIT="Percent:_Per_Year" UNIT_MULT="1">
+      <frb:Annotations>
+        <common:Annotation>
+          <common:AnnotationType>Short Description</common:AnnotationType>
+          <common:AnnotationText>Federal funds</common:AnnotationText>
+        </common:Annotation>
+        <common:Annotation>
+          <common:AnnotationType>Long Description</common:AnnotationType>
+          <common:AnnotationText>Federal funds effective rate</common:AnnotationText>
+        </common:Annotation>
+      </frb:Annotations>
+      
+<frb:Obs OBS_STATUS="A" OBS_VALUE="0.75" TIME_PERIOD="1954-07-15" />
+<frb:Obs OBS_STATUS="ND" OBS_VALUE="-9999" TIME_PERIOD="1954-07-16" />
+<frb:Obs OBS_STATUS="A" OBS_VALUE="0.50" TIME_PERIOD="1954-07-19" />
+    </kf:Series>
+<kf:Series CURRENCY="NA" FREQ="129" INSTRUMENT="FF" MATURITY="O" SERIES_NAME="RIFSPFF_N.M" UNIT="Percent:_Per_Year" UNIT_MULT="1">
+      <frb:Annotations>
+        <common:Annotation>
+          <common:AnnotationType>Short Description</common:AnnotationType>
+          <common:AnnotationText>Federal funds</common:AnnotationText>
+        </common:Annotation>
+        <common:Annotation>
+          <common:AnnotationType>Long Description</common:AnnotationType>
+          <common:AnnotationText>Federal funds effective rate</common:AnnotationText>
+        </common:Annotation>
+      </frb:Annotations>
+      
+<frb:Obs OBS_STATUS="A" OBS_VALUE="0.80" TIME_PERIOD="1954-07-31" />
+      <!-- The live monthly series had no ND row on 22 October 2026. This excerpt adds the package ND sentinel so the parser can omit it. -->
+<frb:Obs OBS_STATUS="ND" OBS_VALUE="-9999" TIME_PERIOD="1954-08-31" />
+<frb:Obs OBS_STATUS="A" OBS_VALUE="1.07" TIME_PERIOD="1954-09-30" />
+<frb:Obs OBS_STATUS="A" OBS_VALUE="0.85" TIME_PERIOD="1954-10-31" />
+    </kf:Series>
+<kf:Series CURRENCY="NA" FREQ="129" INSTRUMENT="TCMNOM" MATURITY="Y10" SERIES_NAME="RIFLGFCY10_N.M" UNIT="Percent:_Per_Year" UNIT_MULT="1">
+      <frb:Annotations>
+        <common:Annotation>
+          <common:AnnotationType>Short Description</common:AnnotationType>
+          <common:AnnotationText>10-year Treasury constant maturity</common:AnnotationText>
+        </common:Annotation>
+        <common:Annotation>
+          <common:AnnotationType>Long Description</common:AnnotationType>
+          <common:AnnotationText>Market yield on U.S. Treasury securities at 10-year  constant maturity, quoted on investment basis</common:AnnotationText>
+        </common:Annotation>
+      </frb:Annotations>
+      
+<frb:Obs OBS_STATUS="A" OBS_VALUE="2.83" TIME_PERIOD="1953-04-30" />
+<frb:Obs OBS_STATUS="A" OBS_VALUE="3.05" TIME_PERIOD="1953-05-31" />
+      <!-- The live monthly series had no ND row on 22 October 2026. This excerpt adds the package ND sentinel so the parser can omit it. -->
+<frb:Obs OBS_STATUS="ND" OBS_VALUE="-9999" TIME_PERIOD="1953-06-30" />
+<frb:Obs OBS_STATUS="A" OBS_VALUE="2.93" TIME_PERIOD="1953-07-31" />
+    </kf:Series>
+  </frb:DataSet>
+</message:MessageGroup>
