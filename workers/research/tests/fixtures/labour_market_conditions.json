@@ -1,0 +1,34 @@
+{
+  "description": "Synthetic labour-market observations for LABOUR_MARKET_CONDITIONS 1.0.0. Not a live download. October 2025 unemployment is omitted from the sufficient window. The missing-endpoint window makes 2025-10-01 an endpoint and does not store a substitute.",
+  "sufficient_window": [
+    {"observation_id": "ln-2024-09", "dataset_id": "bls.ln.LNS14000000", "period_start": "2024-09-01", "raw_value": "3.7", "unit": "percent"},
+    {"observation_id": "ln-2025-08", "dataset_id": "bls.ln.LNS14000000", "period_start": "2025-08-01", "raw_value": "4.0", "unit": "percent"},
+    {"observation_id": "ln-2025-09", "dataset_id": "bls.ln.LNS14000000", "period_start": "2025-09-01", "raw_value": "4.1", "unit": "percent"},
+    {"observation_id": "ln-2026-08", "dataset_id": "bls.ln.LNS14000000", "period_start": "2026-08-01", "raw_value": "4.3", "unit": "percent"},
+    {"observation_id": "ln-2026-09", "dataset_id": "bls.ln.LNS14000000", "period_start": "2026-09-01", "raw_value": "4.4", "unit": "percent"},
+    {"observation_id": "ce-2024-09", "dataset_id": "bls.ce.CES0000000001", "period_start": "2024-09-01", "raw_value": "900", "unit": "thousands"},
+    {"observation_id": "ce-2025-08", "dataset_id": "bls.ce.CES0000000001", "period_start": "2025-08-01", "raw_value": "1000", "unit": "thousands"},
+    {"observation_id": "ce-2025-09", "dataset_id": "bls.ce.CES0000000001", "period_start": "2025-09-01", "raw_value": "1050", "unit": "thousands"},
+    {"observation_id": "ce-2026-08", "dataset_id": "bls.ce.CES0000000001", "period_start": "2026-08-01", "raw_value": "1100", "unit": "thousands"},
+    {"observation_id": "ce-2026-09", "dataset_id": "bls.ce.CES0000000001", "period_start": "2026-09-01", "raw_value": "1155", "unit": "thousands"},
+    {"observation_id": "jt-2024-09", "dataset_id": "bls.jt.JTS000000000000000JOL", "period_start": "2024-09-01", "raw_value": "800", "unit": "thousands"},
+    {"observation_id": "jt-2025-08", "dataset_id": "bls.jt.JTS000000000000000JOL", "period_start": "2025-08-01", "raw_value": "600", "unit": "thousands"},
+    {"observation_id": "jt-2025-09", "dataset_id": "bls.jt.JTS000000000000000JOL", "period_start": "2025-09-01", "raw_value": "640", "unit": "thousands"},
+    {"observation_id": "jt-2026-08", "dataset_id": "bls.jt.JTS000000000000000JOL", "period_start": "2026-08-01", "raw_value": "660", "unit": "thousands"}
+  ],
+  "missing_october_2025_unemployment": [
+    {"observation_id": "ln-2024-10", "dataset_id": "bls.ln.LNS14000000", "period_start": "2024-10-01", "raw_value": "3.9", "unit": "percent"},
+    {"observation_id": "ln-2025-11", "dataset_id": "bls.ln.LNS14000000", "period_start": "2025-11-01", "raw_value": "4.2", "unit": "percent"},
+    {"observation_id": "ln-2026-09", "dataset_id": "bls.ln.LNS14000000", "period_start": "2026-09-01", "raw_value": "4.3", "unit": "percent"},
+    {"observation_id": "ln-2026-10", "dataset_id": "bls.ln.LNS14000000", "period_start": "2026-10-01", "raw_value": "4.6", "unit": "percent"},
+    {"observation_id": "ce-2024-09", "dataset_id": "bls.ce.CES0000000001", "period_start": "2024-09-01", "raw_value": "900", "unit": "thousands"},
+    {"observation_id": "ce-2025-08", "dataset_id": "bls.ce.CES0000000001", "period_start": "2025-08-01", "raw_value": "1000", "unit": "thousands"},
+    {"observation_id": "ce-2025-09", "dataset_id": "bls.ce.CES0000000001", "period_start": "2025-09-01", "raw_value": "1050", "unit": "thousands"},
+    {"observation_id": "ce-2026-08", "dataset_id": "bls.ce.CES0000000001", "period_start": "2026-08-01", "raw_value": "1100", "unit": "thousands"},
+    {"observation_id": "ce-2026-09", "dataset_id": "bls.ce.CES0000000001", "period_start": "2026-09-01", "raw_value": "1155", "unit": "thousands"},
+    {"observation_id": "jt-2024-09", "dataset_id": "bls.jt.JTS000000000000000JOL", "period_start": "2024-09-01", "raw_value": "800", "unit": "thousands"},
+    {"observation_id": "jt-2025-08", "dataset_id": "bls.jt.JTS000000000000000JOL", "period_start": "2025-08-01", "raw_value": "600", "unit": "thousands"},
+    {"observation_id": "jt-2025-09", "dataset_id": "bls.jt.JTS000000000000000JOL", "period_start": "2025-09-01", "raw_value": "640", "unit": "thousands"},
+    {"observation_id": "jt-2026-08", "dataset_id": "bls.jt.JTS000000000000000JOL", "period_start": "2026-08-01", "raw_value": "660", "unit": "thousands"}
+  ]
+}

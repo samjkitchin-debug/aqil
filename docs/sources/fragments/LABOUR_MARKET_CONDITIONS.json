@@ -1,0 +1,220 @@
+{
+  "description": "Fixture result for LABOUR_MARKET_CONDITIONS 1.0.0. Not a live reading.",
+  "method_id": "LABOUR_MARKET_CONDITIONS",
+  "method_version": "1.0.0",
+  "sufficiency": "sufficient",
+  "analysis_mode": "latest_revised",
+  "investment_implication": "no_action",
+  "causal_hypothesis": "No causal mechanism is established.",
+  "missing_reason": null,
+  "observation_ids": [
+    "ce-2024-09",
+    "ce-2025-08",
+    "ce-2025-09",
+    "ce-2026-08",
+    "ce-2026-09",
+    "jt-2024-09",
+    "jt-2025-08",
+    "jt-2025-09",
+    "jt-2026-08",
+    "ln-2024-09",
+    "ln-2025-08",
+    "ln-2025-09",
+    "ln-2026-08",
+    "ln-2026-09"
+  ],
+  "calculation": {
+    "method_id": "LABOUR_MARKET_CONDITIONS",
+    "method_version": "1.0.0",
+    "analysis_mode": "latest_revised",
+    "observation_ids": [
+      "ce-2024-09",
+      "ce-2025-08",
+      "ce-2025-09",
+      "ce-2026-08",
+      "ce-2026-09",
+      "jt-2024-09",
+      "jt-2025-08",
+      "jt-2025-09",
+      "jt-2026-08",
+      "ln-2024-09",
+      "ln-2025-08",
+      "ln-2025-09",
+      "ln-2026-08",
+      "ln-2026-09"
+    ],
+    "series": [
+      {
+        "dataset_id": "bls.ln.LNS14000000",
+        "latest_period": "2026-09-01",
+        "level": "4.4",
+        "unit": "percent",
+        "level_transformation": "latest stored level",
+        "seasonal_adjustment": "seasonally_adjusted",
+        "observation_id": "ln-2026-09",
+        "rank": 5,
+        "history_count": 5,
+        "rank_transformation": "1 plus the count of stored values strictly below the latest value",
+        "twelve_month_change": {
+          "dataset_id": "bls.ln.LNS14000000",
+          "window_start": "2025-09-01",
+          "window_end": "2026-09-01",
+          "start_level": "4.1",
+          "end_level": "4.4",
+          "start_unit": "percent",
+          "end_unit": "percent",
+          "start_observation_id": "ln-2025-09",
+          "end_observation_id": "ln-2026-09",
+          "endpoints_only": true,
+          "transformation": "12-month difference in percentage points",
+          "change_percentage_points": "0.30",
+          "change_unit": "percentage_points"
+        }
+      },
+      {
+        "dataset_id": "bls.ce.CES0000000001",
+        "latest_period": "2026-09-01",
+        "level": "1155",
+        "unit": "thousands",
+        "level_transformation": "latest stored level",
+        "seasonal_adjustment": "seasonally_adjusted",
+        "observation_id": "ce-2026-09",
+        "rank": 5,
+        "history_count": 5,
+        "rank_transformation": "1 plus the count of stored values strictly below the latest value",
+        "twelve_month_change": {
+          "dataset_id": "bls.ce.CES0000000001",
+          "window_start": "2025-09-01",
+          "window_end": "2026-09-01",
+          "start_level": "1050",
+          "end_level": "1155",
+          "start_unit": "thousands",
+          "end_unit": "thousands",
+          "start_observation_id": "ce-2025-09",
+          "end_observation_id": "ce-2026-09",
+          "endpoints_only": true,
+          "transformation": "12-month difference in thousands and percent change",
+          "change_thousands": "105",
+          "change_unit": "thousands",
+          "percent_change": "10.00",
+          "percent_change_unit": "percent"
+        }
+      },
+      {
+        "dataset_id": "bls.jt.JTS000000000000000JOL",
+        "latest_period": "2026-08-01",
+        "level": "660",
+        "unit": "thousands",
+        "level_transformation": "latest stored level",
+        "seasonal_adjustment": "seasonally_adjusted",
+        "observation_id": "jt-2026-08",
+        "rank": 3,
+        "history_count": 4,
+        "rank_transformation": "1 plus the count of stored values strictly below the latest value",
+        "twelve_month_change": {
+          "dataset_id": "bls.jt.JTS000000000000000JOL",
+          "window_start": "2025-08-01",
+          "window_end": "2026-08-01",
+          "start_level": "600",
+          "end_level": "660",
+          "start_unit": "thousands",
+          "end_unit": "thousands",
+          "start_observation_id": "jt-2025-08",
+          "end_observation_id": "jt-2026-08",
+          "endpoints_only": true,
+          "transformation": "12-month difference in thousands and percent change",
+          "change_thousands": "60",
+          "change_unit": "thousands",
+          "percent_change": "10.00",
+          "percent_change_unit": "percent"
+        }
+      }
+    ],
+    "joint": {
+      "latest_common_period": "2026-08-01",
+      "months_rule": "only months present in all three series",
+      "levels": [
+        {
+          "dataset_id": "bls.ln.LNS14000000",
+          "period": "2026-08-01",
+          "level": "4.3",
+          "unit": "percent",
+          "seasonal_adjustment": "seasonally_adjusted",
+          "observation_id": "ln-2026-08"
+        },
+        {
+          "dataset_id": "bls.ce.CES0000000001",
+          "period": "2026-08-01",
+          "level": "1100",
+          "unit": "thousands",
+          "seasonal_adjustment": "seasonally_adjusted",
+          "observation_id": "ce-2026-08"
+        },
+        {
+          "dataset_id": "bls.jt.JTS000000000000000JOL",
+          "period": "2026-08-01",
+          "level": "660",
+          "unit": "thousands",
+          "seasonal_adjustment": "seasonally_adjusted",
+          "observation_id": "jt-2026-08"
+        }
+      ],
+      "twelve_month_change": {
+        "window_start": "2025-08-01",
+        "window_end": "2026-08-01",
+        "endpoints_only": true,
+        "series": [
+          {
+            "dataset_id": "bls.ln.LNS14000000",
+            "window_start": "2025-08-01",
+            "window_end": "2026-08-01",
+            "start_level": "4.0",
+            "end_level": "4.3",
+            "start_unit": "percent",
+            "end_unit": "percent",
+            "start_observation_id": "ln-2025-08",
+            "end_observation_id": "ln-2026-08",
+            "endpoints_only": true,
+            "transformation": "12-month difference in percentage points",
+            "change_percentage_points": "0.30",
+            "change_unit": "percentage_points"
+          },
+          {
+            "dataset_id": "bls.ce.CES0000000001",
+            "window_start": "2025-08-01",
+            "window_end": "2026-08-01",
+            "start_level": "1000",
+            "end_level": "1100",
+            "start_unit": "thousands",
+            "end_unit": "thousands",
+            "start_observation_id": "ce-2025-08",
+            "end_observation_id": "ce-2026-08",
+            "endpoints_only": true,
+            "transformation": "12-month difference in thousands and percent change",
+            "change_thousands": "100",
+            "change_unit": "thousands",
+            "percent_change": "10.00",
+            "percent_change_unit": "percent"
+          },
+          {
+            "dataset_id": "bls.jt.JTS000000000000000JOL",
+            "window_start": "2025-08-01",
+            "window_end": "2026-08-01",
+            "start_level": "600",
+            "end_level": "660",
+            "start_unit": "thousands",
+            "end_unit": "thousands",
+            "start_observation_id": "jt-2025-08",
+            "end_observation_id": "jt-2026-08",
+            "endpoints_only": true,
+            "transformation": "12-month difference in thousands and percent change",
+            "change_thousands": "60",
+            "change_unit": "thousands",
+            "percent_change": "10.00",
+            "percent_change_unit": "percent"
+          }
+        ]
+      }
+    }
+  }
+}
