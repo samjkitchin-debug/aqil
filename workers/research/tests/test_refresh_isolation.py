@@ -34,6 +34,14 @@ def test_default_steps_are_official_live_sources() -> None:
         "ecb_monetary_press",
         "bls_ics_schedule",
         "federal_reserve_sloos_cil",
+        "bls_cpi_u_all_items",
+        "bls_ces_total_nonfarm_payrolls",
+        "bls_jolts_total_nonfarm_job_openings",
+        "federal_reserve_g17_total_ip",
+        "federal_reserve_h8_bank_credit",
+        "federal_reserve_h15_federal_funds_effective",
+        "federal_reserve_h15_treasury_10y_constant_maturity",
+        "ecb_sdw_hicp_sa",
     ]
 
 
