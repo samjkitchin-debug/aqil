@@ -94,6 +94,14 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "fed.press.monetary",
         "bls.cpi.archive",
         "ecb.press.monetary",
+        "bls.cu.CUSR0000SA0",
+        "bls.ce.CES0000000001",
+        "bls.jt.JTS000000000000000JOL",
+        "fed.g17.IP.B50001.S",
+        "fed.h8.B1001NCBA",
+        "fed.h15.RIFSPFF_N.M",
+        "fed.h15.RIFLGFCY10_N.M",
+        "ecb.icp.M.U2.Y.000000.3.INX",
     }
     for record in records:
         assert record.terms_url in record.evidence_urls
@@ -108,6 +116,14 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
             "fed.press.monetary",
             "bls.cpi.archive",
             "ecb.press.monetary",
+            "bls.cu.CUSR0000SA0",
+            "bls.ce.CES0000000001",
+            "bls.jt.JTS000000000000000JOL",
+            "fed.g17.IP.B50001.S",
+            "fed.h8.B1001NCBA",
+            "fed.h15.RIFSPFF_N.M",
+            "fed.h15.RIFLGFCY10_N.M",
+            "ecb.icp.M.U2.Y.000000.3.INX",
         }:
             assert record.assessed_on.isoformat() == "2026-10-22"
         else:
@@ -151,6 +167,14 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "bls.ln.LNS14000000",
         "fed.sloos.SUBLPDCILS_N.Q",
         "census.m3.adv.MDM.NO",
+        "bls.cu.CUSR0000SA0",
+        "bls.ce.CES0000000001",
+        "bls.jt.JTS000000000000000JOL",
+        "fed.g17.IP.B50001.S",
+        "fed.h8.B1001NCBA",
+        "fed.h15.RIFSPFF_N.M",
+        "fed.h15.RIFLGFCY10_N.M",
+        "ecb.icp.M.U2.Y.000000.3.INX",
     }
     assert all(operation_allowed(unemployment, operation) for operation in FIRST_LIVE_OPERATIONS)
     assert unemployment.attribution == AttributionRequirement.REQUIRED

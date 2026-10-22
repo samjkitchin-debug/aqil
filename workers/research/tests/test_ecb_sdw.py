@@ -43,15 +43,9 @@ from aqil_research.sources.rights import (
 )
 from aqil_research.vintages.store import InMemoryObservationStore
 
-FIXTURE = (
-    Path(__file__).parent / "fixtures" / "ecb_sdw" / "icp_m_u2_y_000000_3_inx_excerpt.csv"
-)
+FIXTURE = Path(__file__).parent / "fixtures" / "ecb_sdw" / "icp_m_u2_y_000000_3_inx_excerpt.csv"
 FRAGMENT = (
-    Path(__file__).resolve().parents[3]
-    / "docs"
-    / "sources"
-    / "fragments"
-    / "ecb_sdw_hicp_sa.csv"
+    Path(__file__).resolve().parents[3] / "docs" / "sources" / "fragments" / "ecb_sdw_hicp_sa.csv"
 )
 RETRIEVED = datetime(2026, 10, 22, 9, 0, tzinfo=UTC)
 EXCERPT_VALUES = {
@@ -357,9 +351,7 @@ def test_changed_value_is_a_new_row(
     )
     assert second.observations_newly_stored == 1
     assert second.observations_unchanged == 3
-    december = [
-        row for row in store.all_observations() if row.period_start == date(2025, 12, 1)
-    ]
+    december = [row for row in store.all_observations() if row.period_start == date(2025, 12, 1)]
     assert len(december) == 2
     revised = next(row for row in december if row.raw_value == "130.1")
     assert revised.observation_id != original_december

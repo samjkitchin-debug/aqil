@@ -91,13 +91,11 @@ def _get_text(url: str, max_bytes: int) -> tuple[str, int, int]:
 def _read_once(url: str, max_bytes: int) -> tuple[str, int, int]:
     timeout = httpx.Timeout(READ_TIMEOUT_S, connect=CONNECT_TIMEOUT_S)
     with httpx.Client(timeout=timeout, follow_redirects=False) as client:
+        # download.bls.gov answers 406 when Accept is text/plain. Send the user agent only.
         with client.stream(
             "GET",
             url,
-            headers={
-                "Accept": "text/plain",
-                "User-Agent": AQIL_RETRIEVAL_USER_AGENT,
-            },
+            headers={"User-Agent": AQIL_RETRIEVAL_USER_AGENT},
         ) as response:
             status = response.status_code
             if status != 200:

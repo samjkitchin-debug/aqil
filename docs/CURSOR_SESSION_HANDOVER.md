@@ -1,9 +1,30 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 22 October 2026, method eligibility  
-**Parent:** `2733e93` on `work/aqil-autonomous-build`  
+**Last updated:** 23 October 2026, eight-series integration  
+**Parent:** `b4ef45f` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Eight stored series, 23 October 2026
+
+Docker Desktop was not running, so port 55432 had no listener. Starting Docker brought the existing container `supabase_db_ojvswermsbbaltjohqph` back as healthy. The database was not reset. Before ingest it held 44 live unemployment observations, 146 live SLOOS observations, 12 Employment Situation publications, 12 CPI publications, 15 Board press publications, 3 ECB press publications, 27 future BLS calendar rows, 87 fixture observations and 3 research runs. No advisory lock was held.
+
+The first live pass stored seven series and refused CPI-U. `download.bls.gov` returned HTTP 406 when the CPI client sent `Accept: text/plain`. The client now sends only the existing BLS user agent, matching the payroll client. The retry stored 956 CPI-U months. A second pass of all eight sources inserted 0 rows.
+
+Stored live rows, all `latest_revised`, queried on the preserved database:
+
+| Dataset | Count | Span | Unit | Adjustment |
+| --- | --- | --- | --- | --- |
+| `bls.cu.CUSR0000SA0` | 956 | January 1947–September 2026 | 1982–84=100 | seasonally adjusted |
+| `bls.ce.CES0000000001` | 1053 | January 1939–September 2026 | thousands | seasonally adjusted |
+| `bls.jt.JTS000000000000000JOL` | 309 | December 2000–August 2026 | thousands | seasonally adjusted |
+| `fed.g17.IP.B50001.S` | 1293 | January 1919–September 2026 | index, 2017=100 | seasonally adjusted |
+| `fed.h8.B1001NCBA` | 2806 | 3 January 1973–7 October 2026 | millions of US dollars | seasonally adjusted, weekly |
+| `fed.h15.RIFSPFF_N.M` | 867 | July 1954–September 2026 | percent per year | not stated by the file |
+| `fed.h15.RIFLGFCY10_N.M` | 882 | April 1953–September 2026 | percent per year | not stated by the file |
+| `ecb.icp.M.U2.Y.000000.3.INX` | 348 | January 1997–December 2025 | index, 2015=100 | seasonally adjusted |
+
+Inside those spans, the only missing months are October 2025 for CPI-U and for the unemployment rate. Payrolls include October 2025. Job openings include October 2025 and stop at August 2026. Euro-area HICP includes October 2025 and the stored file ends in December 2025; 2026 months were not in the response and were not invented. Bank credit has no gap longer than seven days. None of these files is a vintage panel. The web tree was not changed. `npm run test:db` was not run because no migration was added. Research pytest on `aqil_research_test` was 253 passed. `ruff check` passed on the files edited for this ingest. `ruff format --check` on the whole tree still fails on five files that were already unformatted, including `collect_bls_calendar.py`, `build_macro_conditions.py`, `macro_conditions.py` and `orchestrate.py`. `tests/test_ecb_sdw.py` was reformatted. GitHub Actions has not run.
 
 ## Method eligibility, 22 October 2026
 
