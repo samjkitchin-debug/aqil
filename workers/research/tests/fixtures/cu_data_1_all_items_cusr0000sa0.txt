@@ -1,0 +1,7 @@
+series_id        	year	period	       value	footnote_codes
+CUSR0000SA0      	1947	M01	       21.48	
+CUSR0000SA0      	1947	M02	       21.62	
+CUSR0000SA0      	2025	M09	     324.245	
+CUSR0000SA0      	2025	M10	           -	X
+CUSR0000SA0      	2025	M11	     325.063	
+CUSR0000SA0      	2026	M09	     336.298	
