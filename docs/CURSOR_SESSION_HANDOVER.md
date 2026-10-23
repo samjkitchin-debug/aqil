@@ -27,7 +27,7 @@ Gates: A pass. B pass. C pass. Ruff has no remaining exception. D conditional. E
 
 Next product steps, not started here: one cited ETF record, one lawful vintage path, then benchmark total returns.
 
-Clean linked worktrees whose tips are already in this history are removed after the fast-forward. These stay: `C:\Users\gamer\aqil-m6` (`m6/research-methods` at `4516775`, clean, not an ancestor) and `C:\Users\gamer\aqil-sahm` (`research/employment-situation-2026-11` at `f7aa03b`, dirty, not an ancestor). Branches are not deleted.
+After local `main` moved, the clean linked worktrees whose tips were already in this history were removed. Branches were not deleted. These stay: `C:\Users\gamer\aqil-m6` (`m6/research-methods` at `4516775`, clean, not an ancestor) and `C:\Users\gamer\aqil-sahm` (`research/employment-situation-2026-11` at `f7aa03b`, dirty, not an ancestor).
 
 ## Baseline certification, wave 2, 23 October 2026
 
