@@ -1,4 +1,4 @@
-"""Fixture tests for INDUSTRIAL_PRODUCTION_ACTIVITY 1.0.0. No database connection."""
+"""Fixture tests for INDUSTRIAL_PRODUCTION_ACTIVITY 1.1.0. No database connection."""
 
 from __future__ import annotations
 
@@ -124,7 +124,7 @@ def test_sufficient_twelve_month_percent_change() -> None:
     fragment = json.loads(FRAGMENT.read_text(encoding="utf-8"))
 
     assert method.method_id == INDUSTRIAL_PRODUCTION_METHOD_ID
-    assert method.method_version == INDUSTRIAL_PRODUCTION_METHOD_VERSION
+    assert method.method_version == INDUSTRIAL_PRODUCTION_METHOD_VERSION == "1.1.0"
     assert method.required_dataset_ids() == (INDUSTRIAL_PRODUCTION_DATASET_ID,)
     assert result.sufficiency == "sufficient"
     assert result.missing_reason is None
@@ -140,7 +140,8 @@ def test_sufficient_twelve_month_percent_change() -> None:
     expected_change = ((later / earlier) - Decimal(1)) * Decimal(100)
     expected_change = expected_change.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
     levels = [Decimal(str(row["raw_value"])) for row in observations]
-    below = sum(1 for level in levels if level < later)
+    level_rank = 1 + sum(1 for level in levels if level < later)
+    assert level_rank == 4
     assert calculation["latest_period"] == "2026-09-01"
     assert calculation["earlier_period"] == EARLIER.isoformat()
     assert calculation["latest_level"] == "104.0400"
@@ -150,19 +151,29 @@ def test_sufficient_twelve_month_percent_change() -> None:
     assert calculation["analysis_mode"] == "latest_revised"
     assert calculation["twelve_month_percent_change"] == format(expected_change, "f")
     assert calculation["twelve_month_percent_change"] == "2.0000"
-    assert calculation["stored_values_strictly_below_latest"] == below == 3
-    assert calculation["historical_rank"] == 1 + below == 4
-    assert calculation["stored_value_count"] == 5
+    assert calculation["endpoints_only"] is True
+    assert calculation["historical_rank"] == 1
+    assert calculation["historical_rank"] != level_rank
+    assert calculation["stored_changes_strictly_below_latest"] == 0
+    assert calculation["stored_change_count"] == 2
+    assert calculation["stored_value_count"] == calculation["stored_change_count"]
+    assert calculation["rank_basis"] == "overlapping_twelve_month_percent_change"
+    assert calculation["ranked_series"] == f"industrial production ({INDUSTRIAL_PRODUCTION_DATASET_ID})"
+    assert "overlapping 12-month percent changes" in str(calculation["rank_definition"])
+    assert "today's revised file" in str(calculation["rank_definition"])
     assert set(result.observation_ids) == {str(row["observation_id"]) for row in observations}
     assert list(result.observation_ids) == sorted(result.observation_ids)
-    assert result.calculation == fragment["calculation"]
     assert list(result.observation_ids) == fragment["observation_ids"]
-    assert result.narrative == fragment["narrative"]
-    assert list(result.assumptions) == fragment["assumptions"]
-    assert list(result.limitations) == fragment["limitations"]
-    assert result.statistical_interpretation == fragment["statistical_interpretation"]
+    assert fragment["method_version"] == "1.0.0"
+    assert fragment["calculation"]["historical_rank"] == level_rank
     assert fragment["publication_allowed"] is False
     assert "composite_score" not in fragment
+    assert "endpoints only" in result.narrative.casefold()
+    assert "not treated as observed" in result.narrative.casefold()
+    assert "2025-10" not in result.narrative
+    assert "today's revised file" in result.narrative
+    assert INDUSTRIAL_PRODUCTION_DATASET_ID in result.narrative
+    _assert_no_gdp_figure(result.narrative)
 
 
 def test_missing_endpoint_fails_the_window() -> None:
@@ -190,6 +201,74 @@ def test_point_in_time_request_is_insufficient() -> None:
     )
     assert "2.0000" not in result.narrative
     assert "104.0400" not in result.narrative
+    _assert_no_gdp_figure(result.narrative)
+
+
+def _point(period: str, value: str) -> EconomicObservation:
+    return EconomicObservation(
+        observation_id=f"g17-{period}",
+        dataset_id=INDUSTRIAL_PRODUCTION_DATASET_ID,
+        provider_id="federal_reserve_board",
+        source_id="federal_reserve_g17_total_ip",
+        rights_record_id="federal_reserve_g17_total_ip",
+        period_start=date.fromisoformat(period),
+        frequency=Frequency.MONTHLY,
+        geography="US",
+        unit="index_2017_100",
+        seasonal_adjustment=SeasonalAdjustment.SEASONALLY_ADJUSTED,
+        raw_value=value,
+        quality_status=QualityStatus.OBSERVED,
+        series_provenance=SeriesProvenance.LATEST_REVISED,
+        provider_vintage_date=VINTAGE,
+        availability_precision=AvailabilityPrecision.UNKNOWN,
+        retrieved_at=RETRIEVED,
+        first_seen_at=RETRIEVED,
+        adapter_version="industrial_production_activity_fixture_v1",
+    )
+
+
+def test_trending_level_change_rank_is_not_the_level_rank() -> None:
+    points = (
+        ("2024-09-01", "100.0000"),
+        ("2025-09-01", "200.0000"),
+        ("2026-09-01", "300.0000"),
+    )
+    series = {date.fromisoformat(period): _point(period, value) for period, value in points}
+    result = _run(series)
+    assert result.sufficiency == "sufficient"
+    calculation = result.calculation
+    assert calculation is not None
+    levels = [Decimal(value) for _, value in points]
+    level_rank = 1 + sum(1 for level in levels if level < levels[-1])
+    assert level_rank == 3
+    assert calculation["historical_rank"] == 1
+    assert calculation["stored_change_count"] == 2
+    assert calculation["historical_rank"] != level_rank
+    assert calculation["twelve_month_percent_change"] == "50.0000"
+    assert calculation["endpoints_only"] is True
+    assert INDUSTRIAL_PRODUCTION_DATASET_ID in str(calculation["ranked_series"])
+    assert "overlapping 12-month percent changes" in result.narrative
+    assert "today's revised file" in result.narrative
+    assert "not what was known on each past date" in result.narrative
+    assert "endpoints only" in result.narrative.casefold()
+    assert "not treated as observed" in result.narrative.casefold()
+    assert "2025-10" not in result.narrative
+    assert "composite" not in json.dumps(calculation).casefold()
+    assert "spread" not in result.narrative.casefold()
+    assert "real rate" not in result.narrative.casefold()
+    _assert_no_gdp_figure(result.narrative)
+
+
+def test_missing_endpoint_returns_insufficient() -> None:
+    result = _run({date(2026, 9, 1): _point("2026-09-01", "300.0000")})
+    assert result.sufficiency == "insufficient"
+    assert result.calculation is None
+    assert result.observation_ids == ()
+    assert result.investment_implication == "insufficient_evidence"
+    assert result.causal_hypothesis == "No causal mechanism is established."
+    assert result.missing_reason == "missing endpoint for window 2025-09-01 to 2026-09-01"
+    assert "interpolat" not in (result.missing_reason or "")
+    assert "2025-10-01 was observed" not in result.narrative.casefold()
     _assert_no_gdp_figure(result.narrative)
 
 
