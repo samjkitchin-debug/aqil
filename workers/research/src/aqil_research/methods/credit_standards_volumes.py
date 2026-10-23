@@ -1,7 +1,8 @@
 """Credit standards and volumes — SLOOS share beside weekly H.8 bank credit.
 
-Does not replace SLOOS_CIL_LENDING_STANDARDS. The survey share stays in
-percent_net_tightening. Weekly bank credit stays in usd_millions.
+The survey share stays in percent_net_tightening. Weekly bank credit stays in
+usd_millions. A missing exact week 52 weeks earlier leaves only that volume
+change unavailable.
 """
 
 from __future__ import annotations
@@ -31,12 +32,9 @@ SLOOS_UNIT = "percent_net_tightening"
 H8_UNIT = "usd_millions"
 WEEKS_EARLIER = 52
 CAUSAL_HYPOTHESIS = "No causal mechanism is established."
-POINT_IN_TIME_REASON = (
-    "A point-in-time request is insufficient because these files are not vintage panels."
-)
 
 
-class CreditStandardsAndVolumesConfig(BaseModel):
+class CreditStandardsVolumesConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     config_id: str = Field(min_length=1)
@@ -58,7 +56,7 @@ class _VolumeReading:
     change: Decimal | None
 
 
-class CreditStandardsAndVolumesMethod:
+class CreditStandardsVolumesMethod:
     method_id = CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID
     method_version = CREDIT_STANDARDS_AND_VOLUMES_METHOD_VERSION
 
@@ -69,12 +67,12 @@ class CreditStandardsAndVolumesMethod:
     def required_dataset_ids(self) -> tuple[str, ...]:
         return (SLOOS_DATASET_ID, H8_DATASET_ID)
 
-    def parse_config(self, payload: dict[str, object]) -> CreditStandardsAndVolumesConfig:
-        return CreditStandardsAndVolumesConfig.model_validate(payload)
+    def parse_config(self, payload: dict[str, object]) -> CreditStandardsVolumesConfig:
+        return CreditStandardsVolumesConfig.model_validate(payload)
 
     def config_hash(self, config: BaseModel) -> str:
-        if not isinstance(config, CreditStandardsAndVolumesConfig):
-            raise TypeError("expected CreditStandardsAndVolumesConfig")
+        if not isinstance(config, CreditStandardsVolumesConfig):
+            raise TypeError("expected CreditStandardsVolumesConfig")
         from aqil_research.methods.parameters import MethodParameterDocument
 
         return MethodParameterDocument(
@@ -84,10 +82,12 @@ class CreditStandardsAndVolumesMethod:
         ).config_hash()
 
     def run(self, context: MethodContext, config: BaseModel) -> MethodExecutionResult:
-        if not isinstance(config, CreditStandardsAndVolumesConfig):
-            raise TypeError("expected CreditStandardsAndVolumesConfig")
+        if not isinstance(config, CreditStandardsVolumesConfig):
+            raise TypeError("expected CreditStandardsVolumesConfig")
         if context.analysis_mode != AnalysisMode.LATEST_REVISED:
-            return _insufficient(POINT_IN_TIME_REASON)
+            return _insufficient(
+                "Point-in-time is insufficient because these files are not vintage panels.",
+            )
 
         standards = _standards_change(context)
         if isinstance(standards, str):
@@ -100,45 +100,34 @@ class CreditStandardsAndVolumesMethod:
 
 def _standards_change(context: MethodContext) -> _StandardsChange | str:
     evaluation = context.evaluation_period
-    rows = _eligible(
-        context.inputs_by_dataset.get(SLOOS_DATASET_ID, {}),
-        anchor=evaluation,
-        dataset_id=SLOOS_DATASET_ID,
-        frequency=Frequency.QUARTERLY,
-        unit=SLOOS_UNIT,
-        seasonal_adjustment=SeasonalAdjustment.NOT_SEASONALLY_ADJUSTED,
-    )
-    latest = _latest(rows)
-    if latest is None:
-        return (
-            "missing required latest observation for "
-            f"{SLOOS_DATASET_ID} on or before {evaluation.isoformat()}"
-        )
-    prior = _prior(rows, latest)
-    if prior is None:
-        return f"no prior stored quarter before {latest.period_start.isoformat()}"
+    rows = [
+        obs
+        for obs in context.inputs_by_dataset.get(SLOOS_DATASET_ID, {}).values()
+        if _standards_row(obs) and obs.period_start <= evaluation
+    ]
+    if not rows:
+        return f"no SLOOS observation on or before {evaluation.isoformat()}"
+    latest = max(rows, key=lambda obs: obs.period_start)
+    earlier = [obs for obs in rows if obs.period_start < latest.period_start]
+    if not earlier:
+        return f"no prior stored SLOOS quarter before {latest.period_start.isoformat()}"
+    prior = max(earlier, key=lambda obs: obs.period_start)
     difference = latest.decimal_value() - prior.decimal_value()
     return _StandardsChange(latest=latest, prior=prior, difference=difference)
 
 
 def _volume_reading(context: MethodContext) -> _VolumeReading | str:
     evaluation = context.evaluation_period
-    rows = _eligible(
-        context.inputs_by_dataset.get(H8_DATASET_ID, {}),
-        anchor=evaluation,
-        dataset_id=H8_DATASET_ID,
-        frequency=Frequency.WEEKLY,
-        unit=H8_UNIT,
-        seasonal_adjustment=SeasonalAdjustment.SEASONALLY_ADJUSTED,
-    )
-    latest = _latest(rows)
-    if latest is None:
-        return (
-            "missing required latest observation for "
-            f"{H8_DATASET_ID} on or before {evaluation.isoformat()}"
-        )
+    rows = {
+        obs.period_start: obs
+        for obs in context.inputs_by_dataset.get(H8_DATASET_ID, {}).values()
+        if _volume_row(obs) and obs.period_start <= evaluation
+    }
+    if not rows:
+        return f"no H.8 observation on or before {evaluation.isoformat()}"
+    latest = rows[max(rows)]
     comparison_period = latest.period_start - timedelta(weeks=WEEKS_EARLIER)
-    comparison = _on_period(rows, comparison_period)
+    comparison = rows.get(comparison_period)
     change = None if comparison is None else latest.decimal_value() - comparison.decimal_value()
     return _VolumeReading(
         latest=latest,
@@ -148,60 +137,31 @@ def _volume_reading(context: MethodContext) -> _VolumeReading | str:
     )
 
 
-def _eligible(
-    series: dict[date, EconomicObservation],
-    *,
-    anchor: date,
-    dataset_id: str,
-    frequency: Frequency,
-    unit: str,
-    seasonal_adjustment: SeasonalAdjustment,
-) -> list[EconomicObservation]:
-    chosen: list[EconomicObservation] = []
-    for period, obs in series.items():
-        if period != obs.period_start or period > anchor:
-            continue
-        if obs.dataset_id != dataset_id or obs.frequency != frequency or obs.unit != unit:
-            continue
-        if obs.seasonal_adjustment != seasonal_adjustment:
-            continue
-        if obs.series_provenance != SeriesProvenance.LATEST_REVISED:
-            continue
-        if obs.quality_status != QualityStatus.OBSERVED:
-            continue
-        chosen.append(obs)
-    return chosen
+def _standards_row(obs: EconomicObservation) -> bool:
+    return (
+        obs.dataset_id == SLOOS_DATASET_ID
+        and obs.unit == SLOOS_UNIT
+        and obs.frequency == Frequency.QUARTERLY
+        and obs.seasonal_adjustment == SeasonalAdjustment.NOT_SEASONALLY_ADJUSTED
+        and obs.series_provenance == SeriesProvenance.LATEST_REVISED
+        and obs.quality_status == QualityStatus.OBSERVED
+    )
 
 
-def _latest(rows: list[EconomicObservation]) -> EconomicObservation | None:
-    if not rows:
-        return None
-    return max(rows, key=lambda row: row.period_start)
-
-
-def _prior(
-    rows: list[EconomicObservation],
-    latest: EconomicObservation,
-) -> EconomicObservation | None:
-    earlier = [row for row in rows if row.period_start < latest.period_start]
-    if not earlier:
-        return None
-    return max(earlier, key=lambda row: row.period_start)
-
-
-def _on_period(
-    rows: list[EconomicObservation],
-    period: date,
-) -> EconomicObservation | None:
-    for row in rows:
-        if row.period_start == period:
-            return row
-    return None
+def _volume_row(obs: EconomicObservation) -> bool:
+    return (
+        obs.dataset_id == H8_DATASET_ID
+        and obs.unit == H8_UNIT
+        and obs.frequency == Frequency.WEEKLY
+        and obs.seasonal_adjustment == SeasonalAdjustment.SEASONALLY_ADJUSTED
+        and obs.series_provenance == SeriesProvenance.LATEST_REVISED
+        and obs.quality_status == QualityStatus.OBSERVED
+    )
 
 
 def _sufficient(
     context: MethodContext,
-    config: CreditStandardsAndVolumesConfig,
+    config: CreditStandardsVolumesConfig,
     standards: _StandardsChange,
     volume: _VolumeReading,
 ) -> MethodExecutionResult:
@@ -217,23 +177,25 @@ def _sufficient(
     sought = volume.comparison_period_start.isoformat()
     volume_reason = None
     if not volume_ready:
-        volume_reason = f"missing H.8 week {sought} for the 52-week change"
-    used = [
+        volume_reason = (
+            f"missing exact H.8 period_start {sought} for the {WEEKS_EARLIER}-week change"
+        )
+    observation_ids = [
         standards.latest.observation_id,
         standards.prior.observation_id,
         volume.latest.observation_id,
     ]
     if volume.comparison is not None:
-        used.append(volume.comparison.observation_id)
+        observation_ids.append(volume.comparison.observation_id)
     calculation: dict[str, object] = {
-        "transformation": (
-            "latest_share minus prior_stored_quarter in percentage points "
-            f"(unit {SLOOS_UNIT}); "
-            f"latest_level minus the week {WEEKS_EARLIER} weeks earlier in {H8_UNIT}"
-        ),
         "analysis_mode": AnalysisMode.LATEST_REVISED.value,
         "evaluation_period": context.evaluation_period.isoformat(),
-        "survey_balance_converted_to_dollars": False,
+        "units": {
+            "lending_standards_share": SLOOS_UNIT,
+            "lending_standards_difference": "percentage_points",
+            "bank_credit_level": H8_UNIT,
+            "bank_credit_change": H8_UNIT,
+        },
         "lending_standards": {
             "dataset_id": SLOOS_DATASET_ID,
             "unit": SLOOS_UNIT,
@@ -271,24 +233,16 @@ def _sufficient(
     return MethodExecutionResult(
         sufficiency="sufficient",
         calculation=calculation,
-        observation_ids=tuple(sorted(set(used))),
+        observation_ids=tuple(sorted(observation_ids)),
         assumptions=(
-            "SLOOS SUBLPDCILS_N.Q is a quarterly net tightening share in "
-            "percent_net_tightening, not seasonally adjusted.",
-            "H.8 B1001NCBA is weekly bank credit in usd_millions, seasonally adjusted.",
-            "The two series are reported beside each other. "
-            "The survey balance is not converted into dollars.",
-            f"The volume comparison uses the exact period_start {WEEKS_EARLIER} weeks earlier.",
+            "Latest-revised SLOOS net tightening share, quarterly and not seasonally adjusted.",
+            "Latest-revised H.8 bank credit, weekly and seasonally adjusted, in usd_millions.",
+            f"The volume comparison looks up the exact period_start {WEEKS_EARLIER} weeks earlier.",
             config.label,
         ),
         limitations=_limitations(),
         missing_reason=None,
-        statistical_interpretation=(
-            "Descriptive reading of the latest SLOOS net tightening share beside "
-            "the latest H.8 bank credit level. The survey balance stays in "
-            "percent_net_tightening and the volume stays in usd_millions. "
-            "No causal mechanism is established."
-        ),
+        statistical_interpretation=_interpretation(),
         causal_hypothesis=CAUSAL_HYPOTHESIS,
         investment_implication="no_action",
         narrative=_narrative(
@@ -298,6 +252,7 @@ def _sufficient(
             prior_share,
             difference,
             latest_level,
+            comparison_level,
             change,
         ),
     )
@@ -310,43 +265,52 @@ def _narrative(
     prior_share: str,
     difference: str,
     latest_level: str,
+    comparison_level: str | None,
     change: str | None,
 ) -> str:
     standards_text = (
-        f"The latest SLOOS net tightening share for {standards.latest.period_start.isoformat()} "
-        f"is {latest_share} per cent net tightening, a difference of {difference} "
-        f"percentage points from the prior stored quarter "
-        f"{standards.prior.period_start.isoformat()} at {prior_share}."
+        f"The latest SLOOS net tightening share is {latest_share} {SLOOS_UNIT} "
+        f"for the quarter starting {standards.latest.period_start.isoformat()} "
+        f"({standards.latest.observation_id}). "
+        f"The prior stored quarter starting {standards.prior.period_start.isoformat()} "
+        f"({standards.prior.observation_id}) is {prior_share} {SLOOS_UNIT}. "
+        f"The difference is {difference} percentage points. "
     )
-    if volume.comparison is None or change is None:
+    level_text = (
+        f"The latest H.8 bank credit week starting {volume.latest.period_start.isoformat()} "
+        f"({volume.latest.observation_id}) is {latest_level} {H8_UNIT}. "
+    )
+    if volume.comparison is None or comparison_level is None or change is None:
         volume_text = (
-            f"Beside it, H.8 bank credit for the week of {volume.latest.period_start.isoformat()} "
-            f"is {latest_level} millions of dollars. "
-            f"The week 52 weeks earlier ({volume.comparison_period_start.isoformat()}) is absent, "
-            "so the 52-week change is insufficient."
+            f"The change versus the week starting {volume.comparison_period_start.isoformat()} "
+            "is insufficient because that exact period_start is not stored. "
         )
     else:
         volume_text = (
-            f"Beside it, H.8 bank credit for the week of {volume.latest.period_start.isoformat()} "
-            f"is {latest_level} millions of dollars, a change of {change} millions of dollars "
-            f"versus the week of {volume.comparison.period_start.isoformat()}."
+            f"The week starting {volume.comparison.period_start.isoformat()} "
+            f"({volume.comparison.observation_id}) is {comparison_level} {H8_UNIT}. "
+            f"The change is {change} {H8_UNIT}. "
         )
+    return standards_text + level_text + volume_text + CAUSAL_HYPOTHESIS
+
+
+def _interpretation() -> str:
     return (
-        f"{standards_text} {volume_text} "
-        "The survey balance is not converted into dollars. "
-        "No causal mechanism is established. "
-        "The reading is internal."
+        "Descriptive reading of the latest stored SLOOS net-tightening share against the "
+        "prior stored quarter, beside the latest stored H.8 bank-credit level and, when "
+        "that exact week exists, the change over 52 weeks. The survey share stays in "
+        "percent_net_tightening. Weekly observations stay on their stored weeks."
     )
 
 
 def _limitations() -> tuple[str, ...]:
     return (
-        "The survey balance is not converted into dollars.",
-        "No causal mechanism is established between lending standards and bank credit.",
-        "A missing exact week is not interpolated and is not filled with zero.",
+        "The survey share stays in percent_net_tightening.",
+        "Weekly bank credit stays on its stored weeks.",
+        "A missing exact comparison week leaves that volume change unavailable.",
+        "These files are not vintage panels.",
+        CAUSAL_HYPOTHESIS,
         "The reading is internal.",
-        "Not an earnings or ETF-return forecasting model.",
-        "Do not infer ETF allocation changes from this output.",
     )
 
 
@@ -358,10 +322,7 @@ def _insufficient(reason: str) -> MethodExecutionResult:
         assumptions=(),
         limitations=_limitations(),
         missing_reason=reason,
-        statistical_interpretation=(
-            "A required latest observation is missing, a required prior quarter is missing, "
-            "or the analysis mode is not latest_revised, so the reading is not reported."
-        ),
+        statistical_interpretation="Insufficient stored observations for this credit reading.",
         causal_hypothesis=CAUSAL_HYPOTHESIS,
         investment_implication="insufficient_evidence",
         narrative=reason,
