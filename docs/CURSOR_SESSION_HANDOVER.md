@@ -1,9 +1,17 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 23 October 2026, ETF Phase A  
+**Last updated:** 23 October 2026, ETF integration  
 **Parent:** `edea3a0` on `work/aqil-etf-intelligence`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## ETF integration, 23 October 2026
+
+The six domain branches were merged locally into `work/aqil-etf-intelligence`. Nothing was pushed. The preserved database `postgres` was not written and was not reset. `npm run test:db` was not run, because that script drops `aqil_pgtap_test` and recreates it from the `postgres` schema, which does not contain `instruments`.
+
+`aqil_etf.instruments` still has zero rows. A share class was not inserted. `instruments.sub_funds` requires a legal name and a three-letter base currency, and neither has a permitted citation. The in-memory catalogue has 39 unverified exposure slots. The only stored ISIN is `IE00BK5BQT80`, with ticker `VWRA`, and that pair is an internal anchor, not a permitted issuer citation. Costs, holdings, fund returns, and benchmark returns stay unavailable. Holdings are not fetched when the rights gate is prohibited or unknown. The anchor quality assessment is UNKNOWN across identity, structure, cost, benchmark, holdings, scale, and performance. There is no rank. Investor fit is UNKNOWN and is not personal advice.
+
+Signed-in `/explore` now reads only local database `aqil_etf`. With no stored share class it shows that empty state. ETF research is not broker holdings and not personal advice. Today, Evidence, and My Wealth were not redesigned. A signed-in browser check was not run: this worktree has no web env file. Typecheck passed. Lint passed with the existing unused `_searchParams` warning. Token check passed. `npm run test:etf` passed 2. Direct pgTAP of `etf_instruments.test.sql` on `aqil_pgtap_test` passed 16. Research pytest of the etf package passed 60. Ruff check and format check passed. GitHub Actions has not run. This is not Verified.
 
 ## ETF Phase A, 23 October 2026
 

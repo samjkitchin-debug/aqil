@@ -11,6 +11,14 @@ from pathlib import Path
 from uuid import UUID
 
 import pytest
+
+from aqil_research.etf.contracts import (
+    BenchmarkReturn,
+    EtfRightsError,
+    EtfShareClass,
+    assert_automated_collection_allowed,
+    load_etf_rights_fragment,
+)
 from aqil_research.etf.fundamentals import issuer_cost_facts
 from aqil_research.etf.holdings import coverage_for_record, top_ten_overlap
 from aqil_research.etf.identity import (
@@ -26,14 +34,6 @@ from aqil_research.etf.performance import (
     conventions_are_distinct,
 )
 from aqil_research.etf.vetting import EvidenceInput, assess_anchor, assess_quality
-
-from aqil_research.etf.contracts import (
-    BenchmarkReturn,
-    EtfRightsError,
-    EtfShareClass,
-    assert_automated_collection_allowed,
-    load_etf_rights_fragment,
-)
 from aqil_research.sources.rights import load_source_rights
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
