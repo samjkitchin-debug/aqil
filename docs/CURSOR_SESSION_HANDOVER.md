@@ -1,9 +1,33 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 24 October 2026, signed-in local acceptance  
-**Parent:** `06ae00e` on local `main`  
+**Last updated:** 24 October 2026, release package  
+**Parent:** `5528c65` on local `main`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Release package, 24 October 2026
+
+Risk class R1 for the rehearsal. No application code changed. Nothing was pushed. Hosted migrations were not applied. Production Saxo was not enabled. No refresh schedule was created.
+
+**Decision: no-go.** A push of local `main` would deploy code whose research loaders fall back to `127.0.0.1:55432/postgres` and whose Exposures loader accepts only `127.0.0.1:55432/aqil_etf`. Vercel would show an honest empty or unavailable Intelligence surface, not the accepted local product. Schema deployment is not delivery.
+
+Hosted project Aqil was read again on 24 October 2026. Applied versions are `20261017103000`, `20261017110000`, `20261017120000`, `20261017140000`, and `20261017180000`. Row counts are zero for `research.economic_observations`, `research.research_runs`, `research.source_retrievals`, `research.research_run_observations`, `forward.catalyst_events`, `forward.etf_instrument_records`, `forward.forward_scenarios`, `forward.event_outcomes`, and `public.user_settings`. There is no `instruments` schema and there are no wealth tables. `user_settings` has row-level security. `research` and `forward` do not. That was left unchanged. Enabling it without policies would block access.
+
+`origin/main` at `c9ea596` already contains `20261018200000` and `20261018210000` in Git. The host has not applied them. The other seven files, through `20261024120000`, are on local `main` only. The running Vercel app is `c9ea596`. It already fails closed when wealth tables are missing. It does not need the seven later tables in order to boot. `20261018200000` replaces checks on `forward.forward_scenarios` and `forward.event_outcomes`. Those hosted tables are empty, so the replacement does not rewrite rows.
+
+Disposable database `aqil_release_rehearsal` was created on the local Supabase cluster, given a stub `auth.users` and `auth.uid()` that exist only there, and received all 14 migration files in filename order. `create role` for `research_writer` and `research_worker_app` was made duplicate-safe in that replay stream because those roles already exist on the cluster. The files in Git were not edited. `research_worker` was already duplicate-safe. All 14 files applied. `anon`, `authenticated`, and `service_role` have no usage on `research`, `forward`, or `instruments`. `research_writer` does. Wealth tables and `saxo_token_vault` have row-level security. `anon` cannot select `public.wealth_accounts`. `saxo_token_vault` has row-level security and no policy. `supabase/config.toml` still exposes only `public` and `graphql_public`. Live observations on database `postgres` stayed 8704 before and after. The rehearsal database was then dropped. `postgres` was not migrated.
+
+Data path for a later release is re-ingest, not a copy of local `postgres`. A copy would carry fixture unemployment rows and would invent a retrieval the host did not perform. After the nine migrations and a server-only `RESEARCH_DATABASE_URL`, one manual `npm run research:refresh` from a private machine is the interim mode. No Vercel cron. Exposures stays empty once `instruments` exists, and stays unavailable until a server-only ETF URL exists. Do not load the VWRA fixture. My Wealth stays the pending shell. Connect Saxo stays off in production. Do not copy brokerage records.
+
+Environment names only: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_APP_URL`, server-only `RESEARCH_DATABASE_URL`, server-only `SUPABASE_SERVICE_ROLE_KEY`, server-only `SAXO_TOKEN_ENCRYPTION_KEY`. `ETF_DATABASE_URL` only after a hosted instruments database exists. No values are recorded here.
+
+Release sequence, not executed: hosted backup; this rehearsal is the local bar; founder approval; apply the nine migrations (a code rollback will not undo them); verify grants and leave `research` row-level security off until policies exist; set the server-only research URL on Vercel; one manual refresh and confirm fixture unemployment did not appear; GitHub Actions, which has not run on this tip; push local `main`; signed-in smoke on `https://aqil-tau.vercel.app`; roll forward if smoke fails.
+
+Founder approvals, separately: (1) apply the nine hosted migrations after this rehearsal; (2) set the server-only research URL and run one manual refresh, with no cron; (3) push local `main`, which deploys production.
+
+The release becomes a conditional go only after those three approvals and the smoke test. It is a no-go now.
+
+Next product work stays outside this release: one cited ETF record, one lawful vintage path, then benchmark total returns. A versioned investment playbook library is later work. It was not built.
 
 ## Signed-in acceptance, 24 October 2026
 

@@ -1,6 +1,6 @@
 # AQIL — Execution Roadmap and Stage Gates
 
-**Last reconciled:** 22 October 2026 · **Git baseline:** `work/aqil-autonomous-build`. See `docs/CURSOR_SESSION_HANDOVER.md`.
+**Last reconciled:** 24 October 2026 · **Git baseline:** local `main`. See `docs/CURSOR_SESSION_HANDOVER.md`.
 
 ## Operating baseline (18 October 2026)
 
@@ -8,7 +8,7 @@ This section supersedes older sentences below that say authentication, hosted Su
 
 - Live app: `https://aqil-tau.vercel.app`. Google sign-in is the production access path.
 - Ordinary access is any verified Google account. The allow-list and `access_grants` gate are removed. See ADR 020.
-- Hosted project `ojvswermsbbaltjohqph` has exactly five migrations: `20261017103000`, `20261017110000`, `20261017120000`, `20261017140000`, `20261017180000`. Local files `20261018200000` and `20261018210000` are not applied. Do not apply them until the founder approves that batch, and do not apply older M5 timestamps after them.
+- Hosted project `ojvswermsbbaltjohqph` still has exactly five migrations, through `20261017180000`, rechecked read-only on 24 October 2026. Nine later local files are not applied, from `20261018200000` through `20261024120000`. Do not apply them until the founder approves that batch. A versioned investment playbook library, distinguishing structural principles from conditional approaches and from unproven tactical predictions, is later product work and is not part of this release.
 - Local Saxo reads are real and read-only. Production does not offer Connect Saxo until encrypted, owner-scoped token storage exists. See ADR 021–024.
 - Workflow: localhost → local tests → reviewed commit → one push to `main` → the existing GitHub to Vercel integration. No Vercel CLI deploy, no second Vercel project, no preview build created for its own sake.
 - Next product order: Census advance durable-goods orders stay blocked until a founder sets `CENSUS_API_KEY` for `timeseries/eits/advm3`. One API response is not a vintage panel. SLOOS C&I standards have 146 live observations and one unpublished reading on Intelligence Evidence, including the stored move from 8.1 percent to 0.0 percent. ECB monetary-policy press, accounts and Governing Council decisions are stored beside Employment Situation, CPI and Federal Reserve press. A BEA growth release still needs a machine-readable feed. Exposures still needs a rights-cleared holdings file. Vanguard and iShares automated collection stay prohibited. Recurring releases should later be shown as compact trends; that presentation is not built. `npm run research:refresh` remains a manual local poll. `npm run test:db` writes only to database `aqil_pgtap_test`. Research tests write only to `aqil_research_test`. M5's fixture horizon UI stays unmerged.
