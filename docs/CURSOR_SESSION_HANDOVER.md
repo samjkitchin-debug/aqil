@@ -1,9 +1,21 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 23 October 2026, eight-series integration  
-**Parent:** `b4ef45f` on `work/aqil-autonomous-build`  
+**Last updated:** 23 October 2026, four internal macro readings  
+**Parent:** `c8a148c` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Four internal readings, 23 October 2026
+
+The prices correction `59edd3c` was already committed on `work/read-prices` and merged as `c8a148c`. It keeps federal funds and the 10-year yield as separate levels, does not calculate a real rate, does not take HICP as an input, and fails a window whose endpoint is missing. The four methods are registered at 1.0.0. Sahm, period-level change, SLOOS C&I, Census, and `MACRO_CONDITIONS_PANEL` 1.0.0 were not edited.
+
+Queried on `postgresql://research_worker:research_worker@127.0.0.1:55432/postgres` after the disposable research tests. Database name `postgres`. Live counts were unchanged: unemployment 44, CPI-U 956, payrolls 1053, job openings 309, industrial production 1293, bank credit 2806, federal funds 867, 10-year yield 882, HICP 348, SLOOS 146. October 2025 is still absent for unemployment and CPI-U. HICP still ends 1 December 2025. Job openings still end 1 August 2026. Both H.15 series still have seasonal adjustment `unknown`. Research runs are now 13. `publication_allowed` is false on every new run. The database was not reset.
+
+Evidence shows the later synthesis, run `ce6eb7e8-7fa1-4a5e-b603-218cdc466e23`, executed 23 October 2026 01:27 UTC. An earlier append at 01:01 UTC remains. It used the previous prices field name and the same CPI-U 12-month change, 3.7173 percent. It was not deleted.
+
+Signed-in Evidence at `http://localhost:3000/research` showed the internal macro reading on a desktop width and at 390px. The 390px section did not widen the page. Today did not show the reading. Research pytest on `aqil_research_test` was 273 passed. Presentation tests were 15 passed. Typecheck passed. Lint passed with the existing unused `_searchParams` warning. Token check passed. Production build passed. pgTAP was not run. GitHub Actions has not run.
+
+A later conditional forward reading still cannot treat these files as a vintage panel, fill October 2025, run Sahm through December 2026, or satisfy `MACRO_CONDITIONS_PANEL` 1.0.0 while Census is absent. The next milestone remains M1 acceptance item 3: a historical-date query that excludes a later revision.
 
 ## Eight stored series, 23 October 2026
 

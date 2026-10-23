@@ -7,8 +7,6 @@ from datetime import UTC, date, datetime
 from decimal import Decimal
 from pathlib import Path
 
-import pytest
-
 from aqil_research.contracts.observation import (
     AnalysisMode,
     AvailabilityPrecision,
@@ -28,7 +26,7 @@ from aqil_research.methods.prices_and_policy import (
     PricesAndPolicyMethod,
 )
 from aqil_research.methods.protocol import MethodContext
-from aqil_research.methods.registry import MethodRegistryError, default_method_registry
+from aqil_research.methods.registry import default_method_registry
 
 FIXTURE = Path(__file__).parent / "fixtures" / "prices_and_policy.json"
 FRAGMENT = (
@@ -166,8 +164,9 @@ def test_method_identity_and_inputs() -> None:
         TREASURY_10Y_DATASET_ID,
     )
     assert HICP_DATASET_ID not in method.required_dataset_ids()
-    with pytest.raises(MethodRegistryError, match=PRICES_AND_POLICY_METHOD_ID):
-        default_method_registry().get(PRICES_AND_POLICY_METHOD_ID)
+    registered = default_method_registry().get(PRICES_AND_POLICY_METHOD_ID)
+    assert registered.method_id == PRICES_AND_POLICY_METHOD_ID
+    assert registered.method_version == "1.0.0"
 
 
 def test_september_2025_to_september_2026_fixture_calculation() -> None:

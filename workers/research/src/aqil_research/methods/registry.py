@@ -8,11 +8,27 @@ from aqil_research.methods.census_adv_orders import (
     CENSUS_ADV_ORDERS_METHOD_ID,
     CensusAdvOrdersMethod,
 )
+from aqil_research.methods.credit_standards_volumes import (
+    CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID,
+    CreditStandardsVolumesMethod,
+)
+from aqil_research.methods.industrial_production_activity import (
+    INDUSTRIAL_PRODUCTION_METHOD_ID,
+    IndustrialProductionActivityMethod,
+)
+from aqil_research.methods.labour_market import (
+    LABOUR_MARKET_METHOD_ID,
+    LabourMarketConditionsMethod,
+)
 from aqil_research.methods.macro_conditions import (
     MACRO_CONDITIONS_METHOD_ID,
     MacroConditionsMethod,
 )
 from aqil_research.methods.period_change import PERIOD_CHANGE_METHOD_ID, PeriodChangeMethod
+from aqil_research.methods.prices_and_policy import (
+    PRICES_AND_POLICY_METHOD_ID,
+    PricesAndPolicyMethod,
+)
 from aqil_research.methods.protocol import AnalyticalMethod
 from aqil_research.methods.sahm import SAHM_METHOD_ID
 from aqil_research.methods.sahm_registered import SahmAnalyticalMethod
@@ -47,6 +63,10 @@ def default_method_registry() -> MethodRegistry:
     registry.register(SloosCilMethod())
     registry.register(CensusAdvOrdersMethod())
     registry.register(MacroConditionsMethod())
+    registry.register(LabourMarketConditionsMethod())
+    registry.register(PricesAndPolicyMethod())
+    registry.register(IndustrialProductionActivityMethod())
+    registry.register(CreditStandardsVolumesMethod())
     return registry
 
 
@@ -54,8 +74,12 @@ __all__ = [
     "MethodRegistry",
     "MethodRegistryError",
     "CENSUS_ADV_ORDERS_METHOD_ID",
+    "CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID",
+    "INDUSTRIAL_PRODUCTION_METHOD_ID",
+    "LABOUR_MARKET_METHOD_ID",
     "MACRO_CONDITIONS_METHOD_ID",
     "PERIOD_CHANGE_METHOD_ID",
+    "PRICES_AND_POLICY_METHOD_ID",
     "SAHM_METHOD_ID",
     "SLOOS_CIL_METHOD_ID",
     "default_method_registry",

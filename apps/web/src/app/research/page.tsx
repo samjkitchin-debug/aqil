@@ -4,9 +4,11 @@ import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
 import { ResearchEmptyState } from "@/components/research/research-empty-state";
 import { ResearchInsightView } from "@/components/research/research-insight-view";
+import { MacroReadingPanel } from "@/components/research/macro-reading-panel";
 import { SloosReadingPanel } from "@/components/research/sloos-reading-panel";
 import { SourcedUpdatesPanel } from "@/components/research/sourced-updates-panel";
 import { loadFounderResearchInsight } from "@/lib/research/load-founder-insight";
+import { loadMacroReading } from "@/lib/research/load-macro-reading";
 import { loadSloosReading } from "@/lib/research/load-sloos-reading";
 import { loadSourcedUpdates } from "@/lib/research/load-sourced-updates";
 
@@ -15,6 +17,7 @@ async function ResearchEvidence() {
   const updates = sourced.status === "ok" ? sourced.updates : [];
   const loaded = await loadFounderResearchInsight();
   const credit = await loadSloosReading();
+  const macro = await loadMacroReading();
 
   if (loaded.status === "unauthorized") {
     return <ResearchEmptyState reason="unauthorized" />;
@@ -40,6 +43,22 @@ async function ResearchEvidence() {
           </h2>
           <p className="research-body" data-testid="credit-standards-unavailable">
             This reading is unavailable. {credit.reason} Publication remains closed.
+          </p>
+        </section>
+      ) : null}
+      {macro.status === "ready" ? (
+        <div className="mt-[var(--space-6)]">
+          <MacroReadingPanel reading={macro.reading} />
+        </div>
+      ) : null}
+      {macro.status === "unavailable" ? (
+        <section className="mt-[var(--space-6)]" aria-labelledby="macro-reading-heading">
+          <h2 id="macro-reading-heading" className="research-section-title">
+            Macro reading
+          </h2>
+          <p className="research-body" data-testid="macro-reading-unavailable">
+            This reading is unavailable. {macro.reason} The reading is internal. Publication remains
+            closed.
           </p>
         </section>
       ) : null}

@@ -36,3 +36,23 @@ CENSUS_ADV_ORDERS_PUBLISHED = {
     "config_id": "census_adv_orders_published_v1",
     "label": "Census advance durable goods new orders (MDM / NO)",
 }
+
+LABOUR_MARKET_PUBLISHED = {
+    "config_id": "labour_market_conditions_v1",
+    "label": "Latest-revised labour levels, endpoint changes, and ranks",
+}
+
+PRICES_AND_POLICY_PUBLISHED = {
+    "config_id": "prices_and_policy_v1",
+    "label": "Latest-revised CPI-U change and separate H.15 levels",
+}
+
+INDUSTRIAL_PRODUCTION_PUBLISHED = {
+    "config_id": "industrial_production_activity_v1",
+    "label": "Latest-revised industrial production level and 12-month change",
+}
+
+CREDIT_STANDARDS_AND_VOLUMES_PUBLISHED = {
+    "config_id": "credit_standards_and_volumes_v1",
+    "label": "Latest-revised SLOOS share and H.8 bank credit",
+}
