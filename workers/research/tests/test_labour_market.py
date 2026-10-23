@@ -140,9 +140,7 @@ def test_sufficient_fixture_window_uses_endpoints_only() -> None:
     assert payrolls["level"] == "1155"
     assert payrolls["unit"] == "thousands"
     assert payrolls["observation_id"] == "ce-2026-09"
-    payroll_levels = [
-        Decimal(row["raw_value"]) for row in rows if row["dataset_id"] == PAYROLLS
-    ]
+    payroll_levels = [Decimal(row["raw_value"]) for row in rows if row["dataset_id"] == PAYROLLS]
     payroll_level_rank = 1 + sum(1 for value in payroll_levels if value < Decimal("1155"))
     assert payroll_level_rank == 5
     assert payrolls["rank"] == 1
@@ -299,7 +297,9 @@ def test_trending_payrolls_level_change_rank_is_not_the_level_rank() -> None:
     )
     rows = [
         *_annual_rows(PAYROLLS, "ce", "thousands", payroll_values),
-        *_annual_rows(UNEMPLOYMENT, "ln", "percent", (("2025-09-01", "4.0"), ("2026-09-01", "4.1"))),
+        *_annual_rows(
+            UNEMPLOYMENT, "ln", "percent", (("2025-09-01", "4.0"), ("2026-09-01", "4.1"))
+        ),
         *_annual_rows(OPENINGS, "jt", "thousands", (("2025-09-01", "500"), ("2026-09-01", "550"))),
     ]
     assert all(row["period_start"] != "2025-10-01" for row in rows)
@@ -332,7 +332,9 @@ def test_trending_payrolls_level_change_rank_is_not_the_level_rank() -> None:
 
 def test_missing_payrolls_endpoint_returns_insufficient() -> None:
     rows = [
-        *_annual_rows(UNEMPLOYMENT, "ln", "percent", (("2025-09-01", "4.0"), ("2026-09-01", "4.1"))),
+        *_annual_rows(
+            UNEMPLOYMENT, "ln", "percent", (("2025-09-01", "4.0"), ("2026-09-01", "4.1"))
+        ),
         *_annual_rows(PAYROLLS, "ce", "thousands", (("2026-09-01", "1100"),)),
         *_annual_rows(OPENINGS, "jt", "thousands", (("2025-09-01", "500"), ("2026-09-01", "550"))),
     ]

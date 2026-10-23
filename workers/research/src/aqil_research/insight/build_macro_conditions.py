@@ -29,9 +29,7 @@ def build_macro_conditions_insight(run: ResearchRun) -> ResearchInsight:
     if not sufficient:
         headline = "Macro conditions panel is incomplete for the configured evaluation windows."
     else:
-        headline = (
-            "US labour, business credit and manufacturing demand — combined conditions read"
-        )
+        headline = "US labour, business credit and manufacturing demand — combined conditions read"
 
     what_changed = _what_changed(labour_result, credit_result, mfg_result, sufficient)
     why_it_matters = (
@@ -131,9 +129,7 @@ def _what_changed(
 
 
 def calc_blocked_note() -> str:
-    return (
-        "Near-term forward spread: blocked (no substitute spread used)."
-    )
+    return "Near-term forward spread: blocked (no substitute spread used)."
 
 
 def _unemployment_chart(labour: dict[str, object] | None) -> list[ChartPoint]:

@@ -158,7 +158,10 @@ def test_sufficient_twelve_month_percent_change() -> None:
     assert calculation["stored_change_count"] == 2
     assert calculation["stored_value_count"] == calculation["stored_change_count"]
     assert calculation["rank_basis"] == "overlapping_twelve_month_percent_change"
-    assert calculation["ranked_series"] == f"industrial production ({INDUSTRIAL_PRODUCTION_DATASET_ID})"
+    assert (
+        calculation["ranked_series"]
+        == f"industrial production ({INDUSTRIAL_PRODUCTION_DATASET_ID})"
+    )
     assert "overlapping 12-month percent changes" in str(calculation["rank_definition"])
     assert "today's revised file" in str(calculation["rank_definition"])
     assert set(result.observation_ids) == {str(row["observation_id"]) for row in observations}

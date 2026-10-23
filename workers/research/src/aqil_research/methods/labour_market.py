@@ -52,8 +52,7 @@ _ENDPOINTS_ONLY_SENTENCE = (
 )
 
 _MISSING_ENDPOINT_INTERPRETATION = (
-    "A 12-month change needs both endpoint months. "
-    "The missing month was not interpolated."
+    "A 12-month change needs both endpoint months. The missing month was not interpolated."
 )
 
 
@@ -166,11 +165,7 @@ class LabourMarketConditionsMethod:
             )
 
         observation_ids = tuple(
-            sorted(
-                obs.observation_id
-                for rows in series_by_id.values()
-                for obs in rows.values()
-            ),
+            sorted(obs.observation_id for rows in series_by_id.values() for obs in rows.values()),
         )
         calculation: dict[str, object] = {
             "method_id": self.method_id,
@@ -243,9 +238,7 @@ def _joint_calculation(
     prior = _add_months(latest_common, -12)
     if prior not in common:
         absent = [
-            spec.dataset_id
-            for spec in _SERIES_SPECS
-            if prior not in series_by_id[spec.dataset_id]
+            spec.dataset_id for spec in _SERIES_SPECS if prior not in series_by_id[spec.dataset_id]
         ]
         listed = ", ".join(absent) if absent else "one or more series"
         return {}, (
@@ -362,9 +355,13 @@ def _series_rank(
         start_value = series[prior].decimal_value()
         if start_value == 0:
             if period == latest_period:
-                return 0, 0, (
-                    f"percent change is undefined for {spec.dataset_id} "
-                    f"because the {prior.isoformat()} level is zero"
+                return (
+                    0,
+                    0,
+                    (
+                        f"percent change is undefined for {spec.dataset_id} "
+                        f"because the {prior.isoformat()} level is zero"
+                    ),
                 )
             continue
         change = _quantized_percent_change(start_value, series[period].decimal_value())
@@ -372,10 +369,14 @@ def _series_rank(
         if period == latest_period:
             latest_change = change
     if latest_change is None:
-        return 0, 0, _missing_endpoint(
-            spec.dataset_id,
-            _add_months(latest_period, -12),
-            latest_period,
+        return (
+            0,
+            0,
+            _missing_endpoint(
+                spec.dataset_id,
+                _add_months(latest_period, -12),
+                latest_period,
+            ),
         )
     rank = 1 + sum(1 for change in changes if change < latest_change)
     return rank, len(changes), None

@@ -58,8 +58,7 @@ def collect_bls_release_calendar(
     notes: list[str] = []
     for release in releases:
         confirmed = (
-            release.stamp_basis in {"utc", "us-eastern"}
-            and release.status.upper() == "CONFIRMED"
+            release.stamp_basis in {"utc", "us-eastern"} and release.status.upper() == "CONFIRMED"
         )
         if not confirmed:
             omitted_unconfirmed += 1

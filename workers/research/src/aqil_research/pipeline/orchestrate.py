@@ -201,9 +201,7 @@ def execute_research_run(
         )
 
     primary_dataset_id = (
-        request.dataset_id
-        if request.dataset_id in inputs_by_dataset
-        else required_dataset_ids[0]
+        request.dataset_id if request.dataset_id in inputs_by_dataset else required_dataset_ids[0]
     )
     context = MethodContext(
         inputs_by_dataset=inputs_by_dataset,

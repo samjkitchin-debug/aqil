@@ -335,7 +335,11 @@ def _built_series(
     for period, value in rows:
         observation = _observation(
             series,
-            {"observation_id": f"{prefix}-{period[:7]}", "period_start": period, "raw_value": value},
+            {
+                "observation_id": f"{prefix}-{period[:7]}",
+                "period_start": period,
+                "raw_value": value,
+            },
         )
         built[observation.period_start] = observation
     return built

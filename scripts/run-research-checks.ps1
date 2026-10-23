@@ -10,5 +10,8 @@ Remove-Item Env:RESEARCH_DATABASE_URL -ErrorAction SilentlyContinue
 Set-Location (Join-Path $root "workers\research")
 
 uv run pytest
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 uv run ruff check .
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 uv run ruff format --check .
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

@@ -189,7 +189,5 @@ class MacroConditionsMethod:
 
 def _combined_narrative(*results: MethodExecutionResult) -> str:
     parts = [result.narrative for result in results if result.narrative]
-    blocked = (
-        "Near-term forward spread: blocked (no substitute spread used). "
-    )
+    blocked = "Near-term forward spread: blocked (no substitute spread used). "
     return " ".join(parts) + " " + blocked
