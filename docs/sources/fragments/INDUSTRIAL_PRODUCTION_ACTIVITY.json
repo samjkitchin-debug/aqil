@@ -1,0 +1,64 @@
+{
+  "method_id": "INDUSTRIAL_PRODUCTION_ACTIVITY",
+  "method_version": "1.0.0",
+  "analysis_mode": "latest_revised",
+  "publication_allowed": false,
+  "note": "Synthetic fixture result for INDUSTRIAL_PRODUCTION_ACTIVITY 1.0.0. Not a live reading of stored observations.",
+  "fixture": "workers/research/tests/fixtures/industrial_production/activity_window.json",
+  "evaluation_period": "2026-09-01",
+  "sufficiency": "sufficient",
+  "missing_reason": null,
+  "calculation": {
+    "transformation": "twelve_month_percent_change",
+    "formula": "(later/earlier - 1) * 100",
+    "dataset_id": "fed.g17.IP.B50001.S",
+    "unit": "index_2017_100",
+    "seasonal_adjustment": "seasonally_adjusted",
+    "analysis_mode": "latest_revised",
+    "evaluation_period": "2026-09-01",
+    "latest_period": "2026-09-01",
+    "earlier_period": "2025-09-01",
+    "latest_level": "104.0400",
+    "earlier_level": "102.0000",
+    "months_back": 12,
+    "twelve_month_percent_change": "2.0000",
+    "historical_rank": 4,
+    "stored_values_strictly_below_latest": 3,
+    "stored_value_count": 5,
+    "rank_definition": "1 plus the count of stored values strictly below the latest",
+    "observation_ids": [
+      "g17-202409-fixture",
+      "g17-202501-fixture",
+      "g17-202503-fixture",
+      "g17-202509-fixture",
+      "g17-202609-fixture"
+    ]
+  },
+  "observation_ids": [
+    "g17-202409-fixture",
+    "g17-202501-fixture",
+    "g17-202503-fixture",
+    "g17-202509-fixture",
+    "g17-202609-fixture"
+  ],
+  "assumptions": [
+    "Input is fed.g17.IP.B50001.S, unit index_2017_100, seasonally adjusted.",
+    "The latest level is the latest stored month on or before the evaluation period.",
+    "The 12-month percent change is (later/earlier - 1) * 100, rounded half up to 4 decimal places.",
+    "Both window endpoints must be stored. Intermediate months are not required and are not interpolated.",
+    "Historical rank is 1 plus the count of stored values strictly below the latest.",
+    "No composite score is calculated.",
+    "Industrial production activity"
+  ],
+  "limitations": [
+    "This is industrial production, not GDP.",
+    "Census advance orders were not collected.",
+    "No causal mechanism is established.",
+    "The reading is internal.",
+    "A missing 12-month endpoint fails the window and is not interpolated."
+  ],
+  "statistical_interpretation": "This is a descriptive 12-month percent change in seasonally adjusted industrial production (index 2017=100). It is not a GDP figure and not a forecast.",
+  "causal_hypothesis": "No causal mechanism is established.",
+  "investment_implication": "no_action",
+  "narrative": "Industrial production for 2026-09-01 is 104.0400 (index 2017=100, seasonally adjusted). The 12-month percent change from 2025-09-01 (102.0000) to 2026-09-01 (104.0400) is 2.0000. The rank in the stored history is 4, defined as 1 plus the count of stored values strictly below the latest. This is industrial production, not GDP. Census advance orders were not collected. No causal mechanism is established. The reading is internal."
+}

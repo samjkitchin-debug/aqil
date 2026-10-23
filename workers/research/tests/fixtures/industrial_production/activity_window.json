@@ -1,0 +1,34 @@
+{
+  "note": "Synthetic fixture for INDUSTRIAL_PRODUCTION_ACTIVITY 1.0.0. Not a live Federal Reserve vintage.",
+  "dataset_id": "fed.g17.IP.B50001.S",
+  "unit": "index_2017_100",
+  "seasonal_adjustment": "seasonally_adjusted",
+  "frequency": "monthly",
+  "observations": [
+    {
+      "observation_id": "g17-202409-fixture",
+      "period_start": "2024-09-01",
+      "raw_value": "100.0000"
+    },
+    {
+      "observation_id": "g17-202501-fixture",
+      "period_start": "2025-01-01",
+      "raw_value": "100.0000"
+    },
+    {
+      "observation_id": "g17-202503-fixture",
+      "period_start": "2025-03-01",
+      "raw_value": "104.0400"
+    },
+    {
+      "observation_id": "g17-202509-fixture",
+      "period_start": "2025-09-01",
+      "raw_value": "102.0000"
+    },
+    {
+      "observation_id": "g17-202609-fixture",
+      "period_start": "2026-09-01",
+      "raw_value": "104.0400"
+    }
+  ]
+}
