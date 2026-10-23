@@ -1,9 +1,19 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 23 October 2026, four internal macro readings  
-**Parent:** `c8a148c` on `work/aqil-autonomous-build`  
+**Last updated:** 23 October 2026, ETF Phase A  
+**Parent:** `edea3a0` on `work/aqil-etf-intelligence`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## ETF Phase A, 23 October 2026
+
+Branch `work/aqil-etf-intelligence` was created from committed HEAD `edea3a0` on `work/aqil-autonomous-build`. The worktree is `C:\Users\gamer\aqil-etf-intelligence`. Untracked files on the integration tree were not copied. Sibling macro and reading worktrees were not edited. `/explore` was not mounted. The six domain agents were not started.
+
+The preserved database `postgres` on port 55432 was not reset and was not migrated. Its live observation count stayed 8704 before and after. A new local database `aqil_etf` received `supabase/migrations/20261024120000_etf_instruments.sql` only. Schema `instruments` is not on `postgres`. The same migration was applied to disposable database `aqil_pgtap_test`, and the `pgtap` extension was created there because it was available but not installed. The isolation marker remained `disposable-pgtap-test`. `npm run test:db` was not run, because that path recreates the disposable database from `postgres` and this migration is not on `postgres`.
+
+`supabase/tests/database/etf_instruments.test.sql` passed 16 tests on `aqil_pgtap_test`. `workers/research/tests/test_etf_share_class_contract.py` passed 4. Ruff check and format check passed on the ETF package and that test. GitHub Actions has not run. This is not Verified.
+
+Nine rights fragments were added under `docs/sources/etf/fragments/`. None has `automated_access=permitted`. `vanguard_uk_vwra_holdings` and `ishares_ucits_holdings` stay on their existing prohibited rows in `SOURCE_RIGHTS.csv`, which was not edited. TER, AUM, holdings, spreads, NAV, fund returns, and benchmark returns stay unavailable. No collector was built.
 
 ## Four internal readings, 23 October 2026
 

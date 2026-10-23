@@ -3,7 +3,6 @@
     "allow_instructions": [
       "Creating, editing and saving ordinary project source, tests, documentation and backlog files inside the open Aqil workspace is allowed.",
       "The same ordinary edits are allowed inside an assigned Git worktree of this repository when that worktree is the agent workspace.",
-      "During the macro parallel sprint, creating and editing ordinary source, tests, fixtures and rights fragments under C:\\Users\\gamer\\aqil-macro-cpi, aqil-macro-labour, aqil-macro-g17, aqil-macro-h15, aqil-macro-h8 and aqil-macro-ecb is allowed when those paths are workspace roots or included in the open multi-root workspace.",
       "Read-only Git inspection and local test, typecheck, lint and build commands inside the workspace or that assigned worktree are allowed."
     ],
     "block_instructions": [
