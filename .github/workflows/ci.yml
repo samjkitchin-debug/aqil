@@ -93,12 +93,37 @@ jobs:
       - name: Provision local research_worker login
         working-directory: .
         run: supabase db query -f scripts/provision-research-worker-local.sql
+      - name: Prepare disposable database aqil_research_test
+        working-directory: .
+        run: |
+          set -euo pipefail
+          container="supabase_db_ojvswermsbbaltjohqph"
+          test_database="aqil_research_test"
+          if [ "$test_database" != "aqil_research_test" ]; then
+            echo "Refusing to prepare a database that is not aqil_research_test." >&2
+            exit 1
+          fi
+          docker exec "$container" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "select pg_terminate_backend(pid) from pg_stat_activity where datname = '${test_database}' and pid <> pg_backend_pid();"
+          docker exec "$container" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "drop database if exists ${test_database};"
+          docker exec "$container" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "create database ${test_database};"
+          docker exec "$container" pg_dump -U postgres -d postgres --schema-only --no-owner -n research -n forward | docker exec -i "$container" psql -U postgres -d "$test_database" -v ON_ERROR_STOP=1
+          docker exec "$container" psql -U postgres -d "$test_database" -v ON_ERROR_STOP=1 -c "create table research.test_isolation_marker (marker text primary key); insert into research.test_isolation_marker (marker) values ('disposable-research-test'); revoke all on table research.test_isolation_marker from public, anon, authenticated; grant select on table research.test_isolation_marker to research_writer, research_worker;"
+          identity="$(docker exec "$container" psql -U postgres -d "$test_database" -tA -c "select current_database();")"
+          identity="$(printf '%s' "$identity" | tr -d '[:space:]')"
+          if [ "$identity" != "$test_database" ]; then
+            echo "Prepared database identity was ${identity}." >&2
+            exit 1
+          fi
+          echo "Prepared disposable database ${test_database}. The development database was not reset."
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.13"
       - run: uv sync --group dev
       - run: uv run ruff check .
       - run: uv run ruff format --check .
-      - run: uv run pytest
+      - name: Pytest on aqil_research_test
+        run: |
+          unset RESEARCH_DATABASE_URL
+          uv run pytest
         env:
-          RESEARCH_DATABASE_URL: postgresql://research_worker:research_worker@127.0.0.1:55432/postgres
+          AQIL_RESEARCH_TEST_DATABASE_URL: postgresql://research_worker:research_worker@127.0.0.1:55432/aqil_research_test

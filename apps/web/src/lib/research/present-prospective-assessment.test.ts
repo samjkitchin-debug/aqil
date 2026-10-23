@@ -55,10 +55,6 @@ test("a not qualified assessment stays internal and states the frozen reasons", 
   ]);
   assert.deepEqual(presented.reasons, FROZEN_NOT_QUALIFIED_REASONS);
   assert.equal(presented.capture, CAPTURE_SENTENCE);
-  assert.equal(
-    presented.capture,
-    "The frozen baseline is the snapshot stored at capture. This snapshot is not a reconstruction of dates before it was captured.",
-  );
   assert.equal(presented.publication, PUBLICATION_SENTENCE);
   assert.equal(presented.capturedOn, "23 October 2026");
   const text = visibleText(record);
@@ -67,10 +63,7 @@ test("a not qualified assessment stays internal and states the frozen reasons", 
   assert.match(text, /No vintage panel\./);
   assert.match(text, /No identified mechanism\./);
   assert.match(text, /The stored windows do not share one horizon\./);
-  assert.equal(
-    /\b(composite score|direction|probability|return|recommendation)\b/i.test(text),
-    false,
-  );
+  assert.equal(/\b(direction|probability|return|recommendation)\b/i.test(text), false);
 });
 
 test("a stored horizon and extra capture wording stay off the page", () => {

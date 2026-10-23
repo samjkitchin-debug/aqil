@@ -1,6 +1,27 @@
 # Cursor session handover
 
 **Status:** living continuity note  
+**Last updated:** 23 October 2026, four macro readings integrated and run on stored observations  
+**Parent:** `2a12389` on `work/aqil-autonomous-build` before the registry commit  
+**Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Four macro readings on stored observations, 23 October 2026
+
+Risk class R2. Prices `59edd3cf47e7fe76d656d1b1021f6a4167773b3a` and industrial production `61a88868b6e49fa5adc98c1e36086ca77a02f211` were already in history. Labour `591f7ac9e8a65112b17a0aae8f1c5824f0d24bfb` was merged with `--no-ff` as `f70e320`, reverted as `ddd753d`, and reapplied as `b63cdf0`. Credit `e3e9906da73332cdbb0455fd33d429fd6d27da98` was merged with `--no-ff` as `0246277`, reverted as `5a6fc02`, and reapplied as `2a12389`. The credit module is `credit_standards_and_volumes.py`. `default_method_registry` registers `CreditStandardsAndVolumesMethod` beside the existing labour, prices, and industrial-production methods. Sahm, period-level change, SLOOS, Census, and `MACRO_CONDITIONS_PANEL` were not edited. `publication_allowed` stays false. Nothing was pushed. Database `postgres` was not reset.
+
+One append on `postgresql://research_worker:research_worker@127.0.0.1:55432/postgres` at 23 October 2026 05:06 UTC. Research runs moved from 20 to 25. Observation counts were unchanged before and after: unemployment 44, CPI-U 956, payrolls 1053, job openings 309, industrial production 1293, bank credit 2806, federal funds 867, 10-year yield 882, HICP 348, SLOOS 146. Publications stayed 12 Employment Situation, 12 CPI, 15 Board, and 3 ECB. Future BLS calendar rows stayed 27.
+
+All four readings were sufficient. `investment_implication` is `no_action`. The causal text is “No causal mechanism is established.”
+
+- Labour `LABOUR_MARKET_CONDITIONS` 1.1.0, run `f0f41b6f-9d18-4e7b-84fb-30e53df2e157`, evaluation 1 September 2026. Unemployment 4.2 percent (observation `bls-202609-5198b4a7b0aad73a40b4a985`), 12-month change -0.20 percentage points from 4.4 (`bls-202509-cc8721d9c3c2d3fb9baf3f35`). Level rank 26 of 44. Payrolls 159044 thousands (`ces-202609-9d4487fc69db9be21443c259`), change 496 thousands, 0.31 percent, from 158548 (`ces-202509-18f11e07860e34278eba4477`). Rank of overlapping 12-month percent changes 237 of 1041. Job openings 7079 thousands in August 2026 (`jolts-202608-b7aaeb1f178a92f9c90a4106`), change 160 thousands, 2.31 percent, from 6919 (`jolts-202508-e35de06bfe2b813d4fe6aa78`). Level rank 233 of 309. Joint month August 2026: unemployment 4.1 (`bls-202608-fdcea9af7cd7ebb6d4c76cf9`), payrolls 159015 (`ces-202608-a3d48c05a22580dc680787bd`), openings 7079.
+- Prices `PRICES_AND_POLICY` 1.1.0, run `e6602b5b-f34a-445a-b7d8-13aab77e5726`. CPI-U 12-month change September 2025 to September 2026 is 3.7173 percent, index 324.245 to 336.298 (`cpi-202509-ec9c2cce960d323014fdadf2`, `cpi-202609-753cdadbfa3126d47809921d`). Rank of overlapping 12-month percent changes 632 of 944; 631 of those changes are strictly below. Federal funds 3.75 percent per year (`h15-ff-202609-1dc5524ff1fff25bde21e6d6`), one-month change 0.1200 percentage points from 3.63 (`h15-ff-202608-444fc01fbedefbd330b95b4e`). Level rank 380 of 867. The 10-year yield 4.99 percent per year (`h15-cm10-202609-090ed7483b700db554e068cb`), one-month change 0.3100 percentage points from 4.68 (`h15-cm10-202608-c76c2839fc1d3a08cc7b0bf5`). Level rank 462 of 882. HICP is not an input and ends December 2025.
+- Industrial production `INDUSTRIAL_PRODUCTION_ACTIVITY` 1.1.0, run `2b1d1c28-56e3-47ab-920a-b0aa175d9a1d`. Index 103.9506 in September 2026 (`g17-202609-fa559535da3f00f4c368ba1c`) from 101.6680 in September 2025 (`g17-202509-2187ff7c019c25026718e60a`). 12-month percent change 2.2452. Rank of overlapping 12-month percent changes 546 of 1281. This is production, not GDP.
+- Credit `CREDIT_STANDARDS_AND_VOLUMES` 1.0.0, run `5894b7a4-98e1-40c2-a503-b8e19cb77281`, evaluation 7 October 2026. SLOOS net tightening 0.0 for the quarter starting 1 July 2026 (`sloos-202607-f0aa32b315708b9091d3fa39`), prior quarter 8.1 (`sloos-202604-af51d0517cd479f5695baadf`), difference -8.1 percentage points. Bank credit 19948526.8 millions of dollars for the week of 7 October 2026 (`h8-20261007-e947103c6bee7f448244b806`), versus 18791290.7 on 8 October 2025 (`h8-20251008-e40a43a1bac7214b539242ec`). The 52-week change is 1157236.1 millions of dollars. The survey share is not converted into dollars.
+
+Synthesis `MACRO_READING_SYNTHESIS` 1.0.0, run `d8ec09f0-719e-4b9f-ab88-772ea1c9ae8d`. The reading is internal. Labour, prices, production, and credit stay separate. No composite score is calculated. Agreement: unemployment, payrolls, CPI-U, federal funds, the 10-year yield, and industrial production share September 2026. A shared month is not a cause. Divergence: job openings and the joint labour month are August 2026, SLOOS is the quarter starting 1 July 2026, and bank credit is the week of 7 October 2026. The stored changes do not share one sign. Euro-area HICP is excluded and ends in December 2025. Job openings, the joint labour month, and SLOOS are behind September 2026. Bank credit on 7 October 2026 is later than the monthly readings.
+
+Research pytest on `aqil_research_test` was 362 passed after the registry import was pointed at `credit_standards_and_volumes.py`. An earlier run on the same disposable database reported 2 unique-key failures while another session was writing, then 358 passed, then this 362 passed. Web presentation tests were 19 passed. Typecheck passed. Lint passed with the existing unused `_searchParams` warning. Token check passed. Production build passed. pgTAP was not run. GitHub Actions has not run. The signed-in Evidence check is recorded at the end of this note if the browser session was open.
+
 **Last updated:** 23 October 2026, ETF intelligence tip merged into the macro baseline  
 **Parent:** `0cf8d32` on `work/aqil-autonomous-build`, merged with `4929d96` on `work/aqil-etf-intelligence`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
@@ -13,13 +34,23 @@ Conflicts were only `apps/web/package.json` and this handover. `docs/07_BUILD_BA
 
 `apps/web/package.json` keeps the macro `test:sourced-updates` entry for `present-prospective-assessment.test.ts` and the ETF `test:etf` script.
 
-Three commits stay outside this merge. `git merge-base --is-ancestor` exited 1 for each against both tips, so none had become an ancestor. They were not cherry-picked:
+Three reading commits were outside both tips before the integration merge. `git merge-base --is-ancestor` exited 1 for each against `0cf8d32` and `4929d96`. They were not cherry-picked into `4c2f14b`. Later commits on this branch merged labour and credit, a later commit reverted those two, and the reapply commits put the labour determinism check and the renamed credit module back.
 
-- `work/read-credit` `e3e9906da73332cdbb0455fd33d429fd6d27da98`. Credit module rename. It is not in the macro tip delta.
-- `work/read-labour` `591f7ac9e8a65112b17a0aae8f1c5824f0d24bfb`. It touches labour tests the macro tip also edits.
-- `work/fwd-evidence` `df8b8aadc3474ce7d27845d54203191fc3a101b8`. It touches prospective-assessment TypeScript files the macro tip continued.
+- `work/read-credit` `e3e9906da73332cdbb0455fd33d429fd6d27da98`. Credit module rename. Merged as `0246277`, reverted as `5a6fc02`, and reapplied as `2a12389`. The module on this baseline is `credit_standards_and_volumes.py`.
+- `work/read-labour` `591f7ac9e8a65112b17a0aae8f1c5824f0d24bfb`. It touches labour tests the macro tip also edits. Merged as `f70e320`, reverted as `ddd753d`, and reapplied as `b63cdf0`. The determinism check is in `workers/research/tests/test_labour_market.py`.
+- `work/fwd-evidence` `df8b8aadc3474ce7d27845d54203191fc3a101b8`. It touches prospective-assessment TypeScript files the macro tip continued. Merged as `24cbf72`. Those three TypeScript files match `4c2f14b`.
 
-The research CI job is not verified. Checks run for this merge are listed in the follow-up note once they have actually run.
+`work/fwd-snapshot` `fedbc19`, merged as `c4e57e4`, is not one of those three. It remains. It copies observation ids and values into the prospective assessment capture.
+
+The research CI job is not verified. `docs/07_ROADMAP_AND_GATES.md` still marks the Python research worker scaffold as verified because of the CI research job. The operating baseline does not claim that this tip's research job is verified, so that roadmap section was not rewritten. AQ-002 no longer calls the job verified.
+
+Checks this session, on the disposable database only:
+
+- `npm run test:research` prepares `aqil_research_test` with `scripts/prepare-research-test-db.ps1` and does not reset database `postgres`. One run, while a credit rename was briefly on the branch, stopped at collection with 33 import errors. The run on this tree was 358 passed. That includes `test_schema_contracts.py` (6) and the ETF package tests. `ruff check` then reported 4 existing line-length errors in `test_industrial_production_activity.py`, `test_labour_market.py`, and `test_prices_and_policy.py`. `ruff format --check` reported 8 files that would be reformatted. Those format findings were already present and were not rewritten. The PowerShell script does not fail the npm exit code when ruff fails. GitHub Actions has not run. This is not a green research CI job.
+- `npm run test:etf` passed 2.
+- `uv run pytest tests/etf tests/test_etf_share_class_contract.py` passed 60. Those tests do not open a database.
+
+Not run: GitHub Actions, `npm run test:db`, pgTAP, a browser session, `supabase db push`, and any write to preserved `postgres` or to `aqil_etf`. Migration `20261024120000_etf_instruments.sql` was not applied. The isolation guard in `test_database.py` was not weakened. An uncommitted edit that would have allowed a development-database insert was discarded and was not committed.
 
 **Last updated:** 23 October 2026, internal macro synthesis on Evidence  
 **Parent:** `77b51d4` on `work/aqil-autonomous-build`  
