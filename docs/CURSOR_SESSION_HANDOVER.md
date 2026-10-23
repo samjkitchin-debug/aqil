@@ -1,9 +1,23 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 23 October 2026, baseline certification gates  
-**Parent:** `a1c29a8` on `work/aqil-autonomous-build`  
+**Last updated:** 24 October 2026, signed-in local acceptance  
+**Parent:** `06ae00e` on local `main`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Signed-in acceptance, 24 October 2026
+
+Risk class R0 for this pass. No application code changed. No auth diff. The earlier `exchange_failed` page was a session conflict: the founder was already signed in on the dev server, signed out there, and signed in on the Cursor browser. Gate D now covers the routes opened while that session was active.
+
+Local `main` is `06ae00e`. `origin/main` is still `c9ea596`. Nothing was pushed. Worktrees `C:\Users\gamer\aqil-m6` and `C:\Users\gamer\aqil-sahm` were not touched. Preserved database `postgres` on port 55432 was not reset and was not given `20261024120000_etf_instruments.sql`. Docker Desktop had been stopped; starting it brought the existing container back. Recounts matched the prior certification: unemployment 44, CPI-U 956, payrolls 1053, job openings 309, industrial production 1293, bank credit 2806, federal funds 867, 10-year yield 882, HICP 348, SLOOS 146. No unemployment or CPI-U row for 1 October 2025. `research.research_runs` is 25 rows, all `publication_allowed` false. `research.sourced_updates` is 42. `aqil_etf.instruments.share_classes` is 0. Isolation markers are not on `postgres` or `aqil_etf`.
+
+Signed-in browser at `http://localhost:3000`, about 1440 and 390 pixels, no horizontal overflow on Today, Upcoming, Evidence, Exposures, My Wealth, Deploy Capital, Learn, or Privacy. Today showed 42 sourced publications and the 44-month unemployment series, with October 2025 named as unpublished. Evidence labelled the macro reading and the prospective assessment internal, and said no fund recommendation is made. A publication link opened the Bureau of Labor Statistics CPI release. Exposures said no share class is stored and that the internal VWRA anchor is not a permitted issuer citation. My Wealth showed no portfolio and did not call a snapshot live. Deploy Capital said no order is sent and that no saved Saxo snapshot is available. The example allocation is labelled made up. Saxo connect was not started.
+
+Hosted project Aqil, read only: migrations stop at `20261017180000`. Later wealth, Saxo, sourced-update, prospective-assessment, and ETF migrations are absent. Hosted research and forward tables that do exist have no rows. The hosted advisor reports row-level security disabled on those research and forward tables. It was not enabled. Research and ETF pages read local Postgres, not that hosted database, so this main on Vercel would not show the local publications.
+
+Tests were not re-run. The cited `06ae00e` results remain: research 359 passed, ETF 60, etf web 2, pgTAP 175, build passed. GitHub Actions has not run.
+
+Next product steps, not started: one cited ETF record, one lawful vintage path, then benchmark total returns.
 
 ## Baseline certification, gates, 23 October 2026
 
