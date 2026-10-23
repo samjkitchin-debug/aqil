@@ -13,7 +13,7 @@ export const FROZEN_NOT_QUALIFIED_REASONS = [
 ] as const;
 
 export const CAPTURE_SENTENCE =
-  "This row is what was stored at capture. It is not a reconstruction of dates before captured_at.";
+  "The frozen baseline is the snapshot stored at capture. This snapshot is not a reconstruction of dates before it was captured.";
 
 export const PUBLICATION_SENTENCE = "Publication remains closed.";
 
