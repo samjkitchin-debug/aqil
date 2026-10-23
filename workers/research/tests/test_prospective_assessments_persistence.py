@@ -11,16 +11,25 @@ from pathlib import Path
 
 import psycopg
 import pytest
+from psycopg.types.json import Json
 
 from aqil_research.persistence.connection import research_connection
 from aqil_research.persistence.prospective_assessments import (
+    INPUT_HASH_FIELDS,
+    OUTPUT_HASH_FIELDS,
     ProspectiveAssessmentDraft,
+    ProspectiveAssessmentPersistenceError,
     insert_prospective_assessment,
     load_prospective_assessment,
     payload_document_hash,
     stored_payload,
 )
-from aqil_research.persistence.test_database import assert_connected_test_database
+from aqil_research.persistence.test_database import (
+    REQUIRED_DATABASE_NAME,
+    TestDatabaseError,
+    assert_connected_test_database,
+    assert_test_database_url,
+)
 from db_guard import open_isolated_test_database
 
 pytestmark = pytest.mark.integration
@@ -37,11 +46,22 @@ _CAPTURE_PHRASE = "not a reconstruction of dates before captured_at"
 _SAFE_ASSESSMENT_ID = r"^pa-[0-9a-f-]{36}$"
 
 
+def _test_database_url_or_skip() -> str:
+    configured = os.environ.get("AQIL_RESEARCH_TEST_DATABASE_URL", "")
+    if not configured.strip():
+        pytest.skip(
+            "AQIL_RESEARCH_TEST_DATABASE_URL is unset. Skipping the database test. "
+            "The database named postgres was not opened."
+        )
+    assert_test_database_url(configured)
+    return open_isolated_test_database()
+
+
 @pytest.fixture(scope="module")
 def require_db() -> str:
     if os.environ.get("RESEARCH_DATABASE_URL", "").strip():
         raise RuntimeError("RESEARCH_DATABASE_URL must be unset for this test")
-    url = open_isolated_test_database()
+    url = _test_database_url_or_skip()
     _ensure_prospective_assessments_table(url)
     return url
 
@@ -66,6 +86,10 @@ def test_not_qualified_row_recomputes_hashes_from_stored_payload(require_db: str
     payload = stored_payload(loaded)
     assert loaded.input_hash == payload_document_hash(payload["input"])
     assert loaded.output_hash == payload_document_hash(payload["output"])
+    assert set(payload["input"]) == set(INPUT_HASH_FIELDS)
+    assert set(payload["output"]) == set(OUTPUT_HASH_FIELDS)
+    assert loaded.captured_values == {"fixture-observation": "4.3"}
+    assert loaded.observation_ids == ("fixture-observation",)
     assert "forecast" not in payload["input"]
     assert "forecast" not in payload["output"]
     assert after_scenarios == before_scenarios
@@ -131,6 +155,99 @@ def test_superseding_insert_leaves_the_first_row_unchanged(require_db: str) -> N
     assert reloaded_second.output_hash == payload_document_hash(second_payload["output"])
 
 
+class _RefuseWrite:
+    def cursor(self) -> None:
+        raise AssertionError("a refused assessment must not open a write")
+
+
+def test_database_named_postgres_is_refused() -> None:
+    prohibited = (
+        "postgresql://research_worker:research_worker@127.0.0.1:55432/postgres?sslmode=disable"
+    )
+    with pytest.raises(TestDatabaseError, match=REQUIRED_DATABASE_NAME):
+        assert_test_database_url(prohibited)
+
+
+def test_unset_test_database_url_skips_without_opening_postgres(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("AQIL_RESEARCH_TEST_DATABASE_URL", raising=False)
+    with pytest.raises(pytest.skip.Exception, match="was not opened"):
+        _test_database_url_or_skip()
+
+
+def test_capture_note_without_the_required_phrase_is_refused() -> None:
+    draft = _draft("pa-00000000-0000-4000-8000-000000000001")
+    draft.capture_note = "stored at capture only"
+    with pytest.raises(ProspectiveAssessmentPersistenceError, match=_CAPTURE_PHRASE):
+        insert_prospective_assessment(_RefuseWrite(), draft)  # type: ignore[arg-type]
+
+
+def test_insert_without_the_required_capture_note_phrase_fails(require_db: str) -> None:
+    database_name = require_db.rstrip("/").rsplit("/", 1)[-1].split("?", 1)[0]
+    assert database_name == _TEST_DATABASE
+    assert database_name != "postgres"
+    assessment_id = _assessment_id()
+    bad_note = "stored at capture only"
+    assert _CAPTURE_PHRASE not in bad_note
+    captured = datetime(2026, 10, 23, 1, 0, tzinfo=UTC)
+    with research_connection() as conn:
+        _assert_database(conn)
+        with pytest.raises(psycopg.Error) as rejected:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    insert into research.prospective_assessments (
+                      assessment_id, created_at, captured_at, lifecycle_status,
+                      publication_allowed, revision_class, completeness, horizon_months,
+                      evaluation_due, run_ids, observation_ids, captured_values,
+                      retrieval_timestamps, publication_timestamps, method_versions,
+                      parameter_hashes, support_text, contradiction_text, uncertainty_text,
+                      unavailable_inputs, input_hash, output_hash, supersedes_assessment_id,
+                      capture_note
+                    ) values (
+                      %s, %s, %s, 'not_qualified', false, 'latest_revised', 'incomplete',
+                      null, null, %s, %s, %s, %s, '[]'::jsonb, %s, %s, %s, %s, %s, %s,
+                      %s, %s, null, %s
+                    )
+                    """,
+                    (
+                        assessment_id,
+                        captured,
+                        captured,
+                        Json(["fixture-run"]),
+                        Json(["fixture-observation"]),
+                        Json({"fixture-observation": "4.3"}),
+                        Json(["2026-10-23T01:00:00+00:00"]),
+                        Json({"fixture": "1.0.0"}),
+                        Json({"fixture": "a" * 64}),
+                        "No 6- or 12-month hypothesis qualifies.",
+                        "No qualifying hypothesis is stored.",
+                        "This row is the stored capture only.",
+                        Json(["qualified_hypothesis"]),
+                        "a" * 64,
+                        "b" * 64,
+                        bad_note,
+                    ),
+                )
+        assert rejected.value.sqlstate == "23514"
+        assert "prospective_assessments_capture_note" in str(rejected.value)
+        conn.rollback()
+    with research_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                select count(*)
+                from research.prospective_assessments
+                where assessment_id = %s
+                """,
+                (assessment_id,),
+            )
+            remaining = cur.fetchone()
+    assert remaining is not None
+    assert remaining[0] == 0
+
+
 def _draft(
     assessment_id: str,
     *,
@@ -146,7 +263,7 @@ def _draft(
         completeness="incomplete",
         run_ids=("fixture-run",),
         observation_ids=("fixture-observation",),
-        captured_values={"label": "fixture-capture"},
+        captured_values={"fixture-observation": "4.3"},
         retrieval_timestamps=("2026-10-23T01:00:00+00:00",),
         publication_timestamps=(),
         method_versions={"fixture": "1.0.0"},

@@ -25,6 +25,36 @@ CAPTURE_NOTE_PHRASE = "not a reconstruction of dates before captured_at"
 REVISION_CLASS = "latest_revised"
 PUBLICATION_ALLOWED = False
 
+# Frozen into input_hash. assessment_id, created_at, and the hashes stay out.
+INPUT_HASH_FIELDS = (
+    "captured_at",
+    "captured_values",
+    "completeness",
+    "method_versions",
+    "observation_ids",
+    "parameter_hashes",
+    "publication_timestamps",
+    "retrieval_timestamps",
+    "run_ids",
+    "unavailable_inputs",
+)
+
+# Frozen into output_hash. publication_allowed stays false in this object.
+OUTPUT_HASH_FIELDS = (
+    "assessment_id",
+    "capture_note",
+    "contradiction_text",
+    "created_at",
+    "evaluation_due",
+    "horizon_months",
+    "lifecycle_status",
+    "publication_allowed",
+    "revision_class",
+    "supersedes_assessment_id",
+    "support_text",
+    "uncertainty_text",
+)
+
 _LIFECYCLE_STATUSES = frozenset(
     {
         "not_qualified",
@@ -57,36 +87,41 @@ def payload_document_hash(document: Mapping[str, Any]) -> str:
 
 def stored_payload(row: StoredProspectiveAssessment) -> dict[str, dict[str, Any]]:
     """Rebuild the hashed input and output documents from a stored row."""
-    return {
+    payload = {
         "input": {
             "captured_at": _iso_timestamp(row.captured_at),
-            "completeness": row.completeness,
-            "run_ids": list(row.run_ids),
-            "observation_ids": list(row.observation_ids),
             "captured_values": row.captured_values,
-            "retrieval_timestamps": list(row.retrieval_timestamps),
-            "publication_timestamps": list(row.publication_timestamps),
+            "completeness": row.completeness,
             "method_versions": row.method_versions,
+            "observation_ids": list(row.observation_ids),
             "parameter_hashes": row.parameter_hashes,
+            "publication_timestamps": list(row.publication_timestamps),
+            "retrieval_timestamps": list(row.retrieval_timestamps),
+            "run_ids": list(row.run_ids),
             "unavailable_inputs": list(row.unavailable_inputs),
         },
         "output": {
             "assessment_id": row.assessment_id,
+            "capture_note": row.capture_note,
+            "contradiction_text": row.contradiction_text,
             "created_at": _iso_timestamp(row.created_at),
-            "lifecycle_status": row.lifecycle_status,
-            "publication_allowed": row.publication_allowed,
-            "revision_class": row.revision_class,
-            "horizon_months": row.horizon_months,
             "evaluation_due": None
             if row.evaluation_due is None
             else row.evaluation_due.isoformat(),
-            "support_text": row.support_text,
-            "contradiction_text": row.contradiction_text,
-            "uncertainty_text": row.uncertainty_text,
-            "capture_note": row.capture_note,
+            "horizon_months": row.horizon_months,
+            "lifecycle_status": row.lifecycle_status,
+            "publication_allowed": row.publication_allowed,
+            "revision_class": row.revision_class,
             "supersedes_assessment_id": row.supersedes_assessment_id,
+            "support_text": row.support_text,
+            "uncertainty_text": row.uncertainty_text,
         },
     }
+    if set(payload["input"]) != set(INPUT_HASH_FIELDS):
+        raise ProspectiveAssessmentPersistenceError("input hash fields drifted")
+    if set(payload["output"]) != set(OUTPUT_HASH_FIELDS):
+        raise ProspectiveAssessmentPersistenceError("output hash fields drifted")
+    return payload
 
 
 def insert_prospective_assessment(
@@ -94,8 +129,9 @@ def insert_prospective_assessment(
     draft: ProspectiveAssessmentDraft,
 ) -> StoredProspectiveAssessment:
     """Insert one assessment. Hashes are computed from the stored payload shape."""
-    _refuse_preserved_database(conn)
     _validate_draft(draft)
+    _refuse_preserved_database(conn)
+    captured_values = _copy_observation_values(draft.observation_ids, draft.captured_values)
     payload = stored_payload(
         StoredProspectiveAssessment(
             assessment_id=draft.assessment_id,
@@ -109,7 +145,7 @@ def insert_prospective_assessment(
             evaluation_due=draft.evaluation_due,
             run_ids=draft.run_ids,
             observation_ids=draft.observation_ids,
-            captured_values=dict(draft.captured_values),
+            captured_values=captured_values,
             retrieval_timestamps=draft.retrieval_timestamps,
             publication_timestamps=draft.publication_timestamps,
             method_versions=dict(draft.method_versions),
@@ -322,6 +358,32 @@ class StoredProspectiveAssessment:
         return self.__dict__ == other.__dict__
 
 
+def _copy_observation_values(
+    observation_ids: Sequence[str],
+    captured_values: Mapping[str, Any],
+) -> dict[str, str]:
+    """Copy each observation id and its value into the stored object."""
+    if not isinstance(captured_values, Mapping):
+        raise ProspectiveAssessmentPersistenceError(
+            "captured_values must copy observation ids and values"
+        )
+    if len(tuple(observation_ids)) != len(set(observation_ids)):
+        raise ProspectiveAssessmentPersistenceError("observation ids must be unique")
+    if set(captured_values) != set(observation_ids):
+        raise ProspectiveAssessmentPersistenceError(
+            "captured_values must copy each observation id and value"
+        )
+    copied: dict[str, str] = {}
+    for observation_id in observation_ids:
+        if not isinstance(observation_id, str) or observation_id == "":
+            raise ProspectiveAssessmentPersistenceError("observation_id is required")
+        value = captured_values[observation_id]
+        if not isinstance(value, str):
+            raise ProspectiveAssessmentPersistenceError("observation values are copied as text")
+        copied[observation_id] = value
+    return copied
+
+
 def _validate_draft(draft: ProspectiveAssessmentDraft) -> None:
     if draft.lifecycle_status not in _LIFECYCLE_STATUSES:
         raise ProspectiveAssessmentPersistenceError("lifecycle_status is not recognised")
@@ -329,8 +391,10 @@ def _validate_draft(draft: ProspectiveAssessmentDraft) -> None:
         raise ProspectiveAssessmentPersistenceError("horizon_months must be null, 6, or 12")
     if CAPTURE_NOTE_PHRASE not in draft.capture_note:
         raise ProspectiveAssessmentPersistenceError(
-            "capture_note must contain the required capture phrase"
+            "capture_note must contain the exact phrase: "
+            "not a reconstruction of dates before captured_at"
         )
+    _copy_observation_values(draft.observation_ids, draft.captured_values)
     _iso_timestamp(draft.created_at)
     _iso_timestamp(draft.captured_at)
     for name, values in (
