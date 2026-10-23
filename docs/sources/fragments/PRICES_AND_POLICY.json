@@ -1,110 +1,44 @@
 {
   "method_id": "PRICES_AND_POLICY",
   "method_version": "1.0.0",
-  "sufficiency": "sufficient",
-  "calculation": {
-    "analysis_mode": "latest_revised",
-    "evaluation_period": "2026-09-01",
-    "cpi_u": {
+  "analysis_mode": "latest_revised",
+  "point_in_time": "insufficient",
+  "inputs": [
+    {
       "dataset_id": "bls.cu.CUSR0000SA0",
-      "transformation": "twelve_month_percent_change",
-      "formula": "(later_index / earlier_index - 1) * 100",
-      "unit": "percent",
-      "index_unit": "1982-84=100",
+      "unit": "1982-84=100",
       "seasonal_adjustment": "seasonally_adjusted",
-      "window_start": "2025-09-01",
-      "window_end": "2026-09-01",
-      "earlier_index": "300.000",
-      "later_index": "312.000",
-      "percent_change": "4.0000",
-      "earlier_observation_id": "cpi-u-2025-09",
-      "later_observation_id": "cpi-u-2026-09",
-      "observation_ids": [
-        "cpi-u-2024-09",
-        "cpi-u-2024-10",
-        "cpi-u-2025-09",
-        "cpi-u-2025-11",
-        "cpi-u-2026-08",
-        "cpi-u-2026-09"
-      ],
-      "latest_value_rank": 6,
-      "stored_value_count": 6,
-      "rank_rule": "1 plus the count of stored values strictly below the latest value"
+      "transformation": "twelve_month_percent_change",
+      "formula": "(index_t / index_t-12 - 1) * 100"
     },
-    "federal_funds": {
+    {
       "dataset_id": "fed.h15.RIFSPFF_N.M",
-      "transformation": "level_and_one_month_change",
-      "level_unit": "percent_per_year",
-      "change_unit": "percentage_points",
+      "unit": "percent_per_year",
       "seasonal_adjustment": "unknown",
-      "level_period": "2026-09-01",
-      "prior_period": "2026-08-01",
-      "level": "5.13",
-      "prior_level": "4.88",
-      "one_month_change": "0.2500",
-      "level_observation_id": "fed-funds-2026-09",
-      "prior_observation_id": "fed-funds-2026-08",
-      "observation_ids": [
-        "fed-funds-2025-09",
-        "fed-funds-2026-07",
-        "fed-funds-2026-08",
-        "fed-funds-2026-09"
-      ],
-      "latest_value_rank": 4,
-      "stored_value_count": 4,
-      "rank_rule": "1 plus the count of stored values strictly below the latest value"
+      "transformation": "level_and_one_month_change_percentage_points"
     },
-    "treasury_10_year_yield": {
+    {
       "dataset_id": "fed.h15.RIFLGFCY10_N.M",
-      "transformation": "level_and_one_month_change",
-      "level_unit": "percent_per_year",
-      "change_unit": "percentage_points",
+      "unit": "percent_per_year",
       "seasonal_adjustment": "unknown",
-      "level_period": "2026-09-01",
-      "prior_period": "2026-08-01",
-      "level": "4.27",
-      "prior_level": "4.01",
-      "one_month_change": "0.2600",
-      "level_observation_id": "treasury-10y-2026-09",
-      "prior_observation_id": "treasury-10y-2026-08",
-      "observation_ids": [
-        "treasury-10y-2026-08",
-        "treasury-10y-2026-09"
-      ],
-      "latest_value_rank": 2,
-      "stored_value_count": 2,
-      "rank_rule": "1 plus the count of stored values strictly below the latest value"
+      "transformation": "level_and_one_month_change_percentage_points"
     }
+  ],
+  "separate_series": {
+    "name": "HICP",
+    "dataset_id": "ecb.icp.M.U2.Y.000000.3.INX",
+    "unit": "index, 2015 = 100",
+    "latest_period_start": "2025-12-01",
+    "role": "limitation_only"
   },
-  "observation_ids": [
-    "cpi-u-2024-09",
-    "cpi-u-2024-10",
-    "cpi-u-2025-09",
-    "cpi-u-2025-11",
-    "cpi-u-2026-08",
-    "cpi-u-2026-09",
-    "fed-funds-2025-09",
-    "fed-funds-2026-07",
-    "fed-funds-2026-08",
-    "fed-funds-2026-09",
-    "treasury-10y-2026-08",
-    "treasury-10y-2026-09"
-  ],
-  "assumptions": [
-    "CPI-U 12-month percent change is (later index / earlier index - 1) * 100 when both months exist. Reported changes are rounded half up to 0.0001.",
-    "Federal funds and the 10-year yield are separate levels in percent per year. One-month changes are in percentage points.",
-    "Each latest value ranks as 1 plus the count of stored values strictly below it.",
-    "Analysis mode is latest_revised.",
-    "Prices and policy fixture"
-  ],
-  "limitations": [
-    "The euro-area HICP series ends December 2025 and is excluded. That series is ecb.icp.M.U2.Y.000000.3.INX, unit index, 2015 = 100, and it is not an input.",
-    "CPI-U is an index (1982-84=100), seasonally adjusted. A missing month is not interpolated.",
-    "Federal funds and the 10-year yield stay separate percent-per-year levels. Their seasonal adjustment is unknown. No real rate is calculated."
-  ],
-  "missing_reason": null,
-  "statistical_interpretation": "Descriptive CPI-U 12-month percent change and separate federal funds and 10-year yield levels. Not a forecast.",
+  "rank": {
+    "lowest": 1,
+    "rule": "count of stored values strictly below the evaluation level, plus 1"
+  },
   "causal_hypothesis": "No causal mechanism is established.",
-  "investment_implication": "no_action",
-  "narrative": "CPI-U 12-month change from 2025-09-01 to 2026-09-01 is 4.0000 percent (index 300.000 to 312.000, 1982-84=100). The latest index ranks 6 among 6 stored values. The federal funds rate is 5.13 percent per year, a one-month change of 0.2500 percentage points. The 10-year yield is 4.27 percent per year, a one-month change of 0.2600 percentage points. No causal mechanism is established."
+  "investment_implication": {
+    "sufficient": "no_action",
+    "insufficient": "insufficient_evidence"
+  },
+  "publication_allowed": false
 }
