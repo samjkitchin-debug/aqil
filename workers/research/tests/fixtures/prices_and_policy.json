@@ -1,0 +1,101 @@
+{
+  "evaluation_period": "2026-09-01",
+  "observations": [
+    {
+      "observation_id": "cpi-u-2024-09",
+      "dataset_id": "bls.cu.CUSR0000SA0",
+      "period_start": "2024-09-01",
+      "raw_value": "280.000",
+      "unit": "1982-84=100",
+      "seasonal_adjustment": "seasonally_adjusted"
+    },
+    {
+      "observation_id": "cpi-u-2024-10",
+      "dataset_id": "bls.cu.CUSR0000SA0",
+      "period_start": "2024-10-01",
+      "raw_value": "282.000",
+      "unit": "1982-84=100",
+      "seasonal_adjustment": "seasonally_adjusted"
+    },
+    {
+      "observation_id": "cpi-u-2025-09",
+      "dataset_id": "bls.cu.CUSR0000SA0",
+      "period_start": "2025-09-01",
+      "raw_value": "300.000",
+      "unit": "1982-84=100",
+      "seasonal_adjustment": "seasonally_adjusted"
+    },
+    {
+      "observation_id": "cpi-u-2025-11",
+      "dataset_id": "bls.cu.CUSR0000SA0",
+      "period_start": "2025-11-01",
+      "raw_value": "305.000",
+      "unit": "1982-84=100",
+      "seasonal_adjustment": "seasonally_adjusted"
+    },
+    {
+      "observation_id": "cpi-u-2026-08",
+      "dataset_id": "bls.cu.CUSR0000SA0",
+      "period_start": "2026-08-01",
+      "raw_value": "310.000",
+      "unit": "1982-84=100",
+      "seasonal_adjustment": "seasonally_adjusted"
+    },
+    {
+      "observation_id": "cpi-u-2026-09",
+      "dataset_id": "bls.cu.CUSR0000SA0",
+      "period_start": "2026-09-01",
+      "raw_value": "312.000",
+      "unit": "1982-84=100",
+      "seasonal_adjustment": "seasonally_adjusted"
+    },
+    {
+      "observation_id": "fed-funds-2025-09",
+      "dataset_id": "fed.h15.RIFSPFF_N.M",
+      "period_start": "2025-09-01",
+      "raw_value": "4.00",
+      "unit": "percent_per_year",
+      "seasonal_adjustment": "unknown"
+    },
+    {
+      "observation_id": "fed-funds-2026-07",
+      "dataset_id": "fed.h15.RIFSPFF_N.M",
+      "period_start": "2026-07-01",
+      "raw_value": "4.00",
+      "unit": "percent_per_year",
+      "seasonal_adjustment": "unknown"
+    },
+    {
+      "observation_id": "fed-funds-2026-08",
+      "dataset_id": "fed.h15.RIFSPFF_N.M",
+      "period_start": "2026-08-01",
+      "raw_value": "4.88",
+      "unit": "percent_per_year",
+      "seasonal_adjustment": "unknown"
+    },
+    {
+      "observation_id": "fed-funds-2026-09",
+      "dataset_id": "fed.h15.RIFSPFF_N.M",
+      "period_start": "2026-09-01",
+      "raw_value": "5.13",
+      "unit": "percent_per_year",
+      "seasonal_adjustment": "unknown"
+    },
+    {
+      "observation_id": "treasury-10y-2026-08",
+      "dataset_id": "fed.h15.RIFLGFCY10_N.M",
+      "period_start": "2026-08-01",
+      "raw_value": "4.01",
+      "unit": "percent_per_year",
+      "seasonal_adjustment": "unknown"
+    },
+    {
+      "observation_id": "treasury-10y-2026-09",
+      "dataset_id": "fed.h15.RIFLGFCY10_N.M",
+      "period_start": "2026-09-01",
+      "raw_value": "4.27",
+      "unit": "percent_per_year",
+      "seasonal_adjustment": "unknown"
+    }
+  ]
+}
