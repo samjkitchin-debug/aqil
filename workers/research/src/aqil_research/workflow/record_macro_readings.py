@@ -18,7 +18,7 @@ from aqil_research.methods.configs import (
     LABOUR_MARKET_PUBLISHED,
     PRICES_AND_POLICY_PUBLISHED,
 )
-from aqil_research.methods.credit_standards_volumes import (
+from aqil_research.methods.credit_standards_and_volumes import (
     CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID,
     H8_DATASET_ID,
     SLOOS_DATASET_ID,
