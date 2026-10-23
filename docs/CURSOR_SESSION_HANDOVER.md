@@ -1,9 +1,33 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 23 October 2026, baseline certification wave 2  
+**Last updated:** 23 October 2026, baseline certification gates  
 **Parent:** `a1c29a8` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Baseline certification, gates, 23 October 2026
+
+Risk class R2. Previous local `main` is `dd82e40`. `origin/main` is `c9ea596`. Both are ancestors of this tip, and `origin/main` adds no commits. Nothing was pushed. Preserved database `postgres` was not reset and was not given `20261024120000_etf_instruments.sql`. `aqil_etf` was not written.
+
+Local commands, all on this machine. GitHub Actions has not run.
+
+- `npm run test:research`: prepared `aqil_research_test` only, marker `disposable-research-test`, `RESEARCH_DATABASE_URL` unset. Pytest 359 passed. `ruff check` passed. `ruff format --check` passed, 254 files. The script exits non-zero if ruff fails.
+- `uv run pytest tests/etf tests/test_etf_share_class_contract.py`: 60 passed. No database.
+- `npm run test:etf --prefix apps/web`: 2 passed.
+- `npm run typecheck`: passed. `npm run lint`: passed with one existing warning, `apps/web/src/components/research/today-story-tangent-path.ts` unused `_searchParams`. `npm run check:tokens`: passed.
+- `npm run test:sourced-updates --prefix apps/web`: 19 passed. Wealth, capital, auth, and Saxo scripts exited 0 (capital 17, auth 13, Saxo 42).
+- `npm run build`: passed.
+- Disposable pgTAP: `scripts/prepare-pgtap-test-db.ps1` recreated `aqil_pgtap_test` from the schema only. Development live observations stayed 8704. The ETF migration was applied only to `aqil_pgtap_test`, and the `pgtap` extension was created there. `npx supabase test db --db-url postgresql://postgres@127.0.0.1:55432/aqil_pgtap_test` passed 11 files, 175 tests, including `etf_instruments.test.sql`. `postgres` still has no `instruments` schema.
+
+Recount on `postgres` after those tests matched the recount before them. Ten live series: unemployment 44, CPI-U 956, payrolls 1053, job openings 309, industrial production 1293, bank credit 2806, federal funds 867, 10-year yield 882, HICP 348, SLOOS 146. `research.research_runs` is 25 rows, all `publication_allowed` false. One `not_qualified` assessment, publication false. No unemployment or CPI-U row for 1 October 2025. `aqil_etf.instruments.share_classes` is 0. Isolation markers are not on `postgres`.
+
+Browser on the existing dev server at `http://127.0.0.1:3000`, signed out. Today, Upcoming, Evidence, Exposures, My Wealth, Deploy Capital, and Learn each redirected to Sign in, with “Sign in to continue.” Privacy rendered. No horizontal overflow on the sign-in page at 1280 and 390 pixels, or on Privacy at those widths. Google sign-in was not used. Signed-in pages were not opened. Code review: `/explore` reads `instruments.share_classes` and shows the empty copy when that table has no rows.
+
+Gates: A pass. B pass. C pass. Ruff has no remaining exception. D conditional. E: local `main` fast-forwards to this commit. Not pushed.
+
+Next product steps, not started here: one cited ETF record, one lawful vintage path, then benchmark total returns.
+
+Clean linked worktrees whose tips are already in this history are removed after the fast-forward. These stay: `C:\Users\gamer\aqil-m6` (`m6/research-methods` at `4516775`, clean, not an ancestor) and `C:\Users\gamer\aqil-sahm` (`research/employment-situation-2026-11` at `f7aa03b`, dirty, not an ancestor). Branches are not deleted.
 
 ## Baseline certification, wave 2, 23 October 2026
 
