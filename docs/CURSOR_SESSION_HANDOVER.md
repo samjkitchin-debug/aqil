@@ -1,9 +1,28 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 23 October 2026, four macro readings integrated and run on stored observations  
-**Parent:** `2a12389` on `work/aqil-autonomous-build` before the registry commit  
+**Last updated:** 23 October 2026, baseline certification wave 1  
+**Parent:** `a1c29a8` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Baseline certification, wave 1, 23 October 2026
+
+Risk class R1. Compared patch content on `work/aqil-autonomous-build`. `git fetch` was read-only. `origin/main` is `c9ea596` and is an ancestor of HEAD. It has no commits that HEAD lacks. Local `main` remains `dd82e40` and is also an ancestor. No pull request was merged or closed.
+
+Stray commits:
+
+- `e3e9906` is already present as `credit_standards_volumes.py` and `CreditStandardsVolumesMethod`. The standards change, the exact 52-week volume lookup, the missing-week insufficiency, the point-in-time refusal, and the separate units are in that module and its current tests. `credit_standards_and_volumes.py` was not revived. The stray assertion that the method is unregistered was left out, because the baseline registers `CreditStandardsVolumesMethod`.
+- `591f7ac` was restored. `test_second_call_is_deterministic` again checks `LABOUR_MARKET_CONDITIONS` 1.1.0 on `sufficient_window` and `missing_october_2025_unemployment`. `uv run pytest tests/test_labour_market.py::test_second_call_is_deterministic -q` passed, 1 test. The assertion had been removed only by the later revert.
+- `df8b8aa` was left out. It is not an ancestor of `4c2f14b`. The Evidence files still match that integration commit: the capture sentence still says the row is not a reconstruction of dates before `captured_at`, and the loader still falls back to the local research URL. The `not_qualified` refusal is unchanged.
+
+Open pull requests, read with `gh pr diff` and compared with HEAD. None were merged:
+
+- #9, M5 live calendars: deferred. The tip has no FOMC calendar adapter. Not required for a certification gate.
+- #10, M6 SLOOS and Census, stacked on #9: deferred. This tip already has separate SLOOS, Census, and macro-conditions methods. The pull request still rewrites that stack and is not a gate fix.
+- #11, My Wealth slice: superseded. This tip has `20261018210000_my_wealth.sql` and the later journal migration. The pull request’s earlier portfolio migration and synthetic fixture were not taken.
+- #13, docs snapshot of 18 October: superseded. It describes `main` at `dd82e40` and open pull requests #9–#12 as the current build. This tip is past that snapshot.
+- #14, pre-release Sahm assessment: deferred. It is later product work. The `not_qualified` refusal stays.
+- Dependabot #3 (`eslint` 9 to 10), #4 (`@types/node` 20 to 26), and #5 (`typescript` 5 to 7): deferred. Lint and typecheck run on the current majors. The bumps were not taken.
 
 ## Four macro readings on stored observations, 23 October 2026
 
