@@ -1,0 +1,70 @@
+{
+  "method_id": "CREDIT_STANDARDS_AND_VOLUMES",
+  "method_version": "1.0.0",
+  "analysis_mode": "latest_revised",
+  "publication_allowed": false,
+  "evidence_copy": "The reading is internal.",
+  "causal_hypothesis": "No causal mechanism is established.",
+  "investment_implication_when_reported": "no_action",
+  "investment_implication_when_insufficient": "insufficient_evidence",
+  "inputs": [
+    {
+      "dataset_id": "fed.sloos.SUBLPDCILS_N.Q",
+      "unit": "percent_net_tightening",
+      "frequency": "quarterly",
+      "seasonal_adjustment": "not_seasonally_adjusted",
+      "transformation": "latest_share_minus_prior_stored_quarter",
+      "difference_unit": "percentage_points"
+    },
+    {
+      "dataset_id": "fed.h8.B1001NCBA",
+      "unit": "usd_millions",
+      "frequency": "weekly",
+      "seasonal_adjustment": "seasonally_adjusted",
+      "transformation": "latest_level_minus_exact_period_start_52_weeks_earlier",
+      "change_unit": "usd_millions"
+    }
+  ],
+  "calculation_keys": {
+    "lending_standards": [
+      "dataset_id",
+      "unit",
+      "frequency",
+      "seasonal_adjustment",
+      "transformation",
+      "latest_period_start",
+      "latest_observation_id",
+      "latest_share",
+      "prior_period_start",
+      "prior_observation_id",
+      "prior_share",
+      "difference_percentage_points"
+    ],
+    "bank_credit": [
+      "dataset_id",
+      "unit",
+      "frequency",
+      "seasonal_adjustment",
+      "transformation",
+      "weeks_earlier",
+      "latest_period_start",
+      "latest_observation_id",
+      "latest_level_usd_millions",
+      "comparison_period_start",
+      "comparison_observation_id",
+      "comparison_level_usd_millions",
+      "change_usd_millions",
+      "sufficiency",
+      "missing_reason"
+    ]
+  },
+  "rules": [
+    "Report the latest SLOOS share, the prior stored quarter, and the difference in percentage points.",
+    "Report the latest H.8 week and the change versus the exact period_start 52 weeks earlier, in usd_millions, only when that period_start is stored.",
+    "A missing exact 52-week period_start leaves that volume change insufficient and still reports the latest level.",
+    "The survey share stays in percent_net_tightening.",
+    "Weekly observations stay on their stored weeks.",
+    "Point-in-time requests are insufficient because these files are not vintage panels.",
+    "No causal mechanism is established."
+  ]
+}

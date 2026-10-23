@@ -1,0 +1,57 @@
+{
+  "label": "Synthetic fixture for CREDIT_STANDARDS_AND_VOLUMES. Not a live reading.",
+  "evaluation_period": "2026-10-07",
+  "sloos": [
+    {
+      "observation_id": "sloos-2026q1",
+      "period_start": "2026-01-01",
+      "raw_value": "6.0"
+    },
+    {
+      "observation_id": "sloos-2026q2",
+      "period_start": "2026-04-01",
+      "raw_value": "8.5"
+    },
+    {
+      "observation_id": "sloos-2026q3",
+      "period_start": "2026-07-01",
+      "raw_value": "11.2"
+    }
+  ],
+  "bank_credit": [
+    {
+      "observation_id": "h8-20251001",
+      "period_start": "2025-10-01",
+      "raw_value": "18000000.0"
+    },
+    {
+      "observation_id": "h8-20251008",
+      "period_start": "2025-10-08",
+      "raw_value": "18100500.1"
+    },
+    {
+      "observation_id": "h8-20260701",
+      "period_start": "2026-07-01",
+      "raw_value": "18500000.0"
+    },
+    {
+      "observation_id": "h8-20261007",
+      "period_start": "2026-10-07",
+      "raw_value": "18943210.4"
+    }
+  ],
+  "expected": {
+    "latest_sloos_observation_id": "sloos-2026q3",
+    "latest_sloos_share": "11.2",
+    "prior_sloos_observation_id": "sloos-2026q2",
+    "prior_sloos_share": "8.5",
+    "difference_percentage_points": "2.7",
+    "latest_h8_observation_id": "h8-20261007",
+    "latest_h8_level_usd_millions": "18943210.4",
+    "comparison_period_start": "2025-10-08",
+    "comparison_h8_observation_id": "h8-20251008",
+    "comparison_h8_level_usd_millions": "18100500.1",
+    "change_usd_millions": "842710.3",
+    "unused_observation_ids": ["sloos-2026q1", "h8-20251001", "h8-20260701"]
+  }
+}
