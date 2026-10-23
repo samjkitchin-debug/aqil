@@ -1,9 +1,33 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 23 October 2026, prospective assessment lifecycle  
-**Parent:** `edea3a0` on `work/fwd-hypothesis`  
+**Last updated:** 23 October 2026, prospective assessment integration  
+**Parent:** `e45437b` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Prospective assessment integration, 23 October 2026
+
+Risk class R2. Four local branches merged in order onto `work/aqil-autonomous-build` from `edea3a0`, with no conflicts: method `d381e76`, snapshot `ba4f4ae`, hypothesis `67aecc8`, Evidence `6f555f2`. The registry already constructed the current labour, prices, and industrial-production classes, which report `1.1.0`. Credit remains `1.0.0`. Sahm remains `1.0.1`. `MACRO_CONDITIONS_PANEL` remains `1.0.0`. `publication_allowed` was not opened.
+
+Version 1.1.0 ranks overlapping 12-month percent changes for payrolls, CPI-U, and industrial production. Unemployment, job openings, the federal funds rate, and the 10-year yield keep a rank of the level, and the stored copy names the series. The historical distribution uses today's revised file. October 2025 was not interpolated. No HICP month was added. The price method does not take HICP as an input.
+
+`supabase/migrations/20261023120000_prospective_assessments.sql` was applied to local Postgres at `127.0.0.1:55432`, database `postgres`, because `research.prospective_assessments` was absent. Nothing was dropped. The hosted project was not changed. pgTAP was not run. `scripts/prepare-research-test-db.ps1` then dropped and recreated only `aqil_research_test`.
+
+Queried on database `postgres` after that pytest. Live counts were unchanged: unemployment 44, CPI-U 956, payrolls 1053, job openings 309, industrial production 1293, bank credit 2806, federal funds 867, 10-year yield 882, HICP 348, SLOOS 146. Research runs are now 17. The earlier 1.0.0 labour, prices, and industrial-production runs remain two each. Credit 1.0.0 is now three, including new run `62425957-93fe-4b0c-af39-0829059591ce`. The two `MACRO_READING_SYNTHESIS` 1.0.0 runs remain, including `ce6eb7e8-7fa1-4a5e-b603-218cdc466e23`. Every new run has `publication_allowed` false.
+
+Stored 1.1.0 narratives, evaluation month 1 September 2026:
+
+- Labour run `5f012de3-67e3-4877-88d9-5b8804ce3e78`. Payrolls (`bls.ce.CES0000000001`) were 159044 thousands. The 12-month change from 1 September 2025 (158548 thousands) is 496 thousands (0.31 percent). The rank of overlapping 12-month percent changes is 237 of 1041. Unemployment stays a level rank, 26 of 44. Job openings stay a level rank, 233 of 309, latest stored month 1 August 2026.
+- Prices run `c1e49875-be03-4749-9148-e25df01905f2`. CPI-U (`bls.cu.CUSR0000SA0`) 12-month percent change from 1 September 2025 to 1 September 2026 is 3.7173 percent, index 324.245 to 336.298. The rank of overlapping 12-month percent changes is 632 of 944. The change uses those two endpoints only. Federal funds stay a level rank, 380 of 867. The 10-year yield stays a level rank, 462 of 882.
+- Industrial production run `63ed1907-0f36-44d3-8ef8-f79c2e59e653`. The index (`fed.g17.IP.B50001.S`) moved from 101.6680 on 1 September 2025 to 103.9506 on 1 September 2026. The 12-month percent change is 2.2452. The rank of overlapping 12-month percent changes is 546 of 1281. The change uses those two endpoints only.
+
+One assessment row was inserted: `pa-09812e2a-f340-455d-a16c-794b14f511b0`. `lifecycle_status` is `not_qualified`. `horizon_months` is null. `publication_allowed` is false. `revision_class` is `latest_revised`. It cites the three 1.1.0 run ids above, copies 5404 observation ids and values, 5404 retrieval timestamps, and 5360 source-release timestamps. All 44 unemployment observations in that copy have no `source_release_at`. The capture note contains “not a reconstruction of dates before captured_at”. The stored reasons are no vintage panel, no identified mechanism, and the stored windows do not share one horizon. The uncertainty text states that no direction, probability, return, or recommendation is stated. An owner `UPDATE` was rejected: `research.prospective_assessments is append-only; UPDATE is not permitted`. The live row was not deleted. On `aqil_research_test`, the persistence tests reproduced the stored hashes and rejected update and delete. Those tests are inside the 294 passed.
+
+Research pytest on `aqil_research_test` was 294 passed. Web presentation tests were 19 passed. Typecheck passed. Lint passed with the existing unused `_searchParams` warning. Token check passed. Production build passed. pgTAP was not run. GitHub Actions has not run.
+
+Signed-in Evidence at `http://localhost:3000/research` showed “The reading is internal. No 6- or 12-month hypothesis qualified.” with the three reasons, the capture sentence, and publication closed. The desktop client width was 1265 pixels and did not overflow. At 390 pixels the section was 358 pixels wide and the page did not overflow. Today showed sourced publications, the unemployment series, and the next confirmed release. It did not show the assessment.
+
+These files still cannot answer a historical-date query that excludes a later revision. That remains M1 acceptance item 3. Sahm stays ineligible through December 2026 because October 2025 is absent. Census stays blocked without a key.
 
 ## Prospective assessment lifecycle, 23 October 2026
 
