@@ -1,9 +1,19 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 23 October 2026, prospective assessment integration  
-**Parent:** `e45437b` on `work/aqil-autonomous-build`  
+**Last updated:** 23 October 2026, internal macro synthesis on Evidence  
+**Parent:** `77b51d4` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Internal macro synthesis on Evidence, 23 October 2026
+
+Risk class R2. The reading shown on Evidence is run `1049ea65-03de-4072-be8c-1f0b3108a1c1`, method `MACRO_READING_SYNTHESIS` 1.0.0. `publication_allowed` is false. It reads the stored 1.1.0 labour run `5f012de3-67e3-4877-88d9-5b8804ce3e78`, prices run `c1e49875-be03-4749-9148-e25df01905f2`, and industrial-production run `63ed1907-0f36-44d3-8ef8-f79c2e59e653`, plus credit 1.0.0 run `62425957-93fe-4b0c-af39-0829059591ce`. Earlier synthesis rows were not deleted.
+
+Agreement: unemployment, payrolls, CPI-U, federal funds, the 10-year yield, and industrial production share September 2026. A shared month is not a cause. Divergence: job openings and the joint labour month are August 2026, SLOOS is the quarter starting 1 July 2026, and bank credit is the week of 7 October 2026. The stored changes do not share one sign, and the windows are not the same length. Euro-area HICP is excluded and ends in December 2025. No composite score, funds-minus-yield spread, real rate, or GDP figure is calculated.
+
+Live counts on database `postgres` were unchanged: unemployment 44, CPI-U 956, payrolls 1053, job openings 309, industrial production 1293, bank credit 2806, federal funds 867, 10-year yield 882, HICP 348, SLOOS 146. Publications remain 12 Employment Situation, 12 CPI, 15 Board, and 3 ECB. Future BLS calendar rows remain 27. Research runs are 20.
+
+Re-checked after that append: research pytest on `aqil_research_test` was 294 passed. Web presentation tests were 19 passed. Typecheck passed. Lint passed with the existing unused `_searchParams` warning. Token check passed. Production build passed. pgTAP was not run. GitHub Actions has not run. Signed-in Evidence at `http://localhost:3000/research` showed “The reading is internal” and the September 2026 agreement, on a desktop width and at 390 pixels with no horizontal overflow. Today still shows sourced publications, the 44-month unemployment series, and the next confirmed release. It does not show the macro reading.
 
 ## Prospective assessment integration, 23 October 2026
 
