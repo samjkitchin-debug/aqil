@@ -8,9 +8,9 @@ from aqil_research.methods.census_adv_orders import (
     CENSUS_ADV_ORDERS_METHOD_ID,
     CensusAdvOrdersMethod,
 )
-from aqil_research.methods.credit_standards_and_volumes import (
+from aqil_research.methods.credit_standards_volumes import (
     CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID,
-    CreditStandardsAndVolumesMethod,
+    CreditStandardsVolumesMethod,
 )
 from aqil_research.methods.industrial_production_activity import (
     INDUSTRIAL_PRODUCTION_METHOD_ID,
@@ -66,7 +66,7 @@ def default_method_registry() -> MethodRegistry:
     registry.register(LabourMarketConditionsMethod())
     registry.register(PricesAndPolicyMethod())
     registry.register(IndustrialProductionActivityMethod())
-    registry.register(CreditStandardsAndVolumesMethod())
+    registry.register(CreditStandardsVolumesMethod())
     return registry
 
 
