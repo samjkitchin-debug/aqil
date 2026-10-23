@@ -1,4 +1,4 @@
-"""PRICES_AND_POLICY 1.0.0 on a small latest-revised fixture. No database."""
+"""PRICES_AND_POLICY 1.1.0 on a small latest-revised fixture. No database."""
 
 from __future__ import annotations
 
@@ -19,10 +19,13 @@ from aqil_research.contracts.observation import (
 from aqil_research.methods.prices_and_policy import (
     CAUSAL_HYPOTHESIS,
     CPI_DATASET_ID,
+    CPI_RANK_DEFINITION,
     FED_FUNDS_DATASET_ID,
+    FUNDS_RANK_DEFINITION,
     PRICES_AND_POLICY_METHOD_ID,
     PRICES_AND_POLICY_METHOD_VERSION,
     TREASURY_10Y_DATASET_ID,
+    TREASURY_RANK_DEFINITION,
     PricesAndPolicyMethod,
 )
 from aqil_research.methods.protocol import MethodContext
@@ -54,8 +57,13 @@ SEPTEMBER_2026_CALCULATION = {
         "index_level": "275.000",
         "comparison_index_level": "250.000",
         "twelve_month_percent_change": "10.0000",
-        "values_strictly_below": 4,
-        "rank": 5,
+        "endpoints_only": True,
+        "values_strictly_below": 1,
+        "rank": 2,
+        "change_count": 2,
+        "rank_basis": "overlapping_twelve_month_percent_change",
+        "ranked_series": f"CPI-U ({CPI_DATASET_ID})",
+        "rank_definition": CPI_RANK_DEFINITION,
     },
     "federal_funds": {
         "dataset_id": FED_FUNDS_DATASET_ID,
@@ -69,6 +77,10 @@ SEPTEMBER_2026_CALCULATION = {
         "one_month_change_percentage_points": "-0.1100",
         "values_strictly_below": 1,
         "rank": 2,
+        "level_count": 5,
+        "rank_basis": "level",
+        "ranked_series": f"federal funds rate ({FED_FUNDS_DATASET_ID})",
+        "rank_definition": FUNDS_RANK_DEFINITION,
     },
     "treasury_10_year": {
         "dataset_id": TREASURY_10Y_DATASET_ID,
@@ -82,6 +94,10 @@ SEPTEMBER_2026_CALCULATION = {
         "one_month_change_percentage_points": "-0.1200",
         "values_strictly_below": 2,
         "rank": 3,
+        "level_count": 5,
+        "rank_basis": "level",
+        "ranked_series": f"10-year Treasury yield ({TREASURY_10Y_DATASET_ID})",
+        "rank_definition": TREASURY_RANK_DEFINITION,
     },
 }
 
@@ -166,7 +182,7 @@ def test_method_identity_and_inputs() -> None:
     assert HICP_DATASET_ID not in method.required_dataset_ids()
     registered = default_method_registry().get(PRICES_AND_POLICY_METHOD_ID)
     assert registered.method_id == PRICES_AND_POLICY_METHOD_ID
-    assert registered.method_version == "1.0.0"
+    assert registered.method_version == PRICES_AND_POLICY_METHOD_VERSION == "1.1.0"
 
 
 def test_september_2025_to_september_2026_fixture_calculation() -> None:
@@ -209,6 +225,30 @@ def test_september_2025_to_september_2026_fixture_calculation() -> None:
     hicp = " ".join(result.limitations)
     assert "HICP (ecb.icp.M.U2.Y.000000.3.INX) is a separate series ending 2025-12-01" in hicp
     assert "index, 2015 = 100" in hicp
+    cpi_levels = [
+        Decimal("250.000"),
+        Decimal("250.000"),
+        Decimal("260.000"),
+        Decimal("260.000"),
+        Decimal("275.000"),
+    ]
+    level_rank = 1 + sum(1 for level in cpi_levels if level < Decimal("275.000"))
+    assert level_rank == 5
+    assert cpi["rank"] == 2
+    assert cpi["rank"] != level_rank
+    assert cpi["endpoints_only"] is True
+    assert cpi["rank_basis"] == "overlapping_twelve_month_percent_change"
+    narrative = result.narrative
+    assert "endpoints only" in narrative.casefold()
+    assert "not treated as observed" in narrative.casefold()
+    assert "2025-10" not in narrative
+    assert "october 2025 was observed" not in narrative.casefold()
+    assert "today's revised file" in narrative
+    assert f"CPI-U ({CPI_DATASET_ID})" in narrative
+    assert f"federal funds rate level ({FED_FUNDS_DATASET_ID})" in narrative
+    assert f"10-year Treasury yield level ({TREASURY_10Y_DATASET_ID})" in narrative
+    assert funds["rank_basis"] == "level"
+    assert treasury["rank_basis"] == "level"
 
 
 def test_rank_one_is_the_lowest_stored_level() -> None:
@@ -218,8 +258,12 @@ def test_rank_one_is_the_lowest_stored_level() -> None:
     assert calculation["cpi_u"]["twelve_month_percent_change"] == "0.0000"
     assert calculation["cpi_u"]["values_strictly_below"] == 0
     assert calculation["cpi_u"]["rank"] == 1
+    assert calculation["cpi_u"]["change_count"] == 1
+    assert calculation["cpi_u"]["rank_basis"] == "overlapping_twelve_month_percent_change"
     assert calculation["federal_funds"]["rank"] == 1
+    assert calculation["federal_funds"]["rank_basis"] == "level"
     assert calculation["treasury_10_year"]["rank"] == 1
+    assert calculation["treasury_10_year"]["rank_basis"] == "level"
     assert calculation["federal_funds"]["one_month_change_percentage_points"] == "-0.2800"
     assert calculation["treasury_10_year"]["one_month_change_percentage_points"] == "-0.1500"
 
@@ -269,6 +313,131 @@ def test_point_in_time_is_insufficient() -> None:
     assert result.missing_reason.startswith("point_in_time is insufficient")
     assert "HICP" in " ".join(result.limitations)
     assert HICP_DATASET_ID not in result.narrative
+
+
+def _built_series(
+    dataset_id: str,
+    provider_id: str,
+    source_id: str,
+    unit: str,
+    seasonal_adjustment: str,
+    prefix: str,
+    rows: tuple[tuple[str, str], ...],
+) -> dict[date, EconomicObservation]:
+    series = {
+        "dataset_id": dataset_id,
+        "provider_id": provider_id,
+        "source_id": source_id,
+        "unit": unit,
+        "seasonal_adjustment": seasonal_adjustment,
+    }
+    built: dict[date, EconomicObservation] = {}
+    for period, value in rows:
+        observation = _observation(
+            series,
+            {"observation_id": f"{prefix}-{period[:7]}", "period_start": period, "raw_value": value},
+        )
+        built[observation.period_start] = observation
+    return built
+
+
+def test_trending_cpi_level_change_rank_is_not_the_level_rank() -> None:
+    inputs = {
+        CPI_DATASET_ID: _built_series(
+            CPI_DATASET_ID,
+            "bls",
+            "bls_cpi_u_all_items",
+            "1982-84=100",
+            "seasonally_adjusted",
+            "cpi",
+            (("2024-09-01", "100.000"), ("2025-09-01", "200.000"), ("2026-09-01", "300.000")),
+        ),
+        FED_FUNDS_DATASET_ID: _built_series(
+            FED_FUNDS_DATASET_ID,
+            "federal_reserve",
+            "federal_reserve_h15_federal_funds_effective",
+            "percent_per_year",
+            "unknown",
+            "ff",
+            (("2026-08-01", "4.00"), ("2026-09-01", "4.10")),
+        ),
+        TREASURY_10Y_DATASET_ID: _built_series(
+            TREASURY_10Y_DATASET_ID,
+            "federal_reserve",
+            "federal_reserve_h15_treasury_10y_constant_maturity",
+            "percent_per_year",
+            "unknown",
+            "t10",
+            (("2026-08-01", "4.20"), ("2026-09-01", "4.25")),
+        ),
+    }
+    result = _run(inputs, date(2026, 9, 1))
+    assert result.sufficiency == "sufficient"
+    assert result.calculation is not None
+    cpi = result.calculation["cpi_u"]
+    levels = [Decimal("100.000"), Decimal("200.000"), Decimal("300.000")]
+    level_rank = 1 + sum(1 for level in levels if level < levels[-1])
+    assert level_rank == 3
+    assert cpi["rank"] == 1
+    assert cpi["change_count"] == 2
+    assert cpi["rank"] != level_rank
+    assert cpi["twelve_month_percent_change"] == "50.0000"
+    assert cpi["endpoints_only"] is True
+    assert cpi["ranked_series"] == f"CPI-U ({CPI_DATASET_ID})"
+    assert "2025-10" not in result.narrative
+    assert "endpoints only" in result.narrative.casefold()
+    assert "not treated as observed" in result.narrative.casefold()
+    assert "today's revised file" in result.narrative
+    assert "not what was known on each past date" in result.narrative
+    rendered = json.dumps(result.calculation).lower()
+    assert "spread" not in rendered
+    assert "real rate" not in rendered
+    assert "real_rate" not in rendered
+    assert "composite" not in rendered
+    assert HICP_DATASET_ID not in rendered
+
+
+def test_missing_cpi_endpoint_returns_insufficient() -> None:
+    inputs = {
+        CPI_DATASET_ID: _built_series(
+            CPI_DATASET_ID,
+            "bls",
+            "bls_cpi_u_all_items",
+            "1982-84=100",
+            "seasonally_adjusted",
+            "cpi",
+            (("2026-09-01", "300.000"),),
+        ),
+        FED_FUNDS_DATASET_ID: _built_series(
+            FED_FUNDS_DATASET_ID,
+            "federal_reserve",
+            "federal_reserve_h15_federal_funds_effective",
+            "percent_per_year",
+            "unknown",
+            "ff",
+            (("2026-08-01", "4.00"), ("2026-09-01", "4.10")),
+        ),
+        TREASURY_10Y_DATASET_ID: _built_series(
+            TREASURY_10Y_DATASET_ID,
+            "federal_reserve",
+            "federal_reserve_h15_treasury_10y_constant_maturity",
+            "percent_per_year",
+            "unknown",
+            "t10",
+            (("2026-08-01", "4.20"), ("2026-09-01", "4.25")),
+        ),
+    }
+    result = _run(inputs, date(2026, 9, 1))
+    assert result.sufficiency == "insufficient"
+    assert result.calculation is None
+    assert result.observation_ids == ()
+    assert result.investment_implication == "insufficient_evidence"
+    assert result.causal_hypothesis == CAUSAL_HYPOTHESIS
+    assert result.missing_reason == (
+        "missing CPI-U endpoint 2025-09-01 for the 12-month window 2025-09-01 to 2026-09-01"
+    )
+    assert "interpolat" not in (result.missing_reason or "")
+    assert "2025-10-01 was observed" not in result.narrative.casefold()
 
 
 def test_fragment_names_hicp_only_as_a_separate_series() -> None:

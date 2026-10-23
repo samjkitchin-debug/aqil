@@ -1,4 +1,9 @@
-"""CPI-U and H.15 policy rates — descriptive levels, changes, and ranks."""
+"""CPI-U and H.15 policy rates — descriptive levels, changes, and ranks.
+
+CPI-U is ranked on overlapping 12-month percent changes. The federal funds rate
+and the 10-year Treasury yield are ranked on the level. The historical
+distribution uses today's revised file.
+"""
 
 from __future__ import annotations
 
@@ -20,7 +25,7 @@ from aqil_research.contracts.observation import (
 from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
 
 PRICES_AND_POLICY_METHOD_ID = "PRICES_AND_POLICY"
-PRICES_AND_POLICY_METHOD_VERSION = "1.0.0"
+PRICES_AND_POLICY_METHOD_VERSION = "1.1.0"
 
 CPI_DATASET_ID = "bls.cu.CUSR0000SA0"
 FED_FUNDS_DATASET_ID = "fed.h15.RIFSPFF_N.M"
@@ -31,6 +36,30 @@ RATE_UNIT = "percent_per_year"
 CPI_FORMULA = "(index_t / index_t-12 - 1) * 100"
 CHANGE_QUANTUM = Decimal("0.0001")
 CAUSAL_HYPOTHESIS = "No causal mechanism is established."
+REVISED_HISTORY_SENTENCE = (
+    "The historical distribution uses today's revised file and is not what was known "
+    "on each past date."
+)
+CPI_ENDPOINTS_SENTENCE = (
+    "The CPI-U 12-month percent change uses the two endpoints only. "
+    "A missing month between those endpoints is not treated as observed and is not interpolated."
+)
+CPI_RANK_DEFINITION = (
+    f"Rank of overlapping 12-month percent changes in CPI-U ({CPI_DATASET_ID}): "
+    "1 plus the count of those percent changes strictly below the latest "
+    "12-month percent change. "
+    f"{CPI_ENDPOINTS_SENTENCE} {REVISED_HISTORY_SENTENCE}"
+)
+FUNDS_RANK_DEFINITION = (
+    f"Rank of the federal funds rate level ({FED_FUNDS_DATASET_ID}): "
+    "1 plus the count of stored federal funds rate levels strictly below the latest level. "
+    f"{REVISED_HISTORY_SENTENCE}"
+)
+TREASURY_RANK_DEFINITION = (
+    f"Rank of the 10-year Treasury yield level ({TREASURY_10Y_DATASET_ID}): "
+    "1 plus the count of stored 10-year Treasury yield levels strictly below the latest level. "
+    f"{REVISED_HISTORY_SENTENCE}"
+)
 
 _POINT_IN_TIME_REASON = (
     "point_in_time is insufficient because these series are latest_revised "
@@ -38,7 +67,11 @@ _POINT_IN_TIME_REASON = (
 )
 _STATISTICAL = (
     "Descriptive reading of the stored CPI-U index over twelve months and of the "
-    "stored federal funds rate and 10-year yield over one month."
+    "stored federal funds rate and 10-year yield over one month. "
+    f"CPI-U ({CPI_DATASET_ID}) is ranked on overlapping 12-month percent changes. "
+    f"The federal funds rate ({FED_FUNDS_DATASET_ID}) and the 10-year Treasury yield "
+    f"({TREASURY_10Y_DATASET_ID}) are ranked on the level. "
+    f"{REVISED_HISTORY_SENTENCE}"
 )
 
 
@@ -106,8 +139,22 @@ class PricesAndPolicyMethod:
         failures: list[str] = []
         for reading in (
             _cpi_window(cpi, start=twelve_month_start, end=evaluation),
-            _rate_window(funds, prior=prior_month, end=evaluation, label="federal funds"),
-            _rate_window(treasury, prior=prior_month, end=evaluation, label="10-year yield"),
+            _rate_window(
+                funds,
+                prior=prior_month,
+                end=evaluation,
+                label="federal funds",
+                ranked_series=f"federal funds rate ({FED_FUNDS_DATASET_ID})",
+                rank_definition=FUNDS_RANK_DEFINITION,
+            ),
+            _rate_window(
+                treasury,
+                prior=prior_month,
+                end=evaluation,
+                label="10-year yield",
+                ranked_series=f"10-year Treasury yield ({TREASURY_10Y_DATASET_ID})",
+                rank_definition=TREASURY_RANK_DEFINITION,
+            ),
         ):
             if isinstance(reading, str):
                 failures.append(reading)
@@ -202,7 +249,10 @@ def _cpi_window(
         )
     change = ((current.decimal_value() / prior_level) - Decimal(1)) * Decimal(100)
     history = _history_through(series, end)
-    below, rank = _rank(current.decimal_value(), history)
+    quantized_change = Decimal(_quantize(change))
+    changes = _overlapping_cpi_percent_changes(series, end)
+    below = sum(1 for item in changes if item < quantized_change)
+    rank = below + 1
     return _SeriesReading(
         payload={
             "dataset_id": CPI_DATASET_ID,
@@ -215,8 +265,13 @@ def _cpi_window(
             "index_level": current.raw_value,
             "comparison_index_level": prior.raw_value,
             "twelve_month_percent_change": _quantize(change),
+            "endpoints_only": True,
             "values_strictly_below": below,
             "rank": rank,
+            "change_count": len(changes),
+            "rank_basis": "overlapping_twelve_month_percent_change",
+            "ranked_series": f"CPI-U ({CPI_DATASET_ID})",
+            "rank_definition": CPI_RANK_DEFINITION,
         },
         history=history,
         period=end,
@@ -234,6 +289,8 @@ def _rate_window(
     prior: date,
     end: date,
     label: str,
+    ranked_series: str,
+    rank_definition: str,
 ) -> _SeriesReading | str:
     missing = _missing_endpoint_reason(
         series,
@@ -262,6 +319,10 @@ def _rate_window(
             "one_month_change_percentage_points": _quantize(change),
             "values_strictly_below": below,
             "rank": rank,
+            "level_count": len(history),
+            "rank_basis": "level",
+            "ranked_series": ranked_series,
+            "rank_definition": rank_definition,
         },
         history=history,
         period=end,
@@ -291,6 +352,25 @@ def _missing_endpoint_reason(
     )
 
 
+def _overlapping_cpi_percent_changes(
+    series: dict[date, EconomicObservation],
+    end: date,
+) -> list[Decimal]:
+    changes: list[Decimal] = []
+    for period in sorted(series):
+        if period > end:
+            continue
+        start = _add_months(period, -12)
+        if start not in series:
+            continue
+        start_level = series[start].decimal_value()
+        if start_level == 0:
+            continue
+        raw = ((series[period].decimal_value() / start_level) - Decimal(1)) * Decimal(100)
+        changes.append(raw.quantize(CHANGE_QUANTUM, rounding=ROUND_HALF_UP))
+    return changes
+
+
 def _history_through(
     series: dict[date, EconomicObservation],
     end: date,
@@ -317,6 +397,10 @@ def _assumptions(label: str) -> tuple[str, ...]:
     return (
         "Inputs are stored latest-revised monthly observations.",
         "Each window is computed only when both stored endpoints exist.",
+        CPI_ENDPOINTS_SENTENCE,
+        CPI_RANK_DEFINITION,
+        FUNDS_RANK_DEFINITION,
+        TREASURY_RANK_DEFINITION,
         label,
     )
 
@@ -336,11 +420,10 @@ def _limitations() -> tuple[str, ...]:
             "Federal funds and the 10-year yield are levels in percent per year. "
             "Seasonal adjustment is unknown. One-month changes are in percentage points."
         ),
-        (
-            "Rank 1 is the lowest level in that stored series on or before the evaluation month. "
-            "Rank equals the count of those stored values strictly below the evaluation level, "
-            "plus 1."
-        ),
+        CPI_ENDPOINTS_SENTENCE,
+        CPI_RANK_DEFINITION,
+        FUNDS_RANK_DEFINITION,
+        TREASURY_RANK_DEFINITION,
     )
 
 
@@ -350,14 +433,23 @@ def _narrative(
     treasury: _SeriesReading,
 ) -> str:
     return (
-        f"CPI-U 12-month percent change from {cpi.comparison_period.isoformat()} "
-        f"to {cpi.period.isoformat()} is {cpi.change} percent "
+        f"CPI-U ({CPI_DATASET_ID}) 12-month percent change from "
+        f"{cpi.comparison_period.isoformat()} to {cpi.period.isoformat()} is {cpi.change} percent "
         f"(index {cpi.comparison_level} to {cpi.level}, {CPI_UNIT}, seasonally adjusted). "
+        f"{CPI_ENDPOINTS_SENTENCE} "
+        f"The rank of overlapping 12-month percent changes in CPI-U ({CPI_DATASET_ID}) "
+        f"is {cpi.payload['rank']} of {cpi.payload['change_count']}. "
+        f"The rank of the federal funds rate level ({FED_FUNDS_DATASET_ID}) "
+        f"is {funds.payload['rank']} of {funds.payload['level_count']} stored levels. "
         f"Federal funds were {funds.level} percent per year on {funds.period.isoformat()}, "
         f"a one-month change of {funds.change} percentage points. "
+        f"The rank of the 10-year Treasury yield level ({TREASURY_10Y_DATASET_ID}) "
+        f"is {treasury.payload['rank']} of {treasury.payload['level_count']} stored levels. "
         f"The 10-year yield was {treasury.level} percent per year on "
         f"{treasury.period.isoformat()}, a one-month change of {treasury.change} "
-        "percentage points. The reading is internal."
+        "percentage points. "
+        f"{REVISED_HISTORY_SENTENCE} "
+        "The reading is internal."
     )
 
 

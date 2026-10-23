@@ -1,9 +1,10 @@
-"""Fixture tests for LABOUR_MARKET_CONDITIONS 1.0.0. No database connection."""
+"""Fixture tests for LABOUR_MARKET_CONDITIONS 1.1.0. No database connection."""
 
 from __future__ import annotations
 
 import json
 from datetime import UTC, date, datetime
+from decimal import Decimal
 from pathlib import Path
 
 from aqil_research.contracts.observation import (
@@ -15,7 +16,10 @@ from aqil_research.contracts.observation import (
     SeasonalAdjustment,
     SeriesProvenance,
 )
-from aqil_research.methods.labour_market import LabourMarketConditionsMethod
+from aqil_research.methods.labour_market import (
+    LABOUR_MARKET_METHOD_VERSION,
+    LabourMarketConditionsMethod,
+)
 from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
 
 FIXTURE = Path(__file__).parent / "fixtures" / "labour_market_conditions.json"
@@ -30,6 +34,10 @@ UNEMPLOYMENT = "bls.ln.LNS14000000"
 PAYROLLS = "bls.ce.CES0000000001"
 OPENINGS = "bls.jt.JTS000000000000000JOL"
 _CAUSAL = "No causal mechanism is established."
+_REVISED = (
+    "The historical distribution uses today's revised file and is not what was known "
+    "on each past date."
+)
 
 
 def _observation(row: dict[str, str]) -> EconomicObservation:
@@ -117,6 +125,8 @@ def test_sufficient_fixture_window_uses_endpoints_only() -> None:
     assert unemployment["observation_id"] == "ln-2026-09"
     assert unemployment["rank"] == 5
     assert unemployment["history_count"] == 5
+    assert unemployment["rank_basis"] == "level"
+    assert unemployment["ranked_series"] == f"unemployment rate ({UNEMPLOYMENT})"
     unemployment_change = unemployment["twelve_month_change"]
     assert unemployment_change["window_start"] == "2025-09-01"
     assert unemployment_change["window_end"] == "2026-09-01"
@@ -130,8 +140,17 @@ def test_sufficient_fixture_window_uses_endpoints_only() -> None:
     assert payrolls["level"] == "1155"
     assert payrolls["unit"] == "thousands"
     assert payrolls["observation_id"] == "ce-2026-09"
-    assert payrolls["rank"] == 5
-    assert payrolls["history_count"] == 5
+    payroll_levels = [
+        Decimal(row["raw_value"]) for row in rows if row["dataset_id"] == PAYROLLS
+    ]
+    payroll_level_rank = 1 + sum(1 for value in payroll_levels if value < Decimal("1155"))
+    assert payroll_level_rank == 5
+    assert payrolls["rank"] == 1
+    assert payrolls["history_count"] == 3
+    assert payrolls["rank"] != payroll_level_rank
+    assert payrolls["rank_basis"] == "overlapping_twelve_month_percent_change"
+    assert payrolls["ranked_series"] == f"payrolls ({PAYROLLS})"
+    assert "overlapping 12-month percent changes in payrolls" in payrolls["rank_transformation"]
     payrolls_change = payrolls["twelve_month_change"]
     assert payrolls_change["change_thousands"] == "105"
     assert payrolls_change["percent_change"] == "10.00"
@@ -146,6 +165,8 @@ def test_sufficient_fixture_window_uses_endpoints_only() -> None:
     assert openings["observation_id"] == "jt-2026-08"
     assert openings["rank"] == 3
     assert openings["history_count"] == 4
+    assert openings["rank_basis"] == "level"
+    assert openings["ranked_series"] == f"job openings ({OPENINGS})"
     openings_change = openings["twelve_month_change"]
     assert openings_change["window_start"] == "2025-08-01"
     assert openings_change["window_end"] == "2026-08-01"
@@ -181,7 +202,21 @@ def test_sufficient_fixture_window_uses_endpoints_only() -> None:
     assert result.causal_hypothesis == fragment["causal_hypothesis"]
     assert result.missing_reason == fragment["missing_reason"]
     assert list(result.observation_ids) == fragment["observation_ids"]
-    assert result.calculation == fragment["calculation"]
+    assert LabourMarketConditionsMethod().method_version == LABOUR_MARKET_METHOD_VERSION == "1.1.0"
+    assert calculation["method_version"] == "1.1.0"
+    fragment_payrolls = next(
+        row for row in fragment["calculation"]["series"] if row["dataset_id"] == PAYROLLS
+    )
+    assert fragment_payrolls["rank"] == payroll_level_rank
+    assert payrolls["rank"] != fragment_payrolls["rank"]
+    assert _REVISED in result.narrative
+    assert "endpoints only" in result.narrative.casefold()
+    assert "not treated as observed" in result.narrative.casefold()
+    assert "2025-10" not in result.narrative
+    assert "october 2025 was observed" not in result.narrative.casefold()
+    assert "composite" not in json.dumps(calculation).casefold()
+    assert "spread" not in result.narrative.casefold()
+    assert "real rate" not in result.narrative.casefold()
 
 
 def test_missing_october_2025_unemployment_endpoint_is_insufficient() -> None:
@@ -218,3 +253,87 @@ def test_point_in_time_context_is_insufficient() -> None:
     assert result.missing_reason == (
         "A point-in-time context is insufficient because these series are not a vintage panel."
     )
+
+
+def _annual_rows(
+    dataset_id: str,
+    prefix: str,
+    unit: str,
+    values: tuple[tuple[str, str], ...],
+) -> list[dict[str, str]]:
+    return [
+        {
+            "observation_id": f"{prefix}-{period[:7]}",
+            "dataset_id": dataset_id,
+            "period_start": period,
+            "raw_value": value,
+            "unit": unit,
+        }
+        for period, value in values
+    ]
+
+
+def test_trending_payrolls_level_change_rank_is_not_the_level_rank() -> None:
+    payroll_values = (
+        ("2022-09-01", "100"),
+        ("2023-09-01", "200"),
+        ("2024-09-01", "300"),
+        ("2025-09-01", "400"),
+        ("2026-09-01", "500"),
+    )
+    rows = [
+        *_annual_rows(PAYROLLS, "ce", "thousands", payroll_values),
+        *_annual_rows(UNEMPLOYMENT, "ln", "percent", (("2025-09-01", "4.0"), ("2026-09-01", "4.1"))),
+        *_annual_rows(OPENINGS, "jt", "thousands", (("2025-09-01", "500"), ("2026-09-01", "550"))),
+    ]
+    assert all(row["period_start"] != "2025-10-01" for row in rows)
+    assert all(row["raw_value"] != "0" for row in rows)
+
+    result = _run(rows, AnalysisMode.LATEST_REVISED)
+    assert result.sufficiency == "sufficient"
+    assert result.calculation is not None
+    payrolls = _by_dataset(result.calculation)[PAYROLLS]
+    levels = [Decimal(value) for _, value in payroll_values]
+    level_rank = 1 + sum(1 for level in levels if level < levels[-1])
+    assert level_rank == 5
+    assert payrolls["rank"] == 1
+    assert payrolls["history_count"] == 4
+    assert payrolls["rank"] != level_rank
+    assert payrolls["rank_basis"] == "overlapping_twelve_month_percent_change"
+    assert payrolls["twelve_month_change"]["percent_change"] == "25.00"
+    assert payrolls["twelve_month_change"]["endpoints_only"] is True
+    assert PAYROLLS in str(payrolls["ranked_series"])
+    assert _REVISED in result.narrative
+    assert "overlapping 12-month percent changes in payrolls" in result.narrative
+    assert "unemployment rate" in result.narrative
+    assert "job openings" in result.narrative
+    assert "not treated as observed" in result.narrative
+    assert "2025-10" not in result.narrative
+    assert "spread" not in result.narrative.casefold()
+    assert "real rate" not in result.narrative.casefold()
+    assert "composite" not in json.dumps(result.calculation).casefold()
+
+
+def test_missing_payrolls_endpoint_returns_insufficient() -> None:
+    rows = [
+        *_annual_rows(UNEMPLOYMENT, "ln", "percent", (("2025-09-01", "4.0"), ("2026-09-01", "4.1"))),
+        *_annual_rows(PAYROLLS, "ce", "thousands", (("2026-09-01", "1100"),)),
+        *_annual_rows(OPENINGS, "jt", "thousands", (("2025-09-01", "500"), ("2026-09-01", "550"))),
+    ]
+    assert "2025-09-01" not in {
+        row["period_start"] for row in rows if row["dataset_id"] == PAYROLLS
+    }
+    assert "2025-10-01" not in {row["period_start"] for row in rows}
+
+    result = _run(rows, AnalysisMode.LATEST_REVISED)
+    assert result.sufficiency == "insufficient"
+    assert result.calculation is None
+    assert result.observation_ids == ()
+    assert result.investment_implication == "insufficient_evidence"
+    assert result.causal_hypothesis == _CAUSAL
+    assert result.missing_reason == (
+        "missing endpoint 2025-09-01 for bls.ce.CES0000000001 "
+        "12-month change from 2025-09-01 to 2026-09-01"
+    )
+    assert "interpolat" not in (result.missing_reason or "")
+    assert "2025-10-01 was observed" not in (result.narrative or "").casefold()
