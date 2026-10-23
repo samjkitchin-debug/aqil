@@ -207,6 +207,22 @@ def test_missing_october_2025_unemployment_endpoint_is_insufficient() -> None:
     )
 
 
+def test_second_call_is_deterministic() -> None:
+    payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    method = LabourMarketConditionsMethod()
+    config = method.parse_config(
+        {
+            "config_id": "labour_market_conditions_fixture",
+            "label": "Fixture labour market window",
+        },
+    )
+    for key in ("sufficient_window", "missing_october_2025_unemployment"):
+        context = _context(payload[key], AnalysisMode.LATEST_REVISED)
+        first = method.run(context, config)
+        second = method.run(context, config)
+        assert second == first
+
+
 def test_point_in_time_context_is_insufficient() -> None:
     payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
     result = _run(payload["sufficient_window"], AnalysisMode.POINT_IN_TIME)
