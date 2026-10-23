@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/etf_share_class.v1.json",
+  "title": "ETF share class v1",
+  "description": "Legal share class plus listings. Base currency, trading currency, hedge status, and distribution policy are separate. TER, AUM, holdings, spreads, and NAV are not required and must not be invented.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "isin",
+    "base_currency",
+    "distribution_policy",
+    "hedge_status",
+    "inception_date",
+    "evidence_status",
+    "benchmark_id",
+    "listings"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "isin": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}[A-Z0-9]{9}[0-9]$"
+    },
+    "base_currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "Sub-fund base currency. Not the listing trading currency."
+    },
+    "distribution_policy": {
+      "enum": ["accumulating", "distributing", "unknown"]
+    },
+    "hedge_status": {
+      "enum": ["hedged", "unhedged", "unknown"]
+    },
+    "inception_date": {
+      "type": ["string", "null"],
+      "format": "date",
+      "description": "Share-class inception. Null means unknown. Fund returns cannot be stored until it is known."
+    },
+    "evidence_status": {
+      "enum": ["unverified", "cited", "unavailable", "insufficient"]
+    },
+    "benchmark_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Cited benchmark id. Null means not cited. Benchmark returns are a different series."
+    },
+    "listings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["mic", "trading_currency", "ticker"],
+        "properties": {
+          "mic": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{4}$"
+          },
+          "trading_currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "ticker": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

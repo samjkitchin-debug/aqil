@@ -1,6 +1,26 @@
 # Cursor session handover
 
 **Status:** living continuity note  
+**Last updated:** 23 October 2026, ETF intelligence tip merged into the macro baseline  
+**Parent:** `0cf8d32` on `work/aqil-autonomous-build`, merged with `4929d96` on `work/aqil-etf-intelligence`  
+**Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## ETF intelligence merged into the macro baseline, 23 October 2026
+
+Risk class R2. `work/aqil-etf-intelligence` at `4929d9662e52c48e26416916d758e9422af412fb` was merged into `work/aqil-autonomous-build` at `0cf8d3213abfef620d544218825eb1f9ac0d7310`. Merge-base `edea3a0c495c113ffb9052228805b555bf5c48a7`. Nothing was pushed. The preserved database `postgres` on port 55432 was not written and was not reset. Hosted Supabase was not migrated. `supabase db push` was not run. Migration `20261024120000_etf_instruments.sql` was not applied to `postgres`. Fixture VWRA rows were not copied into `instruments`. Macro code was not pointed at `instruments`. ETF code was not pointed at `research.economic_observations`.
+
+Conflicts were only `apps/web/package.json` and this handover. `docs/07_BUILD_BACKLOG.csv` merged without a conflict marker. `.github/workflows/ci.yml` came from the ETF tip and adds `npm run test:etf` on the web job. `.cursor/permissions.json` came from the ETF tip and was kept.
+
+`apps/web/package.json` keeps the macro `test:sourced-updates` entry for `present-prospective-assessment.test.ts` and the ETF `test:etf` script.
+
+Three commits stay outside this merge. `git merge-base --is-ancestor` exited 1 for each against both tips, so none had become an ancestor. They were not cherry-picked:
+
+- `work/read-credit` `e3e9906da73332cdbb0455fd33d429fd6d27da98`. Credit module rename. It is not in the macro tip delta.
+- `work/read-labour` `591f7ac9e8a65112b17a0aae8f1c5824f0d24bfb`. It touches labour tests the macro tip also edits.
+- `work/fwd-evidence` `df8b8aadc3474ce7d27845d54203191fc3a101b8`. It touches prospective-assessment TypeScript files the macro tip continued.
+
+The research CI job is not verified. Checks run for this merge are listed in the follow-up note once they have actually run.
+
 **Last updated:** 23 October 2026, internal macro synthesis on Evidence  
 **Parent:** `77b51d4` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
@@ -46,6 +66,24 @@ Risk class R2. The live decision is `not_qualified`. No 6- or 12-month hypothesi
 The migration, `registry.py`, the three reading methods, and `apps/web` were not edited. The preserved database was not opened. `npm run test:db` was not run. Full research pytest was not run. Web checks were not run.
 
 `PYTHONPATH` was `workers/research/src`. `python -m pytest tests/test_prospective_lifecycle.py -q` was 12 passed. `ruff check` passed on the lifecycle module and its tests.
+
+## ETF integration, 23 October 2026
+
+The six domain branches were merged locally into `work/aqil-etf-intelligence`. Nothing was pushed. The preserved database `postgres` was not written and was not reset. `npm run test:db` was not run, because that script drops `aqil_pgtap_test` and recreates it from the `postgres` schema, which does not contain `instruments`.
+
+`aqil_etf.instruments` still has zero rows. A share class was not inserted. `instruments.sub_funds` requires a legal name and a three-letter base currency, and neither has a permitted citation. The in-memory catalogue has 39 unverified exposure slots. The only stored ISIN is `IE00BK5BQT80`, with ticker `VWRA`, and that pair is an internal anchor, not a permitted issuer citation. Costs, holdings, fund returns, and benchmark returns stay unavailable. Holdings are not fetched when the rights gate is prohibited or unknown. The anchor quality assessment is UNKNOWN across identity, structure, cost, benchmark, holdings, scale, and performance. There is no rank. Investor fit is UNKNOWN and is not personal advice.
+
+Signed-in `/explore` now reads only local database `aqil_etf`. With no stored share class it shows that empty state. ETF research is not broker holdings and not personal advice. Today, Evidence, and My Wealth were not redesigned. A signed-in browser check was not run: this worktree has no web env file. Typecheck passed. Lint passed with the existing unused `_searchParams` warning. Token check passed. `npm run test:etf` passed 2. Direct pgTAP of `etf_instruments.test.sql` on `aqil_pgtap_test` passed 16. Research pytest of the etf package passed 60. Ruff check and format check passed. GitHub Actions has not run. This is not Verified.
+
+## ETF Phase A, 23 October 2026
+
+Branch `work/aqil-etf-intelligence` was created from committed HEAD `edea3a0` on `work/aqil-autonomous-build`. The worktree is `C:\Users\gamer\aqil-etf-intelligence`. Untracked files on the integration tree were not copied. Sibling macro and reading worktrees were not edited. `/explore` was not mounted. The six domain agents were not started.
+
+The preserved database `postgres` on port 55432 was not reset and was not migrated. Its live observation count stayed 8704 before and after. A new local database `aqil_etf` received `supabase/migrations/20261024120000_etf_instruments.sql` only. Schema `instruments` is not on `postgres`. The same migration was applied to disposable database `aqil_pgtap_test`, and the `pgtap` extension was created there because it was available but not installed. The isolation marker remained `disposable-pgtap-test`. `npm run test:db` was not run, because that path recreates the disposable database from `postgres` and this migration is not on `postgres`.
+
+`supabase/tests/database/etf_instruments.test.sql` passed 16 tests on `aqil_pgtap_test`. `workers/research/tests/test_etf_share_class_contract.py` passed 4. Ruff check and format check passed on the ETF package and that test. GitHub Actions has not run. This is not Verified.
+
+Nine rights fragments were added under `docs/sources/etf/fragments/`. None has `automated_access=permitted`. `vanguard_uk_vwra_holdings` and `ishares_ucits_holdings` stay on their existing prohibited rows in `SOURCE_RIGHTS.csv`, which was not edited. TER, AUM, holdings, spreads, NAV, fund returns, and benchmark returns stay unavailable. No collector was built.
 
 ## Four internal readings, 23 October 2026
 

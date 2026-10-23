@@ -37,6 +37,7 @@ jobs:
       - run: npm run test:learn
       - run: npm run test:story
       - run: npm run test:sourced-updates
+      - run: npm run test:etf
       - run: npm run lint
       - run: npm run build
         env:
