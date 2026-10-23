@@ -16,6 +16,9 @@ import { loadSourcedUpdates } from "@/lib/research/load-sourced-updates";
 
 async function ResearchEvidence() {
   const sourced = await loadSourcedUpdates();
+  if (sourced.status === "unavailable") {
+    return <p className="research-body">{sourced.reason}</p>;
+  }
   const updates = sourced.status === "ok" ? sourced.updates : [];
   const loaded = await loadFounderResearchInsight();
   const credit = await loadSloosReading();

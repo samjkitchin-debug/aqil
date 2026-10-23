@@ -1,21 +1,25 @@
 # AQIL — Execution Roadmap and Stage Gates
 
-**Last reconciled:** 24 October 2026 · **Git baseline:** local `main`. See `docs/CURSOR_SESSION_HANDOVER.md`.
+**Last reconciled:** 24 October 2026 · **Git baseline:** local `main` `5bb2ca8`, `origin/main` `c9ea596`, ahead 135. Not pushed. See `docs/CURSOR_SESSION_HANDOVER.md`.
 
-## Operating baseline (18 October 2026)
+## Operating baseline (24 October 2026)
 
-This section supersedes older sentences below that say authentication, hosted Supabase or broker access has not started.
+This section supersedes older sentences below that say authentication, hosted Supabase or broker access has not started. It also supersedes any sentence that treats a local test on this tip as a GitHub Actions result.
 
-- Live app: `https://aqil-tau.vercel.app`. Google sign-in is the production access path.
+- Live app: `https://aqil-tau.vercel.app`. Google sign-in is the production access path. The running deployment is still `origin/main` at `c9ea596`.
 - Ordinary access is any verified Google account. The allow-list and `access_grants` gate are removed. See ADR 020.
-- Hosted project `ojvswermsbbaltjohqph` still has exactly five migrations, through `20261017180000`, rechecked read-only on 24 October 2026. Nine later local files are not applied, from `20261018200000` through `20261024120000`. Do not apply them until the founder approves that batch. A versioned investment playbook library, distinguishing structural principles from conditional approaches and from unproven tactical predictions, is later product work and is not part of this release.
+- Hosted project `ojvswermsbbaltjohqph` was last read on 24 October 2026 with exactly five migrations, through `20261017180000_forward_intelligence.sql`. This session did not query or migrate the host. Nine later local files are not applied, from `20261018200000_verified_prospective_assessment.sql` through `20261024120000_etf_instruments.sql`.
+- Hosted U0 remains **no-go** until the founder approves the batch. The local bar is now an upgrade rehearsal, not another restatement of that status and not a fresh replay of all 14 files on an empty database. Disposable database `aqil_u0_upgrade` was created from the five-file state, given representative rows and an authentication stub, upgraded with the nine files, checked, and dropped. Preserved databases `postgres` and `aqil_etf` were not written. Detail is in the handover.
+- In this uncommitted working tree, production web loaders do not fall back to `127.0.0.1`. A missing research or ETF database URL fails closed. Outside production, the local default remains. The running Vercel app is still `c9ea596` and still has the old fallback until this change is committed and pushed. The first private mode after a hosted upgrade is one manual `npm run research:refresh`, with freshness visible. No schedule exists. Automatic updates must not be claimed.
+- Before any hosted apply: take a backup. A code rollback will not undo the nine migrations. Then founder approval, apply, grant checks, the server-only research URL, one manual refresh, and only then one push to `main` so the existing GitHub to Vercel integration deploys. GitHub Actions has not run on `5bb2ca8`. No Vercel CLI deploy. Production Saxo stays off.
+- Reading model, not yet built as a dashboard: Today is the briefing and a compact pulse; Intelligence is the indicator dashboard; Evidence is the detailed record. Upcoming, Evidence, and Exposures stay section links. No fourth primary destination.
 - Local Saxo reads are real and read-only. Production does not offer Connect Saxo until encrypted, owner-scoped token storage exists. See ADR 021–024.
 - Workflow: localhost → local tests → reviewed commit → one push to `main` → the existing GitHub to Vercel integration. No Vercel CLI deploy, no second Vercel project, no preview build created for its own sake.
-- Next product order: Census advance durable-goods orders stay blocked until a founder sets `CENSUS_API_KEY` for `timeseries/eits/advm3`. One API response is not a vintage panel. SLOOS C&I standards have 146 live observations and one unpublished reading on Intelligence Evidence, including the stored move from 8.1 percent to 0.0 percent. ECB monetary-policy press, accounts and Governing Council decisions are stored beside Employment Situation, CPI and Federal Reserve press. A BEA growth release still needs a machine-readable feed. Exposures still needs a rights-cleared holdings file. Vanguard and iShares automated collection stay prohibited. Recurring releases should later be shown as compact trends; that presentation is not built. `npm run research:refresh` remains a manual local poll. `npm run test:db` writes only to database `aqil_pgtap_test`. Research tests write only to `aqil_research_test`. M5's fixture horizon UI stays unmerged.
+- Next product order: Census advance durable-goods orders stay blocked until a founder sets `CENSUS_API_KEY` for `timeseries/eits/advm3`. One API response is not a vintage panel. SLOOS C&I standards have 146 live observations and one unpublished reading on Intelligence Evidence, including the stored move from 8.1 percent to 0.0 percent. ECB monetary-policy press, accounts and Governing Council decisions are stored beside Employment Situation, CPI and Federal Reserve press. A BEA growth release still needs a machine-readable feed. Exposures still needs a rights-cleared holdings file. Vanguard and iShares automated collection stay prohibited. Recurring releases belong on the Intelligence dashboard specified above; that dashboard is not built. `npm run research:refresh` remains a manual local poll. `npm run test:db` writes only to database `aqil_pgtap_test`. Research tests write only to `aqil_research_test`. M5's fixture horizon UI stays unmerged.
 
 ## Progress register
 
-- **Authoritative item list:** `docs/07_BUILD_BACKLOG.csv` (columns include `verification_evidence`, `blockers`, `next_action`).
+- **Authoritative item list:** `docs/07_BUILD_BACKLOG.csv` (columns include `product_milestone`, `verification_evidence`, `blockers`, `next_action`). `product_milestone` is U0, U1, U2, later, or none.
 - **Statuses:** Not started · In progress · Blocked · Partial · Implemented — unverified · Verified · Deferred.
 - **Maturity, in evidence rather than a second register:** operational end-to-end, implemented and locally verified, implemented but unverified, partial, blocked, not implemented. Local tests are not hosted or signed-in verification.
 - **Session continuity:** `docs/CURSOR_SESSION_HANDOVER.md`.
@@ -25,20 +29,32 @@ This section supersedes older sentences below that say authentication, hosted Su
 
 | Area | Status | Evidence / notes |
 |------|--------|------------------|
-| Next.js scaffold, tokens, shell, nav | **Verified** | CI web job: typecheck, lint, `check:tokens`, build, Playwright e2e |
+| Next.js scaffold, tokens, shell, nav | **Implemented — unverified** on this tip | Older CI web job is not `5bb2ca8`. This session ran web typecheck only |
 | Python research worker scaffold | **Implemented — unverified** | GitHub Actions has not run the research CI job, so ruff and pytest on this tip are not verified. |
-| Supabase migration + RLS/pgTAP | **Verified** | `20261017103000_create_user_settings.sql`; CI `supabase db reset` + `supabase test db`; types diff |
-| Local Docker database workflow | **Verified** | `scripts/run-db-tests.ps1`, `npm run test:db` (documented; re-run after env changes) |
-| GitHub CI (web / database / research) | **Verified** on `main` | Development adds Saxo, Wealth, Capital, Benchmark, Learn, Story and sourced-update commands to the web job. That CI run has not happened |
+| Supabase migration + RLS/pgTAP | **Implemented — unverified** on this tip | Older CI evidence is not `5bb2ca8`. The 24 October upgrade rehearsal is local and is not a GitHub Actions run |
+| Local Docker database workflow | **Implemented — unverified** on this tip | `scripts/run-db-tests.ps1` exists. This session did not run `npm run test:db` |
+| GitHub CI (web / database / research) | **Implemented — unverified** on this tip | GitHub Actions has not run on local `main` `5bb2ca8`. Older green runs are not this commit. Local tests are not that CI run |
 | Versioned JSON schemas (files) | **Implemented — unverified** | `docs/schemas/` mirrored in `packages/contracts/`; **no CI schema validator yet** |
 | Claim verifier fail-closed | **Implemented — unverified** | `workers/research/.../claim_verifier.py` + pytest; registry not built |
 | Auth doctrine | **Superseded by the operating baseline** | Google sign-in is live. See ADR 020 and `AUTH_AND_SESSION_DOCTRINE.md` |
 | Information security standard | **Implemented — unverified** | `INFORMATION_SECURITY_STANDARD.md` + CI hardening **in working tree; not on `main` until merged** |
-| Static synthetic research story (PR1) | **Implemented — unverified** | `/research` shows one labelled synthetic story. It is not live intelligence |
+| Static synthetic research story (PR1) | **Implemented — unverified** | The labelled synthetic story is mounted only at `/dev/story`. It is not Today, Evidence, or live intelligence |
 | Hosted Supabase | **Superseded by the operating baseline** | Five foundation migrations are on `ojvswermsbbaltjohqph`. Later migrations are not applied |
 | G0 hard evidence (roadmap table) | **Not started** | Rights matrix, UCITS sample, macro source+revision, first hosted verify — see AQ-008–AQ-012 |
 
-**G0 gate remains open.** PR1 repository foundation is largely **verified**; **G0 exit criteria** (data feasibility + hosted migration verification) are **not** satisfied.
+**G0 gate remains open.** PR1 repository foundation is largely in place on older commits; **G0 exit criteria** (data feasibility + hosted migration verification) are **not** satisfied. GitHub Actions on this tip has not run.
+
+## Operational milestones U0, U1 and U2
+
+These sit beside G0–G8. They are cumulative. U1 includes U0. U2 includes U1. They do not replace Forward Intelligence, and they do not authorise orders or a required return-forecast model.
+
+| Milestone | Product meaning | Not included |
+|---|---|---|
+| U0 | Signed-in macro product: real series, publications, catalysts, visible freshness, and honest empty ETF and wealth states | The Intelligence dashboard, a refresh schedule, hosted apply, Saxo in production |
+| U1 | Cited funds, portfolio mapping, a saved policy in `public.wealth_allocation_targets`, and an implementation-ready playbook library | Issuer scraping, a second policy file as a permanent store, predictive models |
+| U2 | A read-only, policy-based deployment assessment | Orders, and any requirement for a return-forecast model |
+
+U0 is the engineering priority and is still no-go for the hosted project. The safe local work for the approval package is the upgrade rehearsal and the production fail-closed database URL. Neither has been applied to the host.
 
 ## M1 — Next active milestone (macro intelligence engine slice)
 
@@ -78,7 +94,7 @@ This section supersedes older sentences below that say authentication, hosted Su
 | G8: Subscription-readiness | Honor founder free cohort and paid entitlement | tested cutoff terms, anti-abuse, billing/security/legal, provider rights, cost viability | trade execution |
 
 ## First three pull requests
-**PR1: Repository and truth primitives.** Next.js app skeleton and tokens, Supabase migration/RLS tests (**pgTAP green in CI before remote apply**), Python worker scaffold, versioned contracts, static synthetic research story, CI, no LLM. **Pass:** clean setup, CI and mobile story comprehension prototype.
+**PR1: Repository and truth primitives.** Next.js app skeleton and tokens, Supabase migration/RLS tests (**pgTAP green in CI before remote apply**), Python worker scaffold, versioned contracts, static synthetic research story mounted only at `/dev/story`, CI, no LLM. **Pass:** clean setup, CI and mobile story comprehension prototype. GitHub Actions has not run that pass on `5bb2ca8`.
 
 **PR2: Data feasibility proof.** Verify 2–3 chosen UCITS share-class identities and history, documented FX and company/official fund pages, one official historical policy release with amendment, rights matrix. **Pass:** sample real source/quote records are accurately ingested and linked; unknown data blocks.
 

@@ -3,6 +3,7 @@ import "server-only";
 import type { Client } from "pg";
 import { connection } from "next/server";
 
+import { resolveEtfDatabaseUrl } from "@/lib/data/private-database-url";
 import {
   HOLDINGS_BLOCKED_REASON,
   type EtfAssessmentView,
@@ -12,9 +13,6 @@ import {
   type EtfListingView,
   type EtfShareExplore,
 } from "@/lib/etf/present-explore";
-
-const DEFAULT_ETF_DATABASE_URL =
-  "postgresql://research_worker:research_worker@127.0.0.1:55432/aqil_etf";
 
 export type LoadEtfExploreResult =
   | { status: "ready"; shares: EtfShareExplore[] }
@@ -31,33 +29,21 @@ type ShareRow = {
   recorded_at: string;
 };
 
-function etfDatabaseUrl(): string | null {
-  const configured = process.env.ETF_DATABASE_URL?.trim() || DEFAULT_ETF_DATABASE_URL;
-  try {
-    const parsed = new URL(configured);
-    const host = parsed.hostname;
-    if (host !== "127.0.0.1" && host !== "localhost") return null;
-    if (parsed.port !== "55432") return null;
-    if (parsed.pathname !== "/aqil_etf") return null;
-    return configured;
-  } catch {
-    return null;
-  }
+function etfDatabaseUrl() {
+  return resolveEtfDatabaseUrl({
+    nodeEnv: process.env.NODE_ENV,
+    configuredUrl: process.env.ETF_DATABASE_URL,
+  });
 }
 
 export async function loadEtfExplore(): Promise<LoadEtfExploreResult> {
   await connection();
   const databaseUrl = etfDatabaseUrl();
-  if (!databaseUrl) {
-    return {
-      status: "unavailable",
-      reason: "ETF research reads only the local aqil_etf database.",
-    };
-  }
+  if (databaseUrl.status === "unavailable") return databaseUrl;
 
   try {
     const { Client } = await import("pg");
-    const client = new Client({ connectionString: databaseUrl });
+    const client = new Client({ connectionString: databaseUrl.url });
     await client.connect();
     try {
       const shares = await client.query<ShareRow>(
@@ -84,7 +70,7 @@ export async function loadEtfExplore(): Promise<LoadEtfExploreResult> {
   } catch {
     return {
       status: "unavailable",
-      reason: "The local ETF database could not be read.",
+      reason: "The ETF database could not be read.",
     };
   }
 }

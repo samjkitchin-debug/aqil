@@ -1,3 +1,9 @@
+/**
+ * Development-only store. The gitignored file
+ * apps/web/.local/investment-policy/{userId}.json is not the authoritative
+ * policy store. ADR 025 names public.wealth_allocation_targets for that.
+ * Saves stay on this file.
+ */
 import "server-only";
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";

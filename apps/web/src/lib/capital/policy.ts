@@ -4,6 +4,14 @@ import type { ApprovedInstrument } from "./deploy.ts";
 
 export const POLICY_VERSION = 1 as const;
 
+/**
+ * User-facing label for the gitignored development-only policy file.
+ * ADR 025 names public.wealth_allocation_targets as the intended authoritative
+ * store. This sentence does not switch saves onto that table.
+ */
+export const DEVELOPMENT_POLICY_STORE_COPY =
+  "This investment policy is kept in a development-only store: a gitignored file on this machine for your sign-in. Percentages must add up to 100. Leave the budget blank if you have not set one.";
+
 export type StoredInstrument = {
   id: string;
   name: string;

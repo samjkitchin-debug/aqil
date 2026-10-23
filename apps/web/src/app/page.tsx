@@ -2,18 +2,20 @@ import { Suspense } from "react";
 
 import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
+import { MacroConditionsSection } from "@/components/research/macro-conditions-panel";
 import { ResearchInsightView } from "@/components/research/research-insight-view";
 import { SourcedUpdatesPanel } from "@/components/research/sourced-updates-panel";
 import { loadFounderResearchInsight } from "@/lib/research/load-founder-insight";
-import { SeriesBriefing } from "@/components/research/series-briefing";
-import { loadSeriesBriefing } from "@/lib/research/load-series-briefing";
 import { loadSourcedUpdates } from "@/lib/research/load-sourced-updates";
 import { loadVerifiedCatalysts } from "@/lib/research/load-verified-catalysts";
 import { upcomingCatalysts } from "@/lib/research/present-verified-catalysts";
 
 async function NextConfirmedRelease() {
-  const events = await loadVerifiedCatalysts();
-  const next = upcomingCatalysts(events).listed[0];
+  const loaded = await loadVerifiedCatalysts();
+  if (loaded.status === "unavailable") {
+    return <p className="research-body">{loaded.reason}</p>;
+  }
+  const next = upcomingCatalysts(loaded.events).listed[0];
   if (!next) return null;
   return (
     <section aria-labelledby="next-release-heading" className="mt-[var(--space-6)]">
@@ -29,14 +31,11 @@ async function NextConfirmedRelease() {
   );
 }
 
-async function SeriesBlock() {
-  const loaded = await loadSeriesBriefing();
-  if (loaded.status !== "ok") return null;
-  return <SeriesBriefing series={loaded.series} />;
-}
-
 async function TodayBriefing() {
   const sourced = await loadSourcedUpdates();
+  if (sourced.status === "unavailable") {
+    return <p className="research-body">{sourced.reason}</p>;
+  }
   const updates = sourced.status === "ok" ? sourced.updates : [];
 
   return <SourcedUpdatesPanel updates={updates} variant="briefing" />;
@@ -75,9 +74,14 @@ export default function TodayPage() {
               <TodayBriefing />
             </Suspense>
           </section>
-          <Suspense fallback={null}>
-            <SeriesBlock />
-          </Suspense>
+          <section aria-labelledby="macro-pulse-heading">
+            <h2 id="macro-pulse-heading" className="research-section-title">
+              Macro pulse
+            </h2>
+            <Suspense fallback={<p className="research-body">Loading macro pulse…</p>}>
+              <MacroConditionsSection variant="compact" />
+            </Suspense>
+          </section>
           <Suspense fallback={null}>
             <NextConfirmedRelease />
           </Suspense>

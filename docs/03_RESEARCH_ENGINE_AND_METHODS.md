@@ -68,6 +68,10 @@ A future method card may compare a current episode with past macroeconomic, geop
 
 The method must show outcome distributions, contradictory precedents and patterns that failed. Inputs are point-in-time, so later revisions and later prices cannot leak into the comparison. Evaluation uses matched benchmarks, out-of-sample tests and explicit controls for overfitting. A historical correlation, a proposed causal explanation and a demonstrated predictive result stay separate objects. None of them is implied by the others.
 
+### Historical asset returns (later; P2)
+
+A later requirement, outside M1 and outside U0, is a rights-cleared total-return history for benchmark and allocation work. No series is acquired for it in this documentation pass. Monthly, weekly, and quarterly histories keep their own frequency. A missing period stays missing. A historical return is not a forecast, not a causal claim, and not evidence that a method outperforms. See AQ-082.
+
 ### Modular research pipeline (M1)
 The macro worker exposes small protocols, not a plugin platform:
 

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { deployCapital, type ApprovedInstrument, type DeployCapitalInput } from "./deploy.ts";
+import { CITED_SHARE_CLASS_COUNT, MADE_UP_EXAMPLE_COPY, fundComparisonCopy } from "./example.ts";
 
 const equity: ApprovedInstrument = {
   id: "example-world",
@@ -180,6 +181,14 @@ test("a balanced book keeps a one-unit top-up as unallocated cash", () => {
   assert.equal(result.exposures.every((row) => row.deploymentMinor === 0n), true);
   assert.equal(result.instruments.length, 0);
   assert.equal(result.unallocatedMinor, 1n);
+});
+
+test("zero cited share classes are not a fund recommendation", () => {
+  assert.equal(CITED_SHARE_CLASS_COUNT, 0);
+  assert.equal(fundComparisonCopy(0), "No fund comparison is available. No cited share class is stored.");
+  assert.doesNotMatch(fundComparisonCopy(0), /VWRA/);
+  assert.match(MADE_UP_EXAMPLE_COPY, /made up/);
+  assert.doesNotMatch(fundComparisonCopy(1), /VWRA/);
 });
 
 test("converted unit totals stay inside the budget", () => {

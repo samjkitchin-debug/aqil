@@ -1,56 +1,39 @@
 import type { ChartPoint } from "@/lib/research/types";
 
+import { SeriesSparkline, type SparklineMark } from "@/components/research/series-sparkline";
+
 type Props = {
   points: ChartPoint[];
   label: string;
 };
 
-export function UnemploymentSparkline({ points, label }: Props) {
-  if (points.length < 2) {
-    return (
-      <p className="research-body" data-testid="research-chart-empty">
-        Chart unavailable — insufficient observation points.
-      </p>
-    );
-  }
+const WIDTH = 320;
+const HEIGHT = 120;
+const PADDING = 8;
 
-  const values = points.map((p) => p.value);
+function sequenceMarks(points: ChartPoint[]): SparklineMark[] {
+  if (points.length < 2) return [];
+  const values = points.map((point) => point.value);
   const min = Math.min(...values);
   const max = Math.max(...values);
   const span = max - min || 1;
-  const width = 320;
-  const height = 120;
-  const padding = 8;
-
-  const coords = points.map((p, i) => {
-    const x =
-      padding + (i / (points.length - 1)) * (width - padding * 2);
-    const y =
-      height -
-      padding -
-      ((p.value - min) / span) * (height - padding * 2);
+  const coords = points.map((point, index) => {
+    const x = PADDING + (index / (points.length - 1)) * (WIDTH - PADDING * 2);
+    const y = HEIGHT - PADDING - ((point.value - min) / span) * (HEIGHT - PADDING * 2);
     return `${x},${y}`;
   });
+  return [{ kind: "line", points: coords.join(" ") }];
+}
 
+export function UnemploymentSparkline({ points, label }: Props) {
   return (
-    <figure>
-      <svg
-        className="research-chart"
-        viewBox={`0 0 ${width} ${height}`}
-        role="img"
-        aria-label={label}
-        data-testid="research-unemployment-chart"
-      >
-        <polyline
-          fill="none"
-          stroke="var(--colour-brand-navy)"
-          strokeWidth="2"
-          points={coords.join(" ")}
-        />
-      </svg>
-      <figcaption className="research-chart-caption">
-        {label} (latest {points.length} months, percent)
-      </figcaption>
-    </figure>
+    <SeriesSparkline
+      marks={sequenceMarks(points)}
+      label={label}
+      caption={`${label} (latest ${points.length} months, percent)`}
+      width={WIDTH}
+      height={HEIGHT}
+      testId="research-unemployment-chart"
+    />
   );
 }

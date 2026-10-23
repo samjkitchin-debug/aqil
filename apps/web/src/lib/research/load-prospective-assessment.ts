@@ -2,13 +2,11 @@ import "server-only";
 
 import { connection } from "next/server";
 
+import { resolveResearchDatabaseUrl } from "@/lib/data/private-database-url";
 import {
   presentProspectiveAssessment,
   type ProspectiveAssessmentRecord,
 } from "@/lib/research/present-prospective-assessment";
-
-const DEFAULT_RESEARCH_DATABASE_URL =
-  "postgresql://research_worker:research_worker@127.0.0.1:55432/postgres";
 
 type AssessmentRow = {
   assessment_id: string;
@@ -21,10 +19,14 @@ type AssessmentRow = {
 
 export type LoadProspectiveAssessmentResult =
   | { status: "ready"; assessment: ProspectiveAssessmentRecord }
-  | { status: "empty" };
+  | { status: "empty" }
+  | { status: "unavailable"; reason: string };
 
-function researchDatabaseUrl(): string {
-  return process.env.RESEARCH_DATABASE_URL?.trim() || DEFAULT_RESEARCH_DATABASE_URL;
+function researchDatabaseUrl() {
+  return resolveResearchDatabaseUrl({
+    nodeEnv: process.env.NODE_ENV,
+    configuredUrl: process.env.RESEARCH_DATABASE_URL,
+  });
 }
 
 function toRecord(row: AssessmentRow): ProspectiveAssessmentRecord | null {
@@ -44,9 +46,11 @@ function toRecord(row: AssessmentRow): ProspectiveAssessmentRecord | null {
 
 export async function loadProspectiveAssessment(): Promise<LoadProspectiveAssessmentResult> {
   await connection();
+  const database = researchDatabaseUrl();
+  if (database.status === "unavailable") return database;
   try {
     const { Client } = await import("pg");
-    const client = new Client({ connectionString: researchDatabaseUrl() });
+    const client = new Client({ connectionString: database.url });
     await client.connect();
     try {
       const result = await client.query<AssessmentRow>(

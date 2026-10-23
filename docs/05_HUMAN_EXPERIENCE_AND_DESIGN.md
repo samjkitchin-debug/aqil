@@ -13,10 +13,16 @@ Design for four broad, overlapping *use situations*, not patronising skill label
 Validate these with real user interviews. Interview at least novice, experienced investor and low-accessibility/low-confidence readers; recruit across a range of incomes and age groups without stereotyping. Test tasks and teach-back, not opinions about an attractive mockup.
 
 ## 2. Navigation
-Implemented primary destinations are **Today**, **My Wealth** and **Intelligence**. Desktop places them in the sticky header. Narrow screens place the same three in one bottom bar. Intelligence keeps Upcoming (`/calendar`), Evidence (`/research`) and Exposures (`/explore`) as in-page links so a catalyst and its sources stay in one section. Learn remains available from the footer. Sign out sits in the header and is not grouped with education. An earlier six-item hypothesis (Today, Explore, Learn, My Wealth, Research, plus a separate calendar) is retired for the chrome: those jobs still exist, and their routes remain. Public legal pages require no login. Private portfolio and research pages do.
+Implemented primary destinations are **Today**, **My Wealth** and **Intelligence**. Desktop places them in the sticky header. Narrow screens place the same three in one bottom bar. There is no fourth primary destination. Intelligence keeps Upcoming (`/calendar`), Evidence (`/research`) and Exposures (`/explore`) as in-page links. The economic dashboard belongs in Intelligence. Today does not carry a second full dashboard. Learn remains available from the footer. Sign out sits in the header and is not grouped with education. An earlier six-item hypothesis (Today, Explore, Learn, My Wealth, Research, plus a separate calendar) is retired for the chrome: those jobs still exist, and their routes remain. Public legal pages require no login. Private portfolio and research pages do.
 
 ## 3. One knowledge object, three legitimate reading depths
-The UI is a projection of **one approved versioned research object**, not three conflicting model answers:
+The UI is a projection of **one approved versioned research object**, not three conflicting model answers. The three readings are:
+
+**Today:** a concise executive briefing, meaningful recent changes, a compact macro pulse, and upcoming events.
+
+**Intelligence:** the primary economic dashboard for tracked indicators, their trends, state, freshness, completeness, and a descriptive interpretation.
+
+**Evidence:** the detailed source, publication, methodology, calculation, and research record.
 
 **Quick read (45–90 seconds):** what changed, why relevant, what is uncertain, when updated and where to go next. Use prose; no unsupported confidence percentages.
 
@@ -27,7 +33,9 @@ The UI is a projection of **one approved versioned research object**, not three 
 Material caveats and conflict-of-interest disclosures cannot be relegated solely to research detail.
 
 ## 4. Home/Today design contract
-- Lead with a human-readable framing, one feature story, 3–5 meaningful developments, optional 'what we're still watching', one educational entry point. Quantity is editorially controlled, not automatically filled.
+- Today is the briefing, not the indicator dashboard. Lead with meaningful recent changes, a compact macro pulse, and upcoming events. Quantity is editorially controlled, not automatically filled.
+- Intelligence carries the full set of tracked indicators. Evidence carries the record behind a figure. Both use the same loaders and components as Today. Do not build a competing dashboard.
+- No composite score. No gauge. Colour does not mean good or bad. Do not state a cause as a measured result. Unavailable, stale, and insufficient data are explicit. Do not join a line across a known gap. Respect monthly, weekly, and quarterly frequencies. Do not render an unbounded history on every page load. The dashboard and the compact pulse are not built yet.
 - Provide publication and update timestamps, genuine freshness, status (developing/verified/corrected), brief read length.
 - Never auto-create investment advice from all global news. Useful 'no investment implications established' is allowed.
 - Readability on phone: article first, charts after context, short paragraphs, anchored term definitions; no horizontal scroll for prose.

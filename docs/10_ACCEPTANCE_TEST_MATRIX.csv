@@ -1,53 +1,65 @@
-area,fixture,expected_result
-Evidence,Claim with nonexisting source_id,BLOCK publication
-Evidence,Real citation wrong date/unit,BLOCK/flag mismatched context
-Evidence,Source correction/retraction,All dependent outputs flagged + versioned correction
-Evidence,10 syndicated articles one originating press release,One evidence origin
-Evidence,Source fetch outage,"Stale indicator visible, no fake fresh claim"
-Agent,Malicious webpage injected instructions,No tool policy change; no secrets
-Agent,Agent invents quoted financial figure,Blocked by numeric verifier
-Method,Recalculate after method upgrade,Frozen old results identical
-Method,Retrospective macro revision in backtest,As-of query excludes future vintage
-Method,Experimental adaptation wins backtest,No automatic promotion
-Portfolio,Deposit/buy/sell/transfer/FX/fee,Ledger balances and units reconcile
-Portfolio,Distributing vs accumulating fund,"Total returns are correct, no double count"
-Portfolio,Duplicate import or interrupted job,"Idempotent, no duplicate event/fill"
-Portfolio,Missing ETF or FX price,"Show not available, no interpolation disguised"
-Portfolio,Crossmarket session boundary,No pre-available fill timestamp
-Portfolio,Same cashflows passive vs test strategy,Exact external cashflow match
-Portfolio,XIRR with multiple/no root,Explicit unavailable/ambiguous result
-Privacy,User A guesses User B UUID,Denied via RLS/API/storage/export
-Privacy,Service role in frontend bundle,CI fails
-Auth,Protected route without session,No private data rendered; fail closed
-Auth,Expired refresh token,Re-auth prompt; no redirect loop
-Auth,PWA resume after background,Session valid or clean re-auth; no spurious logout
-Auth,Concurrent session refresh,No cookie corruption or race logout
-Auth,Ambiguous refresh failure,Transient retry; private data withheld; session not cleared as a guess
-Auth,Framework redirect inside auth error handler,Redirect is rethrown; return path kept
-Database,SECURITY DEFINER callable by anon,Denied unless explicitly granted and tested
-Ingest,Partial upstream payload,Authoritative rows are not deleted or blanked
-Research,M1 pipeline output without rights record,Blocked; no narrative fill for missing licence
-Research,M1 point-in-time as-of before vintage availability,Revision excluded; later as-of may include it
-Research,M1 latest-revised row in point-in-time mode,Excluded from historical reconstruction; allowed in latest-revised mode
-Research,M1 Sahm fixture hand calculation,Gap and trigger match independent expected decimals
-Research,M1 research result without claim verification,Publication blocked (fail-closed)
-Research,M1 swap fixture provider adapter,Equivalent Sahm calculation; orchestrator unchanged
-Research,M1 second method via orchestrator,PERIOD_LEVEL_CHANGE completes without orchestrator edit
-Research,M1 disable source for collection,Ingest blocked; prior observations retained
-Research,M1 identical inputs replay,analytical_payload_hash stable across run_id
-Research,M1 BLS offline fixture ingest,Sahm completes with latest_revised labelling
-Research,M1 BLS live opt-in run,Rights gate passes; bounded HTTPS; no CI network
-Research,M1 latest-revised BLS in point-in-time mode,Excluded from as-of view
-Database,Remote migration before supabase test db green,Blocked by release policy
-Database,RLS tested only as postgres superuser,Rejected; must use authenticated test roles
-Privacy,User deletion request,Delete private assets while non-personal public method history remains
-Design,"320px, 390px, desktop viewport",No clipped content except explicit table affordance
-Design,Article headline and chart,"Reader can state caveat; alt, units/source/time visible"
-Design,Literal #color in JSX,CI fails token guard
-Research,Forecast wrong but paper result profitable,"Score accuracy incorrect, financial return independently"
-Research,Published wrong thesis,Correction displayed on original story and scorecard
-Research,Small cohorts underperform baseline,No proven-alpha label
-Billing,Pre-cutoff founding account during paywall activation,Lifetime entitlement preserved
-Billing,New account after cutoff,Correct published default plan
-Operations,LLM budget exceeded,No additional calls; show paused reason
-Operations,Backup restore,Journal and forecasts replay exactly
+area,fixture,expected_result,evidence
+Evidence,Claim with nonexisting source_id,BLOCK publication,not assessed in this session
+Evidence,Real citation wrong date/unit,BLOCK/flag mismatched context,not assessed in this session
+Evidence,Source correction/retraction,All dependent outputs flagged + versioned correction,not assessed in this session
+Evidence,10 syndicated articles one originating press release,One evidence origin,not assessed in this session
+Evidence,Source fetch outage,"Stale indicator visible, no fake fresh claim",not assessed in this session
+Agent,Malicious webpage injected instructions,No tool policy change; no secrets,not assessed in this session
+Agent,Agent invents quoted financial figure,Blocked by numeric verifier,not assessed in this session
+Method,Recalculate after method upgrade,Frozen old results identical,not assessed in this session
+Method,Retrospective macro revision in backtest,As-of query excludes future vintage,not assessed in this session
+Method,Experimental adaptation wins backtest,No automatic promotion,not assessed in this session
+Portfolio,Deposit/buy/sell/transfer/FX/fee,Ledger balances and units reconcile,not assessed in this session
+Portfolio,Distributing vs accumulating fund,"Total returns are correct, no double count",not assessed in this session
+Portfolio,Duplicate import or interrupted job,"Idempotent, no duplicate event/fill",not assessed in this session
+Portfolio,Missing ETF or FX price,"Show not available, no interpolation disguised",not assessed in this session
+Portfolio,Crossmarket session boundary,No pre-available fill timestamp,not assessed in this session
+Portfolio,Same cashflows passive vs test strategy,Exact external cashflow match,not assessed in this session
+Portfolio,XIRR with multiple/no root,Explicit unavailable/ambiguous result,not assessed in this session
+Privacy,User A guesses User B UUID,Denied via RLS/API/storage/export,not assessed in this session
+Privacy,Service role in frontend bundle,CI fails,not assessed in this session
+Auth,Protected route without session,No private data rendered; fail closed,not assessed in this session
+Auth,Expired refresh token,Re-auth prompt; no redirect loop,not assessed in this session
+Auth,PWA resume after background,Session valid or clean re-auth; no spurious logout,not assessed in this session
+Auth,Concurrent session refresh,No cookie corruption or race logout,not assessed in this session
+Auth,Ambiguous refresh failure,Transient retry; private data withheld; session not cleared as a guess,not assessed in this session
+Auth,Framework redirect inside auth error handler,Redirect is rethrown; return path kept,not assessed in this session
+Database,SECURITY DEFINER callable by anon,Denied unless explicitly granted and tested,not assessed in this session
+Ingest,Partial upstream payload,Authoritative rows are not deleted or blanked,not assessed in this session
+Research,M1 pipeline output without rights record,Blocked; no narrative fill for missing licence,not assessed in this session
+Research,M1 point-in-time as-of before vintage availability,Revision excluded; later as-of may include it,not assessed in this session
+Research,M1 latest-revised row in point-in-time mode,Excluded from historical reconstruction; allowed in latest-revised mode,not assessed in this session
+Research,M1 Sahm fixture hand calculation,Gap and trigger match independent expected decimals,not assessed in this session
+Research,M1 research result without claim verification,Publication blocked (fail-closed),not assessed in this session
+Research,M1 swap fixture provider adapter,Equivalent Sahm calculation; orchestrator unchanged,not assessed in this session
+Research,M1 second method via orchestrator,PERIOD_LEVEL_CHANGE completes without orchestrator edit,not assessed in this session
+Research,M1 disable source for collection,Ingest blocked; prior observations retained,not assessed in this session
+Research,M1 identical inputs replay,analytical_payload_hash stable across run_id,not assessed in this session
+Research,M1 BLS offline fixture ingest,Sahm completes with latest_revised labelling,not assessed in this session
+Research,M1 BLS live opt-in run,Rights gate passes; bounded HTTPS; no CI network,not assessed in this session
+Research,M1 latest-revised BLS in point-in-time mode,Excluded from as-of view,not assessed in this session
+Database,Remote migration before supabase test db green,Blocked by release policy,not assessed in this session
+Database,RLS tested only as postgres superuser,Rejected; must use authenticated test roles,not assessed in this session
+Privacy,User deletion request,Delete private assets while non-personal public method history remains,not assessed in this session
+Design,"320px, 390px, desktop viewport",No clipped content except explicit table affordance,not assessed in this session
+Design,Article headline and chart,"Reader can state caveat; alt, units/source/time visible",not assessed in this session
+Design,Literal #color in JSX,CI fails token guard,not assessed in this session
+Research,Forecast wrong but paper result profitable,"Score accuracy incorrect, financial return independently",not assessed in this session
+Research,Published wrong thesis,Correction displayed on original story and scorecard,not assessed in this session
+Research,Small cohorts underperform baseline,No proven-alpha label,not assessed in this session
+Billing,Pre-cutoff founding account during paywall activation,Lifetime entitlement preserved,not assessed in this session
+Billing,New account after cutoff,Correct published default plan,not assessed in this session
+Operations,LLM budget exceeded,No additional calls; show paused reason,not assessed in this session
+Operations,Backup restore,Journal and forecasts replay exactly,not assessed in this session
+U0,Production research URL missing or loopback,The loader is unavailable and does not use 127.0.0.1,"24 Oct 2026. npm run test:sourced-updates passed 25 tests, including the six production URL cases. npm run typecheck passed."
+U0,Production ETF URL missing or loopback,The loader is unavailable and does not use 127.0.0.1,"24 Oct 2026. npm run test:etf passed 8 tests, including the same six URL cases."
+U0,Upgrade from the five hosted migrations,Representative rows and the auth stub survive; anon and service_role cannot read research or instruments,24 Oct 2026. aqil_u0_upgrade was created and dropped. The nine files applied after the five. Rows survived. The hosted project was not migrated. Detail is in the handover.
+U0,Hosted apply of the nine migrations,Not applied,not run
+U0,GitHub Actions on this tip,A local test is not that CI run,not run
+U0,One manual hosted research refresh,Freshness is visible and no schedule is claimed,not run
+U0,Intelligence macro dashboard,Tracked indicators with explicit gaps and no composite score,not run
+U0,Compact Today pulse,Today stays a briefing and is not a second dashboard,not run
+U1,One cited ETF document,The exposures state stays empty until a permitted citation exists,not run
+U1,Implementation-ready playbook register,Structural principles stay distinct from timing strategies,not run
+U1,Policy save path uses wealth_allocation_targets,The gitignored file is not the permanent store,not run
+U2,Read-only policy deployment assessment,No orders are sent and no return-forecast model is required,not run

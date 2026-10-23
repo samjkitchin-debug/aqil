@@ -2,10 +2,8 @@ import "server-only";
 
 import { connection } from "next/server";
 
+import { resolveResearchDatabaseUrl } from "@/lib/data/private-database-url";
 import type { LiveSeriesRetrieval } from "@/lib/research/present-series-briefing";
-
-const DEFAULT_RESEARCH_DATABASE_URL =
-  "postgresql://research_worker:research_worker@127.0.0.1:55432/postgres";
 
 const SERIES_SOURCE_ID = "bls_cps_unemployment_rate";
 
@@ -21,8 +19,11 @@ type DbRow = {
   raw_value: string;
 };
 
-function researchDatabaseUrl(): string {
-  return process.env.RESEARCH_DATABASE_URL?.trim() || DEFAULT_RESEARCH_DATABASE_URL;
+function researchDatabaseUrl() {
+  return resolveResearchDatabaseUrl({
+    nodeEnv: process.env.NODE_ENV,
+    configuredUrl: process.env.RESEARCH_DATABASE_URL,
+  });
 }
 
 function toIso(value: Date | string): string {
@@ -42,14 +43,17 @@ function toDateOnly(value: Date | string): string {
 
 export type LoadSeriesBriefingResult =
   | { status: "ok"; series: LiveSeriesRetrieval }
-  | { status: "empty" };
+  | { status: "empty" }
+  | { status: "unavailable"; reason: string };
 
 export async function loadSeriesBriefing(): Promise<LoadSeriesBriefingResult> {
   await connection();
+  const database = researchDatabaseUrl();
+  if (database.status === "unavailable") return database;
 
   try {
     const { Client } = await import("pg");
-    const client = new Client({ connectionString: researchDatabaseUrl() });
+    const client = new Client({ connectionString: database.url });
     await client.connect();
     try {
       const result = await client.query<DbRow>(

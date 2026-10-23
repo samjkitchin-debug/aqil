@@ -1,7 +1,13 @@
 import { deployCapital, type ClassExposure, type DeployCapitalResult, type FxRate } from "@/lib/capital/deploy";
-import { exampleDeployment } from "@/lib/capital/example";
+import {
+  CITED_SHARE_CLASS_COUNT,
+  MADE_UP_EXAMPLE_COPY,
+  exampleDeployment,
+  fundComparisonCopy,
+} from "@/lib/capital/example";
 import { deploymentFromPortfolio, type PortfolioDeployment } from "@/lib/capital/from-portfolio";
 import { brokerHoldingKey } from "@/lib/capital/holding-key";
+import { DEVELOPMENT_POLICY_STORE_COPY } from "@/lib/capital/policy";
 import { saveInvestmentPolicy } from "@/lib/capital/policy-actions";
 import type { LoadedInvestmentPolicy } from "@/lib/capital/policy-file";
 import { formatRetrievedAt, type BrokerPortfolioView } from "@/lib/saxo/portfolio";
@@ -142,12 +148,11 @@ export function DeployCapitalPanel({
         <p className="text-muted">
           Read only. Reported cash from the saved Saxo snapshot can be used. Holdings stay unclassified until you classify them. No order is sent.
         </p>
+        <p className="text-muted">{fundComparisonCopy(CITED_SHARE_CLASS_COUNT)}</p>
       </section>
       <section className="grid max-w-prose gap-[var(--space-3)]" data-testid="deploy-policy">
         <h2 className="text-foreground">Investment policy</h2>
-        <p className="text-muted">
-          Saved on this device for your sign-in only. Percentages must add up to 100. Leave the budget blank if you have not set one.
-        </p>
+        <p className="text-muted">{DEVELOPMENT_POLICY_STORE_COPY}</p>
         <form action={saveInvestmentPolicy} className="grid gap-[var(--space-4)]">
           {TARGET_FIELDS.map(([field, label]) => (
             <label key={field} className="text-sm text-muted">
@@ -315,9 +320,7 @@ export function DeployCapitalPanel({
       </section>
       <section className="grid gap-[var(--space-3)]" data-testid="deploy-example">
         <h2 className="text-foreground">Example allocation</h2>
-        <p className="text-muted">
-          The amounts below are made up so the calculation can be inspected. They are not your holdings.
-        </p>
+        <p className="text-muted">{MADE_UP_EXAMPLE_COPY}</p>
         <ResultTable result={exampleResult} completeNote="This example supplied its own targets, budget and instrument." />
       </section>
     </div>

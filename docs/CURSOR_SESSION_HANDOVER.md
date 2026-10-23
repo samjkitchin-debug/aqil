@@ -1,9 +1,96 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 24 October 2026, release package  
-**Parent:** `5528c65` on local `main`  
+**Last updated:** 24 October 2026, roadmap-reset integration  
+**Parent:** `5bb2ca8` on local `main` before this commit  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Roadmap-reset integration, 24 October 2026
+
+Risk class R1. Local `main` before this commit was `5bb2ca8`. `origin/main` remained `c9ea596`. Nothing was pushed. Hosted migrations were not applied. Production Saxo was not enabled. No refresh schedule was created. Preserved databases `postgres` and `aqil_etf` were not written and were not re-queried. The last read of `postgres` during the upgrade rehearsal was 8791 observations in total, 8704 live and 87 fixture. Cited share classes remain 0. `docs/sources/etf/cited` is absent. GitHub Actions has not run on this tip. The commands below are local tests. They are not CI.
+
+The nine-migration upgrade was rehearsed earlier on disposable database `aqil_u0_upgrade`, then that database was dropped. This integration did not repeat the rehearsal. A read of `pg_database` through `template1` after the ETF tests showed neither `aqil_u0_upgrade` nor `aqil_cited_document_test`.
+
+An earlier typecheck report had invalid-character errors on UTF-16 copies of new files already in the working tree. The playbook files were not in that list. The current tree is UTF-8. `npx tsc --noEmit --incremental false` in `apps/web` passed, and `npm run typecheck` passed. No sprint type error remained to fix.
+
+`apps/web/package.json` `test:sourced-updates` now includes `src/lib/research/present-macro-conditions.test.ts` on the existing `node --experimental-strip-types --test` list. Navigation and playbook tests were run with that same runner. No new test runner was added.
+
+Local results, all exit 0:
+
+- `npm run test:sourced-updates --prefix apps/web`: 33 passed, 0 failed. That includes the eight macro-conditions tests and the production URL cases.
+- `npm run test:capital --prefix apps/web`: 19 passed, 0 failed. Includes the case that zero cited share classes are not a fund recommendation.
+- `npm run test:learn --prefix apps/web`: 6 passed, 0 failed.
+- `npm run test:etf --prefix apps/web`: 8 passed, 0 failed.
+- `node --experimental-strip-types --test src/lib/navigation.test.ts` in `apps/web`: 1 passed, 0 failed.
+- `node --experimental-strip-types --test src/lib/playbook/investment-playbooks.test.ts` in `apps/web`: 5 passed, 0 failed.
+- `npm run typecheck`: passed.
+- `npm run check:tokens`: token styling guard passed.
+- `npm run lint`: passed with 0 errors and 1 warning. The warning is the existing unused `_searchParams` in `apps/web/src/components/research/today-story-tangent-path.ts`.
+- `uv run pytest tests/etf tests/test_etf_share_class_contract.py` in `workers/research`: 72 passed in 1.43s. The cited-document cases use disposable database `aqil_cited_document_test` and refuse `postgres` and `aqil_etf`. `npm run test:db` was not run.
+
+Signed-in Cursor browser on `http://localhost:3000`, using the session that was already present. Google sign-in did not block any requested route.
+
+- Today, `/`: primary navigation is Today, My Wealth, Intelligence. Macro pulse is `data-variant="compact"` with a 16px series title. Completeness line: 10 of 10 tracked series have a stored observation, 1 is stale, liquidity and monetary-policy stance are not available. October 2025 unemployment and CPI-U are named as permanently missing and the line is not drawn across them. An Evidence link opened `/research`.
+- `/conditions`: same panel as `data-variant="dashboard"` with an 18px series title, the same completeness line, and no composite score. Intelligence section links are Conditions, Upcoming, Evidence, Exposures.
+- `/calendar`: Upcoming stays here. Confirmed BLS release times are shown. No modelled schedule.
+- `/research`: Evidence opened with sourced publications, source ids and retrieval ids.
+- `/explore`: "No share class is stored." It names the internal anchor ISIN IE00BK5BQT80 (VWRA) as not a permitted issuer citation.
+- `/my-wealth/deploy`: "No fund comparison is available. No cited share class is stored." The page does not name VWRA. The example allocation is labelled made up.
+- `/learn`: Investment playbooks are listed as research and say they are not an instruction to trade. Four structural principles are proposed. Tactical regional or sector allocation sits under disputed market-timing.
+
+No horizontal overflow on Today or Conditions at about 1920 pixels, or at a 390-pixel-wide layout. At 390 pixels the primary navigation is a fixed bottom bar and the main content can scroll clear of it. The Next.js dev overlay showed two issues while that layout was open; the diff in the dev server log was `data-cursor-ref` attributes injected by the browser tool, and the pages still rendered. That was not changed.
+
+Founder approval is still required, separately, before any of these: a hosted backup and apply of the nine migrations; setting the server-only research URL and one manual refresh, with no cron; a push of local `main`. Do not enable Saxo.
+
+## Roadmap-reset phase 1, 24 October 2026
+
+Risk class R1 for the rehearsal and the production URL change. Nothing was committed or pushed. The hosted project was not queried and was not migrated. Production Saxo was not enabled. No refresh schedule was created. Preserved databases `postgres` and `aqil_etf` were not written. `postgres` held 8791 observations before and after. A read-only split after the rehearsal was 8704 live and 87 fixture. `aqil_etf.instruments.share_classes` was 0 before and after. The database ACL text for `postgres` and `aqil_etf` was unchanged. GitHub Actions has not run on this tip. Local tests below are not a CI result.
+
+Disposable database `aqil_u0_upgrade` was created with `template template1` on the local Supabase cluster, then dropped. It is not in `pg_database` after the drop. This was an upgrade from the five-migration state, not a fresh replay of all 14 files on an empty database. Git migration files were not edited. In the replay stream only, `create role` for `research_writer` and `research_worker_app` was made duplicate-safe, and `grant connect on database postgres` was redirected to `aqil_u0_upgrade` so the preserved database ACL was not rewritten.
+
+Files applied, in order:
+
+1. `20261017103000_create_user_settings.sql`
+2. `20261017110000_create_research_schema.sql`
+3. `20261017120000_research_worker_login.sql`
+4. `20261017140000_source_retrieval_fingerprint.sql`
+5. `20261017180000_forward_intelligence.sql`
+
+An authentication stub existed only on that database: `auth.users` id `11111111-1111-4111-8111-111111111111`, and `auth.uid()` reading `request.jwt.claim.sub`. Representative rows were inserted after the five files and were still present after the nine-file upgrade:
+
+- `public.user_settings`: that user, locale `en-GB`, timezone `Asia/Singapore`
+- `research.source_retrievals`: one fixture retrieval; `response_fingerprint` remained null
+- `research.economic_observations`: `rehearsal-obs-1`, raw value `1.5`, frequency monthly
+- `research.research_runs`: `rehearsal-run-1`, `publication_allowed` false, investment implication `no_action`, with one observation link
+- `forward.catalyst_events`: `rehearsal-event-1`, title `Rehearsal release`, evidence class `synthetic_demonstration`
+- `forward.forward_scenarios` and `forward.event_outcomes`: the same synthetic evidence label, which still satisfied the replacement constraints in `20261018200000_verified_prospective_assessment.sql`
+
+The nine upgrade files, applied after those rows:
+
+1. `20261018200000_verified_prospective_assessment.sql`
+2. `20261018210000_my_wealth.sql`
+3. `20261020120000_saxo_hosted_vault.sql`
+4. `20261020143000_wealth_journal_events.sql`
+5. `20261021110000_research_sourced_updates.sql`
+6. `20261022120000_catalyst_verification_update.sql`
+7. `20261022140000_research_refresh_runs.sql`
+8. `20261023120000_prospective_assessments.sql`
+9. `20261024120000_etf_instruments.sql`
+
+New relations were present: `public.wealth_allocation_targets`, `public.saxo_token_vault`, `research.sourced_updates`, `research.refresh_runs`, `research.prospective_assessments`, and `instruments.share_classes`. `supabase/config.toml` still lists only `public` and `graphql_public`.
+
+Privilege findings on that database:
+
+- `anon`, `authenticated`, and `service_role` have no usage on `research`, `forward`, or `instruments`. `research_writer` does.
+- Direct selects as `anon`, `authenticated`, and `service_role` were denied for `research.economic_observations`. `anon` was denied for `forward.catalyst_events` and `instruments.share_classes`. `service_role` was denied for `instruments.share_classes`.
+- `anon` was denied for `public.wealth_accounts` and `public.saxo_token_vault`.
+- `authenticated` could select its own `user_settings` row (`en-GB`, `Asia/Singapore`) and saw zero rows for a different identity.
+- Wealth tables, `user_settings`, `saxo_token_vault`, and `saxo_source_units` have row-level security. `saxo_token_vault` has no policy. `service_role` has `rolbypassrls` and a select grant on that vault; this session did not select the vault as `service_role`.
+- `research_writer` could update `forward.catalyst_events.last_verified_at`. That update was rolled back, and the title and original verification time remained. An update of `title` was denied. Column privileges matched that result.
+
+`npm run test:sourced-updates` passed 25 tests, including the production URL cases. `npm run test:etf` passed 8 tests, including those URL cases. `npm run typecheck` passed. The Intelligence dashboard, the Today pulse, playbook UI, and ETF ingestion were not built.
+
+Founder approval is still required, separately, before any of these: a hosted backup and apply of the nine migrations; setting the server-only research URL and one manual refresh, with no cron; a commit and push of local `main`, which deploys production. Do not enable Saxo. Do not migrate founder financial data. Do not switch the policy save path.
 
 ## Release package, 24 October 2026
 

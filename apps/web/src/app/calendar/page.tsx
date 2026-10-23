@@ -16,9 +16,23 @@ import { upcomingCatalysts } from "@/lib/research/present-verified-catalysts";
 
 async function CalendarBody() {
   const sourced = await loadSourcedUpdates();
+  const loadedEvents = await loadVerifiedCatalysts();
+  if (sourced.status === "unavailable" || loadedEvents.status === "unavailable") {
+    const reason =
+      sourced.status === "unavailable"
+        ? sourced.reason
+        : loadedEvents.status === "unavailable"
+          ? loadedEvents.reason
+          : "The research database is not configured.";
+    return (
+      <div className="research-banner" data-testid="calendar-unavailable">
+        <p className="research-body">{reason}</p>
+      </div>
+    );
+  }
   const updates = sourced.status === "ok" ? sourced.updates : [];
   const catalysts = futureSourcePublishedDates(updates);
-  const verified = upcomingCatalysts(await loadVerifiedCatalysts());
+  const verified = upcomingCatalysts(loadedEvents.events);
 
   if (catalysts.length === 0 && verified.listed.length === 0) {
     return (

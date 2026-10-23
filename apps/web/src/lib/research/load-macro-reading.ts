@@ -2,10 +2,8 @@ import "server-only";
 
 import { connection } from "next/server";
 
+import { resolveResearchDatabaseUrl } from "@/lib/data/private-database-url";
 import type { MacroReadingView } from "@/lib/research/present-macro-reading";
-
-const DEFAULT_RESEARCH_DATABASE_URL =
-  "postgresql://research_worker:research_worker@127.0.0.1:55432/postgres";
 
 type RunRow = {
   run_id: string;
@@ -30,15 +28,20 @@ export type LoadMacroReadingResult =
   | { status: "unavailable"; reason: string }
   | { status: "empty" };
 
-function researchDatabaseUrl(): string {
-  return process.env.RESEARCH_DATABASE_URL?.trim() || DEFAULT_RESEARCH_DATABASE_URL;
+function researchDatabaseUrl() {
+  return resolveResearchDatabaseUrl({
+    nodeEnv: process.env.NODE_ENV,
+    configuredUrl: process.env.RESEARCH_DATABASE_URL,
+  });
 }
 
 export async function loadMacroReading(): Promise<LoadMacroReadingResult> {
   await connection();
+  const database = researchDatabaseUrl();
+  if (database.status === "unavailable") return database;
   try {
     const { Client } = await import("pg");
-    const client = new Client({ connectionString: researchDatabaseUrl() });
+    const client = new Client({ connectionString: database.url });
     await client.connect();
     try {
       const runResult = await client.query<RunRow>(
