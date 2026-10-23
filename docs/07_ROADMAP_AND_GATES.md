@@ -26,7 +26,7 @@ This section supersedes older sentences below that say authentication, hosted Su
 | Area | Status | Evidence / notes |
 |------|--------|------------------|
 | Next.js scaffold, tokens, shell, nav | **Verified** | CI web job: typecheck, lint, `check:tokens`, build, Playwright e2e |
-| Python research worker scaffold | **Verified** | CI research job: ruff, pytest |
+| Python research worker scaffold | **Implemented — unverified** | GitHub Actions has not run the research CI job, so ruff and pytest on this tip are not verified. |
 | Supabase migration + RLS/pgTAP | **Verified** | `20261017103000_create_user_settings.sql`; CI `supabase db reset` + `supabase test db`; types diff |
 | Local Docker database workflow | **Verified** | `scripts/run-db-tests.ps1`, `npm run test:db` (documented; re-run after env changes) |
 | GitHub CI (web / database / research) | **Verified** on `main` | Development adds Saxo, Wealth, Capital, Benchmark, Learn, Story and sourced-update commands to the web job. That CI run has not happened |

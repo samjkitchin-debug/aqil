@@ -8,7 +8,7 @@ Risk for this phase: R3 for the new schema and access controls, R2 for eligibili
 
 ## One ETF database
 
-Agents must not create a second ETF database, a second instruments schema, or a parallel share-class table. The only ETF database name is the local database `aqil_etf`. Identity lives in schema `instruments`, created by `supabase/migrations/20261024120000_etf_instruments.sql`.
+Agents must not create a second ETF database, a second instruments schema, or a parallel share-class table. The only ETF database name is the local database `aqil_etf`. Identity lives in schema `instruments`, created by `supabase/migrations/20261024120000_etf_instruments.sql`. `instruments.share_classes` is fund identity. `forward.etf_*` is the legacy fixture store.
 
 Do not extend `forward.etf_*`. Do not treat a `forward.etf_instrument_records.etf_id` string as a canonical key. Do not add `instruments` to the Supabase Data API schema list in `supabase/config.toml`. That list stays `public` and `graphql_public`. The migration revokes `instruments` from `anon`, `authenticated`, and `service_role` in the same way as schema `forward`.
 
@@ -25,7 +25,7 @@ Later agents may add only the paths in their row. They import shared types from 
 | Vetting | `workers/research/src/aqil_research/etf/vetting/` and `workers/research/tests/etf/test_vetting.py` | A weighted rank, a write to My Wealth, or `CORE` when hard evidence is missing |
 | Adversarial checks | `workers/research/tests/etf/test_adversarial.py` | Production collectors, or a change to the frozen contract in order to make a test pass |
 
-The orchestrator owns the migration, `docs/schemas/etf_share_class.v1.json` and its mirror under `packages/contracts/schemas/`, `aqil_research.etf.contracts`, `docs/sources/etf/`, the backlog rows AQ-009 and AQ-040, and the session handover on this branch. Explore stays unmounted in Phase A.
+The orchestrator owns the migration, `docs/schemas/etf_share_class.v1.json` and its mirror under `packages/contracts/schemas/`, `aqil_research.etf.contracts`, `docs/sources/etf/`, the backlog rows AQ-009 and AQ-040, and the session handover on this branch. Explore is mounted at `/explore` in `apps/web/src/app/explore/page.tsx`. That page reads `instruments` and shows the existing empty copy when `share_classes` has no rows. It does not show a fixture fund.
 
 ## Frozen paths
 
@@ -69,7 +69,7 @@ No TER, AUM, holding, spread, NAV, or return is invented in this phase. A field 
 
 ## Macro read contract
 
-The fields macro may later query, and the fields it must not write or read, are in `docs/sources/etf/MACRO_ETF_READ_CONTRACT.md`. That note does not change macro code.
+The fields macro may later query, and the fields it must not write or read, are in `docs/sources/etf/MACRO_ETF_READ_CONTRACT.md`. That note is still a proposal. It does not change macro code.
 
 ## Blockers
 

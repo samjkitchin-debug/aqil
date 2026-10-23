@@ -1,9 +1,15 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 23 October 2026, baseline certification wave 1  
+**Last updated:** 23 October 2026, baseline certification wave 2  
 **Parent:** `a1c29a8` on `work/aqil-autonomous-build`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Baseline certification, wave 2, 23 October 2026
+
+Risk class R1. The research CI job already unsets `RESEARCH_DATABASE_URL` and sets `AQIL_RESEARCH_TEST_DATABASE_URL` to database `aqil_research_test`. Pytest was not pointed back at database `postgres`. No workflow edit.
+
+`npm run test:research` uses Windows PowerShell 5.1, which does not fail the script when a native command returns non-zero. `scripts/run-research-checks.ps1` now exits with the pytest or ruff status. `uv run ruff check .` and `uv run ruff format --check .` in `workers/research` both passed after formatting only the eight files that failed. The reformatted labour, prices, and industrial-production tests passed, 21 tests. Exposures stays the one route `apps/web/src/app/explore/page.tsx`. It reads `instruments` and shows the existing empty copy when `share_classes` is empty. No fixture row was inserted. The G0 research-worker row in `docs/07_ROADMAP_AND_GATES.md` no longer says that CI job is verified. `docs/sources/etf/ETF_PROGRAMME_CONTRACT.md` now matches the mounted Explore page. `instruments.share_classes` is fund identity. `forward.etf_*` is the legacy fixture store. `docs/sources/etf/MACRO_ETF_READ_CONTRACT.md` is still a proposal. GitHub Actions has not run.
 
 ## Baseline certification, wave 1, 23 October 2026
 
