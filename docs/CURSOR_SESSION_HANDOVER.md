@@ -1,9 +1,17 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 23 October 2026, four internal macro readings  
-**Parent:** `c8a148c` on `work/aqil-autonomous-build`  
+**Last updated:** 23 October 2026, prospective assessment lifecycle  
+**Parent:** `edea3a0` on `work/fwd-hypothesis`  
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Prospective assessment lifecycle, 23 October 2026
+
+Risk class R2. The live decision is `not_qualified`. No 6- or 12-month hypothesis qualifies: there is no vintage panel, no identified mechanism, and the stored windows do not share one horizon. `horizon_months` stays null. `publication_allowed` stays false. The capture note includes “not a reconstruction of dates before captured_at”. Evaluation is refused before the due date, when the outcome observation is missing, and when every available observation id was already inside the original snapshot. A `proposed_internal` row may be superseded only by a new payload that points at the earlier assessment id. The earlier row is not rewritten.
+
+The migration, `registry.py`, the three reading methods, and `apps/web` were not edited. The preserved database was not opened. `npm run test:db` was not run. Full research pytest was not run. Web checks were not run.
+
+`PYTHONPATH` was `workers/research/src`. `python -m pytest tests/test_prospective_lifecycle.py -q` was 12 passed. `ruff check` passed on the lifecycle module and its tests.
 
 ## Four internal readings, 23 October 2026
 
