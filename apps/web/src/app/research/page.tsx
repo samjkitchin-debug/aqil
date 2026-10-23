@@ -5,10 +5,12 @@ import { AppShell } from "@/components/app-shell";
 import { ResearchEmptyState } from "@/components/research/research-empty-state";
 import { ResearchInsightView } from "@/components/research/research-insight-view";
 import { MacroReadingPanel } from "@/components/research/macro-reading-panel";
+import { ProspectiveAssessmentPanel } from "@/components/research/prospective-assessment-panel";
 import { SloosReadingPanel } from "@/components/research/sloos-reading-panel";
 import { SourcedUpdatesPanel } from "@/components/research/sourced-updates-panel";
 import { loadFounderResearchInsight } from "@/lib/research/load-founder-insight";
 import { loadMacroReading } from "@/lib/research/load-macro-reading";
+import { loadProspectiveAssessment } from "@/lib/research/load-prospective-assessment";
 import { loadSloosReading } from "@/lib/research/load-sloos-reading";
 import { loadSourcedUpdates } from "@/lib/research/load-sourced-updates";
 
@@ -18,6 +20,7 @@ async function ResearchEvidence() {
   const loaded = await loadFounderResearchInsight();
   const credit = await loadSloosReading();
   const macro = await loadMacroReading();
+  const prospective = await loadProspectiveAssessment();
 
   if (loaded.status === "unauthorized") {
     return <ResearchEmptyState reason="unauthorized" />;
@@ -61,6 +64,11 @@ async function ResearchEvidence() {
             closed.
           </p>
         </section>
+      ) : null}
+      {prospective.status === "ready" ? (
+        <div className="mt-[var(--space-6)]">
+          <ProspectiveAssessmentPanel assessment={prospective.assessment} />
+        </div>
       ) : null}
       {loaded.status === "ok" ? (
         <section
