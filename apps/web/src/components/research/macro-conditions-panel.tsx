@@ -1,10 +1,11 @@
 import Link from "next/link";
 
-import { SeriesSparkline } from "@/components/research/series-sparkline";
+import { SeriesChart } from "@/components/research/series-chart";
 import { loadMacroConditions } from "@/lib/research/load-macro-conditions";
 import {
   presentMacroConditions,
   type MacroConditionsView,
+  type MacroSeriesPanel,
 } from "@/lib/research/present-macro-conditions";
 
 type Props = {
@@ -17,13 +18,16 @@ export function MacroConditionsPanel({ view, variant }: Props) {
   return (
     <div data-testid="macro-conditions" data-variant={variant}>
       <p className="research-body">{view.intro}</p>
-      <p className="research-meta">{view.freshnessRule}</p>
       <p className="research-meta" data-testid="macro-completeness">
         {view.completenessLine}
       </p>
       <p className="research-meta" data-testid="macro-revision-limit">
         {view.revisionLimit}
       </p>
+      <details className="macro-details" data-testid="macro-freshness">
+        <summary>How freshness is judged</summary>
+        <p className="research-meta">{view.freshnessRule}</p>
+      </details>
       {compact ? (
         <p className="research-meta">
           <Link href="/conditions" prefetch={false} data-testid="macro-full-view">
@@ -37,40 +41,7 @@ export function MacroConditionsPanel({ view, variant }: Props) {
             {group.label}
           </h3>
           {group.panels.map((panel) => (
-            <article
-              key={panel.sourceId}
-              className={compact ? "macro-panel macro-panel--compact" : "macro-panel"}
-              data-testid={`macro-panel-${panel.sourceId}`}
-              data-state={panel.state}
-            >
-              <h4 className="macro-panel-title">{panel.name}</h4>
-              <p className="research-meta">{panel.stateLine}</p>
-              {panel.detailLine ? <p className="research-meta">{panel.detailLine}</p> : null}
-              {panel.sourceLine ? <p className="research-meta">{panel.sourceLine}</p> : null}
-              <p className="research-body">{panel.description}</p>
-              {panel.chart ? (
-                <SeriesSparkline
-                  marks={panel.chart.marks}
-                  label={panel.chart.label}
-                  caption={panel.chart.caption}
-                  width={panel.chart.width}
-                  height={panel.chart.height}
-                  testId={`macro-sparkline-${panel.sourceId}`}
-                />
-              ) : panel.windowLine ? (
-                <p className="research-meta">{panel.windowLine}</p>
-              ) : null}
-              {panel.chartNote ? <p className="research-body">{panel.chartNote}</p> : null}
-              {panel.gapLine ? <p className="research-meta">{panel.gapLine}</p> : null}
-              <p className="research-meta">{panel.freshnessLine}</p>
-              {panel.evidenceHref ? (
-                <p className="research-meta">
-                  <Link href={panel.evidenceHref} prefetch={false}>
-                    Evidence
-                  </Link>
-                </p>
-              ) : null}
-            </article>
+            <IndicatorPanel key={panel.sourceId} panel={panel} compact={compact} />
           ))}
         </section>
       ))}
@@ -90,6 +61,79 @@ export function MacroConditionsPanel({ view, variant }: Props) {
         ))}
       </section>
     </div>
+  );
+}
+
+function IndicatorPanel({ panel, compact }: { panel: MacroSeriesPanel; compact: boolean }) {
+  return (
+    <article
+      className={compact ? "macro-panel macro-panel--compact" : "macro-panel"}
+      data-testid={`macro-panel-${panel.sourceId}`}
+      data-state={panel.state}
+    >
+      <h4 className="macro-panel-title">{panel.name}</h4>
+      {panel.region ? <p className="macro-region">{panel.region}</p> : null}
+      {panel.warning ? <p className="macro-warning">{panel.warning}</p> : null}
+      {panel.valueLabel ? (
+        <p className="macro-value" data-testid={`macro-value-${panel.sourceId}`}>
+          <span className="macro-value-figure">{panel.valueLabel}</span>
+          {panel.valueUnit ? <span className="macro-value-unit">{panel.valueUnit}</span> : null}
+          {panel.periodLabel ? (
+            <span className={panel.state === "stale" ? "macro-value-when macro-value-when--stale" : "macro-value-when"}>
+              {panel.periodLabel}
+            </span>
+          ) : null}
+        </p>
+      ) : null}
+      {panel.changeLabel ? <p className="macro-change">{panel.changeLabel}</p> : null}
+      {panel.chart ? <SeriesChart chart={panel.chart} testId={`macro-sparkline-${panel.sourceId}`} /> : null}
+      {panel.gapLine ? <p className="research-meta">{panel.gapLine}</p> : null}
+      {panel.chartNote ? <p className="research-body">{panel.chartNote}</p> : null}
+      {!compact && panel.measures ? (
+        <>
+          <h5 className="macro-heading">What it measures</h5>
+          <p className="research-body">{panel.measures}</p>
+        </>
+      ) : null}
+      {!compact && panel.matters ? (
+        <>
+          <h5 className="macro-heading">Why it matters</h5>
+          <p className="research-body">{panel.matters}</p>
+        </>
+      ) : null}
+      {panel.sourceLabel ? <p className="research-meta">Source: {panel.sourceLabel}</p> : null}
+      {panel.sourceHref ? (
+        <p className="research-meta">
+          <a
+            href={panel.sourceHref}
+            rel="noopener noreferrer"
+            target="_blank"
+            data-testid={`macro-source-${panel.sourceId}`}
+          >
+            {panel.sourceLinkLabel}
+          </a>
+        </p>
+      ) : null}
+      {panel.sourceLinkNote ? <p className="research-meta">{panel.sourceLinkNote}</p> : null}
+      <p className="research-meta">{panel.freshnessLabel}</p>
+      {panel.details.length > 0 ? (
+        <details className="macro-details">
+          <summary>Technical details</summary>
+          <ul className="macro-detail-list">
+            {panel.details.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+          {panel.evidenceHref ? (
+            <p className="research-meta">
+              <Link href={panel.evidenceHref} prefetch={false}>
+                Evidence
+              </Link>
+            </p>
+          ) : null}
+        </details>
+      ) : null}
+    </article>
   );
 }
 

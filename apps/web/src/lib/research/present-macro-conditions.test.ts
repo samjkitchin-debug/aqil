@@ -72,15 +72,23 @@ function visibleCopy(view: MacroConditionsView): string {
     for (const item of group.panels) {
       chunks.push(
         item.name,
-        item.stateLine,
-        item.description,
-        item.detailLine ?? "",
-        item.sourceLine ?? "",
-        item.windowLine ?? "",
-        item.chart?.caption ?? "",
+        item.region,
+        item.warning ?? "",
+        item.valueLabel ?? "",
+        item.valueUnit ?? "",
+        item.periodLabel ?? "",
+        item.changeLabel ?? "",
+        item.measures ?? "",
+        item.matters ?? "",
+        item.sourceLabel ?? "",
+        item.sourceLinkLabel ?? "",
+        item.sourceLinkNote ?? "",
+        item.freshnessLabel,
         item.gapLine ?? "",
         item.chartNote ?? "",
-        item.freshnessLine,
+        item.chart?.caption ?? "",
+        item.chart?.unitLabel ?? "",
+        ...item.details,
       );
     }
   }
@@ -158,20 +166,33 @@ test("a missing month is named and the line is not drawn through it", () => {
   const view = presentMacroConditions({ series: [unemployment()], asOf: AS_OF });
   const item = panel(view, "bls_cps_unemployment_rate");
   assert.equal(item.state, "current");
-  assert.match(item.chart?.caption ?? "", /latest 12 stored monthly observations, from September 2025 to September 2026/);
+  assert.equal(item.warning, null);
+  assert.match(item.chart?.caption ?? "", /September 2025 to September 2026/);
   assert.doesNotMatch(item.chart?.caption ?? "", /August 2025/);
   assert.match(item.gapLine ?? "", /Permanently missing: October 2025/);
   assert.match(item.gapLine ?? "", /did not publish this month/);
   assert.match(item.gapLine ?? "", /Nothing was filled in/);
-  assert.equal(item.chart?.marks.length, 2);
-  assert.equal(item.chart?.marks[0]?.kind, "point");
-  assert.equal(item.chart?.marks[1]?.kind, "line");
-  assert.match(
-    item.description,
-    /Latest observation: 4\.2 percent for September 2026\. Previous stored observation: 4\.1 percent for August 2026\. Difference: 0\.1 percentage points higher\./,
+  assert.equal(item.chart?.points.some((point) => point.period.startsWith("2025-10")), false);
+  assert.equal(
+    item.chart?.segments.some((segment) => segment.periods.includes("2025-09-01") && segment.periods.includes("2025-11-01")),
+    false,
   );
+  assert.ok((item.chart?.yTicks.length ?? 0) >= 2);
+  assert.ok(item.chart?.yTicks.every((tick) => tick.value > 1));
+  assert.ok(item.chart?.yTicks.every((tick) => tick.label.endsWith("%")));
+  assert.match(item.chart?.xTicks.map((tick) => tick.label).join(" ") ?? "", /[A-Z][a-z]{2} 202[56]/);
+  assert.equal(item.valueLabel, "4.2%");
+  assert.equal(item.periodLabel, "September 2026");
+  assert.equal(item.changeLabel, "+0.1 percentage points since August 2026");
+  assert.equal(item.sourceLabel, "U.S. Bureau of Labor Statistics · Current Population Survey");
+  assert.equal(item.sourceHref, "https://data.bls.gov/timeseries/LNS14000000");
+  assert.doesNotMatch(item.sourceLabel ?? "", /bls_cps|LNS14000000/);
+  assert.match(item.details.join(" "), /Source id: bls_cps_unemployment_rate/);
+  assert.match(item.details.join(" "), /Dataset: bls\.ln\.LNS14000000/);
+  assert.match(item.details.join(" "), /Stored value: 4\.2 percent/);
+  assert.match(item.measures ?? "", /share of the civilian labour force/);
+  assert.match(item.measures ?? "", /seasonally adjusted/);
   assert.equal(item.evidenceHref, "/research");
-  assert.match(item.detailLine ?? "", /Stored unit percent\. Seasonally adjusted\. Monthly\. Latest revised\./);
 });
 
 test("a continuous monthly span is one line and an unchanged value is not a direction", () => {
@@ -199,7 +220,9 @@ test("a continuous monthly span is one line and an unchanged value is not a dire
   });
   const item = panel(view, "bls_cps_unemployment_rate");
   assert.equal(item.gapLine, null);
-  assert.match(item.description, /Difference: unchanged\./);
+  assert.equal(item.chart?.segments.length, 1);
+  assert.equal(item.changeLabel, "Unchanged since August 2026");
+  assert.ok(item.chart?.yTicks.every((tick) => tick.value > 1));
 });
 
 test("weekly and quarterly series keep their own period and difference unit", () => {
@@ -244,20 +267,68 @@ test("weekly and quarterly series keep their own period and difference unit", ()
           { period: "2026-09-01", rawValue: "159044" },
         ],
       }),
+      series({
+        sourceId: "bls_cpi_u_all_items",
+        datasetId: "bls.cu.CUSR0000SA0",
+        unit: "1982-84=100",
+        observations: [
+          { period: "2026-08-01", rawValue: "334.131" },
+          { period: "2026-09-01", rawValue: "336.298" },
+        ],
+      }),
     ],
     asOf: AS_OF,
   });
   const credit = panel(view, "federal_reserve_h8_bank_credit");
-  assert.match(credit.description, /week of 7 October 2026/);
-  assert.match(credit.description, /57132 millions of US dollars higher/);
-  assert.doesNotMatch(credit.description, /percentage points/);
+  assert.equal(credit.valueLabel, "$19.95 trillion");
+  assert.equal(credit.periodLabel, "week of 7 October 2026");
+  assert.equal(credit.changeLabel, "+$57.13 billion since the week of 30 September 2026");
+  assert.match(credit.chart?.xTicks.map((tick) => tick.label).join(" ") ?? "", /Sep|Oct/);
+  assert.equal(credit.chart?.unitLabel, "US$ trillion");
+  assert.match(credit.details.join(" "), /19948526\.8 millions of US dollars/);
+  assert.doesNotMatch(credit.changeLabel ?? "", /percentage points|millions of US dollars/);
   const sloos = panel(view, "federal_reserve_sloos_cil");
-  assert.match(sloos.description, /quarter starting 1 July 2026/);
-  assert.match(sloos.description, /8\.1 percentage points lower/);
-  assert.match(sloos.detailLine ?? "", /Not seasonally adjusted\. Quarterly\./);
+  assert.equal(sloos.valueLabel, "0.0% net tightening");
+  assert.equal(sloos.periodLabel, "quarter starting 1 July 2026");
+  assert.equal(sloos.changeLabel, "-8.1 percentage points since the quarter starting 1 April 2026");
+  assert.match(sloos.measures ?? "", /not seasonally adjusted/);
+  assert.match(sloos.chart?.xTicks.map((tick) => tick.label).join(" ") ?? "", /Q2 2026|Q3 2026/);
   const payrolls = panel(view, "bls_ces_total_nonfarm_payrolls");
-  assert.match(payrolls.description, /29 thousands higher/);
-  assert.doesNotMatch(payrolls.description, /percentage points/);
+  assert.equal(payrolls.valueLabel, "159.0 million people");
+  assert.equal(payrolls.changeLabel, "+29,000 people since August 2026");
+  assert.equal(payrolls.chart?.unitLabel, "Million people");
+  assert.ok(payrolls.chart?.yTicks.every((tick) => tick.value < 1000));
+  assert.doesNotMatch(`${payrolls.valueLabel} ${payrolls.changeLabel}`, /thousands|percentage points/);
+  assert.match(payrolls.details.join(" "), /159044 thousands/);
+  const prices = panel(view, "bls_cpi_u_all_items");
+  assert.equal(prices.valueLabel, "336.298");
+  assert.equal(prices.valueUnit, "Index (1982–84 = 100)");
+  assert.equal(prices.changeLabel, "+2.167 index points since August 2026");
+  assert.doesNotMatch(prices.changeLabel ?? "", /percent/);
+  assert.match(prices.measures ?? "", /not a 12-month inflation rate/);
+});
+
+test("a tight series prints axis ticks at the step's own precision", () => {
+  const view = presentMacroConditions({
+    series: [
+      series({
+        sourceId: "bls_ces_total_nonfarm_payrolls",
+        unit: "thousands",
+        observations: [
+          { period: "2026-01-01", rawValue: "158400" },
+          { period: "2026-02-01", rawValue: "158600" },
+          { period: "2026-03-01", rawValue: "159050" },
+        ],
+      }),
+    ],
+    asOf: AS_OF,
+  });
+  const ticks = panel(view, "bls_ces_total_nonfarm_payrolls").chart?.yTicks ?? [];
+  const numbers = ticks.map((tick) => Number(tick.label));
+  const diffs = numbers.slice(1).map((value, index) => Number((value - numbers[index]).toFixed(4)));
+  assert.ok(ticks.length >= 3);
+  assert.equal(new Set(diffs).size, 1);
+  assert.ok((diffs[0] ?? 0) > 0);
 });
 
 test("a stale series is still shown and a missing series says so", () => {
@@ -268,8 +339,8 @@ test("a stale series is still shown and a missing series says so", () => {
         datasetId: "ecb.icp.M.U2.Y.000000.3.INX",
         unit: "index, 2015 = 100",
         observations: [
-          { period: "2025-11-01", rawValue: "129.67" },
-          { period: "2025-12-01", rawValue: "129.73" },
+          { period: "2025-11-01", rawValue: "129.67318795084398" },
+          { period: "2025-12-01", rawValue: "129.7338491760366" },
         ],
       }),
     ],
@@ -277,14 +348,22 @@ test("a stale series is still shown and a missing series says so", () => {
   });
   const hicp = panel(view, "ecb_sdw_hicp_sa");
   assert.equal(hicp.state, "stale");
-  assert.match(hicp.stateLine, /Data state: stale/);
-  assert.match(hicp.description, /129\.73 index, 2015 = 100 for December 2025/);
+  assert.match(hicp.warning ?? "", /Stale: December 2025/);
+  assert.match(hicp.warning ?? "", /does not describe current euro-area conditions/);
+  assert.equal(hicp.valueLabel, "129.7");
+  assert.equal(hicp.valueUnit, "Index (2015 = 100)");
+  assert.equal(hicp.periodLabel, "December 2025");
+  assert.match(hicp.changeLabel ?? "", /index points since November 2025/);
+  assert.doesNotMatch(hicp.changeLabel ?? "", /percent/);
+  assert.match(hicp.details.join(" "), /129\.7338491760366/);
   assert.equal(hicp.evidenceHref, "/research");
   const missing = panel(view, "bls_cps_unemployment_rate");
   assert.equal(missing.state, "missing");
-  assert.match(missing.description, /No live observation is stored/);
+  assert.match(missing.warning ?? "", /No observation is stored/);
+  assert.equal(missing.valueLabel, null);
   assert.equal(missing.evidenceHref, null);
   assert.equal(missing.chart, null);
+  assert.match(missing.measures ?? "", /civilian labour force/);
   assert.match(view.completenessLine, /1 of 10 tracked series has a stored observation/);
   assert.match(view.completenessLine, /9 have no live observation/);
   assert.match(view.completenessLine, /1 is stale for its frequency/);
@@ -302,6 +381,7 @@ test("one stored observation is insufficient for a change or a trend", () => {
     series: [
       series({
         sourceId: "bls_jolts_total_nonfarm_job_openings",
+        unit: "thousands",
         observations: [{ period: "2026-08-01", rawValue: "7079" }],
       }),
     ],
@@ -309,27 +389,34 @@ test("one stored observation is insufficient for a change or a trend", () => {
   });
   const item = panel(view, "bls_jolts_total_nonfarm_job_openings");
   assert.equal(item.state, "insufficient");
-  assert.match(item.description, /no difference is stated/);
-  assert.match(item.chartNote ?? "", /insufficient observation points/);
+  assert.equal(item.valueLabel, "7.08 million people");
+  assert.match(item.changeLabel ?? "", /no change is shown/);
+  assert.match(item.warning ?? "", /Only one observation is stored/);
   assert.equal(item.chart, null);
-  assert.match(item.windowLine ?? "", /latest 1 stored monthly observation/);
-  assert.match(item.windowLine ?? "", /The limit is 12/);
+  assert.match(item.details.join(" "), /latest 1 stored monthly observation/);
+  assert.match(item.details.join(" "), /The limit is 12/);
   assert.match(view.revisionLimit, /These stored series are latest revised/);
   assert.doesNotMatch(view.revisionLimit, /because|gauge|composite score/i);
 });
 
 test("a historical date is withheld when revision basis is missing or mixed", () => {
+  assert.match(revisionLimitLine([]), /No live series is stored, so no revision basis is shown/);
   assert.match(
-    revisionLimitLine([]),
-    /No live series is stored, so no revision basis is shown/,
-  );
-  assert.match(
-    revisionLimitLine([series({ sourceId: "bls_cps_unemployment_rate", seriesProvenance: null, observations: [{ period: "2026-09-01", rawValue: "4.2" }] })]),
+    revisionLimitLine([
+      series({
+        sourceId: "bls_cps_unemployment_rate",
+        seriesProvenance: null,
+        observations: [{ period: "2026-09-01", rawValue: "4.2" }],
+      }),
+    ]),
     /Revision basis is not stored/,
   );
   assert.match(
     revisionLimitLine([
-      series({ sourceId: "bls_cps_unemployment_rate", observations: [{ period: "2026-09-01", rawValue: "4.2" }] }),
+      series({
+        sourceId: "bls_cps_unemployment_rate",
+        observations: [{ period: "2026-09-01", rawValue: "4.2" }],
+      }),
       series({
         sourceId: "bls_cpi_u_all_items",
         seriesProvenance: "provider_vintage",
@@ -338,4 +425,24 @@ test("a historical date is withheld when revision basis is missing or mixed", ()
     ]),
     /Revision basis is not only latest revised/,
   );
+});
+
+test("a mismatched stored unit is not rescaled", () => {
+  const view = presentMacroConditions({
+    series: [
+      series({
+        sourceId: "bls_ces_total_nonfarm_payrolls",
+        unit: "percent",
+        observations: [
+          { period: "2026-08-01", rawValue: "4.0" },
+          { period: "2026-09-01", rawValue: "4.2" },
+        ],
+      }),
+    ],
+    asOf: AS_OF,
+  });
+  const item = panel(view, "bls_ces_total_nonfarm_payrolls");
+  assert.equal(item.valueLabel, "4.2");
+  assert.doesNotMatch(item.valueLabel ?? "", /million/);
+  assert.match(item.details.join(" "), /not rescaled/);
 });

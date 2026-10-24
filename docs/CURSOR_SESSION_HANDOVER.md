@@ -1,9 +1,37 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 24 October 2026, revision limit and wealth unknowns
-**Parent:** `cf2daa5` on local `main` before this commit
+**Last updated:** 24 October 2026, conditions presentation
+**Parent:** `c2418c3` on local `main` before this commit
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Conditions presentation, 24 October 2026
+
+Risk class R1 display. Local `main` before this commit was `c2418c3`. `origin/main` remained `c9ea596`. Nothing was pushed. Hosted migrations were not applied. Production Saxo was not enabled. No refresh schedule was created. Preserved databases were not written. GitHub Actions has not run on this tip. The commands below are local tests. They are not CI.
+
+The Intelligence conditions dashboard now leads with the indicator, the latest value, the change, and a labelled chart. Each panel says what the series measures and why it matters. The default source line names the publisher and the publication. Technical identifiers, the stored raw value, and provenance stay in Technical details. The freshness rule is one collapsed note.
+
+Stored observations were not rewritten. No month-on-month or year-on-year rate was added. Missing October 2025 is still named, and the unemployment and CPI lines are not drawn across it. The euro-area HICP panel still shows December 2025 and says that observation does not describe current euro-area conditions. No composite score was added. A higher or lower reading is not described as favourable.
+
+Source links are the access URLs already in `docs/sources/SOURCE_RIGHTS.csv`. Where that register has a data file rather than a series page, the panel says a separate series page is not in the verified source register. Those external URLs were not fetched in this session.
+
+The compact Today pulse uses the same charts and readable values. It does not show the explanations. It still links to the full indicator view.
+
+Local results, all exit 0:
+
+- `npm run test:sourced-updates --prefix apps/web`: 41 passed, 0 failed. Includes formatting, source-link, and axis-step tests.
+- `npm run typecheck`: passed.
+- `npm run check:tokens`: token styling guard passed.
+- `npx eslint` on the touched presentation files: exit 0.
+
+Signed-in Cursor browser on `http://localhost:3000`. Google sign-in did not block the routes.
+
+- `/conditions` at 1440 by 900 pixels and at 390 pixels: 10 of 10 series. Unemployment 4.2% in September 2026, +0.1 percentage points since August 2026. Payrolls 159.0 million people, +29,000 people. Bank credit $19.95 trillion, +$57.13 billion. CPI-U 336.298 index points. HICP 129.7 with the stale December 2025 warning. No horizontal overflow. At 390 pixels, axis labels did not overlap or leave the viewport, and the main content has 72 pixels of padding beneath the bottom navigation. A pointer press on the unemployment chart showed May 2026, 4.3%. A focus event on the September 2026 point showed 4.2%. Screenshots were taken locally and were not committed. The Next.js dev overlay showed a hydration diff whose changed attribute was `data-cursor-ref` from the browser tool. That was not changed.
+- `/` at 390 pixels: `data-variant="compact"`. What it measures is not on the page. Full indicator view href is `/conditions`. The revision-limit sentence is still shown. No horizontal overflow.
+
+This commit is on local `main`, which holds the conditions dashboard. `work/aqil-autonomous-build` does not. It was not fast-forwarded.
+
+Founder approval is still required before a push or a deploy.
 
 ## Revision limit and wealth unknowns, 24 October 2026
 
