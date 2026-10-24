@@ -27,8 +27,34 @@ function trimmed(value: string | undefined): string {
   return value?.trim() ?? "";
 }
 
+function normalisedHost(hostname: string): string {
+  const bare = hostname.startsWith("[") && hostname.endsWith("]") ? hostname.slice(1, -1) : hostname;
+  return bare.toLowerCase().replace(/\.$/, "");
+}
+
+function isIpv4Loopback(host: string): boolean {
+  const parts = host.split(".");
+  if (parts.length !== 4 || parts.some((part) => !/^\d{1,3}$/.test(part))) return false;
+  const numbers = parts.map((part) => Number(part));
+  if (numbers.some((part) => part > 255)) return false;
+  return numbers[0] === 127;
+}
+
+/** Node keeps brackets on a postgresql IPv6 host, and maps ::ffff:127.0.0.1 to hex. */
+function isIpv4MappedLoopback(host: string): boolean {
+  const dotted = host.match(/^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/);
+  if (dotted?.[1]) return isIpv4Loopback(dotted[1]);
+  const hex = host.match(/^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
+  if (!hex?.[1] || !hex[2]) return false;
+  const high = Number.parseInt(hex[1], 16);
+  return (high >> 8) === 127;
+}
+
 function isLoopbackHost(hostname: string): boolean {
-  return hostname === "127.0.0.1" || hostname === "localhost" || hostname === "::1";
+  const host = normalisedHost(hostname);
+  if (host === "localhost" || host === "::1" || host === "0.0.0.0" || host === "::") return true;
+  if (isIpv4Loopback(host) || isIpv4MappedLoopback(host)) return true;
+  return false;
 }
 
 function parseDatabaseUrl(value: string): URL | null {

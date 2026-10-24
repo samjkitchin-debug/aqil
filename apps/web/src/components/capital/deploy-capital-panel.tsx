@@ -7,6 +7,7 @@ import {
 } from "@/lib/capital/example";
 import { deploymentFromPortfolio, type PortfolioDeployment } from "@/lib/capital/from-portfolio";
 import { brokerHoldingKey } from "@/lib/capital/holding-key";
+import { PlaybookApplicabilitySection } from "@/components/capital/playbook-applicability-section";
 import { DEVELOPMENT_POLICY_STORE_COPY } from "@/lib/capital/policy";
 import { saveInvestmentPolicy } from "@/lib/capital/policy-actions";
 import type { LoadedInvestmentPolicy } from "@/lib/capital/policy-file";
@@ -289,6 +290,7 @@ export function DeployCapitalPanel({
           </button>
         </form>
       </section>
+      <PlaybookApplicabilitySection targets={policy.runtime.targets} />
       <section className="grid gap-[var(--space-3)]" data-testid="deploy-account">
         <h2 className="text-foreground">Saved snapshot</h2>
         {account.available ? (

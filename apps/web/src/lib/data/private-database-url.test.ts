@@ -54,6 +54,36 @@ test("production uses a configured non-local research URL", () => {
     status: "configured",
     url: HOSTED,
   });
+  assert.deepEqual(
+    resolveResearchDatabaseUrl({
+      nodeEnv: "production",
+      configuredUrl: "postgresql://research_worker:x@[2001:db8::1]:5432/research",
+    }),
+    {
+      status: "configured",
+      url: "postgresql://research_worker:x@[2001:db8::1]:5432/research",
+    },
+  );
+});
+
+test("production refuses loopback spellings other than 127.0.0.1", () => {
+  const localUrls = [
+    "postgresql://research_worker:research_worker@127.0.0.2:55432/postgres",
+    "postgresql://research_worker:x@[::1]:55432/postgres",
+    "postgresql://research_worker:x@[::ffff:127.0.0.1]:55432/postgres",
+    "postgresql://research_worker:x@0.0.0.0:55432/postgres",
+    "postgresql://research_worker:x@[::]:55432/postgres",
+  ];
+  for (const configuredUrl of localUrls) {
+    assert.deepEqual(resolveResearchDatabaseUrl({ nodeEnv: "production", configuredUrl }), {
+      status: "unavailable",
+      reason: RESEARCH_DATABASE_LOCAL_REFUSED,
+    });
+    assert.deepEqual(resolveEtfDatabaseUrl({ nodeEnv: "production", configuredUrl }), {
+      status: "unavailable",
+      reason: RESEARCH_DATABASE_LOCAL_REFUSED,
+    });
+  }
 });
 
 test("development keeps the local ETF default and refuses other addresses", () => {

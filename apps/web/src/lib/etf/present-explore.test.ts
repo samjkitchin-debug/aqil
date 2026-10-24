@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  ETF_CITED_DOCUMENT_REQUIREMENT,
   ETF_EMPTY_COPY,
   ETF_RESEARCH_BOUNDARY,
   HOLDINGS_BLOCKED_REASON,
@@ -38,8 +39,17 @@ function unverifiedAnchor(): EtfShareExplore {
 }
 
 test("the empty catalogue does not claim a verified fund", () => {
+  assert.match(ETF_EMPTY_COPY, /No share class is stored/);
   assert.match(ETF_EMPTY_COPY, /IE00BK5BQT80/);
   assert.match(ETF_EMPTY_COPY, /not a permitted issuer citation/);
+  assert.match(ETF_CITED_DOCUMENT_REQUIREMENT, /docs\/sources\/etf\/cited\/\*\.json/);
+  assert.match(ETF_CITED_DOCUMENT_REQUIREMENT, /source_id/);
+  assert.match(ETF_CITED_DOCUMENT_REQUIREMENT, /founder_supplied does not permit/);
+  assert.match(ETF_CITED_DOCUMENT_REQUIREMENT, /Unknown and prohibited each refuse/);
+  assert.match(ETF_CITED_DOCUMENT_REQUIREMENT, /docs\/sources\/SOURCE_RIGHTS\.csv/);
+  assert.match(ETF_CITED_DOCUMENT_REQUIREMENT, /forward-horizon\.v1\.json is not that document/);
+  assert.doesNotMatch(ETF_CITED_DOCUMENT_REQUIREMENT, /share class is stored/i);
+  assert.doesNotMatch(ETF_CITED_DOCUMENT_REQUIREMENT, /VWRA/);
   assert.match(ETF_RESEARCH_BOUNDARY, /not your broker holdings/);
   assert.match(ETF_RESEARCH_BOUNDARY, /not personal advice/);
 });

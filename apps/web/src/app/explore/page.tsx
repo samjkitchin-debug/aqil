@@ -5,7 +5,11 @@ import { PrivatePage } from "@/components/auth/private-page";
 import { EtfExplorePanel } from "@/components/etf/etf-explore-panel";
 import { StatusLine } from "@/components/ui/status-line";
 import { loadEtfExplore } from "@/lib/etf/load-explore";
-import { ETF_EMPTY_COPY, ETF_RESEARCH_BOUNDARY } from "@/lib/etf/present-explore";
+import {
+  ETF_CITED_DOCUMENT_REQUIREMENT,
+  ETF_EMPTY_COPY,
+  ETF_RESEARCH_BOUNDARY,
+} from "@/lib/etf/present-explore";
 
 async function EtfExplore() {
   const loaded = await loadEtfExplore();
@@ -25,6 +29,7 @@ async function EtfExplore() {
       <div className="research-banner" data-testid="explore-empty">
         <h2 className="research-section-title">ETF research</h2>
         <p className="research-body">{ETF_EMPTY_COPY}</p>
+        <p className="research-body mt-[var(--space-4)]">{ETF_CITED_DOCUMENT_REQUIREMENT}</p>
         <StatusLine tone="limitation">{ETF_RESEARCH_BOUNDARY}</StatusLine>
       </div>
     );

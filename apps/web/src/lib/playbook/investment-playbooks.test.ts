@@ -228,6 +228,8 @@ test("learn lists the register as research without a new navigation item", () =>
 
   assert.match(page, /InvestmentPlaybooks/);
   assert.match(component, /PLAYBOOK_TRADE_NOTICE/);
+  assert.match(component, /\/my-wealth\/deploy/);
+  assert.match(component, /Missing inputs stay missing/);
   assert.match(component, /Structural principles/);
   assert.match(component, /Disputed market-timing/);
   assert.doesNotMatch(component, /#[0-9a-fA-F]{3,8}\b/);

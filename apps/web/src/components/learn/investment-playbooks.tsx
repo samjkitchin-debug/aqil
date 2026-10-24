@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { loadInvestmentPlaybooks } from "@/lib/playbook/load-investment-playbooks";
 import {
   PLAYBOOK_REGISTER_NOTE,
@@ -23,6 +25,13 @@ export function InvestmentPlaybooks() {
         </h2>
         <p className="research-body">{PLAYBOOK_TRADE_NOTICE}</p>
         <p className="research-body mt-[var(--space-4)]">{PLAYBOOK_REGISTER_NOTE}</p>
+        <p className="research-body mt-[var(--space-4)]">
+          <Link href="/my-wealth/deploy" prefetch={false} className="underline">
+            Deploy capital
+          </Link>{" "}
+          reads the saved development policy and lists which of these required inputs are present or
+          missing. Missing inputs stay missing.
+        </p>
       </section>
 
       <PlaybookGroup

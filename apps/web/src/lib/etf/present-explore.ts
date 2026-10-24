@@ -4,6 +4,14 @@ export const ETF_RESEARCH_BOUNDARY =
 export const ETF_EMPTY_COPY =
   "No share class is stored. No source is cleared for automated collection, so listings, costs, holdings, and returns stay unavailable. The internal anchor ISIN IE00BK5BQT80 (VWRA) is not a permitted issuer citation.";
 
+/**
+ * Founder-facing copy of the cited-document gate in
+ * workers/research/src/aqil_research/etf/documents/ingest.py
+ * (FIRST_INSERT_REQUIREMENT). No share class is claimed.
+ */
+export const ETF_CITED_DOCUMENT_REQUIREMENT =
+  "A first share-class insert needs one cited issuer document at docs/sources/etf/cited/*.json and a rights row with the same source_id. The document must include source_id, source_locator, and a document_date or retrieved_on, plus isin, umbrella_legal_name, sub_fund_legal_name, base_currency, distribution_policy, and hedge_status. Omitted fields stay absent. founder_supplied does not permit acquire, retain, extract, or display. The rights row must have operational_status enabled, and automated_access (acquire), raw_data_retention (retain), internal_computation (extract), and redistribution (display) must each be permitted. Unknown and prohibited each refuse that use. Do not change an unknown or prohibited cell in docs/sources/SOURCE_RIGHTS.csv to permitted. The internal fixture apps/web/fixtures/forward-horizon.v1.json is not that document. Share classes resolve on instruments.share_classes by ISIN.";
+
 export const HOLDINGS_BLOCKED_REASON =
   "Holdings are not shown. No snapshot with a permitted rights gate is stored, and prohibited or unknown sources are not fetched.";
 

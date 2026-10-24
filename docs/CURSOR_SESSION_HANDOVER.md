@@ -1,10 +1,38 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 24 October 2026, roadmap-reset integration  
-**Parent:** `5bb2ca8` on local `main` before this commit  
+**Last updated:** 24 October 2026, playbook input check and cited-document empty state
+**Parent:** `e722149` on local `main` before this commit
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
 
+## Playbook inputs and the cited-document empty state, 24 October 2026
+
+Risk class R1. Local `main` before this commit was `e722149`. `origin/main` remained `c9ea596`. Nothing was pushed. Hosted migrations were not applied. Production Saxo was not enabled. No refresh schedule was created. Preserved databases `postgres` and `aqil_etf` were not written. This session did not run a SQL count. Signed-in Exposures says no share class is stored. `docs/sources/etf/cited` is absent. GitHub Actions has not run on this tip. The commands below are local tests. They are not CI.
+
+Deploy capital now reads the five-entry register and the saved development policy. For each entry it says which required inputs are present, missing, or not required. Written target weights are present only when the saved targets add up to 100 percent. An empty policy records that targets are not set. Current weights, a standing contribution, regional or sector holdings, and a cited ongoing charge stay missing. A sentence that no return forecast is required is not a stored forecast. The unapproved timing entry is not applied. The check does not name a fund, score a method, or send an order. Saves still use the gitignored development file. `public.wealth_allocation_targets` was not written.
+
+Exposures keeps the empty state and now repeats the cited-document gate already implemented for a first share-class insert: one JSON file at `docs/sources/etf/cited/*.json`, a matching rights row, and the required identity fields. Unknown and prohibited rights stay refused. No share class was inserted.
+
+Production research and ETF URL resolution now refuses loopback spellings that previously passed, including `127.0.0.2`, `[::1]`, IPv4-mapped `127.0.0.1`, `0.0.0.0`, and `[::]`. A non-local address such as `2001:db8::1` still resolves. Development still uses the local default when the URL is unset.
+
+Conditions, Upcoming, and Evidence were not rebuilt. From Exposures, Upcoming opened `/calendar` and showed confirmed BLS release times. Evidence opened `/research`. No navigation bug was reproduced, so none was changed.
+
+Local results, all exit 0:
+
+- `npm run test:capital --prefix apps/web`: 25 passed, 0 failed. Includes the six playbook-input tests.
+- `npm run test:learn --prefix apps/web`: 11 passed, 0 failed.
+- `npm run test:etf --prefix apps/web`: 9 passed, 0 failed. Includes the extra production loopback cases.
+- `npm run typecheck`: passed.
+- `npm run check:tokens`: token styling guard passed.
+- `npx eslint` on the touched web files: exit 0.
+
+Signed-in Cursor browser on `http://localhost:3000`. Google sign-in did not block the routes.
+
+- `/my-wealth/deploy`: Playbook inputs lists all five entries. Targets are not set. Every other portfolio input is missing. Tactical regional or sector allocation says it is not approved and is not applied. No order is sent. No fund name is shown. No horizontal overflow at about 1920 pixels, or at 390 pixels. At 390 pixels the primary navigation is a fixed bottom bar and the main content has padding beneath it.
+- `/explore`: "No share class is stored." The cited-document requirement is on the page, including `docs/sources/etf/cited/*.json`. No horizontal overflow at 390 pixels or at 1440 pixels.
+- `/learn`: The register says Deploy capital lists which required inputs are present or missing. The link target is `/my-wealth/deploy`. Primary navigation stays Today, My Wealth, and Intelligence. No horizontal overflow at 390 pixels or at 1440 pixels. A click on that link focused it and did not change the URL in this session. Opening `/my-wealth/deploy` directly showed the check. The Next.js dev overlay again showed hydration diffs whose changed attributes were `data-cursor-ref` from the browser tool. That was not changed.
+
+Founder approval is still required, separately, before any of these: a hosted backup and apply of the nine migrations; setting the server-only research URL and one manual refresh, with no cron; a push of local `main`. Do not enable Saxo. Do not switch policy saves onto `public.wealth_allocation_targets`. Do not insert a cited share class until a real permitted document is in the tree.
 ## Roadmap-reset integration, 24 October 2026
 
 Risk class R1. Local `main` before this commit was `5bb2ca8`. `origin/main` remained `c9ea596`. Nothing was pushed. Hosted migrations were not applied. Production Saxo was not enabled. No refresh schedule was created. Preserved databases `postgres` and `aqil_etf` were not written and were not re-queried. The last read of `postgres` during the upgrade rehearsal was 8791 observations in total, 8704 live and 87 fixture. Cited share classes remain 0. `docs/sources/etf/cited` is absent. GitHub Actions has not run on this tip. The commands below are local tests. They are not CI.
