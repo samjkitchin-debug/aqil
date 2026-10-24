@@ -20,11 +20,11 @@ Euro-area HICP stays on its chart, is excluded from the reading, and ends in Dec
 
 Events read contract, documented here only. A later verified development may be cited as a possible transmission channel, with its own source id, and it is not evidence that a measured series moved. This briefing does not load that input. Conditions does not query the macro-event tables.
 
-The uncommitted chart work stays with this change: payrolls display as jobs, openings as job openings, bank credit copy uses trillions, and the chart curve still breaks on a missing month.
+The chart work stays with this change: payrolls display as jobs, openings as job openings, bank credit copy uses trillions, and the chart curve still breaks on a missing month. AQ-076 evidence now says 159.0 million jobs. AQ-076 stays Implemented — unverified, because GitHub Actions has not run.
 
 Local results, all exit 0:
 
-- `npm run test:sourced-updates` in `apps/web`: 55 passed, 0 failed. That includes the economic-evidence presenter tests and the existing prospective-assessment presenter tests.
+- `npm run test:sourced-updates` in `apps/web`: 55 passed, 0 failed. That includes the economic-evidence presenter tests and the existing prospective-assessment presenter tests. The same command was run again after the backlog wording check and again passed 55, with 0 failed. Research methods were not edited, so research pytest was not run and preserved database `postgres` was not opened.
 - `npx tsc --noEmit` in `apps/web`: passed.
 - `npx eslint` on the touched presentation files: exit 0.
 - `npm run check:tokens`: passed.
