@@ -9,11 +9,12 @@ from datetime import UTC, datetime
 from aqil_research.manual.register import (
     register_ai_infrastructure,
     register_publication_recorded,
+    register_supplied_ustr_notice,
     register_ustr_notice,
 )
 from aqil_research.manual.rights_gate import RegistrationBlocked
 from aqil_research.manual.sec_capex import fetch_company_facts
-from aqil_research.manual.ustr_notice import fetch_ustr_notice
+from aqil_research.manual.ustr_notice import fetch_ustr_notice, supplied_fields_from_args
 from aqil_research.persistence.connection import research_connection
 from aqil_research.sources.rights import find_source_rights, load_source_rights
 
@@ -28,12 +29,23 @@ def register_macro_parser(sub: argparse._SubParsersAction) -> None:
         required=True,
         choices=("ustr-notice", "central-bank-publication", "ai-infrastructure"),
     )
+    parser.add_argument(
+        "--title", default=None, help="Notice title. Used only with the no-fetch fields."
+    )
+    parser.add_argument(
+        "--canonical-url", default=None, help="Canonical https URL. No request is made."
+    )
+    parser.add_argument("--published-at", default=None, help="Publication date, YYYY-MM-DD.")
+    parser.add_argument("--event-dates", default=None, help="Event dates stated by the notice.")
+    parser.add_argument(
+        "--summary", default=None, help="Short summary. The notice body is not stored."
+    )
 
 
 def run_register_macro(args: argparse.Namespace) -> int:
     try:
         with research_connection() as conn:
-            result = _run(conn, args.record)
+            result = _run(conn, args)
     except RegistrationBlocked as exc:
         print(f"blocked: {exc}", file=sys.stderr)
         return 2
@@ -41,13 +53,23 @@ def run_register_macro(args: argparse.Namespace) -> int:
     return 0
 
 
-def _run(conn, record: str):
+def _run(conn, args: argparse.Namespace):
     rights = load_source_rights()
     now = datetime.now(tz=UTC)
+    record = args.record
     if record == "ustr-notice":
         source = find_source_rights(rights, source_id="govinfo_federal_register")
         if source is None:
             raise RegistrationBlocked("govinfo_federal_register is not in the rights register")
+        supplied = supplied_fields_from_args(args)
+        if supplied is not None:
+            return register_supplied_ustr_notice(
+                conn,
+                notice=supplied,
+                rights=source,
+                record_class="recorded",
+                retrieved_at=now,
+            )
         body = fetch_ustr_notice(source)
         return register_ustr_notice(
             conn,

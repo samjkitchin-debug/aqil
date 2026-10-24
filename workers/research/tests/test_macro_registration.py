@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
+import argparse
 from datetime import UTC, datetime
 
 import psycopg
 import pytest
 
+from aqil_research.manual.command import _run
 from aqil_research.manual.register import (
     register_ai_infrastructure,
     register_publication_recorded,
+    register_supplied_ustr_notice,
     register_synthetic_supersession,
     register_ustr_notice,
 )
@@ -19,8 +22,21 @@ from aqil_research.manual.sec_capex import (
     extract_annual_capex,
     fetch_company_facts,
 )
-from aqil_research.manual.ustr_notice import fetch_ustr_notice, notice_supports_ustr_claim
-from aqil_research.sources.rights import find_source_rights, load_source_rights
+from aqil_research.manual.ustr_notice import (
+    USTR_CLAIM,
+    USTR_EVENT_DATES,
+    USTR_EVENT_KEY,
+    USTR_NOTICE_URL,
+    USTR_TITLE,
+    fetch_ustr_notice,
+    notice_supports_ustr_claim,
+    parse_supplied_ustr_notice,
+)
+from aqil_research.sources.rights import (
+    RightsDecision,
+    find_source_rights,
+    load_source_rights,
+)
 from aqil_research.workflow import refresh as refresh_module
 from db_guard import open_isolated_test_database
 
@@ -131,7 +147,125 @@ def test_refresh_does_not_register_macro_events() -> None:
     text = open(source, encoding="utf-8").read()
     assert "register-macro" not in text
     assert "register_ustr_notice" not in text
+    assert "register_supplied_ustr_notice" not in text
     assert "register_ai_infrastructure" not in text
+
+
+def _notice_args() -> argparse.Namespace:
+    return argparse.Namespace(
+        record="ustr-notice",
+        title=USTR_TITLE,
+        canonical_url=USTR_NOTICE_URL,
+        published_at="2026-10-07",
+        event_dates=USTR_EVENT_DATES,
+        summary=USTR_CLAIM,
+    )
+
+
+def test_no_fetch_path_stores_one_event_and_a_second_call_is_unchanged(
+    database_url: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fail_fetch(*_args: object, **_kwargs: object) -> str:
+        raise AssertionError("the no-fetch path must not HTTP-fetch")
+
+    monkeypatch.setattr("aqil_research.manual.command.fetch_ustr_notice", fail_fetch)
+    with psycopg.connect(database_url) as conn:
+        with conn.transaction(force_rollback=True):
+            before = conn.execute("select count(*) from research.economic_observations").fetchone()
+            first = _run(conn, _notice_args())
+            second = _run(conn, _notice_args())
+            assert first.outcome == "recorded"
+            assert second.outcome == "unchanged"
+            assert first.detail == second.detail == USTR_EVENT_KEY
+            row = conn.execute(
+                """
+                select e.category, e.epistemic_class, e.claim_scope, e.summary,
+                       e.event_dates_stated, e.event_on, e.surface_on_today, e.surface_reason,
+                       e.publication_allowed, e.indicator_source_ids, e.channel_note,
+                       e.record_class, u.canonical_url, u.title, r.http_status,
+                       (select count(*) from research.macro_events where event_key = %s),
+                       (select count(*) from research.economic_observations)
+                from research.macro_events e
+                join research.macro_event_evidence ev
+                  on ev.event_id = e.event_id and ev.role = 'primary'
+                join research.sourced_updates u on u.update_id = ev.update_id
+                join research.source_retrievals r on r.retrieval_id = u.retrieval_id
+                where e.event_key = %s
+                """,
+                (USTR_EVENT_KEY, USTR_EVENT_KEY),
+            ).fetchone()
+            assert row is not None
+            assert row[0] == "trade_policy"
+            assert row[1] == "confirmed_event"
+            assert row[2] == "policy_action_stated"
+            assert row[3] == USTR_CLAIM
+            assert "6 July 2026" in row[4] and "23 August 2026" in row[4]
+            assert row[5].isoformat() == "2026-08-23"
+            assert row[6] is True
+            assert row[7] == USTR_CLAIM
+            assert row[8] is False
+            assert row[9] == ["bls_cpi_u_all_items", "federal_reserve_g17_total_ip"]
+            assert "plausible channel" in row[10].lower()
+            assert "not a measured effect" in row[10].lower()
+            assert row[11] == "recorded"
+            assert row[12] == USTR_NOTICE_URL
+            assert row[13] == USTR_TITLE
+            assert row[14] is None
+            assert row[15] == 1
+            assert before is not None and row[16] == before[0]
+            assert "<" not in row[3]
+            assert "SUPPLEMENTARY" not in row[3]
+
+
+@pytest.mark.parametrize(
+    "source_id",
+    ["federal_reserve_monetary_press", "ecb_monetary_press"],
+)
+def test_supplied_path_refuses_central_bank_press(database_url: str, source_id: str) -> None:
+    rights = find_source_rights(load_source_rights(), source_id=source_id)
+    assert rights is not None
+    notice = parse_supplied_ustr_notice(
+        title=USTR_TITLE,
+        canonical_url=USTR_NOTICE_URL,
+        published_at="2026-10-07",
+        event_dates=USTR_EVENT_DATES,
+        summary=USTR_CLAIM,
+    )
+    with psycopg.connect(database_url) as conn:
+        with conn.transaction(force_rollback=True):
+            with pytest.raises(RegistrationBlocked, match="central-bank"):
+                register_supplied_ustr_notice(
+                    conn,
+                    notice=notice,
+                    rights=rights,
+                    record_class="synthetic_fixture",
+                    retrieved_at=RETRIEVED_AT,
+                )
+
+
+def test_supplied_path_still_requires_retention_and_redistribution(database_url: str) -> None:
+    rights = find_source_rights(load_source_rights(), source_id="govinfo_federal_register")
+    assert rights is not None
+    notice = parse_supplied_ustr_notice(
+        title=USTR_TITLE,
+        canonical_url=USTR_NOTICE_URL,
+        published_at="2026-10-07",
+        event_dates=USTR_EVENT_DATES,
+        summary=USTR_CLAIM,
+    )
+    with psycopg.connect(database_url) as conn:
+        with conn.transaction(force_rollback=True):
+            for field in ("raw_data_retention", "redistribution"):
+                blocked = rights.model_copy(update={field: RightsDecision.UNKNOWN})
+                with pytest.raises(RegistrationBlocked, match=field):
+                    register_supplied_ustr_notice(
+                        conn,
+                        notice=notice,
+                        rights=blocked,
+                        record_class="synthetic_fixture",
+                        retrieved_at=RETRIEVED_AT,
+                    )
 
 
 def test_synthetic_ustr_pathway_is_idempotent_and_hidden(

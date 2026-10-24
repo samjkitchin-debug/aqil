@@ -54,7 +54,7 @@ Scheduled Python worker(s) (uv, Pydantic, Polars or pandas, NumPy, pytest)
 4. `portfolio`: ledger, cash accounts, holdings projection, valuation, TWR/MWR, benchmarks, import review.
 5. `sources`: source registry, rights, ingestion, document evidence, revisions and event clustering.
 6. `methods_signals`: versioned research methods, factor indicators, reproducible calculation results.
-7. `causal`: policy lifecycle, economic relationships, horizon/scenario and contestable assumptions. AQ-035 policy lifecycle is still not started.
+7. `causal`: policy lifecycle, economic relationships, horizon/scenario and contestable assumptions. AQ-035 policy lifecycle is still not started. Macro events and the AI infrastructure theme are four append-only research tables, registered by hand and kept out of refresh. `publication_allowed` stays false. Institutional capital is not part of that slice.
 8. `hypotheses`: forecast registration, frozen revisions, adjudication, independent evaluation.
 9. `lab`: shadow portfolios, experiment pre-registration, simulated orders and outcome tracking.
 10. `editorial`: story multi-depth outputs, claim mappings, publish approval, errata, reading feeds.

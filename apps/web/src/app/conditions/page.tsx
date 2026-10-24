@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
 import { EconomicEvidenceBriefing } from "@/components/research/economic-evidence-briefing";
+import { EventsAndThemesSection } from "@/components/research/events-and-themes";
 import { MacroConditionsSection } from "@/components/research/macro-conditions-panel";
 import { loadEconomicEvidence } from "@/lib/research/load-economic-evidence";
 import { presentEconomicEvidence } from "@/lib/research/present-economic-evidence";
@@ -37,6 +38,9 @@ export default function ConditionsPage() {
             </h2>
             <Suspense fallback={<p className="research-body">Loading conditions…</p>}>
               <ConditionsDashboard />
+            </Suspense>
+            <Suspense fallback={<p className="research-body">Loading events and themes…</p>}>
+              <EventsAndThemesSection variant="compact" />
             </Suspense>
           </section>
         </PrivatePage>

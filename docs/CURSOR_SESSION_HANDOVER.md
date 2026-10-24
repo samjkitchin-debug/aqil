@@ -1,8 +1,28 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 24 October 2026, economic evidence briefing
+**Last updated:** 24 October 2026, USTR no-fetch registration
 
+
+## USTR notice without a new fetch, 24 October 2026
+
+Risk class R2. Local only. Nothing was pushed. The hosted project was not migrated. `publication_allowed` stays false. No refresh step was added. `govinfo_federal_register` still has `automated_access` unknown, `raw_data_retention` permitted, and `redistribution` permitted. The notice was not fetched.
+
+What is real: Federal Register notice 2026-20510 is stored on local postgres as a `confirmed_event`, `policy_action_stated`, `trade_policy`. The summary is only that the 6 July 2018 and 23 August 2018 Section 301 actions concerning China did not terminate on 6 July 2026 and 23 August 2026 and remain in effect, subject to possible further modification. It is not a new tariff schedule and the notice body is not stored. Event dates are 6 July 2026 and 23 August 2026. `published_at` is 7 October 2026. The canonical URL is `https://www.govinfo.gov/content/pkg/FR-2026-10-07/html/2026-20510.htm`. `surface_on_today` is true and the reason restates that claim. Plausible channels are `bls_cpi_u_all_items` and `federal_reserve_g17_total_ip`, labelled as plausible channels and not a measured effect. A second registration returned unchanged. The existing Federal Reserve publication remains `publication_recorded` with `surface_on_today` false.
+
+What is manual: registration is `aqil-research register-macro` with the operator-supplied title, URL, publication time, event dates, and short summary. It is not part of `research:refresh`. Monitoring is manual.
+
+What is blocked: `AQIL_SEC_USER_AGENT` is unset, so SEC companyfacts was not called and the AI infrastructure theme is not stored. No amount was invented. AQ-035, AQ-036, and AQ-011 are not complete. Institutional capital is not part of this slice.
+
+`research.economic_observations` was not rewritten. Immediately before and after the insert it had 20492 rows, of which 20405 are live. The ten series in the earlier 8791 / 8704 note are still 8791 rows and 8704 live. Unemployment remains 44 live rows inside a series total of 131. The other rows were already stored and were not touched. `research.sourced_updates` went from 42 to 43. The new row is the govinfo notice. The other 42 rows were not updated. Database `aqil_etf` was not opened.
+
+Disposable tests, not CI: `macro_events_themes.test.sql` passed 32 on `aqil_pgtap_test`. `tests/test_macro_registration.py` passed 12 on `aqil_research_test`. The web presenter test passed 8. `npm run typecheck` in `apps/web` passed. `etf_instruments.test.sql` was not run and the instruments migration was not applied.
+
+Signed-in Cursor browser on `http://localhost:3000`. Google sign-in did not block the routes. Primary navigation stayed Today, My Wealth, and Intelligence.
+
+- `/` at 1440 and at 390 pixels: one material development, the continuation claim, both event dates, published 7 October 2026, and Federal Register via govinfo. The awareness line is shown. The theme is not on the page. No horizontal overflow.
+- `/conditions` at 1440 and at 390 pixels: Events and themes shows the Federal Reserve publication record and the USTR policy action. The CPI-U hash `macro-panel-bls_cpi_u_all_items` opens that panel. Plausible channel links point at the CPI-U and industrial-production panels. No horizontal overflow.
+- `/research` at 1440 and at 390 pixels: class, claim scope, primary title, both dates, and no later evidence. No theme dimensions, because the SEC theme is not stored. No horizontal overflow.
 
 ## Economic evidence briefing, 24 October 2026
 
@@ -18,7 +38,7 @@ Conditions now shows an internal economic reading above the indicator charts. It
 
 Euro-area HICP stays on its chart, is excluded from the reading, and ends in December 2025. The files are described as latest revised and not a vintage panel. Each chart keeps its explanation and Technical details, and adds one compact line. A block lists broad equity performance, regional relative performance, sector leadership, valuation, earnings revisions, credit spreads, and benchmark total returns as not answered. An economic reading is not an investment conclusion. No ETF or Saxo query was added.
 
-Events read contract, documented here only. A later verified development may be cited as a possible transmission channel, with its own source id, and it is not evidence that a measured series moved. This briefing does not load that input. Conditions does not query the macro-event tables.
+Events read contract, documented here only. A later verified development may be cited as a possible transmission channel, with its own source id, and it is not evidence that a measured series moved. This briefing does not load that input. A separate Events and themes block on Conditions reads the macro-event tables. An event is not evidence that a measured series moved.
 
 The chart work stays with this change: payrolls display as jobs, openings as job openings, bank credit copy uses trillions, and the chart curve still breaks on a missing month. AQ-076 evidence now says 159.0 million jobs. AQ-076 stays Implemented — unverified, because GitHub Actions has not run.
 

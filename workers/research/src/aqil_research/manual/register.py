@@ -25,6 +25,9 @@ from aqil_research.manual.ustr_notice import (
     USTR_CLUSTER_KEY,
     USTR_EVENT_DATES,
     USTR_EVENT_KEY,
+    USTR_NOTICE_URL,
+    USTR_TITLE,
+    SuppliedUstrNotice,
     notice_supports_ustr_claim,
 )
 from aqil_research.sources.rights import (
@@ -107,11 +110,8 @@ def register_ustr_notice(
     published_at = datetime(2026, 10, 7, tzinfo=UTC)
     if published_at > retrieved_at:
         raise RegistrationBlocked("publication time is after retrieval")
-    title = (
-        "Continuation of Actions: China's Acts, Policies, and Practices Related to "
-        "Technology Transfer, Intellectual Property, and Innovation"
-    )
-    url = "https://www.govinfo.gov/content/pkg/FR-2026-10-07/html/2026-20510.htm"
+    title = USTR_TITLE
+    url = USTR_NOTICE_URL
     content_hash = _content_hash(rights.source_id, title, url, published_at)
     with conn.transaction():
         _defer(conn)
@@ -145,6 +145,80 @@ def register_ustr_notice(
             channel_note=USTR_CHANNEL_NOTE,
             surface_on_today=True,
             surface_reason=USTR_CLAIM,
+            surfaced_at=retrieved_at,
+            record_class=record_class,
+            investment_implication="no_action",
+        )
+        event_id = _event_id(conn, USTR_EVENT_KEY)
+        _link_evidence(
+            conn,
+            event_id=event_id,
+            update_id=update_id,
+            role="primary",
+            cluster_key=cluster_key_for(update_id, USTR_CLUSTER_KEY),
+        )
+        _check(conn)
+    outcome = "recorded" if event_inserted or inserted_update else "unchanged"
+    return RegistrationResult(outcome, USTR_EVENT_KEY)
+
+
+def register_supplied_ustr_notice(
+    conn: psycopg.Connection,
+    *,
+    notice: SuppliedUstrNotice,
+    rights: SourceRightsRecord,
+    record_class: RecordClass,
+    retrieved_at: datetime,
+) -> RegistrationResult:
+    """Store the operator's short summary. This function does not fetch the notice."""
+    if rights.source_id in PRESS_SOURCE_IDS:
+        raise RegistrationBlocked(
+            "policy_action_stated cannot use a central-bank press release as the primary source",
+        )
+    if rights.source_id != "govinfo_federal_register":
+        raise RegistrationBlocked("USTR registration requires govinfo_federal_register")
+    require_rights(rights, _STORE_AND_DISPLAY)
+    if notice.published_at > retrieved_at:
+        raise RegistrationBlocked("publication time is after retrieval")
+    content_hash = _content_hash(
+        rights.source_id,
+        notice.title,
+        notice.canonical_url,
+        notice.published_at,
+    )
+    summary_bytes = notice.summary.encode("utf-8")
+    with conn.transaction():
+        _defer(conn)
+        update_id, inserted_update = _upsert_sourced_update(
+            conn,
+            rights=rights,
+            title=notice.title,
+            canonical_url=notice.canonical_url,
+            published_at=notice.published_at,
+            retrieved_at=retrieved_at,
+            content_hash=content_hash,
+            collection_mode="live" if record_class == "recorded" else "fixture",
+            endpoint_host="www.govinfo.gov",
+            request_series_ids=["2026-20510"],
+            http_status=None,
+            response_bytes=len(summary_bytes),
+            fingerprint=hashlib.sha256(summary_bytes).hexdigest(),
+            ingest_notes=["no HTTP fetch; short summary stored; document body not stored"],
+        )
+        event_inserted = _upsert_event(
+            conn,
+            event_key=USTR_EVENT_KEY,
+            category="trade_policy",
+            epistemic_class="confirmed_event",
+            claim_scope="policy_action_stated",
+            summary=notice.summary,
+            country="United States",
+            event_on=notice.event_on,
+            event_dates_stated=notice.event_dates,
+            indicator_source_ids=list(USTR_CHANNELS),
+            channel_note=USTR_CHANNEL_NOTE,
+            surface_on_today=True,
+            surface_reason=notice.summary,
             surfaced_at=retrieved_at,
             record_class=record_class,
             investment_implication="no_action",
