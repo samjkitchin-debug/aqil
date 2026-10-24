@@ -23,6 +23,10 @@ test("levels use readable units and keep a precise chart value", () => {
   assert.equal(credit?.axisUnit, "US$ trillion");
   assert.ok(Math.abs((credit?.chartValue ?? 0) - 19.9485268) < 1e-6);
 
+  const eurostat = displayLevel("104.31", "index, 2025 = 100");
+  assert.equal(eurostat?.headline, "104.31");
+  assert.equal(eurostat?.beside, "Index (2025 = 100)");
+  assert.equal(displayChange("0.24", "index, 2025 = 100"), "+0.24 index points");
   const hicp = displayLevel("129.7338491760366", "index, 2015 = 100");
   assert.equal(hicp?.headline, "129.7");
   assert.equal(hicp?.precise, "129.73");

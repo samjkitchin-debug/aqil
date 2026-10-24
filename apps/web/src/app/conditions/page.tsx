@@ -7,6 +7,12 @@ import { EventsAndThemesSection } from "@/components/research/events-and-themes"
 import { MacroConditionsSection } from "@/components/research/macro-conditions-panel";
 import { loadEconomicEvidence } from "@/lib/research/load-economic-evidence";
 import { presentEconomicEvidence } from "@/lib/research/present-economic-evidence";
+import {
+  NO_REGIONAL_READING,
+  STORED_US_READING_HEADING,
+  conditionRegion,
+  showsStoredUnitedStatesReading,
+} from "@/lib/research/present-macro-conditions";
 
 
 async function ConditionsDashboard({
@@ -15,18 +21,26 @@ async function ConditionsDashboard({
   searchParams: Promise<{ region?: string }>;
 }) {
   const params = await searchParams;
+  const region = conditionRegion(params.region);
   const loaded = await loadEconomicEvidence();
   const briefing = loaded.status === "ready" ? presentEconomicEvidence(loaded.input) : null;
   const lines = Object.fromEntries((briefing?.seriesLines ?? []).map((line) => [line.sourceId, line.compact]));
+  const showUnitedStatesReading = showsStoredUnitedStatesReading(region);
   return (
     <>
-      {loaded.status === "unavailable" ? (
+      {showUnitedStatesReading && loaded.status === "unavailable" ? (
         <p className="research-body" data-testid="economic-reading-unavailable">
           {loaded.reason}
         </p>
-      ) : briefing ? (
-        <EconomicEvidenceBriefing view={briefing} />
       ) : null}
+      {showUnitedStatesReading && briefing ? (
+        <EconomicEvidenceBriefing view={briefing} heading={STORED_US_READING_HEADING} />
+      ) : null}
+      {showUnitedStatesReading ? null : (
+        <p className="research-body" data-testid="regional-reading-absent">
+          {NO_REGIONAL_READING}
+        </p>
+      )}
       <MacroConditionsSection variant="dashboard" seriesLines={lines} region={params.region} />
     </>
   );

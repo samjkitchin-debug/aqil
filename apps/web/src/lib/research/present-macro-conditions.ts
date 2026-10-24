@@ -105,6 +105,14 @@ export const CONDITION_REGIONS = [
 
 export type ConditionRegionId = (typeof CONDITION_REGIONS)[number]["id"];
 
+export const STORED_US_READING_HEADING = "Stored United States reading";
+export const NO_REGIONAL_READING =
+  "No regional reading is stored. The panels are stored observations.";
+
+export function showsStoredUnitedStatesReading(region: ConditionRegionId): boolean {
+  return region === "global" || region === "united-states";
+}
+
 const FACTOR_FAMILIES = [
   { id: "growth", name: "Growth" },
   { id: "inflation", name: "Inflation" },

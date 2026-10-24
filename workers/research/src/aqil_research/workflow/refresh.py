@@ -12,8 +12,8 @@ Cadence, when the command is used:
 - SLOOS C&I lending standards: each refresh, from the Board data package
 - CPI-U, payrolls, job openings, industrial production, bank credit,
   federal funds, the 10-year yield, and euro-area HICP: each refresh
-- Euro-area core HICP, the deposit facility rate, and the cleared Eurostat
-  euro-area series: each refresh
+- Euro-area core HICP, the deposit facility rate, the cleared Eurostat
+  euro-area series, and the Eurostat all-items HICP index: each refresh
 - Japan CPI reference index and machinery orders: each refresh
 - BIS dollar credit, UK CPI, Bank Rate, and Malaysian industrial production:
   each refresh
@@ -57,6 +57,7 @@ CADENCE = {
     "eurostat_unemployment_ea21": "each_refresh",
     "eurostat_industrial_production_ea21": "each_refresh",
     "eurostat_retail_volume_ea21": "each_refresh",
+    "eurostat_hicp_total_ea": "each_refresh",
     "stat_cpi_2025_all_items_reference": "each_refresh",
     "cao_mo_private_ex_volatile_sa_monthly": "each_refresh",
     "bis_gli_usd_credit_nonbanks": "each_refresh",
@@ -131,6 +132,7 @@ def default_refresh_steps() -> tuple[RefreshStep, ...]:
         ("eurostat_unemployment_ea21", _refresh_eurostat_unemployment),
         ("eurostat_industrial_production_ea21", _refresh_eurostat_industry),
         ("eurostat_retail_volume_ea21", _refresh_eurostat_retail),
+        ("eurostat_hicp_total_ea", _refresh_eurostat_hicp),
         ("stat_cpi_2025_all_items_reference", _refresh_stat_cpi),
         ("cao_mo_private_ex_volatile_sa_monthly", _refresh_cao_mo),
         ("bis_gli_usd_credit_nonbanks", _refresh_bis_gli),
@@ -579,6 +581,10 @@ def _refresh_eurostat_industry(now: datetime) -> SourceRefreshResult:
 
 def _refresh_eurostat_retail(now: datetime) -> SourceRefreshResult:
     return _eurostat_refresh(now, "eurostat_retail")
+
+
+def _refresh_eurostat_hicp(now: datetime) -> SourceRefreshResult:
+    return _eurostat_refresh(now, "eurostat_hicp")
 
 
 def _refresh_stat_cpi(now: datetime) -> SourceRefreshResult:

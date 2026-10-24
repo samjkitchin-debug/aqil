@@ -99,13 +99,19 @@ export const MACRO_SERIES: readonly MacroSeriesSpec[] = [
     sourceId: "ecb_sdw_hicp_sa",
     groupId: "international",
     groupLabel: "International",
-    name: "Euro area HICP",
+    name: "Discontinued euro-area HICP",
   },
   {
     sourceId: "ecb_hicp_core",
     groupId: "inflation",
     groupLabel: "Inflation",
-    name: "Euro area core HICP",
+    name: "Discontinued euro-area core HICP",
+  },
+  {
+    sourceId: "eurostat_hicp_total_ea",
+    groupId: "inflation",
+    groupLabel: "Inflation",
+    name: "Euro area all-items HICP",
   },
   {
     sourceId: "ecb_fm_deposit_facility",

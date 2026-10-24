@@ -48,6 +48,7 @@ def test_default_steps_are_official_live_sources() -> None:
         "eurostat_unemployment_ea21",
         "eurostat_industrial_production_ea21",
         "eurostat_retail_volume_ea21",
+        "eurostat_hicp_total_ea",
         "stat_cpi_2025_all_items_reference",
         "cao_mo_private_ex_volatile_sa_monthly",
         "bis_gli_usd_credit_nonbanks",

@@ -164,7 +164,7 @@ export const INDICATOR_METADATA: readonly IndicatorMetadata[] = [
     retrievalHref: null,
     expectedUnit: "index, 2015 = 100",
     measures:
-      "The euro-area Harmonised Index of Consumer Prices, all items, working-day and seasonally adjusted, with 2015 = 100. This panel shows the index level, not a year-on-year inflation rate.",
+      "The European Central Bank's discontinued euro-area Harmonised Index of Consumer Prices, all items, working-day and seasonally adjusted, with 2015 = 100. The stored file ends in December 2025. This panel shows the index level, not a year-on-year inflation rate. It is not the Eurostat index.",
     matters:
       "A change is a move in the price index, in index points. When the latest month is old, the figure does not describe current euro-area prices.",
   },
@@ -179,9 +179,24 @@ export const INDICATOR_METADATA: readonly IndicatorMetadata[] = [
     retrievalHref: null,
     expectedUnit: "index, 2015 = 100",
     measures:
-      "The euro-area harmonised index of consumer prices excluding energy and food, working-day and seasonally adjusted, with 2015 = 100. The European Central Bank is the compiler. This panel shows the index level, not a year-on-year rate.",
+      "The European Central Bank's discontinued euro-area harmonised index of consumer prices excluding energy and food, working-day and seasonally adjusted, with 2015 = 100. The stored file ends in December 2025. This panel shows the index level, not a year-on-year rate. It is not a Eurostat index.",
     matters:
       "It leaves out energy and food, which often move for reasons other than domestic demand. It is still a price index, not a forecast of returns.",
+  },
+  {
+    sourceId: "eurostat_hicp_total_ea",
+    region: "Euro area",
+    organisation: "Eurostat",
+    datasetLabel: "Harmonised index of consumer prices",
+    sourceHref:
+      "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?lang=EN&freq=M&unit=I25&coicop18=TOTAL&geo=EA",
+    linkKind: "series",
+    retrievalHref: null,
+    expectedUnit: "index, 2025 = 100",
+    measures:
+      "The euro-area all-items harmonised index of consumer prices from Eurostat, ECOICOP version 2, with 2025 = 100. Geography is the changing-composition euro area. The series is not seasonally adjusted. This panel shows the index level, not a year-on-year rate. It is separate from the discontinued European Central Bank series.",
+    matters:
+      "A change is a move in the price index, in index points. It is not a seasonally adjusted path and it is not a forecast of returns.",
   },
   {
     sourceId: "ecb_fm_deposit_facility",
@@ -209,7 +224,7 @@ export const INDICATOR_METADATA: readonly IndicatorMetadata[] = [
     retrievalHref: null,
     expectedUnit: "percent",
     measures:
-      "The euro-area unemployment rate for EA21, Eurostat's euro area of 21 countries from 2026, seasonally adjusted and not calendar adjusted. It is the percentage of the population in the labour force. It is not the EU27 rate.",
+      "The euro-area unemployment rate for EA21, Eurostat's fixed composition of 21 countries from 2026, seasonally adjusted and not calendar adjusted. It is the percentage of the population in the labour force. It is not the changing-composition euro area and it is not the EU27 rate.",
     matters:
       "A rise can indicate weaker demand for labour in the euro area. It does not count people who have left the labour force, and it is not the United States rate.",
   },
@@ -224,7 +239,7 @@ export const INDICATOR_METADATA: readonly IndicatorMetadata[] = [
     retrievalHref: null,
     expectedUnit: "index, 2015 = 100",
     measures:
-      "Euro-area real gross domestic product for EA21, chain-linked volumes, index 2015 = 100, seasonally and calendar adjusted. Geography is the euro area of 21 countries from 2026, not the EU27.",
+      "Euro-area real gross domestic product for EA21, chain-linked volumes, index 2015 = 100, seasonally and calendar adjusted. Geography is Eurostat's fixed composition of 21 countries from 2026, not the changing-composition euro area and not the EU27.",
     matters:
       "The index level shows the volume of output. A change is a move in that index, not a judgement about the investment environment.",
   },
@@ -239,7 +254,7 @@ export const INDICATOR_METADATA: readonly IndicatorMetadata[] = [
     retrievalHref: null,
     expectedUnit: "index, 2021 = 100",
     measures:
-      "Euro-area industrial production for EA21, industry groups B to D, seasonally and calendar adjusted, index 2021 = 100. It is a volume index, not the EU27 series.",
+      "Euro-area industrial production for EA21, industry groups B to D, seasonally and calendar adjusted, index 2021 = 100. Geography is Eurostat's fixed composition of 21 countries from 2026, not the changing-composition euro area. It is a volume index, not the EU27 series.",
     matters:
       "It records production in mining, manufacturing and energy supply. A change is a move in the index, not a forecast of company earnings.",
   },
@@ -254,7 +269,7 @@ export const INDICATOR_METADATA: readonly IndicatorMetadata[] = [
     retrievalHref: null,
     expectedUnit: "index, 2021 = 100",
     measures:
-      "Euro-area retail sales volume for EA21, excluding motor vehicles, seasonally and calendar adjusted, index 2021 = 100. Net turnover from the same table is not shown. It is not the EU27 series.",
+      "Euro-area retail sales volume for EA21, excluding motor vehicles, seasonally and calendar adjusted, index 2021 = 100. Geography is Eurostat's fixed composition of 21 countries from 2026, not the changing-composition euro area. Net turnover from the same table is not shown. It is not the EU27 series.",
     matters:
       "Volume of sales is a quantity measure. It can move when households buy more or less. It is not a price index and not a forecast of retail profits.",
   },

@@ -97,6 +97,8 @@ export function unitLabel(unit: string): string {
       return "Index (1982–84 = 100)";
     case "index, 2015 = 100":
       return "Index (2015 = 100)";
+    case "index, 2025 = 100":
+      return "Index (2025 = 100)";
     case "index, 2021 = 100":
       return "Index (2021 = 100)";
     case "index, 2020 = 100":
@@ -281,6 +283,7 @@ function isIndexUnit(unit: string): boolean {
     unit === "index_2017_100" ||
     unit === "1982-84=100" ||
     unit === "index, 2015 = 100" ||
+    unit === "index, 2025 = 100" ||
     unit === "index, 2021 = 100" ||
     unit === "index, 2020 = 100" ||
     unit ===

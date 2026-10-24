@@ -8,13 +8,14 @@ import {
 
 type Props = {
   view: EconomicEvidenceView;
+  heading?: string;
 };
 
-export function EconomicEvidenceBriefing({ view }: Props) {
+export function EconomicEvidenceBriefing({ view, heading = ECONOMIC_READING_HEADING }: Props) {
   return (
     <section className="economic-briefing" aria-labelledby="economic-reading-heading" data-testid="economic-reading">
       <h3 id="economic-reading-heading" className="research-section-title">
-        {ECONOMIC_READING_HEADING}
+        {heading}
       </h3>
       <p className="research-body" data-testid="economic-reading-intro">
         This reading restates stored results. It does not calculate a new change. The reading is internal.

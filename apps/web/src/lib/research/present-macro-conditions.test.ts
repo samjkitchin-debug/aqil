@@ -13,8 +13,11 @@ import {
   frequencySparkline,
   gapsInWindow,
   isStale,
+  NO_REGIONAL_READING,
   presentMacroConditions,
   revisionLimitLine,
+  showsStoredUnitedStatesReading,
+  STORED_US_READING_HEADING,
   subtractDecimal,
   type MacroConditionsView,
 } from "./present-macro-conditions.ts";
@@ -99,7 +102,7 @@ function visibleCopy(view: MacroConditionsView): string {
 }
 
 test("the tracked series are grouped and monetary-policy press is not a rates panel", () => {
-  assert.equal(MACRO_SERIES.length, 22);
+  assert.equal(MACRO_SERIES.length, 23);
   assert.deepEqual(
     MACRO_SERIES.map((item) => item.sourceId),
     [
@@ -114,6 +117,7 @@ test("the tracked series are grouped and monetary-policy press is not a rates pa
       "federal_reserve_h15_treasury_10y_constant_maturity",
       "ecb_sdw_hicp_sa",
       "ecb_hicp_core",
+      "eurostat_hicp_total_ea",
       "ecb_fm_deposit_facility",
       "eurostat_unemployment_ea21",
       "eurostat_gdp_real_ea21",
@@ -367,6 +371,11 @@ test("a stale series is still shown and a missing series says so", () => {
   });
   const hicp = panel(view, "ecb_sdw_hicp_sa");
   assert.equal(hicp.state, "stale");
+  assert.equal(hicp.name, "Discontinued euro-area HICP");
+  assert.match(hicp.measures ?? "", /discontinued/);
+  assert.match(hicp.measures ?? "", /seasonally adjusted/);
+  assert.match(hicp.measures ?? "", /2015 = 100/);
+  assert.match(hicp.measures ?? "", /December 2025/);
   assert.match(hicp.warning ?? "", /Stale: December 2025/);
   assert.match(hicp.warning ?? "", /does not describe current euro-area conditions/);
   assert.equal(hicp.valueLabel, "129.7");
@@ -612,6 +621,17 @@ test("China lists missing families and does not invent a reading", () => {
   }
 });
 
+test("the stored reading is limited to Global and the United States", () => {
+  assert.equal(STORED_US_READING_HEADING, "Stored United States reading");
+  assert.equal(showsStoredUnitedStatesReading("global"), true);
+  assert.equal(showsStoredUnitedStatesReading("united-states"), true);
+  for (const region of ["europe", "china", "japan", "other-asia"] as const) {
+    assert.equal(showsStoredUnitedStatesReading(region), false);
+  }
+  assert.match(NO_REGIONAL_READING, /No regional reading is stored/);
+  assert.match(NO_REGIONAL_READING, /The panels are stored observations/);
+});
+
 test("Europe keeps euro-area series and leaves families with no series missing", () => {
   const view = presentMacroConditions({
     series: [
@@ -635,6 +655,11 @@ test("Europe keeps euro-area series and leaves families with no series missing",
   );
   const euro = panel(view, "eurostat_unemployment_ea21");
   assert.equal(euro.region, "Euro area");
+  assert.match(euro.measures ?? "", /fixed composition of 21 countries/);
+  const hicp = panel(view, "eurostat_hicp_total_ea");
+  assert.equal(hicp.name, "Euro area all-items HICP");
+  assert.match(hicp.measures ?? "", /not seasonally adjusted/);
+  assert.match(hicp.measures ?? "", /changing-composition/);
   assert.equal(euro.valueLabel, "6.4%");
   assert.equal(
     view.unavailable.some((item) => item.id === "credit"),

@@ -129,6 +129,7 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "ons.mm23.D7BT",
         "boe.iudbedr",
         "dosm.ipi.abs",
+        "eurostat.prc_hicp_minr.M.I25.TOTAL.EA",
     }
     for record in records:
         assert record.terms_url in record.evidence_urls
@@ -182,6 +183,8 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
             "dosm.ipi.abs",
         }:
             assert record.assessed_on.isoformat() == "2026-10-24"
+        elif record.dataset_id == "eurostat.prc_hicp_minr.M.I25.TOTAL.EA":
+            assert record.assessed_on.isoformat() == "2026-10-25"
         elif record.dataset_id == "govinfo.federal_register.notices":
             assert record.assessed_on.isoformat() == "2026-10-24"
         else:
@@ -246,6 +249,7 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "ons.mm23.D7BT",
         "boe.iudbedr",
         "dosm.ipi.abs",
+        "eurostat.prc_hicp_minr.M.I25.TOTAL.EA",
     }
     assert all(operation_allowed(unemployment, operation) for operation in FIRST_LIVE_OPERATIONS)
     assert unemployment.attribution == AttributionRequirement.REQUIRED
