@@ -1,7 +1,17 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 25 October 2026, Spencer-15 variant
+**Last updated:** 25 October 2026, research suite and Stock–Watson block
+
+## Research suite and Stock–Watson block, 25 October 2026
+
+Risk class R1. Local only. Nothing was pushed or deployed. The hosted project was not queried. Database `postgres` was not reset and no observation was inserted or deleted.
+
+`npm run test:research` passed 528 tests in 12.33 seconds. Ruff reported all checks passed. The disposable database was `aqil_research_test`. GitHub Actions has not run. `BRY_BOSCHAN_MONTHLY_1971` still refuses to date. The registered method remains `BRY_BOSCHAN_SPENCER15_VARIANT`. Classification: validated labelled variant, local hook only. Unattended hosted scheduling is off.
+
+Working paper 2772 pages 6–8 and 16–17 freeze the 1988 coincident orders: factor autoregression 2, idiosyncratic autoregression 2, innovation variance 1, contemporaneous loadings, standardised log differences, payroll employment rather than hours. The 1989 hours-equation lags were not readable and were not frozen. `BEA_API_KEY` and `CENSUS_API_KEY` are unset. `CES0000000056` is not in the CE series file. No factor code and no NumPy dependency were added. AQ-102 stays blocked.
+
+## Spencer-15 variant, 25 October 2026
 
 ## Spencer-15 variant, 25 October 2026
 

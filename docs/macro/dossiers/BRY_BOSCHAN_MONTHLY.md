@@ -5,7 +5,7 @@
 **Priority:** P0, implementation rank 1.  
 **Backlog:** AQ-094 through AQ-100.  
 **Last source check:** 25 October 2026, the full NBER volume: front matter `c2145`, foreword `c2146`, chapter 1 `c2147`, chapter 2 `c2148` (58 pages), chapter 3 `c2149` (88 pages), and chapter 4 `c2150` (67 pages).  
-**Campaign A classification:** the 1971 constant still refuses to date. `BRY_BOSCHAN_SPENCER15_VARIANT` dates with constants printed outside the 1971 volume. It is not a FORTRAN replica.
+**Campaign A classification:** validated labelled variant, local hook only. The 1971 constant still refuses to date. `BRY_BOSCHAN_SPENCER15_VARIANT` dates with constants printed outside the 1971 volume. It is not a FORTRAN replica. On 25 October 2026 `npm run test:research` passed 528 tests and Ruff reported all checks passed. The disposable database was `aqil_research_test`. Database `postgres` was not reset. GitHub Actions has not run.
 
 ## 1. Identity and provenance
 
@@ -137,3 +137,7 @@ The 1971 refusal stored no dates. The labelled variant later stored local run `8
 ## 16. Status and priority
 
 AQ-094 keeps the 1971 refusal and records the labelled variant. The 1971 volume still does not print the Spencer coefficients or the twelve-month alignment. Those two constants are taken from the Macaulay and Otsu pages named above, not from the 1971 book. AQ-095 recount stands. AQ-096 through AQ-100 are implemented on the variant only: the method is registered, run `8fb20325-414f-401b-8c46-bda82ed94e16` is stored on local postgres, replay matched, and the G.17 refresh hook was idempotent on disposable database `aqil_research_test`. Health failures were injected in unit tests. The NBER comparison is not a gate. The strategic milestone remains `STOCK_WATSON_DFM`. AQ-102 stays blocked.
+
+### Full research suite, 25 October 2026
+
+`npm run test:research` passed 528 tests in 12.33 seconds, including Ruff. The development database was not reset. This does not change the six-month NBER window and does not make the variant a 1971 replica. Unattended hosted scheduling is still off. The hook runs only when refresh is invoked.

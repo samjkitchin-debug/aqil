@@ -128,4 +128,33 @@ Computational cost of a four-variable monthly model is small. That is not a reas
 
 ## 15. Status and priority
 
-The 1989 coincident equations and the four-series contract are recorded. Working paper 2772 was read for the innovation-variance normalisation and the existence of the Kalman filter. The 1988b employment paper was not read. Estimation code was not written. AQ-102 stays blocked because three series have no rights row and are not stored, and because the Kalman matrices and the idiosyncratic coefficients are not frozen from a clean table.
+The 1989 coincident equations and the four-series contract are recorded. Working paper 2772 was read again from the PDF on 25 October 2026. The 1988b employment paper was not read. Estimation code was not written.
+
+## Implementation card, 25 October 2026
+
+PyMuPDF text from the PDF is the source. Damaged glyphs were not filled in.
+
+Working paper 2772, pages 6 to 8 and 16 to 17, prints this coincident structure:
+
+- The series are differenced logarithms, after the authors did not reject integration and did not reject no cointegration.
+- Each growth rate is standardised to mean zero and unit variance on the estimation sample.
+- The factor innovation variance is 1.
+- Idiosyncratic dynamics are diagonal and uncorrelated with the factor at all leads and lags.
+- The adopted orders are a factor autoregression of order 2 and idiosyncratic autoregressions of order 2. Page 16 gives log likelihood 341.38 for that model and 327.77 for idiosyncratic order 1.
+- In that 1988 model the factor enters all four equations contemporaneously. The fourth series is employees on nonagricultural payrolls (LPNAG), not employee-hours.
+- Estimation is Gaussian maximum likelihood through the Kalman filter. The filtered estimate is the real-time index. The smoother is retrospective. The initial mean is zero when the unconditional covariance is used.
+- Table 1's factor autoregressive digits are not reliable in extraction, so those coefficients are not frozen. The orders and the unit innovation variance are frozen.
+
+The 1989 chapter puts lags of the factor in the employee-hours equation. Those coefficients were not readable as a clean table. They are not frozen. The leading index, the recession index, and the 2016 handbook form are not this card.
+
+## Data classification, 25 October 2026
+
+Industrial production is held as `fed.g17.IP.B50001.S`, a seasonally adjusted total index, 2017=100, January 1919 to September 2026. That is not the 1989 CITIBASE vintage. The base year differs.
+
+Real personal income less transfers was not stored. `https://apps.bea.gov/api/data/` returned an empty body with no key. `BEA_API_KEY` is unset. No key was invented. Disposable income was not used.
+
+Real manufacturing and trade sales were not stored. `CENSUS_API_KEY` is unset. Advance durable-goods orders are a different series. No nominal sales were deflated.
+
+Employee-hours are not an exact BLS match. Datatype 56 is aggregate weekly hours of all employees. `ce.series` has `CES0500000056`, total private, from March 2006, and `CES0500000081`, production and nonsupervisory employees, total private, from January 1964. `CES0000000056` is absent. Neither private series was stored. Payroll headcount is the 1988 LPNAG concept and is not the 1989 hours concept.
+
+No new rights row was added, because nothing is cleared for ingest and the rights test locks the dataset list. AQ-102 stays blocked. No factor code and no NumPy dependency were added.

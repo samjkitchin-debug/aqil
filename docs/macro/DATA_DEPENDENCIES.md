@@ -77,3 +77,13 @@ Every new series needs a `docs/sources/SOURCE_RIGHTS.csv` row before ingest. FRE
 ## Vintage policy for the first two methods
 
 The pilot's runs are `latest_revised` retrospective calculations. The dynamic factor model may be estimated on revised data for numerical checks. Neither result is a real-time historical forecast until vintages exist. Candidate later sources are ALFRED, if rights change, and Philadelphia Fed real-time data. Neither is approved here.
+
+## Stock–Watson panel check, 25 October 2026
+
+Employee-hours are not stored. BLS datatype 56 is aggregate weekly hours of all employees. `ce.series` contains `CES0500000056` (total private, from March 2006) and `CES0500000081` (production and nonsupervisory, total private, from January 1964). `CES0000000056` is absent. Private coverage is not total nonfarm, so neither series was stored.
+
+Real personal income less transfers is not stored. The BEA API returned an empty body without a key, and `BEA_API_KEY` is unset.
+
+Real manufacturing and trade sales are not stored. `CENSUS_API_KEY` is unset. Advance durable-goods orders are not that composite.
+
+Industrial production remains `fed.g17.IP.B50001.S`. The factor is not estimated.
