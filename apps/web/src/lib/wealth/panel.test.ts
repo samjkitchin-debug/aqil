@@ -3,7 +3,7 @@ import test from "node:test";
 
 import type { BrokerPortfolioView } from "../saxo/portfolio.ts";
 
-import { buildWealthPanel } from "./panel.ts";
+import { BROKERAGE_SHARE_CLASS_UNRESOLVED, buildWealthPanel } from "./panel.ts";
 
 function portfolio(overrides: Partial<BrokerPortfolioView> = {}): BrokerPortfolioView {
   return {
@@ -195,6 +195,16 @@ test("reconnect is distinct from a saved snapshot", () => {
   const connected = buildWealthPanel({ broker: portfolio(), link: "active", error: null });
   assert.equal(connected.freshness.connection, "connected");
   assert.equal(connected.freshness.connectionLabel, "Saxo is connected");
+});
+
+test("a brokerage line stays unresolved without an ISIN", () => {
+  assert.equal(
+    BROKERAGE_SHARE_CLASS_UNRESOLVED,
+    "The share class is unresolved because the saved line has no ISIN.",
+  );
+  assert.doesNotMatch(BROKERAGE_SHARE_CLASS_UNRESOLVED, /VWRA|ticker/i);
+  const panel = buildWealthPanel({ broker: portfolio(), link: "active", error: null });
+  assert.equal("isin" in panel.holdings[0], false);
 });
 
 test("simulation environment is labelled separately from live", () => {

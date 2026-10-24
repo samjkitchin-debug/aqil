@@ -1,4 +1,4 @@
-import type { PanelHolding, PanelTone } from "@/lib/wealth/panel";
+import { BROKERAGE_SHARE_CLASS_UNRESOLVED, type PanelHolding, type PanelTone } from "@/lib/wealth/panel";
 
 function toneClass(tone: PanelTone | null): string {
   if (tone === "positive") return "aq-result-positive";
@@ -82,6 +82,7 @@ export function HoldingsBoard({ holdings }: { holdings: PanelHolding[] }) {
                       {holding.ticker}
                       <span> · {holding.kind}</span>
                     </p>
+                    <p data-testid="brokerage-share-class-unresolved">{BROKERAGE_SHARE_CLASS_UNRESOLVED}</p>
                   </div>
                   <p className="aq-line-value aq-num">{holding.value ?? "Unavailable"}</p>
                   <p className="aq-line-weight aq-num">

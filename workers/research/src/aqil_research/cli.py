@@ -93,9 +93,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Recompute Sahm from frozen observation evidence and print comparison",
     )
+    from aqil_research.etf.documents.command import register_cite_etf_parser
     from aqil_research.manual.command import register_macro_parser
 
     register_macro_parser(sub)
+    register_cite_etf_parser(sub)
     return parser
 
 
@@ -137,6 +139,10 @@ def main(argv: list[str] | None = None) -> int:
         from aqil_research.manual.command import run_register_macro
 
         return run_register_macro(args)
+    if args.command == "cite-etf":
+        from aqil_research.etf.documents.command import run_cite_etf
+
+        return run_cite_etf(args)
     return 1
 
 

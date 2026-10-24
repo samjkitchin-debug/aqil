@@ -6,9 +6,11 @@ the preserved databases postgres or aqil_etf, and they do not invent VWRA facts.
 
 from __future__ import annotations
 
+import argparse
 import subprocess
 from collections.abc import Iterator
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -16,9 +18,11 @@ import psycopg
 import pytest
 from pydantic import ValidationError
 
+from aqil_research.etf.documents.command import cite_issuer_document, run_cite_etf
 from aqil_research.etf.documents.ingest import (
     FIRST_INSERT_REQUIREMENT,
     CitedCharacteristic,
+    CitedExposure,
     CitedIssuerDocument,
     CitedListing,
     DocumentIngestError,
@@ -37,6 +41,8 @@ from aqil_research.sources.rights import (
     OperationalStatus,
     RightsDecision,
     SourceRightsRecord,
+    find_source_rights,
+    load_source_rights,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -571,3 +577,189 @@ def _psql(database: str, sql: str) -> str:
         detail = completed.stderr.strip() or completed.stdout.strip()
         raise RuntimeError(detail or f"psql failed on {database}")
     return completed.stdout
+
+
+def test_optional_exposures_are_cited_and_idempotent(
+    disposable_url: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    document = _document(
+        isin="IE00B0000082",
+        umbrella_legal_name="Synthetic umbrella exposures",
+        sub_fund_legal_name="Synthetic sub-fund exposures",
+        source_locator="synthetic://aqil/etf/cited-exposures",
+        listings=(CitedListing(mic="XSYN", trading_currency="GBP", ticker="SYN2"),),
+        exposures=(
+            CitedExposure(
+                exposure_kind="geographic",
+                exposure_class="Synthetic geography",
+                weight=Decimal("0.25"),
+                as_of_date=date(2026, 1, 15),
+            ),
+            CitedExposure(
+                exposure_kind="sector",
+                exposure_class="Synthetic sector",
+                weight=None,
+                as_of_date=date(2026, 1, 15),
+            ),
+        ),
+    )
+    path = tmp_path / "cited.json"
+    path.write_text(document.model_dump_json(), encoding="utf-8")
+    monkeypatch.setattr(
+        "aqil_research.etf.documents.command.load_source_rights",
+        lambda: (_rights(),),
+    )
+    args = argparse.Namespace(document=path, database_url=disposable_url)
+    assert run_cite_etf(args) == 0
+    assert run_cite_etf(args) == 0
+    with _open(disposable_url) as conn:
+        rows = conn.execute(
+            """
+            select exposure_class, weight::text, evidence_status, source_id, source_locator
+            from instruments.exposure_snapshots
+            where share_class_id = (
+              select share_class_id from instruments.share_classes where isin = %s
+            )
+            order by exposure_class
+            """,
+            ("IE00B0000082",),
+        ).fetchall()
+    assert len(rows) == 2
+    assert rows[0][0] == "Synthetic geography"
+    assert Decimal(str(rows[0][1])) == Decimal("0.25")
+    assert rows[0][2:] == (
+        "cited",
+        "fixture_cited_issuer_document",
+        "synthetic://aqil/etf/cited-exposures",
+    )
+    assert rows[1] == (
+        "Synthetic sector",
+        None,
+        "cited",
+        "fixture_cited_issuer_document",
+        "synthetic://aqil/etf/cited-exposures",
+    )
+
+
+def test_omitted_exposures_are_not_invented(disposable_url: str) -> None:
+    with _open(disposable_url) as conn:
+        stored = persist_cited_share_class(
+            conn,
+            _document(
+                isin="IE00B0000090",
+                umbrella_legal_name="Synthetic umbrella plain",
+                sub_fund_legal_name="Synthetic sub-fund plain",
+                source_locator="synthetic://aqil/etf/cited-plain",
+            ),
+            _rights(),
+        )
+        count = conn.execute(
+            """
+            select count(*)
+            from instruments.exposure_snapshots
+            where share_class_id = %s
+            """,
+            (stored.share_class_id,),
+        ).fetchone()
+    assert count is not None
+    assert count[0] == 0
+
+
+def test_trading_currency_is_not_an_exposure() -> None:
+    with pytest.raises(ValidationError, match="trading currency"):
+        _document(
+            listings=(CitedListing(mic="XSYN", trading_currency="GBP", ticker="SYN"),),
+            exposures=(
+                CitedExposure(
+                    exposure_kind="geographic",
+                    exposure_class="GBP",
+                    as_of_date=date(2026, 1, 15),
+                ),
+            ),
+        )
+
+
+def test_holdings_files_stay_out_of_the_cited_document() -> None:
+    with pytest.raises(ValidationError):
+        CitedIssuerDocument.model_validate(
+            {
+                "source_id": "fixture_cited_issuer_document",
+                "source_locator": "synthetic://aqil/etf/cited-document",
+                "document_date": "2026-01-15",
+                "isin": "IE00B0000009",
+                "umbrella_legal_name": "Synthetic umbrella",
+                "sub_fund_legal_name": "Synthetic sub-fund",
+                "base_currency": "GBP",
+                "distribution_policy": "distributing",
+                "hedge_status": "unhedged",
+                "holdings": [{"name": "Example"}],
+            }
+        )
+
+
+def test_cite_etf_refuses_preserved_databases_before_opening_a_document(tmp_path: Path) -> None:
+    missing = tmp_path / "absent.json"
+    for database in sorted(PRESERVED):
+        code = run_cite_etf(
+            argparse.Namespace(
+                document=missing,
+                database_url=f"postgresql://research_worker@127.0.0.1:55432/{database}",
+            )
+        )
+        assert code == 1
+    assert not missing.exists()
+
+
+@pytest.mark.parametrize(
+    "source_id",
+    ["vanguard_uk_vwra_holdings", "ishares_ucits_holdings"],
+)
+def test_cite_etf_refuses_prohibited_issuer_rows(
+    disposable_url: str,
+    tmp_path: Path,
+    source_id: str,
+) -> None:
+    rights = find_source_rights(load_source_rights(), source_id=source_id)
+    assert rights is not None
+    assert rights.automated_access == RightsDecision.PROHIBITED
+    assert rights.redistribution == RightsDecision.PROHIBITED
+    isin = "IE00B0000108" if source_id.startswith("vanguard") else "IE00B0000116"
+    path = tmp_path / f"{source_id}.json"
+    path.write_text(
+        _document(
+            source_id=source_id,
+            source_locator="synthetic://aqil/etf/prohibited-issuer",
+            isin=isin,
+            founder_supplied=True,
+            umbrella_legal_name="Synthetic umbrella refused",
+            sub_fund_legal_name="Synthetic sub-fund refused",
+        ).model_dump_json(),
+        encoding="utf-8",
+    )
+    assert run_cite_etf(argparse.Namespace(document=path, database_url=disposable_url)) == 1
+    with _open(disposable_url) as conn:
+        count = conn.execute(
+            "select count(*) from instruments.share_classes where isin = %s",
+            (isin,),
+        ).fetchone()
+    assert count is not None
+    assert count[0] == 0
+
+
+def test_cite_issuer_document_refuses_a_missing_rights_row(disposable_url: str) -> None:
+    with _open(disposable_url) as conn:
+        result = cite_issuer_document(
+            conn,
+            _document(
+                source_id="not_in_the_register",
+                isin="IE00B0000124",
+                umbrella_legal_name="Synthetic umbrella missing rights",
+                sub_fund_legal_name="Synthetic sub-fund missing rights",
+                source_locator="synthetic://aqil/etf/missing-rights",
+            ),
+            (),
+        )
+    assert result.stored is False
+    assert result.refusal == "no rights row for this source_id"

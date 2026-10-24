@@ -8,6 +8,9 @@ import {
   type BrokerPortfolioView,
 } from "../saxo/portfolio.ts";
 
+export const BROKERAGE_SHARE_CLASS_UNRESOLVED =
+  "The share class is unresolved because the saved line has no ISIN.";
+
 const RECONNECT_ERRORS = new Set([
   "refresh_failed",
   "no_session",

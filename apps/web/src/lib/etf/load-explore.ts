@@ -6,6 +6,7 @@ import { connection } from "next/server";
 import { resolveEtfDatabaseUrl } from "@/lib/data/private-database-url";
 import {
   HOLDINGS_BLOCKED_REASON,
+  type CitedExposureView,
   type EtfAssessmentView,
   type EtfBenchmarkView,
   type EtfCostView,
@@ -14,9 +15,12 @@ import {
   type EtfShareExplore,
 } from "@/lib/etf/present-explore";
 
+const SHARE_CLASS_ISIN = /^[A-Z]{2}[A-Z0-9]{9}[0-9]$/;
+
 export type LoadEtfExploreResult =
   | { status: "ready"; shares: EtfShareExplore[] }
   | { status: "empty" }
+  | { status: "absent" }
   | { status: "unavailable"; reason: string };
 
 type ShareRow = {
@@ -36,8 +40,10 @@ function etfDatabaseUrl() {
   });
 }
 
-export async function loadEtfExplore(): Promise<LoadEtfExploreResult> {
+export async function loadEtfExplore(isin?: string): Promise<LoadEtfExploreResult> {
   await connection();
+  const requested = isin?.trim() ?? "";
+  if (requested && !SHARE_CLASS_ISIN.test(requested)) return { status: "absent" };
   const databaseUrl = etfDatabaseUrl();
   if (databaseUrl.status === "unavailable") return databaseUrl;
 
@@ -55,9 +61,11 @@ export async function loadEtfExplore(): Promise<LoadEtfExploreResult> {
                 to_char(inception_date, 'YYYY-MM-DD') as inception_date,
                 to_char(recorded_at at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as recorded_at
          from instruments.share_classes
+         where ($1::text is null or isin = $1)
          order by recorded_at, isin`,
+        [requested || null],
       );
-      if (shares.rows.length === 0) return { status: "empty" };
+      if (shares.rows.length === 0) return requested ? { status: "absent" } : { status: "empty" };
 
       const views: EtfShareExplore[] = [];
       for (const share of shares.rows) {
@@ -148,6 +156,28 @@ async function loadShare(client: Client, share: ShareRow): Promise<EtfShareExplo
     `select count(*)::text as count from instruments.fund_returns where share_class_id = $1`,
     [share.share_class_id],
   );
+  const exposures = await client.query<{
+    exposure_class: string;
+    weight_text: string | null;
+    as_of_date: string;
+    source_id: string;
+    source_locator: string;
+    recorded_at: string;
+  }>(
+    `select exposure_class,
+            weight::text as weight_text,
+            to_char(as_of_date, 'YYYY-MM-DD') as as_of_date,
+            source_id,
+            source_locator,
+            to_char(recorded_at at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as recorded_at
+     from instruments.exposure_snapshots
+     where share_class_id = $1
+       and evidence_status = 'cited'
+       and source_id is not null
+       and source_locator is not null
+     order by as_of_date, exposure_class`,
+    [share.share_class_id],
+  );
   const benchmarkReturns = await client.query<{ count: string }>(
     `select count(*)::text as count
      from instruments.benchmark_returns br
@@ -218,5 +248,18 @@ async function loadShare(client: Client, share: ShareRow): Promise<EtfShareExplo
       : null,
     fundReturnCount: Number(fundReturns.rows[0]?.count ?? 0),
     benchmarkReturnCount: Number(benchmarkReturns.rows[0]?.count ?? 0),
+    exposures: exposures.rows.flatMap((row): CitedExposureView[] => {
+      if (!row.source_id || !row.source_locator) return [];
+      return [
+        {
+          exposureClass: row.exposure_class,
+          weightText: row.weight_text,
+          asOf: row.as_of_date,
+          sourceId: row.source_id,
+          sourceLocator: row.source_locator,
+          recordedAt: row.recorded_at,
+        },
+      ];
+    }),
   };
 }

@@ -10,7 +10,7 @@ export const ETF_EMPTY_COPY =
  * (FIRST_INSERT_REQUIREMENT). No share class is claimed.
  */
 export const ETF_CITED_DOCUMENT_REQUIREMENT =
-  "A first share-class insert needs one cited issuer document at docs/sources/etf/cited/*.json and a rights row with the same source_id. The document must include source_id, source_locator, and a document_date or retrieved_on, plus isin, umbrella_legal_name, sub_fund_legal_name, base_currency, distribution_policy, and hedge_status. Omitted fields stay absent. founder_supplied does not permit acquire, retain, extract, or display. The rights row must have operational_status enabled, and automated_access (acquire), raw_data_retention (retain), internal_computation (extract), and redistribution (display) must each be permitted. Unknown and prohibited each refuse that use. Do not change an unknown or prohibited cell in docs/sources/SOURCE_RIGHTS.csv to permitted. The internal fixture apps/web/fixtures/forward-horizon.v1.json is not that document. Share classes resolve on instruments.share_classes by ISIN.";
+  "A first share-class insert needs one cited issuer document at docs/sources/etf/cited/*.json and a rights row with the same source_id. The document must include source_id, source_locator, and a document_date or retrieved_on, plus isin, umbrella_legal_name, sub_fund_legal_name, base_currency, distribution_policy, and hedge_status. Omitted fields stay absent. founder_supplied does not permit acquire, retain, extract, or display. The rights row must have operational_status enabled, and automated_access (acquire), raw_data_retention (retain), internal_computation (extract), and redistribution (display) must each be permitted. Unknown and prohibited each refuse that use. Do not change an unknown or prohibited cell in docs/sources/SOURCE_RIGHTS.csv to permitted. The internal fixture apps/web/fixtures/forward-horizon.v1.json is not that document. Share classes resolve on instruments.share_classes by ISIN. Optional geographic and sector exposure lines may be included. Each stored line uses evidence_status cited and keeps source_id and source_locator. Trading currency is a listing fact, not an exposure. Holdings files stay out of this path.";
 
 export const HOLDINGS_BLOCKED_REASON =
   "Holdings are not shown. No snapshot with a permitted rights gate is stored, and prohibited or unknown sources are not fetched.";
@@ -43,6 +43,23 @@ export type EtfAssessmentView = {
   recordedAt: string;
 };
 
+export type CitedExposureView = {
+  exposureClass: string;
+  weightText: string | null;
+  asOf: string;
+  sourceId: string;
+  sourceLocator: string;
+  recordedAt: string;
+};
+
+const SHARE_CLASS_ISIN = /^[A-Z]{2}[A-Z0-9]{9}[0-9]$/;
+
+export function citedShareClassHref(isin: string | null | undefined): string | null {
+  const value = isin?.trim() ?? "";
+  if (!SHARE_CLASS_ISIN.test(value)) return null;
+  return `/explore?isin=${encodeURIComponent(value)}`;
+}
+
 export type EtfShareExplore = {
   isin: string;
   evidenceStatus: "unverified" | "cited" | "unavailable" | "insufficient";
@@ -57,6 +74,7 @@ export type EtfShareExplore = {
   assessment: EtfAssessmentView | null;
   fundReturnCount: number;
   benchmarkReturnCount: number;
+  exposures: CitedExposureView[];
 };
 
 export function identityCopy(share: EtfShareExplore): string {
@@ -116,3 +134,12 @@ export function assessmentCopy(share: EtfShareExplore): string {
 export function freshnessCopy(share: EtfShareExplore): string {
   return `Share class row recorded ${share.recordedAt}. That timestamp is not a market-data as-of date.`;
 }
+
+export function exposureCopy(exposure: CitedExposureView): string {
+  const weight = exposure.weightText ? `Weight ${exposure.weightText}.` : "No weight is cited.";
+  return `${exposure.exposureClass}. ${weight} As of ${exposure.asOf}. Evidence cited. Source ${exposure.sourceId}. Locator ${exposure.sourceLocator}. Recorded ${exposure.recordedAt}.`;
+}
+
+export const EXPOSURES_ABSENT = "No cited exposure is stored.";
+
+export const SHARE_CLASS_ABSENT = "No cited share class is stored for this ISIN.";

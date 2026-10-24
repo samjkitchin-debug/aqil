@@ -1,8 +1,38 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 25 October 2026, macro and ETF integration
+**Last updated:** 25 October 2026, three-pillar release sprint
 
+
+## Three-pillar release sprint, 25 October 2026
+
+Risk class R2. Local `main` only. Nothing was pushed, deployed, or applied to the hosted project. Database `postgres` was not reset. `aqil_etf` was not written. No Saxo call was made. Git migration files were not edited. GitHub Actions has not run. The results below are local.
+
+The recount on `postgres` matched the coverage register: 23 operational series, 34,859 operational periods, 789 non-operational OECD rows, and 87 fixture rows. The same counts were present after the rehearsal and after the disposable tests. `instruments` is not on `postgres`. `public.wealth_instruments` is 0. `public.wealth_allocation_targets` is 0. `aqil_etf.instruments.share_classes` is 0. `docs/sources/etf/cited` is absent.
+
+`npm run test:db` on `aqil_pgtap_test` first failed only in `etf_instruments.test.sql`, because the disposable database is cloned from `postgres` and `instruments` is not on `postgres`. The other 11 files passed, including `macro_events_themes.test.sql`. `scripts/prepare-pgtap-test-db.ps1` now applies `20261024120000_etf_instruments.sql` only to `aqil_pgtap_test` when that schema is absent, and it refuses to continue if `instruments` appears on `postgres`. The re-run passed 12 files and 207 tests. Development live observations remained 35,648. `postgres` still has no `instruments` schema.
+
+Disposable database `aqil_u0_ten` was created from the five hosted files, given representative rows and an authentication stub, then upgraded with the ten later files, including `20261024150000_research_macro_events_themes.sql`. Representative rows survived. Grants matched the earlier rehearsal: `anon`, `authenticated`, and `service_role` have no usage on `research`, `forward`, or `instruments`; wealth row-level security was not weakened; the token vault has row-level security and no policy. The database was dropped. It is not in `pg_database`. Detail is in `docs/runbooks/U0_HOSTED_RELEASE.md`.
+
+Production URL resolution still refuses a loopback fallback. `apps/web/src/lib/data/private-database-url.test.ts`, run inside `npm run test:etf` and the earlier `npm run test:sourced-updates`, passed the production cases for both the research URL and the ETF URL.
+
+Local commands, not CI:
+
+- `npm run test:research` after these edits: 512 passed on `aqil_research_test`, including the cited-document cases. Ruff check passed. Ruff format check passed, 372 files. The script printed that the development database was not reset.
+- `npm run test:wealth` in `apps/web`: 60 passed.
+- `npm run test:etf` in `apps/web`: 11 passed.
+- `npm run test:sourced-updates` in `apps/web`: 60 passed before these edits. Those modules were not edited again.
+- `npm run typecheck`: passed.
+- `npm run lint`: passed with 0 errors and 1 existing warning in `apps/web/src/components/research/today-story-tangent-path.ts`.
+- `npm run check:tokens`: passed.
+- `npm run build`: the first post-edit build failed because `/explore` awaited `searchParams` outside Suspense. That await now sits inside Suspense. The rebuild passed. `/explore` remains a partial prerender.
+- `npm run test:e2e` was not run. Playwright has no stored sign-in. `apps/web/e2e/auth.spec.ts` checks that an anonymous visit redirects to Sign in. The suite was not weakened.
+
+Signed-in Cursor browser at `http://localhost:3000`, desktop about 1440 pixels and 390 pixels, no horizontal overflow on My Wealth, Exposures, or the United States conditions page. Primary navigation stayed Today, My Wealth, and Intelligence. Exposures with no ISIN says no share class is stored and names the internal anchor `IE00BK5BQT80` (VWRA) as not a permitted issuer citation. It does not show a share-class dossier. `/explore?isin=IE00BK5BQT80` says no cited share class is stored for this ISIN. The United States conditions page shows the stored reading and the sentence that an economic reading is not an investment conclusion. The Evidence link in that reading opened `/research`.
+
+This signed-in session did not show a brokerage holdings board. My Wealth showed Connect Saxo. A gitignored Saxo portfolio file exists under `apps/web/.local/saxo-portfolio/` and was not opened. The unresolved sentence is on the holdings board in code and in `npm run test:wealth`. It was not observed on a live line in this browser session, because no line was returned. No portfolio row was invented.
+
+U0 remains no-go. There is no permitted fund document and no ISIN on a stored holding. `cite-etf` refuses `postgres`, `aqil_etf`, Vanguard, and iShares. Optional exposures are stored only on the disposable citation database, with `evidence_status=cited`, `source_id`, and `source_locator`. The Deploy Capital save path was not switched. The later read still needs targets totalling 10,000 basis points, a classification for each holding, foreign exchange, and an explicit budget.
 
 ## Macro and ETF integration, 25 October 2026
 

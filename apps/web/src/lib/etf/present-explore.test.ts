@@ -1,14 +1,21 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { NOT_INVESTMENT_CONCLUSION } from "../research/present-economic-evidence.ts";
+import { MACRO_SERIES } from "../research/macro-conditions.ts";
+import { mapCitedExposure } from "./exposure-context.ts";
 import {
   ETF_CITED_DOCUMENT_REQUIREMENT,
   ETF_EMPTY_COPY,
   ETF_RESEARCH_BOUNDARY,
+  EXPOSURES_ABSENT,
   HOLDINGS_BLOCKED_REASON,
+  SHARE_CLASS_ABSENT,
   assessmentCopy,
   benchmarkCopy,
+  citedShareClassHref,
   costsCopy,
+  exposureCopy,
   holdingsCopy,
   identityCopy,
   listingsCopy,
@@ -35,6 +42,7 @@ function unverifiedAnchor(): EtfShareExplore {
     },
     fundReturnCount: 0,
     benchmarkReturnCount: 0,
+    exposures: [],
   };
 }
 
@@ -65,4 +73,54 @@ test("an unverified anchor hides uncited fields and holdings", () => {
   assert.match(benchmarkCopy(share), /separate series/);
   assert.match(assessmentCopy(share), /^UNKNOWN/);
   assert.doesNotMatch(assessmentCopy(share), /CORE/);
+  assert.equal(share.exposures.length, 0);
+});
+
+test("an exact ISIN can open a dossier and a ticker cannot", () => {
+  assert.equal(citedShareClassHref(null), null);
+  assert.equal(citedShareClassHref(""), null);
+  assert.equal(citedShareClassHref("VWRA"), null);
+  assert.equal(citedShareClassHref("IE00BK5BQT80"), "/explore?isin=IE00BK5BQT80");
+  assert.equal(SHARE_CLASS_ABSENT, "No cited share class is stored for this ISIN.");
+  assert.doesNotMatch(SHARE_CLASS_ABSENT, /VWRA/);
+  assert.equal(EXPOSURES_ABSENT, "No cited exposure is stored.");
+});
+
+test("a cited exposure maps only to stored operational series", () => {
+  const known = new Set(MACRO_SERIES.map((series) => series.sourceId));
+  const unitedStates = mapCitedExposure("US equity");
+  assert.equal(unitedStates.status, "mapped");
+  if (unitedStates.status !== "mapped") return;
+  assert.ok(unitedStates.series.length > 0);
+  for (const series of unitedStates.series) {
+    assert.ok(known.has(series.sourceId));
+    assert.match(series.href, /\/conditions\?region=united-states#macro-panel-/);
+  }
+  assert.equal(unitedStates.unitedStatesReading?.sentence, NOT_INVESTMENT_CONCLUSION);
+  assert.equal(unitedStates.unitedStatesReading?.href, "/conditions?region=united-states");
+
+  const europe = mapCitedExposure("Europe equity");
+  assert.equal(europe.status, "mapped");
+  if (europe.status !== "mapped") return;
+  assert.equal(europe.unitedStatesReading, null);
+  assert.ok(europe.series.every((series) => known.has(series.sourceId)));
+  assert.ok(europe.series.every((series) => series.href.includes("region=europe")));
+
+  assert.equal(mapCitedExposure("VWRA").status, "missing");
+  assert.deepEqual(mapCitedExposure("Broad technology, healthcare, or financials sector equity"), {
+    status: "missing",
+    sentence: "No sector series is stored.",
+  });
+  assert.deepEqual(mapCitedExposure("Quality, value, or minimum-volatility factor equity"), {
+    status: "missing",
+    sentence: "No factor series is stored.",
+  });
+  assert.match(exposureCopy({
+    exposureClass: "Synthetic geography",
+    weightText: null,
+    asOf: "2026-01-15",
+    sourceId: "fixture_cited_issuer_document",
+    sourceLocator: "synthetic://aqil/etf/cited-exposures",
+    recordedAt: "2026-01-16T00:00:00Z",
+  }), /No weight is cited/);
 });

@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import re
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 from typing import Literal
 
@@ -47,7 +48,11 @@ FIRST_INSERT_REQUIREMENT = (
     "permitted. Unknown and prohibited each refuse that use. Do not change an "
     "unknown or prohibited cell in docs/sources/SOURCE_RIGHTS.csv to permitted. "
     "The internal fixture apps/web/fixtures/forward-horizon.v1.json is not that "
-    "document. Share classes resolve on instruments.share_classes by ISIN."
+    "document. Share classes resolve on instruments.share_classes by ISIN. "
+    "Optional geographic and sector exposure lines may be included. Each stored "
+    "line uses evidence_status cited and keeps source_id and source_locator. "
+    "Trading currency is a listing fact, not an exposure. Holdings files stay out "
+    "of this path."
 )
 
 PRESERVED_DATABASES = frozenset({"postgres", "aqil_etf"})
@@ -96,6 +101,34 @@ class CitedCharacteristic(BaseModel):
     as_of_date: date
 
 
+class CitedExposure(BaseModel):
+    """One geographic or sector line stated by the document."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    exposure_kind: Literal["geographic", "sector"]
+    exposure_class: str = Field(min_length=1)
+    weight: Decimal | None = None
+    as_of_date: date
+
+    @field_validator("exposure_class")
+    @classmethod
+    def strip_class(cls, value: str) -> str:
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("exposure class is required")
+        return stripped
+
+    @field_validator("weight")
+    @classmethod
+    def weight_is_finite(cls, value: Decimal | None) -> Decimal | None:
+        if value is None:
+            return None
+        if not value.is_finite():
+            raise ValueError("exposure weight must be a finite number")
+        return value
+
+
 class CitedIssuerDocument(BaseModel):
     """Facts taken from one issuer document. Blank optional fields stay absent."""
 
@@ -116,6 +149,7 @@ class CitedIssuerDocument(BaseModel):
     inception_date: date | None = None
     listings: tuple[CitedListing, ...] = ()
     characteristics: tuple[CitedCharacteristic, ...] = ()
+    exposures: tuple[CitedExposure, ...] = ()
 
     @field_validator("source_id", "source_locator")
     @classmethod
@@ -150,6 +184,10 @@ class CitedIssuerDocument(BaseModel):
             raise ValueError("base currency must be three letters")
         if self.domicile_iso2 is not None and re.fullmatch(r"[A-Z]{2}", self.domicile_iso2) is None:
             raise ValueError("domicile must be two letters")
+        currencies = {listing.trading_currency for listing in self.listings}
+        for exposure in self.exposures:
+            if exposure.exposure_class in currencies:
+                raise ValueError("trading currency is a listing fact, not an exposure")
         return self
 
 
@@ -443,6 +481,8 @@ def _ensure_provenance(
         )
     for fact in document.characteristics:
         _insert_characteristic(conn, share_class_id, fact, document)
+    for exposure in document.exposures:
+        _insert_exposure(conn, share_class_id, exposure, document)
 
 
 def _insert_listing(
@@ -570,6 +610,54 @@ def _insert_characteristic(
             fact.code,
             fact.value_text,
             fact.unit,
+            document.source_id,
+            document.source_locator,
+        ),
+    )
+
+
+def _insert_exposure(
+    conn: psycopg.Connection,
+    share_class_id: str,
+    exposure: CitedExposure,
+    document: CitedIssuerDocument,
+) -> None:
+    exists = conn.execute(
+        """
+        select 1
+        from instruments.exposure_snapshots
+        where share_class_id = %s
+          and as_of_date = %s
+          and exposure_class = %s
+          and weight is not distinct from %s
+          and evidence_status = 'cited'
+          and source_id = %s
+          and source_locator = %s
+        """,
+        (
+            share_class_id,
+            exposure.as_of_date,
+            exposure.exposure_class,
+            exposure.weight,
+            document.source_id,
+            document.source_locator,
+        ),
+    ).fetchone()
+    if exists is not None:
+        return
+    conn.execute(
+        """
+        insert into instruments.exposure_snapshots (
+          share_class_id, as_of_date, exposure_class, weight,
+          evidence_status, source_id, source_locator
+        )
+        values (%s, %s, %s, %s, 'cited', %s, %s)
+        """,
+        (
+            share_class_id,
+            exposure.as_of_date,
+            exposure.exposure_class,
+            exposure.weight,
             document.source_id,
             document.source_locator,
         ),

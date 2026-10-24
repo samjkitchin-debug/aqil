@@ -3,6 +3,7 @@ import { createAccount, recordHolding, saveTargets } from "@/lib/wealth/actions"
 import { consolidate, liveInvestable, monetaryGaps, type Target } from "@/lib/wealth/allocation";
 import { convertMinor, formatMinor } from "@/lib/wealth/money";
 import type { WealthLoad } from "@/lib/wealth/load-snapshot";
+import { citedShareClassHref } from "@/lib/etf/present-explore";
 import { WEALTH_UNKNOWNS } from "@/lib/wealth/wealth-limits";
 
 const CLASSES = [
@@ -123,9 +124,21 @@ export function MyWealthView({
               </tr>
             </thead>
             <tbody>
-              {holdings.map((holding) => (
+              {holdings.map((holding) => {
+                const shareHref = citedShareClassHref(holding.isin);
+                return (
                 <tr key={holding.id} className="border-t border-border">
-                  <td className="py-[var(--space-2)] pr-[var(--space-3)]">{holding.name}</td>
+                  <td className="py-[var(--space-2)] pr-[var(--space-3)]">
+                    {holding.name}
+                    {shareHref ? (
+                      <>
+                        {" "}
+                        <a className="aq-quiet-link" href={shareHref}>
+                          View the cited share class
+                        </a>
+                      </>
+                    ) : null}
+                  </td>
                   <td className="py-[var(--space-2)] pr-[var(--space-3)]">
                     {holding.accountName}
                     {holding.environment === "simulation" ? " (simulation)" : ""}
@@ -135,7 +148,8 @@ export function MyWealthView({
                     {formatMinor(holding.amountMinor, holding.currency)} as of {holding.asOf}
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

@@ -53,6 +53,22 @@ $markerOnDevelopment = docker exec $container psql -U postgres -d postgres -tA -
 if ($markerOnDevelopment.Trim() -ne "") {
   throw "The pgTAP marker must not exist on the development database."
 }
+
+# instruments is intentionally absent from preserved database postgres.
+# Apply that migration only on this disposable database so etf_instruments.test.sql can run.
+$instrumentsOnTest = (Invoke-Psql $testDatabase "select exists(select 1 from information_schema.schemata where schema_name = 'instruments')").Trim()
+if ($instrumentsOnTest -ne "t") {
+  $migration = Join-Path (Split-Path -Parent $PSScriptRoot) "supabase\migrations\20261024120000_etf_instruments.sql"
+  docker cp $migration "${container}:/tmp/aqil_pgtap_etf_instruments.sql"
+  if ($LASTEXITCODE -ne 0) { throw "Could not copy the instruments migration." }
+  docker exec $container psql -U postgres -d $testDatabase -v ON_ERROR_STOP=1 -f /tmp/aqil_pgtap_etf_instruments.sql
+  if ($LASTEXITCODE -ne 0) { throw "Could not apply the instruments migration on $testDatabase." }
+}
+$instrumentsOnDevelopment = (Invoke-Psql "postgres" "select exists(select 1 from information_schema.schemata where schema_name = 'instruments')").Trim()
+if ($instrumentsOnDevelopment -eq "t") {
+  throw "The instruments schema must stay off preserved database postgres."
+}
+
 $after = (Invoke-Psql "postgres" $liveCountSql).Trim()
 if ($before -ne $after) {
   throw "Development live observation count changed from $before to $after."

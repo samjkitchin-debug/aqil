@@ -1,9 +1,14 @@
+import Link from "next/link";
+
 import { StatusLine } from "@/components/ui/status-line";
+import { mapCitedExposure } from "@/lib/etf/exposure-context";
 import {
   ETF_RESEARCH_BOUNDARY,
+  EXPOSURES_ABSENT,
   assessmentCopy,
   benchmarkCopy,
   costsCopy,
+  exposureCopy,
   freshnessCopy,
   holdingsCopy,
   identityCopy,
@@ -29,6 +34,47 @@ export function EtfExplorePanel({ share }: Props) {
       <p className="research-body">{costsCopy(share)}</p>
       <h3 className="research-section-title">Evidence freshness</h3>
       <p className="research-meta">{freshnessCopy(share)}</p>
+      <h3 className="research-section-title">Cited exposures</h3>
+      {share.exposures.length === 0 ? (
+        <p className="research-body" data-testid="cited-exposures-absent">
+          {EXPOSURES_ABSENT}
+        </p>
+      ) : (
+        <div data-testid="cited-exposures">
+          {share.exposures.map((exposure) => {
+            const context = mapCitedExposure(exposure.exposureClass);
+            return (
+              <div key={`${exposure.exposureClass}-${exposure.asOf}-${exposure.sourceId}`}>
+                <p className="research-body">{exposureCopy(exposure)}</p>
+                {context.status === "missing" ? (
+                  <p className="research-body">{context.sentence}</p>
+                ) : (
+                  <>
+                    <p className="research-body">{context.contextSentence}</p>
+                    <ul>
+                      {context.series.map((series) => (
+                        <li key={series.sourceId}>
+                          <Link className="aq-quiet-link" href={series.href}>
+                            {series.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                    {context.unitedStatesReading ? (
+                      <p className="research-body">
+                        <Link className="aq-quiet-link" href={context.unitedStatesReading.href}>
+                          {context.unitedStatesReading.heading}
+                        </Link>
+                        . {context.unitedStatesReading.sentence}
+                      </p>
+                    ) : null}
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
       <h3 className="research-section-title">Holdings</h3>
       <p className="research-body">{holdingsCopy(share)}</p>
       <h3 className="research-section-title">Benchmark</h3>

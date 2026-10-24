@@ -9,16 +9,27 @@ import {
   ETF_CITED_DOCUMENT_REQUIREMENT,
   ETF_EMPTY_COPY,
   ETF_RESEARCH_BOUNDARY,
+  SHARE_CLASS_ABSENT,
 } from "@/lib/etf/present-explore";
 
-async function EtfExplore() {
-  const loaded = await loadEtfExplore();
+async function EtfExplore({ isin }: { isin?: string }) {
+  const loaded = await loadEtfExplore(isin);
 
   if (loaded.status === "unavailable") {
     return (
       <div className="research-banner" data-testid="explore-unavailable">
         <h2 className="research-section-title">ETF research</h2>
         <p className="research-body">ETF research is unavailable. {loaded.reason}</p>
+        <StatusLine tone="limitation">{ETF_RESEARCH_BOUNDARY}</StatusLine>
+      </div>
+    );
+  }
+
+  if (loaded.status === "absent") {
+    return (
+      <div className="research-banner" data-testid="explore-absent">
+        <h2 className="research-section-title">ETF research</h2>
+        <p className="research-body">{SHARE_CLASS_ABSENT}</p>
         <StatusLine tone="limitation">{ETF_RESEARCH_BOUNDARY}</StatusLine>
       </div>
     );
@@ -44,15 +55,32 @@ async function EtfExplore() {
   );
 }
 
-export default function ExplorePage() {
+async function ExploreBody({
+  searchParams,
+}: {
+  searchParams: Promise<{ isin?: string }>;
+}) {
+  const params = await searchParams;
+  const isin = params.isin?.trim() || undefined;
+  const nextPath = isin ? `/explore?isin=${encodeURIComponent(isin)}` : "/explore";
+  return (
+    <PrivatePage nextPath={nextPath}>
+      <Suspense fallback={<p className="research-body">Loading ETF research…</p>}>
+        <EtfExplore isin={isin} />
+      </Suspense>
+    </PrivatePage>
+  );
+}
+
+export default function ExplorePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ isin?: string }>;
+}) {
   return (
     <AppShell title="Intelligence">
       <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
-        <PrivatePage nextPath="/explore">
-          <Suspense fallback={<p className="research-body">Loading ETF research…</p>}>
-            <EtfExplore />
-          </Suspense>
-        </PrivatePage>
+        <ExploreBody searchParams={searchParams} />
       </Suspense>
     </AppShell>
   );
