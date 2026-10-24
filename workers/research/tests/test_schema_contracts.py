@@ -122,3 +122,100 @@ def test_research_insight_matches_schema() -> None:
     )
     insight = build_sahm_insight(run)
     jsonschema.validate(insight.model_dump(mode="json"), _schema("research_insight.v1.json"))
+
+
+def test_macro_event_schema_matches_model_and_mirror() -> None:
+    from datetime import UTC, datetime
+
+    from aqil_research.contracts.macro_event import MacroEvent, macro_event_field_names
+
+    schema = _schema("macro_event.v1.json")
+    mirror = json.loads(
+        (REPO_ROOT / "packages" / "contracts" / "schemas" / "macro_event.v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert mirror == schema
+    assert macro_event_field_names() == tuple(schema["required"])
+    assert tuple(MacroEvent.model_fields) == tuple(schema["required"])
+    row = MacroEvent(
+        event_id="aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        event_key="ustr_section_301_china_continuation_2026",
+        category="trade_policy",
+        epistemic_class="confirmed_event",
+        claim_scope="policy_action_stated",
+        summary="USTR states that the actions remain in effect.",
+        country="United States",
+        region=None,
+        industries=[],
+        event_on=date(2026, 8, 23),
+        event_dates_stated="6 July 2026 and 23 August 2026",
+        indicator_source_ids=["bls_cpi_u_all_items", "federal_reserve_g17_total_ip"],
+        channel_note=(
+            "CPI-U and industrial production are plausible channels, not a measured effect."
+        ),
+        surface_on_today=True,
+        surface_reason="USTR states that the actions did not terminate and remain in effect.",
+        surfaced_at=datetime(2026, 10, 24, 12, 0, tzinfo=UTC),
+        record_class="synthetic_fixture",
+        investment_implication="no_action",
+        evidence=[
+            {
+                "update_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+                "role": "primary",
+                "cluster_key": "fr-2026-20510",
+            }
+        ],
+    )
+    jsonschema.validate(row.model_dump(mode="json"), schema)
+    rejected = row.model_dump(mode="json")
+    rejected["evidence"] = []
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(rejected, schema)
+
+
+def test_structural_theme_schema_rejects_price_as_infrastructure() -> None:
+    from aqil_research.contracts.structural_theme import (
+        StructuralThemeAssessment,
+        structural_theme_field_names,
+    )
+
+    schema = _schema("structural_theme_assessment.v1.json")
+    mirror = json.loads(
+        (
+            REPO_ROOT / "packages" / "contracts" / "schemas" / "structural_theme_assessment.v1.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert mirror == schema
+    assert structural_theme_field_names() == tuple(schema["required"])
+    assert tuple(StructuralThemeAssessment.model_fields) == tuple(schema["required"])
+    payload = {
+        "schema_version": "1.0",
+        "assessment_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "theme_key": "ai_infrastructure_investment",
+        "supersedes_assessment_id": None,
+        "real_economy_activity": "Company-wide actual capital expenditure is recorded.",
+        "earnings": "Earnings are not established by this filing.",
+        "market_prices": "Market prices are not established by this filing.",
+        "media_attention": "Media attention is not established by this filing.",
+        "publication_allowed": False,
+        "record_class": "synthetic_fixture",
+        "dimensions": [
+            {
+                "dimension": "infrastructure_investment",
+                "status": "insufficient",
+                "measure_kind": "equity_price",
+                "explanation": "An equity price is not infrastructure investment evidence.",
+                "update_id": None,
+                "amount": None,
+                "unit": None,
+                "period_start": None,
+                "period_end": None,
+                "reporting_entity": None,
+                "filed_at": None,
+                "relationship": None,
+            }
+        ],
+    }
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(payload, schema)

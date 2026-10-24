@@ -7,6 +7,7 @@ import { ResearchInsightView } from "@/components/research/research-insight-view
 import { MacroReadingPanel } from "@/components/research/macro-reading-panel";
 import { ProspectiveAssessmentPanel } from "@/components/research/prospective-assessment-panel";
 import { SloosReadingPanel } from "@/components/research/sloos-reading-panel";
+import { EventsAndThemesSection } from "@/components/research/events-and-themes";
 import { SourcedUpdatesPanel } from "@/components/research/sourced-updates-panel";
 import { loadFounderResearchInsight } from "@/lib/research/load-founder-insight";
 import { loadMacroReading } from "@/lib/research/load-macro-reading";
@@ -37,6 +38,9 @@ async function ResearchEvidence() {
         </h2>
         <SourcedUpdatesPanel updates={updates} variant="evidence" />
       </section>
+      <div className="mt-[var(--space-6)]">
+        <EventsAndThemesSection variant="evidence" />
+      </div>
       {credit.status === "ready" ? (
         <div className="mt-[var(--space-6)]">
           <SloosReadingPanel reading={credit.reading} />

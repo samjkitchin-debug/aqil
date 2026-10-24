@@ -93,6 +93,9 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Recompute Sahm from frozen observation evidence and print comparison",
     )
+    from aqil_research.manual.command import register_macro_parser
+
+    register_macro_parser(sub)
     return parser
 
 
@@ -130,6 +133,10 @@ def main(argv: list[str] | None = None) -> int:
         from aqil_research.cli_ops import run_refresh_status
 
         return run_refresh_status(args)
+    if args.command == "register-macro":
+        from aqil_research.manual.command import run_register_macro
+
+        return run_register_macro(args)
     return 1
 
 

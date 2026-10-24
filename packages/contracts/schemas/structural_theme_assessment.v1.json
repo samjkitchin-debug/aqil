@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/structural_theme_assessment.v1.json",
+  "title": "Structural theme assessment v1",
+  "description": "Append-only assessment for one structural theme. Separate text for real-economy activity, earnings, market prices and media attention. No strength, confidence or gauge. publication_allowed is false. A later assessment points at the prior row.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "assessment_id",
+    "theme_key",
+    "supersedes_assessment_id",
+    "real_economy_activity",
+    "earnings",
+    "market_prices",
+    "media_attention",
+    "publication_allowed",
+    "record_class",
+    "dimensions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "assessment_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "theme_key": {
+      "const": "ai_infrastructure_investment"
+    },
+    "supersedes_assessment_id": {
+      "type": ["string", "null"],
+      "format": "uuid"
+    },
+    "real_economy_activity": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 800
+    },
+    "earnings": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 800
+    },
+    "market_prices": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 800
+    },
+    "media_attention": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 800
+    },
+    "publication_allowed": {
+      "const": false
+    },
+    "record_class": {
+      "enum": ["recorded", "synthetic_fixture"]
+    },
+    "dimensions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dimension"
+      }
+    }
+  },
+  "$defs": {
+    "dimension": {
+      "type": "object",
+      "required": [
+        "dimension",
+        "status",
+        "measure_kind",
+        "explanation",
+        "update_id",
+        "amount",
+        "unit",
+        "period_start",
+        "period_end",
+        "reporting_entity",
+        "filed_at",
+        "relationship"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {
+          "enum": [
+            "infrastructure_investment",
+            "commercial_adoption",
+            "semiconductor_equipment_demand",
+            "earnings_cash_flow",
+            "market_breadth_relative_performance",
+            "financing_sustainability"
+          ]
+        },
+        "status": {
+          "enum": ["available", "stale", "insufficient", "contradictory", "not_yet_monitored"]
+        },
+        "measure_kind": {
+          "enum": [
+            "actual_capital_expenditure",
+            "forecast_spending",
+            "actual_spending",
+            "infrastructure_demand",
+            "commercial_adoption",
+            "revenue",
+            "earnings",
+            "equity_price",
+            "none"
+          ]
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 800
+        },
+        "update_id": {
+          "type": ["string", "null"],
+          "format": "uuid"
+        },
+        "amount": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9]+(\\.[0-9]+)?$"
+        },
+        "unit": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "period_start": {
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "period_end": {
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "reporting_entity": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "filed_at": {
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "relationship": {
+          "type": ["string", "null"],
+          "enum": ["supports", "contradicts", null]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "dimension": {
+                "const": "infrastructure_investment"
+              }
+            },
+            "required": ["dimension"]
+          },
+          "then": {
+            "properties": {
+              "measure_kind": {
+                "enum": ["actual_capital_expenditure", "forecast_spending", "none"]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "dimension": {
+                "const": "market_breadth_relative_performance"
+              }
+            },
+            "required": ["dimension"]
+          },
+          "then": {
+            "properties": {
+              "measure_kind": {
+                "enum": ["equity_price", "none"]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "available"
+              }
+            },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "update_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "explanation": {
+                "minLength": 20
+              },
+              "measure_kind": {
+                "not": {
+                  "const": "none"
+                }
+              }
+            },
+            "required": ["update_id"]
+          }
+        }
+      ]
+    }
+  }
+}

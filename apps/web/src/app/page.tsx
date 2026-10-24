@@ -4,6 +4,7 @@ import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
 import { MacroConditionsSection } from "@/components/research/macro-conditions-panel";
 import { ResearchInsightView } from "@/components/research/research-insight-view";
+import { EventsAndThemesSection } from "@/components/research/events-and-themes";
 import { SourcedUpdatesPanel } from "@/components/research/sourced-updates-panel";
 import { loadFounderResearchInsight } from "@/lib/research/load-founder-insight";
 import { loadSourcedUpdates } from "@/lib/research/load-sourced-updates";
@@ -66,6 +67,9 @@ export default function TodayPage() {
     <AppShell title="Today">
       <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
         <PrivatePage nextPath="/">
+          <Suspense fallback={<p className="research-body">Loading material developments…</p>}>
+            <EventsAndThemesSection variant="today" />
+          </Suspense>
           <section aria-labelledby="sourced-briefing-heading">
             <h2 id="sourced-briefing-heading" className="research-section-title">
               Sourced publications

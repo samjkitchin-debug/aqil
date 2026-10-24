@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/macro_event.v1.json",
+  "title": "Macro event v1",
+  "description": "One manually registered macro event and its sourced-update evidence. The summary is short and is not a document body. event_on is the date the event concerns, not the source published_at. publication_allowed is false. This is not an investment instruction.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "event_id",
+    "event_key",
+    "category",
+    "epistemic_class",
+    "claim_scope",
+    "summary",
+    "country",
+    "region",
+    "industries",
+    "event_on",
+    "event_dates_stated",
+    "indicator_source_ids",
+    "channel_note",
+    "surface_on_today",
+    "surface_reason",
+    "surfaced_at",
+    "record_class",
+    "monitoring",
+    "publication_allowed",
+    "investment_implication",
+    "evidence"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "event_key": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]{1,80}$"
+    },
+    "category": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]{1,80}$"
+    },
+    "epistemic_class": {
+      "enum": ["confirmed_event", "reported_allegation", "forecast", "interpretation"]
+    },
+    "claim_scope": {
+      "enum": ["policy_action_stated", "publication_recorded"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "country": {
+      "type": ["string", "null"],
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "region": {
+      "type": ["string", "null"],
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "industries": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      }
+    },
+    "event_on": {
+      "type": "string",
+      "format": "date"
+    },
+    "event_dates_stated": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 400
+    },
+    "indicator_source_ids": {
+      "type": "array",
+      "maxItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "bls_cps_unemployment_rate",
+          "bls_ces_total_nonfarm_payrolls",
+          "bls_jolts_total_nonfarm_job_openings",
+          "bls_cpi_u_all_items",
+          "federal_reserve_g17_total_ip",
+          "federal_reserve_sloos_cil",
+          "federal_reserve_h8_bank_credit",
+          "federal_reserve_h15_federal_funds_effective",
+          "federal_reserve_h15_treasury_10y_constant_maturity",
+          "ecb_sdw_hicp_sa"
+        ]
+      }
+    },
+    "channel_note": {
+      "type": ["string", "null"],
+      "minLength": 20,
+      "maxLength": 400
+    },
+    "surface_on_today": {
+      "type": "boolean"
+    },
+    "surface_reason": {
+      "type": ["string", "null"],
+      "minLength": 40,
+      "maxLength": 500
+    },
+    "surfaced_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "record_class": {
+      "enum": ["recorded", "synthetic_fixture"]
+    },
+    "monitoring": {
+      "const": "manual"
+    },
+    "publication_allowed": {
+      "const": false
+    },
+    "investment_implication": {
+      "enum": ["no_action", "insufficient_evidence"]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["update_id", "role", "cluster_key"],
+        "additionalProperties": false,
+        "properties": {
+          "update_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "enum": [
+              "primary",
+              "secondary",
+              "supporting",
+              "conflicting",
+              "subsequent_development"
+            ]
+          },
+          "cluster_key": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.:/-]{1,200}$"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "epistemic_class": {
+            "const": "confirmed_event"
+          }
+        },
+        "required": ["epistemic_class"]
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "contains": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "const": "primary"
+                }
+              },
+              "required": ["role"]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

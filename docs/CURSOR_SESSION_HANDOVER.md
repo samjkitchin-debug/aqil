@@ -1,9 +1,26 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 24 October 2026, conditions presentation
-**Parent:** `c2418c3` on local `main` before this commit
-**Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+**Last updated:** 24 October 2026, macro events and themes
+
+## Macro events and themes, 24 October 2026
+
+Risk class R2. Local only. Nothing was pushed. The hosted project was not migrated. `publication_allowed` stays false. No refresh step was added. `research.economic_observations` stayed at 8791 rows, of which 8704 are live. `research.sourced_updates` stayed at 42 rows. Database `aqil_etf` was not written.
+
+What is real: one existing Federal Reserve monetary-policy press row is now also a `publication_recorded` macro event. The summary says the Board published the minutes of the discount-rate meetings on 17 August, 9 September and 16 September 2026. It does not say policy changed. `surface_on_today` is false, so Today does not show it. A second registration returned unchanged.
+
+What is manual: registration is `aqil-research register-macro`. It is not part of `research:refresh`. Monitoring is manual.
+
+What is blocked:
+
+- Federal Register notice 2026-20510 was re-fetched on 24 October 2026 and the SUMMARY and DATES support the Section 301 continuation claim. It was not stored. `govinfo_federal_register` has `automated_access` unknown because the govinfo policies page grants crawl and preservation to LOCKSS participants, not a general client. A new fetch is refused.
+- The AI infrastructure theme was not stored. `AQIL_SEC_USER_AGENT` is not set, so SEC companyfacts was not called. No amount was invented.
+
+Synthetic fixtures in `aqil_research_test` proved idempotent registration, supersession that keeps the prior row, and `record_class = recorded` as the web filter. Those rows were rolled back.
+
+`npm run test:db` on `aqil_pgtap_test` did not reset database `postgres`. Live observations remained 8704. `macro_events_themes.test.sql` passed. The suite failed on `etf_instruments.test.sql` because schema `instruments` is not in the development database. That ETF migration was not applied.
+
+Signed-in browser on `http://localhost:3000`, desktop and 390 pixels. Today shows Material developments, the awareness line, and no material development in the window. Primary navigation stayed Today, My Wealth and Intelligence. Conditions and Evidence show the Federal Reserve publication record, the epistemic class and the claim scope. No horizontal overflow. The CPI-U panel id is `macro-panel-bls_cpi_u_all_items` and the hash opens that panel. There is no Plausible channel link on the page because the USTR event was not stored.
 
 ## Conditions presentation, 24 October 2026
 

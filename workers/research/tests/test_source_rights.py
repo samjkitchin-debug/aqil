@@ -102,6 +102,7 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "fed.h15.RIFSPFF_N.M",
         "fed.h15.RIFLGFCY10_N.M",
         "ecb.icp.M.U2.Y.000000.3.INX",
+        "govinfo.federal_register.notices",
     }
     for record in records:
         assert record.terms_url in record.evidence_urls
@@ -126,6 +127,8 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
             "ecb.icp.M.U2.Y.000000.3.INX",
         }:
             assert record.assessed_on.isoformat() == "2026-10-22"
+        elif record.dataset_id == "govinfo.federal_register.notices":
+            assert record.assessed_on.isoformat() == "2026-10-24"
         else:
             assert record.assessed_on.isoformat() == "2026-10-17"
 
@@ -178,6 +181,18 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
     }
     assert all(operation_allowed(unemployment, operation) for operation in FIRST_LIVE_OPERATIONS)
     assert unemployment.attribution == AttributionRequirement.REQUIRED
+
+    govinfo = by_dataset["govinfo.federal_register.notices"]
+    assert govinfo.source_id == "govinfo_federal_register"
+    assert govinfo.m1_role == M1Role.UNRESOLVED
+    assert govinfo.attribution == AttributionRequirement.REQUIRED
+    assert govinfo.operational_status == OperationalStatus.ENABLED
+    assert not source_usable(govinfo, RightsOperation.AUTOMATED_ACCESS)
+    assert source_usable(govinfo, RightsOperation.RAW_DATA_RETENTION)
+    assert source_usable(govinfo, RightsOperation.REDISTRIBUTION)
+    assert not operation_allowed(govinfo, RightsOperation.AI_PROCESSING)
+    assert not operation_allowed(govinfo, RightsOperation.AI_MODEL_TRAINING)
+    assert govinfo.m1_role != M1Role.FIRST_LIVE_PROVIDER
 
 
 def test_unknown_or_prohibited_rights_block_only_that_operation() -> None:

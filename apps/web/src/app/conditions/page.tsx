@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
+import { EventsAndThemesSection } from "@/components/research/events-and-themes";
 import { MacroConditionsSection } from "@/components/research/macro-conditions-panel";
 
 export default function ConditionsPage() {
@@ -15,6 +16,9 @@ export default function ConditionsPage() {
             </h2>
             <Suspense fallback={<p className="research-body">Loading conditions…</p>}>
               <MacroConditionsSection variant="dashboard" />
+            </Suspense>
+            <Suspense fallback={<p className="research-body">Loading events and themes…</p>}>
+              <EventsAndThemesSection variant="compact" />
             </Suspense>
           </section>
         </PrivatePage>

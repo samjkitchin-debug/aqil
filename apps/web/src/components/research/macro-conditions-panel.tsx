@@ -68,6 +68,7 @@ function IndicatorPanel({ panel, compact }: { panel: MacroSeriesPanel; compact: 
   return (
     <article
       className={compact ? "macro-panel macro-panel--compact" : "macro-panel"}
+      id={`macro-panel-${panel.sourceId}`}
       data-testid={`macro-panel-${panel.sourceId}`}
       data-state={panel.state}
     >

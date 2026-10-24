@@ -112,6 +112,9 @@ Each directional graph edge stores `relation`, `mechanism`, `sign` (including un
 ### Country policy tracker
 For each country/bloc, track proposal, bill, enactment, appropriations, appropriated vs disbursed funds, procurement, implementation, measurable uptake/output, enforcement, court challenge, reversal, trade response and foreign spillovers. Record effective dates and data revisions. Identify economic significance based on exposure, not merely country size.
 
+### Macro events and structural themes
+A macro event is a short manually registered claim, with an epistemic class and a claim scope, linked to an existing sourced update. A confirmed event needs primary evidence. A central-bank press release alone is not a stated policy action. The AI infrastructure theme can record company-wide actual capital expenditure from a filing. It does not score the theme, forecast it, or name an investment. Monitoring stays manual and `publication_allowed` stays false. This is not the policy lifecycle in AQ-035.
+
 ### Example mini-contract: Middle East de-escalation (hypothetical; not a current prediction)
 - Define precise geographical/event scope and outcome metric **before** evaluating claims.
 - Signals: independent verified ceasefire compliance, cross-border kinetic incidents, military posture, shipping flows, insurance premia, physical oil exports, sanctions and policy follow-through. A diplomatic headline is not equivalent to confirmed operational de-escalation.
