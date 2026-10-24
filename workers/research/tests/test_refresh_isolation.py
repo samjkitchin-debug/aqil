@@ -42,6 +42,18 @@ def test_default_steps_are_official_live_sources() -> None:
         "federal_reserve_h15_federal_funds_effective",
         "federal_reserve_h15_treasury_10y_constant_maturity",
         "ecb_sdw_hicp_sa",
+        "ecb_hicp_core",
+        "ecb_fm_deposit_facility",
+        "eurostat_gdp_real_ea21",
+        "eurostat_unemployment_ea21",
+        "eurostat_industrial_production_ea21",
+        "eurostat_retail_volume_ea21",
+        "stat_cpi_2025_all_items_reference",
+        "cao_mo_private_ex_volatile_sa_monthly",
+        "bis_gli_usd_credit_nonbanks",
+        "ons_mm23_cpi_d7bt",
+        "boe_official_bank_rate",
+        "dosm_ipi_abs",
     ]
 
 

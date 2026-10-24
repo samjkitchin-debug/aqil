@@ -3,6 +3,8 @@ import Link from "next/link";
 import { SeriesChart } from "@/components/research/series-chart";
 import { loadMacroConditions } from "@/lib/research/load-macro-conditions";
 import {
+  CONDITION_REGIONS,
+  conditionRegion,
   presentMacroConditions,
   type MacroConditionsView,
   type MacroSeriesPanel,
@@ -29,6 +31,21 @@ export function MacroConditionsPanel({ view, variant, seriesLines }: Props) {
         <summary>How freshness is judged</summary>
         <p className="research-meta">{view.freshnessRule}</p>
       </details>
+      {compact ? null : (
+        <nav className="research-meta" aria-label="Region" data-testid="macro-region-filter">
+          {CONDITION_REGIONS.map((item) => (
+            <Link
+              key={item.id}
+              href={item.id === "global" ? "/conditions" : `/conditions?region=${item.id}`}
+              prefetch={false}
+              data-testid={`macro-region-${item.id}`}
+              aria-current={view.regionId === item.id ? "page" : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      )}
       {compact ? (
         <p className="research-meta">
           <Link href="/conditions" prefetch={false} data-testid="macro-full-view">
@@ -160,9 +177,11 @@ function IndicatorPanel({
 export async function MacroConditionsSection({
   variant,
   seriesLines,
+  region,
 }: {
   variant: "compact" | "dashboard";
   seriesLines?: Readonly<Record<string, string>>;
+  region?: string;
 }) {
   const loaded = await loadMacroConditions();
   if (loaded.status === "unavailable") {
@@ -172,6 +191,10 @@ export async function MacroConditionsSection({
       </p>
     );
   }
-  const view = presentMacroConditions({ series: loaded.series, asOf: new Date() });
+  const view = presentMacroConditions({
+    series: loaded.series,
+    asOf: new Date(),
+    region: variant === "dashboard" ? conditionRegion(region) : "global",
+  });
   return <MacroConditionsPanel view={view} variant={variant} seriesLines={seriesLines} />;
 }

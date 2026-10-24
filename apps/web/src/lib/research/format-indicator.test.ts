@@ -32,6 +32,10 @@ test("levels use readable units and keep a precise chart value", () => {
   assert.equal(prices?.headline, "336.298");
   assert.equal(prices?.beside, "Index (1982–84 = 100)");
 
+  const japan = displayLevel("101.9", "index, 2020 = 100");
+  assert.equal(japan?.headline, "101.9");
+  assert.equal(japan?.beside, "Index (2020 = 100)");
+
   const output = displayLevel("103.9506", "index_2017_100");
   assert.equal(output?.headline, "103.95");
   assert.equal(output?.beside, "Index (2017 = 100)");

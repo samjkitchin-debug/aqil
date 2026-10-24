@@ -1,0 +1,5 @@
+DATAFLOW,FREQ,CURR_DENOM,BORROWERS_CTY,BORROWERS_SECTOR,LENDERS_SECTOR,L_POS_TYPE,L_INSTR,UNIT_MEASURE,TIME_PERIOD,OBS_VALUE,TITLE,UNIT_MULT,DECIMALS,COLLECTION,AVAILABILITY,OBS_STATUS,OBS_PRE_BREAK,OBS_CONF
+BIS:WS_GLI(1.0),Q,USD,3P,N,A,I,B,USD,2025-Q2,13979225.357,USD denominated credit (bank loans & debt securities) to non-bank borrowers located outside the US,6,0,,A,A,,F
+BIS:WS_GLI(1.0),Q,USD,3P,N,A,I,B,USD,2025-Q3,14226387.541,USD denominated credit (bank loans & debt securities) to non-bank borrowers located outside the US,6,0,,A,A,,F
+BIS:WS_GLI(1.0),Q,USD,3P,N,A,I,B,USD,2025-Q4,14253874.857,USD denominated credit (bank loans & debt securities) to non-bank borrowers located outside the US,6,0,,A,A,,F
+BIS:WS_GLI(1.0),Q,USD,3P,N,A,I,B,USD,2026-Q1,14747653.746,USD denominated credit (bank loans & debt securities) to non-bank borrowers located outside the US,6,0,,A,A,,F

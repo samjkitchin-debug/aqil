@@ -1,4 +1,5 @@
 import {
+  DAILY_STALE_DAYS,
   MACRO_CONDITIONS_WINDOW,
   MACRO_SERIES,
   MONTHLY_STALE_MONTHS,
@@ -52,6 +53,7 @@ export type MacroSeriesPanel = {
 };
 
 export type MacroConditionsView = {
+  regionId: ConditionRegionId;
   intro: string;
   freshnessRule: string;
   completenessLine: string;
@@ -90,15 +92,73 @@ const RETRIEVED = new Intl.DateTimeFormat("en-GB", {
   timeZone: "UTC",
 });
 
-type Frequency = "monthly" | "weekly" | "quarterly";
+type Frequency = "daily" | "monthly" | "weekly" | "quarterly";
+
+export const CONDITION_REGIONS = [
+  { id: "global", label: "Global" },
+  { id: "united-states", label: "United States" },
+  { id: "europe", label: "Europe" },
+  { id: "china", label: "China" },
+  { id: "japan", label: "Japan" },
+  { id: "other-asia", label: "Other Asia" },
+] as const;
+
+export type ConditionRegionId = (typeof CONDITION_REGIONS)[number]["id"];
+
+const FACTOR_FAMILIES = [
+  { id: "growth", name: "Growth" },
+  { id: "inflation", name: "Inflation" },
+  { id: "labour", name: "Labour" },
+  { id: "monetary_policy", name: "Monetary policy" },
+  { id: "credit", name: "Credit" },
+  { id: "liquidity", name: "Liquidity" },
+  { id: "trade", name: "Trade" },
+  { id: "manufacturing", name: "Manufacturing" },
+  { id: "currencies", name: "Currencies" },
+  { id: "energy", name: "Energy" },
+  { id: "property", name: "Property" },
+] as const;
+
+const FAMILY_BY_GROUP: Record<string, (typeof FACTOR_FAMILIES)[number]["id"]> = {
+  labour: "labour",
+  inflation: "inflation",
+  growth: "growth",
+  credit: "credit",
+  rates: "monetary_policy",
+  manufacturing: "manufacturing",
+  trade: "trade",
+};
+
+const OTHER_ASIA = new Set(["South Korea", "Taiwan", "Singapore", "Malaysia", "Vietnam"]);
+
+export function conditionRegion(value: string | undefined): ConditionRegionId {
+  const found = CONDITION_REGIONS.find((item) => item.id === value);
+  return found?.id ?? "global";
+}
+
+function regionBucket(region: string): ConditionRegionId | "other" {
+  if (region === "United States") return "united-states";
+  if (region === "Euro area" || region === "United Kingdom") return "europe";
+  if (region === "China") return "china";
+  if (region === "Japan") return "japan";
+  if (OTHER_ASIA.has(region)) return "other-asia";
+  return "other";
+}
 
 export function presentMacroConditions(input: {
   series: readonly StoredSeriesWindow[];
   asOf: Date;
+  region?: ConditionRegionId;
 }): MacroConditionsView {
+  const selected = input.region ?? "global";
+  const regionLabel = CONDITION_REGIONS.find((item) => item.id === selected)?.label ?? "Global";
   const bySource = new Map(input.series.map((series) => [series.sourceId, series]));
   const groups: MacroConditionsView["groups"] = [];
-  for (const spec of MACRO_SERIES) {
+  const selectedSeries = MACRO_SERIES.filter((spec) => {
+    if (selected === "global") return true;
+    return regionBucket(indicatorMetadata(spec.sourceId)?.region ?? "") === selected;
+  });
+  for (const spec of selectedSeries) {
     let group = groups.find((item) => item.id === spec.groupId);
     if (!group) {
       group = { id: spec.groupId, label: spec.groupLabel, panels: [] };
@@ -107,13 +167,28 @@ export function presentMacroConditions(input: {
     group.panels.push(presentSeries(spec, bySource.get(spec.sourceId), input.asOf));
   }
   const panels = groups.flatMap((group) => group.panels);
+  const presentFamilies = new Set(
+    selectedSeries.map((spec) => FAMILY_BY_GROUP[spec.groupId]).filter((family) => family !== undefined),
+  );
+  const unavailable = [
+    ...UNAVAILABLE_CONDITIONS.map((item) => ({ ...item })),
+    ...FACTOR_FAMILIES.filter((family) => !presentFamilies.has(family.id)).map((family) => ({
+      id: family.id,
+      name: family.name,
+      detail: `No live series is stored for ${family.name.toLowerCase()} in ${regionLabel}.`,
+    })),
+  ].filter((item, index, all) => all.findIndex((other) => other.id === item.id) === index);
   return {
+    regionId: selected,
     intro: INTRO,
     freshnessRule: freshnessRule(input.asOf),
-    completenessLine: completenessLine(panels),
-    revisionLimit: revisionLimitLine(input.series),
+    completenessLine:
+      panels.length === 0 ? `No live series is stored for ${regionLabel}.` : completenessLine(panels),
+    revisionLimit: revisionLimitLine(
+      input.series.filter((item) => selectedSeries.some((spec) => spec.sourceId === item.sourceId)),
+    ),
     groups,
-    unavailable: UNAVAILABLE_CONDITIONS.map((item) => ({ ...item })),
+    unavailable,
   };
 }
 
@@ -146,6 +221,9 @@ export function isStale(frequency: Frequency, latestPeriod: string, asOf: Date):
   }
   if (frequency === "weekly") {
     return latestPeriod < addDays(today, -WEEKLY_STALE_DAYS);
+  }
+  if (frequency === "daily") {
+    return latestPeriod < addDays(today, -DAILY_STALE_DAYS);
   }
   return latestPeriod < addMonths(quarterStart(today), -(QUARTERLY_STALE_QUARTERS * 3));
 }
@@ -447,6 +525,7 @@ function freshnessRule(asOf: Date): string {
     `A monthly series is stale when the latest period starts earlier than the first day of the month ${MONTHLY_STALE_MONTHS} months before the current month.`,
     `A weekly series is stale when the latest period starts more than ${WEEKLY_STALE_DAYS} days before today.`,
     `A quarterly series is stale when the latest period starts earlier than the first day of the quarter ${QUARTERLY_STALE_QUARTERS} quarters before the current quarter.`,
+    `A daily series is stale when the latest period starts more than ${DAILY_STALE_DAYS} days before today.`,
     `Comparison date: ${DAY.format(asOf)} UTC.`,
   ].join(" ");
 }
@@ -513,7 +592,7 @@ function gapCopy(sourceId: string, gaps: readonly string[], frequency: string): 
 function chartNote(state: MacroPanelState, frequency: string): string | null {
   if (state === "missing" || state === "insufficient") return null;
   if (!isKnownFrequency(frequency)) {
-    return "This frequency is not monthly, weekly, or quarterly, so no line is drawn.";
+    return "This frequency is not daily, monthly, weekly, or quarterly, so no line is drawn.";
   }
   return null;
 }
@@ -528,6 +607,7 @@ function sinceText(period: string, frequency: string, adjacent: boolean): string
 function formatPeriod(iso: string, frequency: string): string {
   const date = new Date(`${iso.slice(0, 10)}T00:00:00Z`);
   if (Number.isNaN(date.getTime())) return iso;
+  if (frequency === "daily") return DAY.format(date);
   if (frequency === "weekly") return `week of ${DAY.format(date)}`;
   if (frequency === "quarterly") return `quarter starting ${DAY.format(date)}`;
   return MONTH.format(date);
@@ -539,13 +619,14 @@ function sentence(value: string): string {
 }
 
 function isKnownFrequency(frequency: string): frequency is Frequency {
-  return frequency === "monthly" || frequency === "weekly" || frequency === "quarterly";
+  return frequency === "daily" || frequency === "monthly" || frequency === "weekly" || frequency === "quarterly";
 }
 
 function stepPeriod(iso: string, frequency: string): string | null {
   if (frequency === "monthly") return addMonths(iso, 1);
   if (frequency === "quarterly") return addMonths(iso, 3);
   if (frequency === "weekly") return addDays(iso, 7);
+  if (frequency === "daily") return addDays(iso, 1);
   return null;
 }
 

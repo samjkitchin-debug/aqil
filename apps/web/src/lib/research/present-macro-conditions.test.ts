@@ -98,8 +98,8 @@ function visibleCopy(view: MacroConditionsView): string {
   return chunks.join("\n");
 }
 
-test("the ten live series are grouped and monetary-policy press is not a rates panel", () => {
-  assert.equal(MACRO_SERIES.length, 10);
+test("the tracked series are grouped and monetary-policy press is not a rates panel", () => {
+  assert.equal(MACRO_SERIES.length, 22);
   assert.deepEqual(
     MACRO_SERIES.map((item) => item.sourceId),
     [
@@ -113,6 +113,18 @@ test("the ten live series are grouped and monetary-policy press is not a rates p
       "federal_reserve_h15_federal_funds_effective",
       "federal_reserve_h15_treasury_10y_constant_maturity",
       "ecb_sdw_hicp_sa",
+      "ecb_hicp_core",
+      "ecb_fm_deposit_facility",
+      "eurostat_unemployment_ea21",
+      "eurostat_gdp_real_ea21",
+      "eurostat_industrial_production_ea21",
+      "eurostat_retail_volume_ea21",
+      "stat_cpi_2025_all_items_reference",
+      "cao_mo_private_ex_volatile_sa_monthly",
+      "bis_gli_usd_credit_nonbanks",
+      "ons_mm23_cpi_d7bt",
+      "boe_official_bank_rate",
+      "dosm_ipi_abs",
     ],
   );
   assert.deepEqual(
@@ -120,6 +132,8 @@ test("the ten live series are grouped and monetary-policy press is not a rates p
     [
       "federal_reserve_h15_federal_funds_effective",
       "federal_reserve_h15_treasury_10y_constant_maturity",
+      "ecb_fm_deposit_facility",
+      "boe_official_bank_rate",
     ],
   );
   for (const sourceId of EXCLUDED_PRESS_SOURCE_IDS) {
@@ -369,11 +383,20 @@ test("a stale series is still shown and a missing series says so", () => {
   assert.equal(missing.evidenceHref, null);
   assert.equal(missing.chart, null);
   assert.match(missing.measures ?? "", /civilian labour force/);
-  assert.match(view.completenessLine, /1 of 10 tracked series has a stored observation/);
-  assert.match(view.completenessLine, /9 have no live observation/);
+  assert.match(
+    view.completenessLine,
+    new RegExp(`1 of ${MACRO_SERIES.length} tracked series has a stored observation`),
+  );
+  assert.match(
+    view.completenessLine,
+    new RegExp(`${MACRO_SERIES.length - 1} have no live observation`),
+  );
   assert.match(view.completenessLine, /1 is stale for its frequency/);
   assert.match(view.freshnessRule, /Comparison date: 24 October 2026 UTC/);
-  assert.equal(view.unavailable.map((item) => item.id).join(","), "liquidity,monetary_policy_stance");
+  assert.equal(
+    view.unavailable.map((item) => item.id).join(","),
+    "liquidity,monetary_policy_stance,currencies,energy,property",
+  );
   const copy = visibleCopy(view);
   assert.match(copy, /There is no composite score/);
   assert.match(copy, /not a judgement about the investment environment/);
@@ -490,6 +513,200 @@ test("a smoothed line passes through observations without crossing a gap", () =>
       const high = Math.max(span.start, span.end);
       assert.ok(span.mid >= low - 0.05 && span.mid <= high + 0.05);
     }
+  }
+});
+
+test("Japan shows the reference index and machinery orders and lists families with no stored series", () => {
+  const view = presentMacroConditions({
+    series: [
+      unemployment(),
+      series({
+        sourceId: "stat_cpi_2025_all_items_reference",
+        datasetId: "stat.cpi.2025base.JP.0001.all_items.monthly.calendar.nsa.reference_3dp",
+        unit: "index, 2025 = 100, three-decimal reference price index, not a nominal yen amount and not a real volume",
+        seasonalAdjustment: "not_seasonally_adjusted",
+        frequency: "monthly",
+        observations: [
+          { period: "2026-08-01", rawValue: "101.200" },
+          { period: "2026-09-01", rawValue: "101.500" },
+        ],
+      }),
+      series({
+        sourceId: "cao_mo_private_ex_volatile_sa_monthly",
+        datasetId: "cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar",
+        unit: "million yen, nominal, not a real volume index",
+        frequency: "monthly",
+        observations: [
+          { period: "2026-07-01", rawValue: "880000" },
+          { period: "2026-08-01", rawValue: "890123" },
+        ],
+      }),
+    ],
+    asOf: AS_OF,
+    region: "japan",
+  });
+  assert.equal(view.regionId, "japan");
+  assert.equal(
+    view.groups.flatMap((group) => group.panels).some((item) => item.sourceId === "bls_cps_unemployment_rate"),
+    false,
+  );
+  assert.equal(
+    view.groups.flatMap((group) => group.panels).some((item) => item.sourceId === "meti_iip_production_sa"),
+    false,
+  );
+  const prices = panel(view, "stat_cpi_2025_all_items_reference");
+  assert.equal(prices.region, "Japan");
+  assert.equal(prices.name, "CPI reference index");
+  assert.equal(prices.valueLabel, "101.500");
+  assert.equal(prices.valueUnit, "Reference index (2025 = 100)");
+  assert.match(prices.measures ?? "", /not the official one-decimal/);
+  assert.equal(prices.sourceLabel, "Statistics Bureau of Japan · Three-decimal reference index");
+  assert.equal(prices.sourceHref, "https://www.stat.go.jp/data/cpi/1.html");
+  const orders = panel(view, "cao_mo_private_ex_volatile_sa_monthly");
+  assert.equal(orders.region, "Japan");
+  assert.equal(orders.name, "Machinery orders");
+  assert.equal(orders.valueLabel, "890123");
+  assert.equal(orders.valueUnit, "Million yen");
+  assert.equal(
+    orders.sourceLabel,
+    "Cabinet Office, Economic and Social Research Institute · Machinery orders",
+  );
+  assert.equal(orders.sourceHref, "https://www.esri.cao.go.jp/jp/stat/juchu/juchu.html");
+  assert.equal(view.unavailable.some((item) => item.name === "Inflation"), false);
+  assert.equal(view.unavailable.some((item) => item.name === "Manufacturing"), false);
+  for (const name of [
+    "Growth",
+    "Labour",
+    "Monetary policy",
+    "Credit",
+    "Liquidity",
+    "Trade",
+    "Currencies",
+    "Energy",
+    "Property",
+  ]) {
+    assert.equal(
+      view.unavailable.some((item) => item.name === name),
+      true,
+      name,
+    );
+  }
+});
+
+test("China lists missing families and does not invent a reading", () => {
+  const view = presentMacroConditions({
+    series: [unemployment()],
+    asOf: AS_OF,
+    region: "china",
+  });
+  assert.equal(view.regionId, "china");
+  assert.equal(view.groups.length, 0);
+  assert.match(view.completenessLine, /No live series is stored for China/);
+  assert.doesNotMatch(visibleCopy(view), /4\.2/);
+  for (const name of ["Growth", "Inflation", "Labour", "Monetary policy", "Credit", "Trade", "Manufacturing"]) {
+    assert.equal(
+      view.unavailable.some((item) => item.name === name),
+      true,
+      name,
+    );
+  }
+});
+
+test("Europe keeps euro-area series and leaves families with no series missing", () => {
+  const view = presentMacroConditions({
+    series: [
+      unemployment(),
+      series({
+        sourceId: "eurostat_unemployment_ea21",
+        unit: "percent",
+        frequency: "monthly",
+        observations: [
+          { period: "2026-07-01", rawValue: "6.3" },
+          { period: "2026-08-01", rawValue: "6.4" },
+        ],
+      }),
+    ],
+    asOf: AS_OF,
+    region: "europe",
+  });
+  assert.equal(
+    view.groups.flatMap((group) => group.panels).some((item) => item.sourceId === "bls_cps_unemployment_rate"),
+    false,
+  );
+  const euro = panel(view, "eurostat_unemployment_ea21");
+  assert.equal(euro.region, "Euro area");
+  assert.equal(euro.valueLabel, "6.4%");
+  assert.equal(
+    view.unavailable.some((item) => item.id === "credit"),
+    true,
+  );
+  assert.equal(
+    view.unavailable.some((item) => item.id === "currencies"),
+    true,
+  );
+  const ukPrices = panel(view, "ons_mm23_cpi_d7bt");
+  assert.equal(ukPrices.region, "United Kingdom");
+  assert.equal(ukPrices.name, "UK CPI all items");
+  assert.match(ukPrices.measures ?? "", /geography GB/);
+  const bankRate = panel(view, "boe_official_bank_rate");
+  assert.equal(bankRate.region, "United Kingdom");
+  assert.equal(bankRate.name, "Bank Rate");
+  assert.match(bankRate.measures ?? "", /not an exchange rate/);
+  assert.equal(
+    view.groups.flatMap((group) => group.panels).some((item) => item.sourceId === "bis_gli_usd_credit_nonbanks"),
+    false,
+  );
+});
+
+test("Global shows the BIS credit stock and Other Asia shows Malaysian production", () => {
+  const global = presentMacroConditions({
+    series: [unemployment()],
+    asOf: AS_OF,
+    region: "global",
+  });
+  const credit = panel(global, "bis_gli_usd_credit_nonbanks");
+  assert.equal(credit.region, "Global");
+  assert.equal(credit.name, "US dollar credit to non-banks");
+  assert.match(credit.measures ?? "", /millions of US dollars/);
+  assert.match(credit.matters ?? "", /credit stock/);
+  assert.equal(
+    global.groups.flatMap((group) => group.panels).some((item) => item.sourceId === "oecd_cli_g20"),
+    false,
+  );
+  const asia = presentMacroConditions({
+    series: [
+      unemployment(),
+      series({
+        sourceId: "dosm_ipi_abs",
+        unit: "index, 2015 = 100",
+        frequency: "monthly",
+        observations: [
+          { period: "2026-07-01", rawValue: "128.4" },
+          { period: "2026-08-01", rawValue: "129.1" },
+        ],
+      }),
+    ],
+    asOf: AS_OF,
+    region: "other-asia",
+  });
+  assert.equal(
+    asia.groups.flatMap((group) => group.panels).some((item) => item.sourceId === "bls_cps_unemployment_rate"),
+    false,
+  );
+  assert.equal(
+    asia.groups.flatMap((group) => group.panels).some((item) => item.sourceId === "bis_gli_usd_credit_nonbanks"),
+    false,
+  );
+  const production = panel(asia, "dosm_ipi_abs");
+  assert.equal(production.region, "Malaysia");
+  assert.equal(production.name, "Malaysia industrial production");
+  assert.equal(production.valueLabel, "129.1");
+  assert.equal(production.valueUnit, "Index (2015 = 100)");
+  assert.equal(production.sourceLabel, "Department of Statistics Malaysia · Industrial production index");
+  assert.match(production.measures ?? "", /not seasonally adjusted/);
+  assert.equal(asia.unavailable.some((item) => item.name === "Manufacturing"), false);
+  for (const name of ["Growth", "Inflation", "Labour", "Monetary policy", "Credit", "Trade", "Currencies"]) {
+    assert.equal(asia.unavailable.some((item) => item.name === name), true, name);
   }
 });
 

@@ -41,6 +41,7 @@ export function displayLevel(raw: string, unit: string, countNoun?: CountNoun): 
   }
   if (unit === "thousands") return countLevel(trimmed, countNoun);
   if (unit === "usd_millions") return dollarLevel(trimmed);
+  if (unit === "million yen, nominal, not a real volume index") return yenMillionLevel(trimmed);
   if (isIndexUnit(unit)) return indexLevel(trimmed, unit);
   const chartValue = Number(trimmed);
   if (!Number.isFinite(chartValue)) return null;
@@ -68,6 +69,9 @@ export function displayChange(diff: string, unit: string, countNoun?: CountNoun)
     if (!money) return null;
     return money;
   }
+  if (unit === "million yen, nominal, not a real volume index") {
+    return `${signed(trimZeros(trimmed))} million yen`;
+  }
   if (isIndexUnit(unit)) {
     const shown = decimalScale(trimmed) <= 3 ? trimZeros(trimmed) : showDecimals(trimmed, 2);
     return `${signed(shown)} index points`;
@@ -93,6 +97,18 @@ export function unitLabel(unit: string): string {
       return "Index (1982–84 = 100)";
     case "index, 2015 = 100":
       return "Index (2015 = 100)";
+    case "index, 2021 = 100":
+      return "Index (2021 = 100)";
+    case "index, 2020 = 100":
+      return "Index (2020 = 100)";
+    case "index, 2025 = 100, three-decimal reference price index, not a nominal yen amount and not a real volume":
+      return "Reference index (2025 = 100)";
+    case "million yen, nominal, not a real volume index":
+      return "Million yen";
+    case "Index, amplitude adjusted":
+      return "Index (amplitude adjusted)";
+    case "US dollar, millions":
+      return "Millions of US dollars";
     default:
       return unit;
   }
@@ -112,6 +128,10 @@ export function storedUnitPhrase(unit: string): string {
       return "percent net tightening";
     case "index_2017_100":
       return "index, 2017 = 100";
+    case "index, 2021 = 100":
+      return "index, 2021 = 100";
+    case "index, 2020 = 100":
+      return "index, 2020 = 100";
     case "1982-84=100":
       return "1982–84 = 100";
     default:
@@ -257,7 +277,30 @@ function indexLevel(raw: string, unit: string): DisplayLevel | null {
 }
 
 function isIndexUnit(unit: string): boolean {
-  return unit === "index_2017_100" || unit === "1982-84=100" || unit === "index, 2015 = 100";
+  return (
+    unit === "index_2017_100" ||
+    unit === "1982-84=100" ||
+    unit === "index, 2015 = 100" ||
+    unit === "index, 2021 = 100" ||
+    unit === "index, 2020 = 100" ||
+    unit ===
+      "index, 2025 = 100, three-decimal reference price index, not a nominal yen amount and not a real volume" ||
+    unit === "Index, amplitude adjusted"
+  );
+}
+
+function yenMillionLevel(raw: string): DisplayLevel | null {
+  const chartValue = Number(raw);
+  if (!Number.isFinite(chartValue)) return null;
+  return {
+    headline: trimZeros(raw),
+    precise: trimZeros(raw),
+    chartValue,
+    axisUnit: "Million yen",
+    tickSuffix: "",
+    beside: "Million yen",
+    rescaled: false,
+  };
 }
 
 function signedMoney(diff: string, magnitude: string, scale: string): string {

@@ -1,5 +1,5 @@
 /**
- * Human-readable register for the ten tracked conditions series.
+ * Human-readable register for the tracked conditions series.
  * Links are copied from docs/sources/SOURCE_RIGHTS.csv. The metadata test
  * refuses a URL that is not in that row's access or evidence fields.
  */
@@ -167,6 +167,184 @@ export const INDICATOR_METADATA: readonly IndicatorMetadata[] = [
       "The euro-area Harmonised Index of Consumer Prices, all items, working-day and seasonally adjusted, with 2015 = 100. This panel shows the index level, not a year-on-year inflation rate.",
     matters:
       "A change is a move in the price index, in index points. When the latest month is old, the figure does not describe current euro-area prices.",
+  },
+  {
+    sourceId: "ecb_hicp_core",
+    region: "Euro area",
+    organisation: "European Central Bank",
+    datasetLabel: "Harmonised index of consumer prices",
+    sourceHref:
+      "https://data-api.ecb.europa.eu/service/data/ICP/M.U2.Y.XEF000.3.INX?format=csvdata",
+    linkKind: "series",
+    retrievalHref: null,
+    expectedUnit: "index, 2015 = 100",
+    measures:
+      "The euro-area harmonised index of consumer prices excluding energy and food, working-day and seasonally adjusted, with 2015 = 100. The European Central Bank is the compiler. This panel shows the index level, not a year-on-year rate.",
+    matters:
+      "It leaves out energy and food, which often move for reasons other than domestic demand. It is still a price index, not a forecast of returns.",
+  },
+  {
+    sourceId: "ecb_fm_deposit_facility",
+    region: "Euro area",
+    organisation: "European Central Bank",
+    datasetLabel: "Key ECB interest rates",
+    sourceHref:
+      "https://data-api.ecb.europa.eu/service/data/FM/D.U2.EUR.4F.KR.DFR.LEV?format=csvdata",
+    linkKind: "series",
+    retrievalHref: null,
+    expectedUnit: "percent_per_year",
+    measures:
+      "The euro-area deposit facility rate, the rate banks receive on overnight deposits at the Eurosystem, in percent per year. The file is a daily level provided by the ECB. Seasonal adjustment is not stated.",
+    matters:
+      "It is a policy rate. A change is a change in that administered rate, not a market forecast and not a sovereign yield.",
+  },
+  {
+    sourceId: "eurostat_unemployment_ea21",
+    region: "Euro area",
+    organisation: "Eurostat",
+    datasetLabel: "Unemployment by sex and age",
+    sourceHref:
+      "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_m?lang=EN&age=TOTAL&geo=EA21&s_adj=SA&sex=T&unit=PC_ACT",
+    linkKind: "series",
+    retrievalHref: null,
+    expectedUnit: "percent",
+    measures:
+      "The euro-area unemployment rate for EA21, Eurostat's euro area of 21 countries from 2026, seasonally adjusted and not calendar adjusted. It is the percentage of the population in the labour force. It is not the EU27 rate.",
+    matters:
+      "A rise can indicate weaker demand for labour in the euro area. It does not count people who have left the labour force, and it is not the United States rate.",
+  },
+  {
+    sourceId: "eurostat_gdp_real_ea21",
+    region: "Euro area",
+    organisation: "Eurostat",
+    datasetLabel: "Gross domestic product and main components",
+    sourceHref:
+      "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/namq_10_gdp?lang=EN&geo=EA21&na_item=B1GQ&s_adj=SCA&unit=CLV_I15",
+    linkKind: "series",
+    retrievalHref: null,
+    expectedUnit: "index, 2015 = 100",
+    measures:
+      "Euro-area real gross domestic product for EA21, chain-linked volumes, index 2015 = 100, seasonally and calendar adjusted. Geography is the euro area of 21 countries from 2026, not the EU27.",
+    matters:
+      "The index level shows the volume of output. A change is a move in that index, not a judgement about the investment environment.",
+  },
+  {
+    sourceId: "eurostat_industrial_production_ea21",
+    region: "Euro area",
+    organisation: "Eurostat",
+    datasetLabel: "Production in industry",
+    sourceHref:
+      "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/sts_inpr_m?lang=EN&geo=EA21&indic_bt=PRD&nace_r2=B-D&s_adj=SCA&unit=I21",
+    linkKind: "series",
+    retrievalHref: null,
+    expectedUnit: "index, 2021 = 100",
+    measures:
+      "Euro-area industrial production for EA21, industry groups B to D, seasonally and calendar adjusted, index 2021 = 100. It is a volume index, not the EU27 series.",
+    matters:
+      "It records production in mining, manufacturing and energy supply. A change is a move in the index, not a forecast of company earnings.",
+  },
+  {
+    sourceId: "eurostat_retail_volume_ea21",
+    region: "Euro area",
+    organisation: "Eurostat",
+    datasetLabel: "Retail trade volume",
+    sourceHref:
+      "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/sts_trtu_m?lang=EN&geo=EA21&indic_bt=VOL_SLS&nace_r2=G47&s_adj=SCA&unit=I21",
+    linkKind: "series",
+    retrievalHref: null,
+    expectedUnit: "index, 2021 = 100",
+    measures:
+      "Euro-area retail sales volume for EA21, excluding motor vehicles, seasonally and calendar adjusted, index 2021 = 100. Net turnover from the same table is not shown. It is not the EU27 series.",
+    matters:
+      "Volume of sales is a quantity measure. It can move when households buy more or less. It is not a price index and not a forecast of retail profits.",
+  },
+  {
+    sourceId: "stat_cpi_2025_all_items_reference",
+    region: "Japan",
+    organisation: "Statistics Bureau of Japan",
+    datasetLabel: "Three-decimal reference index",
+    sourceHref: "https://www.stat.go.jp/data/cpi/1.html",
+    linkKind: "publication",
+    retrievalHref: "https://www.stat.go.jp/data/cpi/2025/csv/zmi2025aa.csv",
+    expectedUnit:
+      "index, 2025 = 100, three-decimal reference price index, not a nominal yen amount and not a real volume",
+    measures:
+      "The Japanese all-items consumer price reference index, published to three decimal places, with 2025 = 100. It is not the official one-decimal consumer price index. Periods are calendar months and the series is not seasonally adjusted.",
+    matters:
+      "A change is a move in the reference index, in index points. It is not a year-on-year inflation rate and it is not the official one-decimal index.",
+  },
+  {
+    sourceId: "cao_mo_private_ex_volatile_sa_monthly",
+    region: "Japan",
+    organisation: "Cabinet Office, Economic and Social Research Institute",
+    datasetLabel: "Machinery orders",
+    sourceHref: "https://www.esri.cao.go.jp/jp/stat/juchu/juchu.html",
+    linkKind: "publication",
+    retrievalHref: "https://www.esri.cao.go.jp/jp/stat/juchu/2026/2608chouki-1.xlsx",
+    expectedUnit: "million yen, nominal, not a real volume index",
+    measures:
+      "Private machinery orders in Japan, excluding ships and electric power, in nominal million yen. The series is seasonally adjusted and monthly. It is not a real volume index and it is not a fiscal-year total.",
+    matters:
+      "Orders can move before production. A change is a change in the nominal amount, not a forecast of company earnings.",
+  },
+  {
+    sourceId: "bis_gli_usd_credit_nonbanks",
+    region: "Global",
+    organisation: "Bank for International Settlements",
+    datasetLabel: "Global liquidity indicators",
+    sourceHref:
+      "https://stats.bis.org/api/v1/data/WS_GLI/Q.USD.3P.N.A.I.B.USD/all?detail=full",
+    linkKind: "series",
+    retrievalHref: null,
+    expectedUnit: "US dollar, millions",
+    measures:
+      "US dollar credit to non-bank borrowers outside the United States, in millions of US dollars. The series covers bank loans and debt securities and is quarterly. The Bank for International Settlements publishes the current file.",
+    matters:
+      "A rise means more dollar credit is outstanding to those borrowers. It is a credit stock. It is not a United States domestic bank-credit series and it is not a forecast of returns.",
+  },
+  {
+    sourceId: "ons_mm23_cpi_d7bt",
+    region: "United Kingdom",
+    organisation: "Office for National Statistics",
+    datasetLabel: "CPI all items",
+    sourceHref:
+      "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+    linkKind: "series",
+    retrievalHref: null,
+    expectedUnit: "index, 2015 = 100",
+    measures:
+      "The consumer price index for all items, geography GB, with 2015 = 100. It is not seasonally adjusted. This panel shows the index level, not a year-on-year inflation rate.",
+    matters:
+      "A change is a move in the price index, in index points. It is the Office for National Statistics all-items index, not the euro-area harmonised index.",
+  },
+  {
+    sourceId: "boe_official_bank_rate",
+    region: "United Kingdom",
+    organisation: "Bank of England",
+    datasetLabel: "Official Bank Rate",
+    sourceHref:
+      "https://www.bankofengland.co.uk/boeapps/database/_iadb-fromshowcolumns.asp?csv.x=yes&Datefrom=01/Jan/1975&Dateto=now&SeriesCodes=IUDBEDR&CSVF=CT&UsingCodes=Y",
+    linkKind: "series",
+    retrievalHref: null,
+    expectedUnit: "percent",
+    measures:
+      "The Bank of England Bank Rate, in percent. It is the official policy rate for the United Kingdom. It is not an exchange rate and it is not a market yield.",
+    matters:
+      "A change is a change in that administered rate. It does not measure the pound's exchange rate and it is not a forecast of returns.",
+  },
+  {
+    sourceId: "dosm_ipi_abs",
+    region: "Malaysia",
+    organisation: "Department of Statistics Malaysia",
+    datasetLabel: "Industrial production index",
+    sourceHref: "https://storage.dosm.gov.my/ipi/ipi.csv",
+    linkKind: "series",
+    retrievalHref: null,
+    expectedUnit: "index, 2015 = 100",
+    measures:
+      "The Malaysian industrial production index, absolute level, with 2015 = 100. It is not seasonally adjusted. Growth rates in the same file are not shown.",
+    matters:
+      "It records the volume of industrial production in Malaysia. A change is a move in the index, not a forecast of company earnings.",
   },
 ];
 

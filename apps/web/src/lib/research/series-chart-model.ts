@@ -177,7 +177,7 @@ function tickLabel(period: string, frequency: string, includeYear: boolean): str
     return `Q${quarter} ${period.slice(0, 4)}`;
   }
   const month = SHORT_MONTH[Number(period.slice(5, 7)) - 1] ?? "";
-  if (frequency === "weekly") {
+  if (frequency === "weekly" || frequency === "daily") {
     const day = Number(period.slice(8, 10));
     return includeYear ? `${day} ${month} ${period.slice(0, 4)}` : `${day} ${month}`;
   }
@@ -210,13 +210,14 @@ function decimalsForStep(step: number): number {
 }
 
 function isKnownFrequency(frequency: string): boolean {
-  return frequency === "monthly" || frequency === "weekly" || frequency === "quarterly";
+  return frequency === "daily" || frequency === "monthly" || frequency === "weekly" || frequency === "quarterly";
 }
 
 function stepPeriod(iso: string, frequency: string): string | null {
   if (frequency === "monthly") return addMonths(iso, 1);
   if (frequency === "quarterly") return addMonths(iso, 3);
   if (frequency === "weekly") return addDays(iso, 7);
+  if (frequency === "daily") return addDays(iso, 1);
   return null;
 }
 

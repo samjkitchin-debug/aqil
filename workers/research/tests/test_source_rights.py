@@ -103,6 +103,32 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "fed.h15.RIFLGFCY10_N.M",
         "ecb.icp.M.U2.Y.000000.3.INX",
         "govinfo.federal_register.notices",
+        "ecb.icp.M.U2.Y.XEF000.3.INX",
+        "ecb.fm.D.U2.EUR.4F.KR.DFR.LEV",
+        "eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21",
+        "eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21",
+        "eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21",
+        "eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21",
+        "ecb.bls.Q.U2.ALL.O.E.Z.B3.ST.S.WFNET",
+        "ecb.bsi.M.U2.N.A.A20.A.1.U6.2240.Z01.E",
+        "meti.iip.b2020.production.sa.m.1000000000",
+        "stat.cpi.2025base.JP.0001.all_items.monthly.calendar.nsa.reference_3dp",
+        "cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar",
+        "sbj.cpi.2025.all_items.m",
+        "sbj.cpi.2025.all_items_less_fresh_food.m",
+        "boj.FM01.not_bound",
+        "boj.fm08.foreign_exchange",
+        "nbs.national_data",
+        "nbs_cpi.not_bound",
+        "nbs_industrial_production.not_bound",
+        "pboc.statistics",
+        "pboc_policy_rate.not_bound",
+        "pboc_exchange_rate.not_bound",
+        "bis.ws_gli.Q.USD.3P.N.A.I.B.USD",
+        "oecd.stes.DF_CLI.G20.M.LI.IX._Z.AA.IX._Z.H",
+        "ons.mm23.D7BT",
+        "boe.iudbedr",
+        "dosm.ipi.abs",
     }
     for record in records:
         assert record.terms_url in record.evidence_urls
@@ -127,6 +153,35 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
             "ecb.icp.M.U2.Y.000000.3.INX",
         }:
             assert record.assessed_on.isoformat() == "2026-10-22"
+        elif record.dataset_id in {
+            "ecb.icp.M.U2.Y.XEF000.3.INX",
+            "ecb.fm.D.U2.EUR.4F.KR.DFR.LEV",
+            "eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21",
+            "eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21",
+            "eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21",
+            "eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21",
+            "ecb.bls.Q.U2.ALL.O.E.Z.B3.ST.S.WFNET",
+            "ecb.bsi.M.U2.N.A.A20.A.1.U6.2240.Z01.E",
+            "meti.iip.b2020.production.sa.m.1000000000",
+            "stat.cpi.2025base.JP.0001.all_items.monthly.calendar.nsa.reference_3dp",
+            "cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar",
+            "sbj.cpi.2025.all_items.m",
+            "sbj.cpi.2025.all_items_less_fresh_food.m",
+            "boj.FM01.not_bound",
+            "boj.fm08.foreign_exchange",
+            "nbs.national_data",
+            "nbs_cpi.not_bound",
+            "nbs_industrial_production.not_bound",
+            "pboc.statistics",
+            "pboc_policy_rate.not_bound",
+            "pboc_exchange_rate.not_bound",
+            "bis.ws_gli.Q.USD.3P.N.A.I.B.USD",
+            "oecd.stes.DF_CLI.G20.M.LI.IX._Z.AA.IX._Z.H",
+            "ons.mm23.D7BT",
+            "boe.iudbedr",
+            "dosm.ipi.abs",
+        }:
+            assert record.assessed_on.isoformat() == "2026-10-24"
         elif record.dataset_id == "govinfo.federal_register.notices":
             assert record.assessed_on.isoformat() == "2026-10-24"
         else:
@@ -178,6 +233,19 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "fed.h15.RIFSPFF_N.M",
         "fed.h15.RIFLGFCY10_N.M",
         "ecb.icp.M.U2.Y.000000.3.INX",
+        "ecb.icp.M.U2.Y.XEF000.3.INX",
+        "ecb.fm.D.U2.EUR.4F.KR.DFR.LEV",
+        "eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21",
+        "eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21",
+        "eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21",
+        "eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21",
+        "stat.cpi.2025base.JP.0001.all_items.monthly.calendar.nsa.reference_3dp",
+        "cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar",
+        "meti.iip.b2020.production.sa.m.1000000000",
+        "bis.ws_gli.Q.USD.3P.N.A.I.B.USD",
+        "ons.mm23.D7BT",
+        "boe.iudbedr",
+        "dosm.ipi.abs",
     }
     assert all(operation_allowed(unemployment, operation) for operation in FIRST_LIVE_OPERATIONS)
     assert unemployment.attribution == AttributionRequirement.REQUIRED

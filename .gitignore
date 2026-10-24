@@ -66,3 +66,6 @@ Desktop.ini
 
 # Accidental source archive. Contains a local environment file. Do not commit.
 apps/web/apps web.zip
+
+# Worktree bytes that differ from main. Not product source.
+.local/

@@ -9,7 +9,12 @@ import { loadEconomicEvidence } from "@/lib/research/load-economic-evidence";
 import { presentEconomicEvidence } from "@/lib/research/present-economic-evidence";
 
 
-async function ConditionsDashboard() {
+async function ConditionsDashboard({
+  searchParams,
+}: {
+  searchParams: Promise<{ region?: string }>;
+}) {
+  const params = await searchParams;
   const loaded = await loadEconomicEvidence();
   const briefing = loaded.status === "ready" ? presentEconomicEvidence(loaded.input) : null;
   const lines = Object.fromEntries((briefing?.seriesLines ?? []).map((line) => [line.sourceId, line.compact]));
@@ -22,12 +27,16 @@ async function ConditionsDashboard() {
       ) : briefing ? (
         <EconomicEvidenceBriefing view={briefing} />
       ) : null}
-      <MacroConditionsSection variant="dashboard" seriesLines={lines} />
+      <MacroConditionsSection variant="dashboard" seriesLines={lines} region={params.region} />
     </>
   );
 }
 
-export default function ConditionsPage() {
+export default function ConditionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ region?: string }>;
+}) {
   return (
     <AppShell title="Intelligence">
       <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
@@ -37,7 +46,7 @@ export default function ConditionsPage() {
               Conditions
             </h2>
             <Suspense fallback={<p className="research-body">Loading conditions…</p>}>
-              <ConditionsDashboard />
+              <ConditionsDashboard searchParams={searchParams} />
             </Suspense>
             <Suspense fallback={<p className="research-body">Loading events and themes…</p>}>
               <EventsAndThemesSection variant="compact" />

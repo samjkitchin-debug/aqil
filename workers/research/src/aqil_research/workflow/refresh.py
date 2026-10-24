@@ -12,6 +12,11 @@ Cadence, when the command is used:
 - SLOOS C&I lending standards: each refresh, from the Board data package
 - CPI-U, payrolls, job openings, industrial production, bank credit,
   federal funds, the 10-year yield, and euro-area HICP: each refresh
+- Euro-area core HICP, the deposit facility rate, and the cleared Eurostat
+  euro-area series: each refresh
+- Japan CPI reference index and machinery orders: each refresh
+- BIS dollar credit, UK CPI, Bank Rate, and Malaysian industrial production:
+  each refresh
 - Unemployment series: weekly, and skipped when a live retrieval is newer
 
 Each source uses its own database transaction. A failure is recorded and the
@@ -46,6 +51,18 @@ CADENCE = {
     "federal_reserve_h15_federal_funds_effective": "each_refresh",
     "federal_reserve_h15_treasury_10y_constant_maturity": "each_refresh",
     "ecb_sdw_hicp_sa": "each_refresh",
+    "ecb_hicp_core": "each_refresh",
+    "ecb_fm_deposit_facility": "each_refresh",
+    "eurostat_gdp_real_ea21": "each_refresh",
+    "eurostat_unemployment_ea21": "each_refresh",
+    "eurostat_industrial_production_ea21": "each_refresh",
+    "eurostat_retail_volume_ea21": "each_refresh",
+    "stat_cpi_2025_all_items_reference": "each_refresh",
+    "cao_mo_private_ex_volatile_sa_monthly": "each_refresh",
+    "bis_gli_usd_credit_nonbanks": "each_refresh",
+    "ons_mm23_cpi_d7bt": "each_refresh",
+    "boe_official_bank_rate": "each_refresh",
+    "dosm_ipi_abs": "each_refresh",
     "bls_cps_unemployment_rate": "weekly",
 }
 
@@ -108,6 +125,18 @@ def default_refresh_steps() -> tuple[RefreshStep, ...]:
         ("federal_reserve_h15_federal_funds_effective", _refresh_h15_funds),
         ("federal_reserve_h15_treasury_10y_constant_maturity", _refresh_h15_ten_year),
         ("ecb_sdw_hicp_sa", _refresh_hicp),
+        ("ecb_hicp_core", _refresh_hicp_core),
+        ("ecb_fm_deposit_facility", _refresh_deposit_facility),
+        ("eurostat_gdp_real_ea21", _refresh_eurostat_gdp),
+        ("eurostat_unemployment_ea21", _refresh_eurostat_unemployment),
+        ("eurostat_industrial_production_ea21", _refresh_eurostat_industry),
+        ("eurostat_retail_volume_ea21", _refresh_eurostat_retail),
+        ("stat_cpi_2025_all_items_reference", _refresh_stat_cpi),
+        ("cao_mo_private_ex_volatile_sa_monthly", _refresh_cao_mo),
+        ("bis_gli_usd_credit_nonbanks", _refresh_bis_gli),
+        ("ons_mm23_cpi_d7bt", _refresh_ons_cpi),
+        ("boe_official_bank_rate", _refresh_boe_bank_rate),
+        ("dosm_ipi_abs", _refresh_dosm_ipi),
     )
 
 
@@ -465,6 +494,204 @@ def _refresh_hicp(now: datetime) -> SourceRefreshResult:
         StoredEcbPoint,
         lambda retrieved, priors: EcbSdwAdapter(
             config=EcbSdwAdapterConfig(live=True),
+            retrieved_at=retrieved,
+            prior_points=priors,  # type: ignore[arg-type]
+        ),
+    )
+
+
+def _refresh_hicp_core(now: datetime) -> SourceRefreshResult:
+    from aqil_research.adapters.ecb_hicp_core.adapter import (
+        EcbHicpCoreAdapter,
+        EcbHicpCoreAdapterConfig,
+    )
+    from aqil_research.adapters.ecb_hicp_core.constants import DATASET_ID, SOURCE_ID
+    from aqil_research.adapters.ecb_hicp_core.stability import StoredEcbPoint
+
+    return _refresh_registered(
+        now,
+        SOURCE_ID,
+        DATASET_ID,
+        StoredEcbPoint,
+        lambda retrieved, priors: EcbHicpCoreAdapter(
+            config=EcbHicpCoreAdapterConfig(live=True),
+            retrieved_at=retrieved,
+            prior_points=priors,  # type: ignore[arg-type]
+        ),
+    )
+
+
+def _refresh_deposit_facility(now: datetime) -> SourceRefreshResult:
+    from aqil_research.adapters.ecb_fm_dfr.adapter import EcbFmDfrAdapter, EcbFmDfrAdapterConfig
+    from aqil_research.adapters.ecb_fm_dfr.constants import DATASET_ID, SOURCE_ID
+    from aqil_research.adapters.ecb_fm_dfr.stability import StoredEcbPoint
+
+    return _refresh_registered(
+        now,
+        SOURCE_ID,
+        DATASET_ID,
+        StoredEcbPoint,
+        lambda retrieved, priors: EcbFmDfrAdapter(
+            config=EcbFmDfrAdapterConfig(live=True),
+            retrieved_at=retrieved,
+            prior_points=priors,  # type: ignore[arg-type]
+        ),
+    )
+
+
+def _eurostat_refresh(now: datetime, package: str) -> SourceRefreshResult:
+    adapter_module = __import__(
+        f"aqil_research.adapters.{package}.adapter",
+        fromlist=["EurostatSeriesAdapter", "EurostatSeriesAdapterConfig"],
+    )
+    constants = __import__(
+        f"aqil_research.adapters.{package}.constants",
+        fromlist=["DATASET_ID", "SOURCE_ID"],
+    )
+    stability = __import__(
+        f"aqil_research.adapters.{package}.stability",
+        fromlist=["StoredEurostatPoint"],
+    )
+    return _refresh_registered(
+        now,
+        constants.SOURCE_ID,
+        constants.DATASET_ID,
+        stability.StoredEurostatPoint,
+        lambda retrieved, priors: adapter_module.EurostatSeriesAdapter(
+            config=adapter_module.EurostatSeriesAdapterConfig(live=True),
+            retrieved_at=retrieved,
+            prior_points=priors,  # type: ignore[arg-type]
+        ),
+    )
+
+
+def _refresh_eurostat_gdp(now: datetime) -> SourceRefreshResult:
+    return _eurostat_refresh(now, "eurostat_gdp")
+
+
+def _refresh_eurostat_unemployment(now: datetime) -> SourceRefreshResult:
+    return _eurostat_refresh(now, "eurostat_unemployment")
+
+
+def _refresh_eurostat_industry(now: datetime) -> SourceRefreshResult:
+    return _eurostat_refresh(now, "eurostat_industry")
+
+
+def _refresh_eurostat_retail(now: datetime) -> SourceRefreshResult:
+    return _eurostat_refresh(now, "eurostat_retail")
+
+
+def _refresh_stat_cpi(now: datetime) -> SourceRefreshResult:
+    from aqil_research.adapters.stat_cpi_all_items.adapter import (
+        StatCpiAdapter,
+        StatCpiAdapterConfig,
+    )
+    from aqil_research.adapters.stat_cpi_all_items.constants import DATASET_ID, SOURCE_ID
+    from aqil_research.adapters.stat_cpi_all_items.stability import StoredStatCpiPoint
+
+    return _refresh_registered(
+        now,
+        SOURCE_ID,
+        DATASET_ID,
+        StoredStatCpiPoint,
+        lambda retrieved, priors: StatCpiAdapter(
+            config=StatCpiAdapterConfig(live=True),
+            retrieved_at=retrieved,
+            prior_points=priors,  # type: ignore[arg-type]
+        ),
+    )
+
+
+def _refresh_cao_mo(now: datetime) -> SourceRefreshResult:
+    from aqil_research.adapters.cao_mo_private_ex_volatile.adapter import (
+        CaoMoAdapter,
+        CaoMoAdapterConfig,
+    )
+    from aqil_research.adapters.cao_mo_private_ex_volatile.constants import DATASET_ID, SOURCE_ID
+    from aqil_research.adapters.cao_mo_private_ex_volatile.stability import StoredCaoMoPoint
+
+    return _refresh_registered(
+        now,
+        SOURCE_ID,
+        DATASET_ID,
+        StoredCaoMoPoint,
+        lambda retrieved, priors: CaoMoAdapter(
+            config=CaoMoAdapterConfig(live=True),
+            retrieved_at=retrieved,
+            prior_points=priors,  # type: ignore[arg-type]
+        ),
+    )
+
+
+def _refresh_bis_gli(now: datetime) -> SourceRefreshResult:
+    from aqil_research.adapters.bis_gli.adapter import BisGliAdapter, BisGliAdapterConfig
+    from aqil_research.adapters.bis_gli.constants import DATASET_ID, SOURCE_ID
+    from aqil_research.adapters.bis_gli.stability import StoredBisPoint
+
+    return _refresh_registered(
+        now,
+        SOURCE_ID,
+        DATASET_ID,
+        StoredBisPoint,
+        lambda retrieved, priors: BisGliAdapter(
+            config=BisGliAdapterConfig(live=True),
+            retrieved_at=retrieved,
+            prior_points=priors,  # type: ignore[arg-type]
+        ),
+    )
+
+
+def _refresh_ons_cpi(now: datetime) -> SourceRefreshResult:
+    from aqil_research.adapters.ons_cpi.adapter import OnsCpiAdapter, OnsCpiAdapterConfig
+    from aqil_research.adapters.ons_cpi.constants import DATASET_ID, SOURCE_ID
+    from aqil_research.adapters.ons_cpi.stability import StoredOnsPoint
+
+    return _refresh_registered(
+        now,
+        SOURCE_ID,
+        DATASET_ID,
+        StoredOnsPoint,
+        lambda retrieved, priors: OnsCpiAdapter(
+            config=OnsCpiAdapterConfig(live=True),
+            retrieved_at=retrieved,
+            prior_points=priors,  # type: ignore[arg-type]
+        ),
+    )
+
+
+def _refresh_boe_bank_rate(now: datetime) -> SourceRefreshResult:
+    from aqil_research.adapters.boe_bank_rate.adapter import (
+        BoeBankRateAdapter,
+        BoeBankRateAdapterConfig,
+    )
+    from aqil_research.adapters.boe_bank_rate.constants import DATASET_ID, SOURCE_ID
+    from aqil_research.adapters.boe_bank_rate.stability import StoredBoePoint
+
+    return _refresh_registered(
+        now,
+        SOURCE_ID,
+        DATASET_ID,
+        StoredBoePoint,
+        lambda retrieved, priors: BoeBankRateAdapter(
+            config=BoeBankRateAdapterConfig(live=True),
+            retrieved_at=retrieved,
+            prior_points=priors,  # type: ignore[arg-type]
+        ),
+    )
+
+
+def _refresh_dosm_ipi(now: datetime) -> SourceRefreshResult:
+    from aqil_research.adapters.dosm_ipi.adapter import DosmIpiAdapter, DosmIpiAdapterConfig
+    from aqil_research.adapters.dosm_ipi.constants import DATASET_ID, SOURCE_ID
+    from aqil_research.adapters.dosm_ipi.stability import StoredDosmPoint
+
+    return _refresh_registered(
+        now,
+        SOURCE_ID,
+        DATASET_ID,
+        StoredDosmPoint,
+        lambda retrieved, priors: DosmIpiAdapter(
+            config=DosmIpiAdapterConfig(live=True),
             retrieved_at=retrieved,
             prior_points=priors,  # type: ignore[arg-type]
         ),
