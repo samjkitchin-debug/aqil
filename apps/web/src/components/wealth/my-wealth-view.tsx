@@ -3,6 +3,7 @@ import { createAccount, recordHolding, saveTargets } from "@/lib/wealth/actions"
 import { consolidate, liveInvestable, monetaryGaps, type Target } from "@/lib/wealth/allocation";
 import { convertMinor, formatMinor } from "@/lib/wealth/money";
 import type { WealthLoad } from "@/lib/wealth/load-snapshot";
+import { WEALTH_UNKNOWNS } from "@/lib/wealth/wealth-limits";
 
 const CLASSES = [
   ["global_equity", "Global equity"],
@@ -14,6 +15,17 @@ const CLASSES = [
 
 function label(assetClass: string): string {
   return CLASSES.find(([value]) => value === assetClass)?.[1] ?? assetClass;
+}
+
+function WealthUnknowns() {
+  return (
+    <p className="text-muted" data-testid="wealth-unknowns">
+      {WEALTH_UNKNOWNS}{" "}
+      <a className="aq-quiet-link" href="/my-wealth/journal">
+        Investment journal
+      </a>
+    </p>
+  );
 }
 
 export function MyWealthView({
@@ -30,6 +42,7 @@ export function MyWealthView({
   if (load.status === "storage_pending") {
     return (
       <div data-testid="wealth-pending">
+        <WealthUnknowns />
         <BrokerSection broker={broker} link={link} error={error} connectEnabled={connectEnabled} heading="h1" />
       </div>
     );
@@ -70,6 +83,7 @@ export function MyWealthView({
 
   return (
     <div className="grid gap-[var(--space-6)]">
+      <WealthUnknowns />
       {broker ? <BrokerSection broker={broker} link={link} error={error} connectEnabled={connectEnabled} heading="h1" /> : null}
       {showRecorded ? (
         <details className="aq-recorded" open={broker ? undefined : true}>

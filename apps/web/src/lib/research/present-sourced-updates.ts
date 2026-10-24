@@ -3,6 +3,12 @@ import type { SourcedUpdateV1 } from "@/lib/research/sourced-update";
 export const SOURCED_UPDATES_EMPTY_COPY =
   "No sourced updates have been retrieved yet.";
 
+export const PUBLICATION_BOUNDARY =
+  "These are the publishers' releases. They are not an Aqil investment conclusion.";
+
+export const NO_PUBLISHER_CORRECTION =
+  "No publisher correction is stored. A later correction is kept as a new row when the publisher changes the page.";
+
 export const CALENDAR_EMPTY_COPY =
   "No validated catalyst date has been retrieved.";
 
@@ -20,6 +26,13 @@ const PROVIDER_LABELS: Record<string, string> = {
 
 /** A publisher date inside this window can be shown as a recent publication. */
 export const RECENT_PUBLICATION_DAYS = 14;
+
+export function publisherCorrectionLine(
+  updates: readonly { correction_of: string | null }[],
+): string | null {
+  if (updates.length === 0 || updates.some((row) => row.correction_of)) return null;
+  return NO_PUBLISHER_CORRECTION;
+}
 
 export function providerLabelForSource(sourceId: string): string {
   return PROVIDER_LABELS[sourceId] ?? sourceId;

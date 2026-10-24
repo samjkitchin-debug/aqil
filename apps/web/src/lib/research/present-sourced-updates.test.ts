@@ -4,8 +4,11 @@ import test from "node:test";
 import {
   formatOptionalPublishedAt,
   latestRetrievedAt,
+  NO_PUBLISHER_CORRECTION,
   partitionPublications,
   presentSourcedUpdates,
+  PUBLICATION_BOUNDARY,
+  publisherCorrectionLine,
   sortSourcedUpdatesByRecency,
   SOURCED_UPDATES_EMPTY_COPY,
 } from "./present-sourced-updates.ts";
@@ -110,5 +113,19 @@ test("a release from several weeks ago is not grouped as recent", () => {
   assert.deepEqual(
     groups.earlier.map((row) => row.update.source_id),
     ["bls_employment_situation_archive"],
+  );
+});
+
+test("a publisher release is not an Aqil conclusion and an empty correction stays empty", () => {
+  assert.equal(
+    PUBLICATION_BOUNDARY,
+    "These are the publishers' releases. They are not an Aqil investment conclusion.",
+  );
+  assert.equal(publisherCorrectionLine([]), null);
+  const stored = fixture({ update_id: "00000000-0000-4000-8000-000000000020" });
+  assert.equal(publisherCorrectionLine([stored]), NO_PUBLISHER_CORRECTION);
+  assert.equal(
+    publisherCorrectionLine([{ ...stored, correction_of: "00000000-0000-4000-8000-000000000019" }]),
+    null,
   );
 });

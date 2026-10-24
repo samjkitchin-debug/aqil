@@ -21,6 +21,16 @@ export function MacroConditionsPanel({ view, variant }: Props) {
       <p className="research-meta" data-testid="macro-completeness">
         {view.completenessLine}
       </p>
+      <p className="research-meta" data-testid="macro-revision-limit">
+        {view.revisionLimit}
+      </p>
+      {compact ? (
+        <p className="research-meta">
+          <Link href="/conditions" prefetch={false} data-testid="macro-full-view">
+            Full indicator view
+          </Link>
+        </p>
+      ) : null}
       {view.groups.map((group) => (
         <section key={group.id} aria-labelledby={`macro-group-${group.id}`}>
           <h3 id={`macro-group-${group.id}`} className="research-section-title">

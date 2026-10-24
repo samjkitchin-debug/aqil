@@ -13,6 +13,7 @@ import type { JournalSummary } from "@/lib/wealth/journal-workflow";
 import type { MoneyStatus } from "@/lib/wealth/journal";
 import { formatMinor } from "@/lib/wealth/money";
 import type { SuppliedPrice, SuppliedRate } from "@/lib/wealth/journal-valuation";
+import { JOURNAL_NOT_SAXO } from "@/lib/wealth/wealth-limits";
 
 const EVENT_LABELS: Record<ManualEventType, string> = {
   deposit: "Deposit",
@@ -98,8 +99,8 @@ export function JournalPanel({
             My wealth
           </a>
         </p>
-        <p className="text-muted">
-          Record deposits, withdrawals, buys, sells, fees, distributions and splits yourself. A market value uses only a price you supply for that date. Summary amounts use SGD.
+        <p className="text-muted" data-testid="journal-not-saxo">
+          {JOURNAL_NOT_SAXO} Record deposits, withdrawals, buys, sells, fees, distributions and splits yourself. A market value uses only a price you supply for that date. Summary amounts use SGD.
         </p>
         {message ? <p className="text-foreground">{message}</p> : null}
         <form action="/my-wealth/journal" method="get" className="flex flex-wrap items-end gap-[var(--space-3)]">

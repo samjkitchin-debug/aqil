@@ -1,9 +1,40 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 24 October 2026, playbook input check and cited-document empty state
-**Parent:** `e722149` on local `main` before this commit
+**Last updated:** 24 October 2026, revision limit and wealth unknowns
+**Parent:** `cf2daa5` on local `main` before this commit
 **Checkpoint:** local only. Not pushed. Production, hosted migrations and Saxo authorisation stay unchanged.
+
+## Revision limit and wealth unknowns, 24 October 2026
+
+Risk class R1. Local `main` before this commit was `cf2daa5`. `origin/main` remained `c9ea596`. Nothing was pushed. Hosted migrations were not applied. Production Saxo was not enabled. No refresh schedule was created. Preserved databases `postgres` and `aqil_etf` were not written. A read-only count on `aqil_etf.instruments.share_classes` was 0. `docs/sources/etf/cited` is absent. GitHub Actions has not run on this tip. The commands below are local tests. They are not CI.
+
+Today and Conditions now say the stored series are latest revised, and that this view does not exclude a later revision. A latest-revised row is not described as a historical vintage. The compact pulse links to the full indicator view at `/conditions`. The dashboard does not repeat that link. No composite score was added. No vintage panel was fabricated and no live observation was rewritten.
+
+`workers/research/tests/test_asof_selection.py` uses synthetic fixture values only. A decision date before availability keeps the earlier vintage and excludes the later one. The later decision date includes the revision. A `latest_revised` row is excluded from point-in-time mode and kept in latest-revised mode. A retracted row is dropped. A naive decision time is refused.
+
+Today and Evidence say the listed items are the publishers' releases and not an Aqil investment conclusion. When no row has `correction_of`, the page says no publisher correction is stored. No correction row was inserted.
+
+My Wealth says contributions are not separated from account value, that a shown Saxo account value includes contributions and is not investment return, that no cashflow-matched benchmark is stored, and that money-weighted return is not shown on that page. The investment journal says it is a manual record and is not the Saxo ledger. No Saxo snapshot was read. No benchmark series was acquired. Policy saves were not switched onto `public.wealth_allocation_targets`. Connect Saxo was visible on localhost and was not started.
+
+Local results, all exit 0:
+
+- `uv run pytest tests/test_asof_selection.py` in `workers/research`: 7 passed. `ruff check` and `ruff format --check` passed for that file. No database.
+- `npm run test:sourced-updates --prefix apps/web`: 36 passed, 0 failed.
+- `npm run test:wealth --prefix apps/web`: 59 passed, 0 failed. Includes the two wealth-limit tests.
+- `npm run typecheck`: passed.
+- `npm run check:tokens`: token styling guard passed.
+- `npx eslint` on the touched web files: exit 0.
+
+Signed-in Cursor browser on `http://localhost:3000`. Google sign-in did not block the routes.
+
+- `/`: compact pulse. The revision limit is shown. Full indicator view has href `/conditions`. Primary navigation stayed Today, My Wealth, and Intelligence. The publication boundary and the empty correction sentence are shown. No horizontal overflow at about 1920 pixels, or at 390 pixels. At 390 pixels the primary navigation is a fixed bottom bar and the main content has 72 pixels of padding beneath it. A click on Full indicator view did not change the URL in this session.
+- `/conditions`: dashboard variant. The same revision limit is shown. The full-view link is absent. 10 of 10 tracked series have a stored observation, 1 is stale, and October 2025 is named. No horizontal overflow at about 1920 pixels, or at 390 pixels.
+- `/research`: the publication boundary and the empty correction sentence are shown. No horizontal overflow at about 1920 pixels, or at 390 pixels.
+- `/my-wealth`: the unknown-state paragraph is shown. No order control was added. Connect Saxo was not used. No horizontal overflow at about 1920 pixels, or at 390 pixels.
+- `/my-wealth/journal`: the manual-record sentence is shown. No entries were saved. No horizontal overflow at about 1920 pixels. At a 390-pixel layout the existing statement-preview CSV header still extends past the viewport. That form was not changed.
+
+Founder approval is still required, separately, before any of these: a hosted backup and apply of the nine migrations; setting the server-only research URL and one manual refresh, with no cron; a push of local `main`. Do not enable Saxo. Do not switch policy saves onto `public.wealth_allocation_targets`. Do not insert a cited share class until a real permitted document is in the tree. Do not fabricate a vintage panel. Do not start benchmark history.
 
 ## Playbook inputs and the cited-document empty state, 24 October 2026
 

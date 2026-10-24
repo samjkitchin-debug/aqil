@@ -4,6 +4,8 @@ import {
   formatRetrievedAt,
   latestRetrievedAt,
   partitionPublications,
+  PUBLICATION_BOUNDARY,
+  publisherCorrectionLine,
   RECENT_PUBLICATION_DAYS,
   type SourcedUpdatePresentation,
   SOURCED_UPDATES_EMPTY_COPY,
@@ -26,9 +28,18 @@ export function SourcedUpdatesPanel({ updates, variant }: Props) {
 
   const groups = partitionPublications(updates);
   const lastRetrieval = latestRetrievedAt(updates);
+  const correctionLine = publisherCorrectionLine(updates);
 
   return (
     <section data-testid="sourced-updates-panel">
+      <p className="research-body" data-testid="publication-boundary">
+        {PUBLICATION_BOUNDARY}
+      </p>
+      {correctionLine ? (
+        <p className="research-body" data-testid="no-publisher-correction">
+          {correctionLine}
+        </p>
+      ) : null}
       <p className="research-meta" data-testid="sourced-updates-freshness">
         {updates.length} sourced {updates.length === 1 ? "publication" : "publications"}
         {lastRetrieval ? (

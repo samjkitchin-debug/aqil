@@ -35,7 +35,7 @@ Material caveats and conflict-of-interest disclosures cannot be relegated solely
 ## 4. Home/Today design contract
 - Today is the briefing, not the indicator dashboard. Lead with meaningful recent changes, a compact macro pulse, and upcoming events. Quantity is editorially controlled, not automatically filled.
 - Intelligence carries the full set of tracked indicators. Evidence carries the record behind a figure. Both use the same loaders and components as Today. Do not build a competing dashboard.
-- No composite score. No gauge. Colour does not mean good or bad. Do not state a cause as a measured result. Unavailable, stale, and insufficient data are explicit. Do not join a line across a known gap. Respect monthly, weekly, and quarterly frequencies. Do not render an unbounded history on every page load. The dashboard and the compact pulse are not built yet.
+- No composite score. No gauge. Colour does not mean good or bad. Do not state a cause as a measured result. Unavailable, stale, and insufficient data are explicit. Do not join a line across a known gap. Respect monthly, weekly, and quarterly frequencies. Do not render an unbounded history on every page load. The dashboard is mounted at /conditions. Today uses the same panel as a compact pulse.
 - Provide publication and update timestamps, genuine freshness, status (developing/verified/corrected), brief read length.
 - Never auto-create investment advice from all global news. Useful 'no investment implications established' is allowed.
 - Readability on phone: article first, charts after context, short paragraphs, anchored term definitions; no horizontal scroll for prose.

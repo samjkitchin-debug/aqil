@@ -41,6 +41,7 @@ export type MacroConditionsView = {
   intro: string;
   freshnessRule: string;
   completenessLine: string;
+  revisionLimit: string;
   groups: { id: string; label: string; panels: MacroSeriesPanel[] }[];
   unavailable: { id: string; name: string; detail: string }[];
 };
@@ -101,6 +102,7 @@ export function presentMacroConditions(input: {
     intro: INTRO,
     freshnessRule: freshnessRule(input.asOf),
     completenessLine: completenessLine(panels),
+    revisionLimit: revisionLimitLine(input.series),
     groups,
     unavailable: UNAVAILABLE_CONDITIONS.map((item) => ({ ...item })),
   };
@@ -353,6 +355,20 @@ function freshnessLine(retrievedAt: string | null, state: MacroPanelState): stri
   const date = new Date(retrievedAt);
   if (Number.isNaN(date.getTime())) return "Retrieval time is not stored.";
   return `Retrieved ${RETRIEVED.format(date)} UTC.`;
+}
+
+export function revisionLimitLine(series: readonly StoredSeriesWindow[]): string {
+  const stored = series.filter((item) => item.observations.length > 0);
+  if (stored.length === 0) {
+    return "No live series is stored, so no revision basis is shown. A historical date is not shown.";
+  }
+  if (stored.some((item) => !item.seriesProvenance)) {
+    return "Revision basis is not stored for every series with observations. A historical date is not shown.";
+  }
+  if (stored.every((item) => item.seriesProvenance === "latest_revised")) {
+    return "These stored series are latest revised. This view does not exclude a later revision. A latest-revised row is not a historical vintage.";
+  }
+  return "Revision basis is not only latest revised. A historical date is not shown on this page.";
 }
 
 function detailLine(series: StoredSeriesWindow): string {

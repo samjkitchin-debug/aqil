@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test:forward-contract": "node --experimental-strip-types --test src/lib/forward/validate-forward-horizon.test.ts",
     "test:auth": "node --experimental-strip-types --test src/lib/auth/auth.test.ts src/lib/auth/refresh-ownership.mock.test.ts",
-    "test:wealth": "node --experimental-strip-types --test src/lib/wealth/allocation.test.ts src/lib/wealth/panel.test.ts src/lib/wealth/journal.test.ts src/lib/wealth/journal-entry.test.ts src/lib/wealth/journal-valuation.test.ts src/lib/wealth/journal-returns.test.ts src/lib/wealth/journal-csv.test.ts src/lib/wealth/journal-store.test.ts",
+    "test:wealth": "node --experimental-strip-types --test src/lib/wealth/allocation.test.ts src/lib/wealth/panel.test.ts src/lib/wealth/journal.test.ts src/lib/wealth/journal-entry.test.ts src/lib/wealth/journal-valuation.test.ts src/lib/wealth/journal-returns.test.ts src/lib/wealth/journal-csv.test.ts src/lib/wealth/journal-store.test.ts src/lib/wealth/wealth-limits.test.ts",
     "test:benchmark": "node --experimental-strip-types --test src/lib/benchmark/cashflow-matched.test.ts src/lib/benchmark/passive-baseline.test.ts",
     "test:learn": "node --experimental-strip-types --test src/lib/learn/compounding.test.ts src/lib/playbook/investment-playbooks.test.ts",
     "test:story": "node --experimental-strip-types --test src/lib/research/story.test.ts",

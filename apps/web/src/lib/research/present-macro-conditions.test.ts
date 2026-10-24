@@ -12,6 +12,7 @@ import {
   gapsInWindow,
   isStale,
   presentMacroConditions,
+  revisionLimitLine,
   subtractDecimal,
   type MacroConditionsView,
 } from "./present-macro-conditions.ts";
@@ -65,7 +66,7 @@ function panel(view: MacroConditionsView, sourceId: string) {
 }
 
 function visibleCopy(view: MacroConditionsView): string {
-  const chunks = [view.intro, view.freshnessRule, view.completenessLine];
+  const chunks = [view.intro, view.freshnessRule, view.completenessLine, view.revisionLimit];
   for (const group of view.groups) {
     chunks.push(group.label);
     for (const item of group.panels) {
@@ -313,4 +314,28 @@ test("one stored observation is insufficient for a change or a trend", () => {
   assert.equal(item.chart, null);
   assert.match(item.windowLine ?? "", /latest 1 stored monthly observation/);
   assert.match(item.windowLine ?? "", /The limit is 12/);
+  assert.match(view.revisionLimit, /These stored series are latest revised/);
+  assert.doesNotMatch(view.revisionLimit, /because|gauge|composite score/i);
+});
+
+test("a historical date is withheld when revision basis is missing or mixed", () => {
+  assert.match(
+    revisionLimitLine([]),
+    /No live series is stored, so no revision basis is shown/,
+  );
+  assert.match(
+    revisionLimitLine([series({ sourceId: "bls_cps_unemployment_rate", seriesProvenance: null, observations: [{ period: "2026-09-01", rawValue: "4.2" }] })]),
+    /Revision basis is not stored/,
+  );
+  assert.match(
+    revisionLimitLine([
+      series({ sourceId: "bls_cps_unemployment_rate", observations: [{ period: "2026-09-01", rawValue: "4.2" }] }),
+      series({
+        sourceId: "bls_cpi_u_all_items",
+        seriesProvenance: "provider_vintage",
+        observations: [{ period: "2026-09-01", rawValue: "100" }],
+      }),
+    ]),
+    /Revision basis is not only latest revised/,
+  );
 });

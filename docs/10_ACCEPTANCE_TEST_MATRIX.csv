@@ -7,7 +7,7 @@ Evidence,Source fetch outage,"Stale indicator visible, no fake fresh claim",not 
 Agent,Malicious webpage injected instructions,No tool policy change; no secrets,not assessed in this session
 Agent,Agent invents quoted financial figure,Blocked by numeric verifier,not assessed in this session
 Method,Recalculate after method upgrade,Frozen old results identical,not assessed in this session
-Method,Retrospective macro revision in backtest,As-of query excludes future vintage,not assessed in this session
+Method,Retrospective macro revision in backtest,As-of query excludes future vintage,"24 Oct 2026. uv run pytest tests/test_asof_selection.py passed 7. A decision date before availability excludes the later synthetic vintage. Not CI."
 Method,Experimental adaptation wins backtest,No automatic promotion,not assessed in this session
 Portfolio,Deposit/buy/sell/transfer/FX/fee,Ledger balances and units reconcile,not assessed in this session
 Portfolio,Distributing vs accumulating fund,"Total returns are correct, no double count",not assessed in this session
@@ -27,8 +27,8 @@ Auth,Framework redirect inside auth error handler,Redirect is rethrown; return p
 Database,SECURITY DEFINER callable by anon,Denied unless explicitly granted and tested,not assessed in this session
 Ingest,Partial upstream payload,Authoritative rows are not deleted or blanked,not assessed in this session
 Research,M1 pipeline output without rights record,Blocked; no narrative fill for missing licence,not assessed in this session
-Research,M1 point-in-time as-of before vintage availability,Revision excluded; later as-of may include it,not assessed in this session
-Research,M1 latest-revised row in point-in-time mode,Excluded from historical reconstruction; allowed in latest-revised mode,not assessed in this session
+Research,M1 point-in-time as-of before vintage availability,Revision excluded; later as-of may include it,"24 Oct 2026. The same 7 as-of tests. The later synthetic vintage is absent before its availability time and present at that time. Not CI."
+Research,M1 latest-revised row in point-in-time mode,Excluded from historical reconstruction; allowed in latest-revised mode,"24 Oct 2026. The same 7 as-of tests. A latest_revised fixture row is excluded from point-in-time mode and kept in latest-revised mode. Not CI."
 Research,M1 Sahm fixture hand calculation,Gap and trigger match independent expected decimals,not assessed in this session
 Research,M1 research result without claim verification,Publication blocked (fail-closed),not assessed in this session
 Research,M1 swap fixture provider adapter,Equivalent Sahm calculation; orchestrator unchanged,not assessed in this session
@@ -37,7 +37,7 @@ Research,M1 disable source for collection,Ingest blocked; prior observations ret
 Research,M1 identical inputs replay,analytical_payload_hash stable across run_id,not assessed in this session
 Research,M1 BLS offline fixture ingest,Sahm completes with latest_revised labelling,not assessed in this session
 Research,M1 BLS live opt-in run,Rights gate passes; bounded HTTPS; no CI network,not assessed in this session
-Research,M1 latest-revised BLS in point-in-time mode,Excluded from as-of view,not assessed in this session
+Research,M1 latest-revised BLS in point-in-time mode,Excluded from as-of view,"24 Oct 2026. The same 7 as-of tests exclude a latest_revised fixture row from point-in-time mode. Live series were not rewritten. Not CI."
 Database,Remote migration before supabase test db green,Blocked by release policy,not assessed in this session
 Database,RLS tested only as postgres superuser,Rejected; must use authenticated test roles,not assessed in this session
 Privacy,User deletion request,Delete private assets while non-personal public method history remains,not assessed in this session
@@ -57,8 +57,8 @@ U0,Upgrade from the five hosted migrations,Representative rows and the auth stub
 U0,Hosted apply of the nine migrations,Not applied,not run
 U0,GitHub Actions on this tip,A local test is not that CI run,not run
 U0,One manual hosted research refresh,Freshness is visible and no schedule is claimed,not run
-U0,Intelligence macro dashboard,Tracked indicators with explicit gaps and no composite score,not run
-U0,Compact Today pulse,Today stays a briefing and is not a second dashboard,not run
+U0,Intelligence macro dashboard,Tracked indicators with explicit gaps and no composite score,"24 Oct 2026 signed-in Cursor browser. /conditions dashboard variant. 10 of 10 series. October 2025 named. No composite score. Revision limit says latest revised and this view does not exclude a later revision. No horizontal overflow at about 1920 or at 390. Not CI."
+U0,Compact Today pulse,Today stays a briefing and is not a second dashboard,"24 Oct 2026 signed-in Cursor browser. Today data-variant compact. Primary navigation stayed Today, My Wealth and Intelligence. Full indicator view href is /conditions. A click in this session did not change the URL. Opening /conditions directly showed the dashboard. No horizontal overflow at about 1920 or at 390. Not CI."
 U1,One cited ETF document,The exposures state stays empty until a permitted citation exists,not run
 U1,Implementation-ready playbook register,Structural principles stay distinct from timing strategies,not run
 U1,Policy save path uses wealth_allocation_targets,The gitignored file is not the permanent store,not run
