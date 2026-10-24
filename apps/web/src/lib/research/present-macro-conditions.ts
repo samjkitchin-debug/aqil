@@ -246,10 +246,11 @@ function presentSeries(
     frequency,
   );
   const trusted = !meta || unit === meta.expectedUnit || !latest;
-  const latestLevel = latest ? levelFor(latest.rawValue, unit, trusted) : null;
+  const countNoun = trusted ? meta?.countNoun : undefined;
+  const latestLevel = latest ? levelFor(latest.rawValue, unit, trusted, countNoun) : null;
   const diff = latest && previous ? subtractDecimal(latest.rawValue, previous.rawValue) : null;
   const chartPoints = window.flatMap((observation) => {
-    const level = levelFor(observation.rawValue, unit, trusted);
+    const level = levelFor(observation.rawValue, unit, trusted, countNoun);
     if (!level) return [];
     return [
       {
@@ -278,7 +279,7 @@ function presentSeries(
     valueLabel: latestLevel?.headline ?? null,
     valueUnit: latestLevel?.beside ?? null,
     periodLabel: latest ? formatPeriod(latest.period, frequency) : null,
-    changeLabel: changeLabel(diff, unit, trusted, previous, latest, frequency),
+    changeLabel: changeLabel(diff, unit, trusted, previous, latest, frequency, countNoun),
     measures: measuresCopy(meta, stored),
     matters: meta?.matters ?? null,
     sourceLabel: meta ? `${meta.organisation} · ${meta.datasetLabel}` : null,
@@ -294,7 +295,12 @@ function presentSeries(
   };
 }
 
-function levelFor(raw: string, unit: string, trusted: boolean): DisplayLevel | null {
+function levelFor(
+  raw: string,
+  unit: string,
+  trusted: boolean,
+  countNoun?: "jobs" | "openings",
+): DisplayLevel | null {
   if (!trusted) {
     const chartValue = Number(raw);
     if (!Number.isFinite(chartValue)) return null;
@@ -308,7 +314,7 @@ function levelFor(raw: string, unit: string, trusted: boolean): DisplayLevel | n
       rescaled: false,
     };
   }
-  return displayLevel(raw, unit);
+  return displayLevel(raw, unit, countNoun);
 }
 
 function pointLabel(level: DisplayLevel): string {
@@ -322,11 +328,12 @@ function changeLabel(
   previous: StoredObservation | null,
   latest: StoredObservation | null,
   frequency: string,
+  countNoun?: "jobs" | "openings",
 ): string | null {
   if (!latest) return null;
   if (!previous) return "A previous observation is not stored, so no change is shown.";
   if (diff === null) return "The stored values are not numbers, so no change is shown.";
-  const phrase = trusted ? displayChange(diff, unit) : plainChange(diff, unit);
+  const phrase = trusted ? displayChange(diff, unit, countNoun) : plainChange(diff, unit);
   if (!phrase) return "The stored values are not numbers, so no change is shown.";
   const adjacent = isKnownFrequency(frequency) && periodsAreAdjacent(previous.period, latest.period, frequency);
   return `${phrase} ${sinceText(previous.period, frequency, adjacent)}`;

@@ -11,9 +11,10 @@ import {
 type Props = {
   view: MacroConditionsView;
   variant: "compact" | "dashboard";
+  seriesLines?: Readonly<Record<string, string>>;
 };
 
-export function MacroConditionsPanel({ view, variant }: Props) {
+export function MacroConditionsPanel({ view, variant, seriesLines }: Props) {
   const compact = variant === "compact";
   return (
     <div data-testid="macro-conditions" data-variant={variant}>
@@ -41,7 +42,12 @@ export function MacroConditionsPanel({ view, variant }: Props) {
             {group.label}
           </h3>
           {group.panels.map((panel) => (
-            <IndicatorPanel key={panel.sourceId} panel={panel} compact={compact} />
+            <IndicatorPanel
+              key={panel.sourceId}
+              panel={panel}
+              compact={compact}
+              readingLine={compact ? undefined : seriesLines?.[panel.sourceId]}
+            />
           ))}
         </section>
       ))}
@@ -64,7 +70,15 @@ export function MacroConditionsPanel({ view, variant }: Props) {
   );
 }
 
-function IndicatorPanel({ panel, compact }: { panel: MacroSeriesPanel; compact: boolean }) {
+function IndicatorPanel({
+  panel,
+  compact,
+  readingLine,
+}: {
+  panel: MacroSeriesPanel;
+  compact: boolean;
+  readingLine?: string;
+}) {
   return (
     <article
       className={compact ? "macro-panel macro-panel--compact" : "macro-panel"}
@@ -87,6 +101,11 @@ function IndicatorPanel({ panel, compact }: { panel: MacroSeriesPanel; compact: 
         </p>
       ) : null}
       {panel.changeLabel ? <p className="macro-change">{panel.changeLabel}</p> : null}
+      {readingLine ? (
+        <p className="macro-reading-line" data-testid={`macro-reading-line-${panel.sourceId}`}>
+          {readingLine}
+        </p>
+      ) : null}
       {panel.chart ? <SeriesChart chart={panel.chart} testId={`macro-sparkline-${panel.sourceId}`} /> : null}
       {panel.gapLine ? <p className="research-meta">{panel.gapLine}</p> : null}
       {panel.chartNote ? <p className="research-body">{panel.chartNote}</p> : null}
@@ -140,8 +159,10 @@ function IndicatorPanel({ panel, compact }: { panel: MacroSeriesPanel; compact: 
 
 export async function MacroConditionsSection({
   variant,
+  seriesLines,
 }: {
   variant: "compact" | "dashboard";
+  seriesLines?: Readonly<Record<string, string>>;
 }) {
   const loaded = await loadMacroConditions();
   if (loaded.status === "unavailable") {
@@ -152,5 +173,5 @@ export async function MacroConditionsSection({
     );
   }
   const view = presentMacroConditions({ series: loaded.series, asOf: new Date() });
-  return <MacroConditionsPanel view={view} variant={variant} />;
+  return <MacroConditionsPanel view={view} variant={variant} seriesLines={seriesLines} />;
 }

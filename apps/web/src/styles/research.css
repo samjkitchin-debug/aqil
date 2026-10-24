@@ -199,3 +199,24 @@
   font-size: var(--font-size-xs);
   color: var(--colour-text-muted);
 }
+
+.economic-briefing {
+  display: grid;
+  overflow-wrap: anywhere;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--colour-border);
+}
+
+.economic-briefing .research-section-title {
+  margin-top: 0;
+}
+
+.macro-reading-line {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--colour-text);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-reading);
+}

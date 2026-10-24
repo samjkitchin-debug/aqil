@@ -64,7 +64,7 @@ export function SeriesChart({ chart, testId }: Props) {
             </g>
           ))}
           {chart.segments.map((segment) => (
-            <polyline key={segment.periods.join("|")} className="research-chart-line" points={segment.points} />
+            <path key={segment.periods.join("|")} className="research-chart-line" d={segment.d} />
           ))}
           {chart.points.map((point, index) => (
             <circle

@@ -17,6 +17,8 @@ export type IndicatorMetadata = {
   /** Second verified URL when the public link is not the retrieval file. */
   retrievalHref: string | null;
   expectedUnit: string;
+  /** What a stored "thousands" level counts. Absent for rates, indexes and dollars. */
+  countNoun?: "jobs" | "openings";
   measures: string;
   matters: string;
 };
@@ -45,8 +47,9 @@ export const INDICATOR_METADATA: readonly IndicatorMetadata[] = [
     linkKind: "data_file",
     retrievalHref: null,
     expectedUnit: "thousands",
+    countNoun: "jobs",
     measures:
-      "The number of paid jobs on nonfarm payrolls in the United States, from the establishment survey. The Bureau publishes the level in thousands of jobs. Shown here in people.",
+      "The number of paid jobs on nonfarm payrolls in the United States, from the establishment survey. The Bureau publishes the level in thousands of jobs. Shown here in millions of jobs.",
     matters:
       "The month-to-month change shows whether employers added or cut jobs. One person can hold more than one job, so this is a count of jobs rather than of people in the labour force.",
   },
@@ -59,8 +62,9 @@ export const INDICATOR_METADATA: readonly IndicatorMetadata[] = [
     linkKind: "data_file",
     retrievalHref: null,
     expectedUnit: "thousands",
+    countNoun: "openings",
     measures:
-      "The number of job openings on the last business day of the month for total nonfarm. The Bureau publishes the level in thousands. Shown here in people.",
+      "The number of job openings on the last business day of the month for total nonfarm. The Bureau publishes the level in thousands of job openings. Shown here in millions of job openings.",
     matters:
       "Openings record vacancies employers are seeking to fill. They can fall after roles are filled or after vacancies are withdrawn. They are not the unemployment rate.",
   },
@@ -76,7 +80,7 @@ export const INDICATOR_METADATA: readonly IndicatorMetadata[] = [
     measures:
       "The Consumer Price Index for All Urban Consumers, all items, as a price index with 1982–84 = 100. It follows a fixed basket for urban consumers. This panel shows the index level, not a 12-month inflation rate.",
     matters:
-      "A change is a move in the index, in index points. An inflation rate would need both endpoint months and a defined comparison. That rate is not calculated here.",
+      "A change on the chart is a move in the index, in index points. The stored 12-month percent change is a separate reading. It uses the two endpoint index levels and is not the index level.",
   },
   {
     sourceId: "federal_reserve_g17_total_ip",
@@ -103,7 +107,7 @@ export const INDICATOR_METADATA: readonly IndicatorMetadata[] = [
     retrievalHref: "https://www.federalreserve.gov/datadownload/Output.aspx?rel=SLOOS&filetype=zip",
     expectedUnit: "percent_net_tightening",
     measures:
-      "The net percentage of domestic banks reporting tighter standards on commercial and industrial loans to large and middle-market firms. A positive figure means more banks tightened than eased. It is not a volume of credit.",
+      "The net percentage of domestic banks reporting tighter standards on commercial and industrial loans to large and middle-market firms, shown in percent. A positive figure means more banks tightened than eased. It is not a volume of credit.",
     matters:
       "It records how loan officers describe the change in standards over the survey quarter. It is not the stock of bank credit and it is not a forecast of defaults.",
   },
@@ -117,7 +121,7 @@ export const INDICATOR_METADATA: readonly IndicatorMetadata[] = [
     retrievalHref: "https://www.federalreserve.gov/datadownload/Output.aspx?rel=H8&filetype=zip",
     expectedUnit: "usd_millions",
     measures:
-      "Bank credit at commercial banks in the United States. The Board publishes the level in millions of US dollars. Shown here in dollars. Observations are weekly.",
+      "Bank credit at commercial banks in the United States. The Board publishes the level in millions of US dollars. Shown here in trillions of US dollars. A smaller change is shown in billions or millions. Observations are weekly.",
     matters:
       "The change shows whether the stock of bank credit grew or shrank over the comparison week. It covers loans and securities on bank balance sheets, not lending standards.",
   },

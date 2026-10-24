@@ -2,8 +2,29 @@ import { Suspense } from "react";
 
 import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
-import { EventsAndThemesSection } from "@/components/research/events-and-themes";
+import { EconomicEvidenceBriefing } from "@/components/research/economic-evidence-briefing";
 import { MacroConditionsSection } from "@/components/research/macro-conditions-panel";
+import { loadEconomicEvidence } from "@/lib/research/load-economic-evidence";
+import { presentEconomicEvidence } from "@/lib/research/present-economic-evidence";
+
+
+async function ConditionsDashboard() {
+  const loaded = await loadEconomicEvidence();
+  const briefing = loaded.status === "ready" ? presentEconomicEvidence(loaded.input) : null;
+  const lines = Object.fromEntries((briefing?.seriesLines ?? []).map((line) => [line.sourceId, line.compact]));
+  return (
+    <>
+      {loaded.status === "unavailable" ? (
+        <p className="research-body" data-testid="economic-reading-unavailable">
+          {loaded.reason}
+        </p>
+      ) : briefing ? (
+        <EconomicEvidenceBriefing view={briefing} />
+      ) : null}
+      <MacroConditionsSection variant="dashboard" seriesLines={lines} />
+    </>
+  );
+}
 
 export default function ConditionsPage() {
   return (
@@ -15,10 +36,7 @@ export default function ConditionsPage() {
               Conditions
             </h2>
             <Suspense fallback={<p className="research-body">Loading conditions…</p>}>
-              <MacroConditionsSection variant="dashboard" />
-            </Suspense>
-            <Suspense fallback={<p className="research-body">Loading events and themes…</p>}>
-              <EventsAndThemesSection variant="compact" />
+              <ConditionsDashboard />
             </Suspense>
           </section>
         </PrivatePage>

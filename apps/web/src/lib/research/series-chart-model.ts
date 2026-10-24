@@ -32,7 +32,7 @@ export type SeriesChartModel = {
   plot: { x: number; y: number; width: number; height: number };
   yTicks: { y: number; label: string; value: number }[];
   xTicks: { x: number; label: string; anchor: "start" | "middle" | "end" }[];
-  segments: { periods: string[]; points: string }[];
+  segments: { periods: string[]; d: string }[];
   points: ChartObservation[];
 };
 
@@ -123,14 +123,14 @@ export function periodsAreAdjacent(previous: string, next: string, frequency: st
   return stepPeriod(previous, frequency) === next;
 }
 
-function lineSegments(points: readonly ChartObservation[], frequency: string): { periods: string[]; points: string }[] {
-  const segments: { periods: string[]; points: string }[] = [];
+function lineSegments(points: readonly ChartObservation[], frequency: string): { periods: string[]; d: string }[] {
+  const segments: { periods: string[]; d: string }[] = [];
   let run: ChartObservation[] = [];
   const flush = () => {
     if (run.length > 1) {
       segments.push({
         periods: run.map((point) => point.period),
-        points: run.map((point) => `${point.x},${point.y}`).join(" "),
+        d: smoothLinePath(run),
       });
     }
     run = [];
@@ -239,4 +239,57 @@ function daysBetween(start: string, end: string): number {
 
 function roundCoord(value: number): number {
   return Math.round(value * 100) / 100;
+}
+
+function smoothLinePath(points: readonly { x: number; y: number }[]): string {
+  const first = points[0];
+  if (!first) return "";
+  if (points.length === 1) return `M ${formatCoord(first.x)} ${formatCoord(first.y)}`;
+  const slopes: number[] = [];
+  const spans: number[] = [];
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const left = points[index];
+    const right = points[index + 1];
+    if (!left || !right) continue;
+    const span = right.x - left.x;
+    spans.push(span);
+    slopes.push(span === 0 ? 0 : (right.y - left.y) / span);
+  }
+  const tangents = slopes.map((slope, index) => {
+    if (index === 0) return slope;
+    const previous = slopes[index - 1] ?? 0;
+    return previous * slope <= 0 ? 0 : (previous + slope) / 2;
+  });
+  tangents.push(slopes[slopes.length - 1] ?? 0);
+  const commands = [`M ${formatCoord(first.x)} ${formatCoord(first.y)}`];
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const left = points[index];
+    const right = points[index + 1];
+    const span = spans[index] ?? 0;
+    if (!left || !right) continue;
+    let start = tangents[index] ?? 0;
+    let end = tangents[index + 1] ?? 0;
+    const secant = slopes[index] ?? 0;
+    if (secant === 0) {
+      start = 0;
+      end = 0;
+    } else {
+      const alpha = start / secant;
+      const beta = end / secant;
+      const magnitude = alpha * alpha + beta * beta;
+      if (magnitude > 9) {
+        const scale = 3 / Math.sqrt(magnitude);
+        start = scale * alpha * secant;
+        end = scale * beta * secant;
+      }
+    }
+    commands.push(
+      `C ${formatCoord(left.x + span / 3)} ${formatCoord(left.y + (start * span) / 3)} ${formatCoord(right.x - span / 3)} ${formatCoord(right.y - (end * span) / 3)} ${formatCoord(right.x)} ${formatCoord(right.y)}`,
+    );
+  }
+  return commands.join(" ");
+}
+
+function formatCoord(value: number): string {
+  return (Math.round(value * 100) / 100).toString();
 }

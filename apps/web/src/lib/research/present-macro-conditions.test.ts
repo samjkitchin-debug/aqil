@@ -7,6 +7,8 @@ import {
   MACRO_SERIES,
   type StoredSeriesWindow,
 } from "./macro-conditions.ts";
+import { displayLevel } from "./format-indicator.ts";
+import { buildSeriesChart } from "./series-chart-model.ts";
 import {
   frequencySparkline,
   gapsInWindow,
@@ -285,6 +287,7 @@ test("weekly and quarterly series keep their own period and difference unit", ()
   assert.equal(credit.changeLabel, "+$57.13 billion since the week of 30 September 2026");
   assert.match(credit.chart?.xTicks.map((tick) => tick.label).join(" ") ?? "", /Sep|Oct/);
   assert.equal(credit.chart?.unitLabel, "US$ trillion");
+  assert.match(credit.measures ?? "", /trillions of US dollars/);
   assert.match(credit.details.join(" "), /19948526\.8 millions of US dollars/);
   assert.doesNotMatch(credit.changeLabel ?? "", /percentage points|millions of US dollars/);
   const sloos = panel(view, "federal_reserve_sloos_cil");
@@ -294,9 +297,11 @@ test("weekly and quarterly series keep their own period and difference unit", ()
   assert.match(sloos.measures ?? "", /not seasonally adjusted/);
   assert.match(sloos.chart?.xTicks.map((tick) => tick.label).join(" ") ?? "", /Q2 2026|Q3 2026/);
   const payrolls = panel(view, "bls_ces_total_nonfarm_payrolls");
-  assert.equal(payrolls.valueLabel, "159.0 million people");
-  assert.equal(payrolls.changeLabel, "+29,000 people since August 2026");
-  assert.equal(payrolls.chart?.unitLabel, "Million people");
+  assert.equal(payrolls.valueLabel, "159.0 million jobs");
+  assert.equal(payrolls.changeLabel, "+29,000 jobs since August 2026");
+  assert.equal(payrolls.chart?.unitLabel, "Million jobs");
+  assert.match(payrolls.measures ?? "", /millions of jobs/);
+  assert.doesNotMatch(payrolls.measures ?? "", /in people/);
   assert.ok(payrolls.chart?.yTicks.every((tick) => tick.value < 1000));
   assert.doesNotMatch(`${payrolls.valueLabel} ${payrolls.changeLabel}`, /thousands|percentage points/);
   assert.match(payrolls.details.join(" "), /159044 thousands/);
@@ -389,7 +394,9 @@ test("one stored observation is insufficient for a change or a trend", () => {
   });
   const item = panel(view, "bls_jolts_total_nonfarm_job_openings");
   assert.equal(item.state, "insufficient");
-  assert.equal(item.valueLabel, "7.08 million people");
+  assert.equal(item.valueLabel, "7.08 million job openings");
+  assert.match(item.measures ?? "", /millions of job openings/);
+  assert.doesNotMatch(item.measures ?? "", /in people/);
   assert.match(item.changeLabel ?? "", /no change is shown/);
   assert.match(item.warning ?? "", /Only one observation is stored/);
   assert.equal(item.chart, null);
@@ -446,3 +453,62 @@ test("a mismatched stored unit is not rescaled", () => {
   assert.doesNotMatch(item.valueLabel ?? "", /million/);
   assert.match(item.details.join(" "), /not rescaled/);
 });
+
+test("a smoothed line passes through observations without crossing a gap", () => {
+  const point = (period: string, raw: string) => {
+    const display = displayLevel(raw, "percent");
+    assert.ok(display);
+    return { period, display, dateLabel: period, valueLabel: `${raw}%` };
+  };
+  const chart = buildSeriesChart({
+    label: "Rate",
+    caption: "January 2026 to June 2026",
+    frequency: "monthly",
+    points: [
+      point("2026-01-01", "4.0"),
+      point("2026-02-01", "4.8"),
+      point("2026-03-01", "4.2"),
+      point("2026-05-01", "4.1"),
+      point("2026-06-01", "4.4"),
+    ],
+  });
+  assert.ok(chart);
+  assert.equal(chart.segments.length, 2);
+  assert.equal(chart.segments[0]?.periods.includes("2026-05-01"), false);
+  const first = chart.segments[0]?.d ?? "";
+  assert.match(first, /^M /);
+  assert.match(first, / C /);
+  const firstSpans = curveSpans(first);
+  assert.ok(firstSpans.length >= 2);
+  const opening = firstSpans[0];
+  assert.ok(opening);
+  const straight = (opening.start + opening.end) / 2;
+  assert.ok(Math.abs(opening.mid - straight) > 0.5);
+  for (const segment of chart.segments) {
+    for (const span of curveSpans(segment.d)) {
+      const low = Math.min(span.start, span.end);
+      const high = Math.max(span.start, span.end);
+      assert.ok(span.mid >= low - 0.05 && span.mid <= high + 0.05);
+    }
+  }
+});
+
+function curveSpans(path: string): { start: number; mid: number; end: number }[] {
+  const numbers = path.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+  const spans: { start: number; mid: number; end: number }[] = [];
+  if (numbers.length < 8) return spans;
+  let y0 = numbers[1] ?? 0;
+  for (let index = 2; index + 5 < numbers.length; index += 6) {
+    const c1 = numbers[index + 1] ?? 0;
+    const c2 = numbers[index + 3] ?? 0;
+    const y1 = numbers[index + 5] ?? 0;
+    spans.push({ start: y0, mid: cubic(y0, c1, c2, y1, 0.5), end: y1 });
+    y0 = y1;
+  }
+  return spans;
+}
+
+function cubic(p0: number, p1: number, p2: number, p3: number, t: number): number {
+  const remain = 1 - t;
+  return remain ** 3 * p0 + 3 * remain ** 2 * t * p1 + 3 * remain * t ** 2 * p2 + t ** 3 * p3;
+}

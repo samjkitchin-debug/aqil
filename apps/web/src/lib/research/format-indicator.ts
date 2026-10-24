@@ -21,13 +21,25 @@ export type DisplayLevel = {
 
 const PEOPLE = /^\d+$/;
 
-export function displayLevel(raw: string, unit: string): DisplayLevel | null {
+export type CountNoun = "jobs" | "openings";
+
+const COUNT_NOUN: Record<CountNoun, { one: string; many: string; million: string; axis: string }> = {
+  jobs: { one: "job", many: "jobs", million: "million jobs", axis: "Million jobs" },
+  openings: {
+    one: "job opening",
+    many: "job openings",
+    million: "million job openings",
+    axis: "Million job openings",
+  },
+};
+
+export function displayLevel(raw: string, unit: string, countNoun?: CountNoun): DisplayLevel | null {
   const trimmed = raw.trim();
   if (!isDecimal(trimmed)) return null;
   if (unit === "percent" || unit === "percent_per_year" || unit === "percent_net_tightening") {
     return rateLevel(trimmed, unit);
   }
-  if (unit === "thousands") return peopleLevel(trimmed);
+  if (unit === "thousands") return countLevel(trimmed, countNoun);
   if (unit === "usd_millions") return dollarLevel(trimmed);
   if (isIndexUnit(unit)) return indexLevel(trimmed, unit);
   const chartValue = Number(trimmed);
@@ -43,18 +55,14 @@ export function displayLevel(raw: string, unit: string): DisplayLevel | null {
   };
 }
 
-export function displayChange(diff: string, unit: string): string | null {
+export function displayChange(diff: string, unit: string, countNoun?: CountNoun): string | null {
   const trimmed = diff.trim();
   if (!isDecimal(trimmed)) return null;
   if (isZero(trimmed)) return "Unchanged";
   if (unit === "percent" || unit === "percent_per_year" || unit === "percent_net_tightening") {
     return `${signed(rateMagnitude(trimmed))} percentage points`;
   }
-  if (unit === "thousands") {
-    const people = multiplyExact(trimmed, 1000n);
-    if (!people) return null;
-    return `${signed(groupInteger(people))} people`;
-  }
+  if (unit === "thousands") return countChange(trimmed, countNoun);
   if (unit === "usd_millions") {
     const money = dollarChange(trimmed);
     if (!money) return null;
@@ -76,7 +84,7 @@ export function unitLabel(unit: string): string {
     case "percent_net_tightening":
       return "Net tightening";
     case "thousands":
-      return "Million people";
+      return "Thousands";
     case "usd_millions":
       return "US dollars";
     case "index_2017_100":
@@ -132,7 +140,21 @@ function rateLevel(raw: string, unit: string): DisplayLevel | null {
   };
 }
 
-function peopleLevel(raw: string): DisplayLevel | null {
+function countLevel(raw: string, countNoun: CountNoun | undefined): DisplayLevel | null {
+  const labels = countNoun ? COUNT_NOUN[countNoun] : null;
+  if (!labels) {
+    const chartValue = Number(raw);
+    if (!Number.isFinite(chartValue)) return null;
+    return {
+      headline: raw,
+      precise: raw,
+      chartValue,
+      axisUnit: "Thousands",
+      tickSuffix: "",
+      beside: null,
+      rescaled: false,
+    };
+  }
   const millions = divideExact(raw, 1000n);
   if (!millions) return null;
   const chartValue = Number(millions);
@@ -140,14 +162,23 @@ function peopleLevel(raw: string): DisplayLevel | null {
   const magnitude = Math.abs(chartValue);
   const headlineDecimals = magnitude >= 20 ? 1 : 2;
   return {
-    headline: `${showDecimals(millions, headlineDecimals)} million people`,
-    precise: `${trimZeros(showDecimals(millions, 3))} million people`,
+    headline: `${showDecimals(millions, headlineDecimals)} ${labels.million}`,
+    precise: `${trimZeros(showDecimals(millions, 3))} ${labels.million}`,
     chartValue,
-    axisUnit: "Million people",
+    axisUnit: labels.axis,
     tickSuffix: "",
     beside: null,
     rescaled: true,
   };
+}
+
+function countChange(diff: string, countNoun: CountNoun | undefined): string | null {
+  const labels = countNoun ? COUNT_NOUN[countNoun] : null;
+  if (!labels) return `${signed(trimZeros(diff))} thousand`;
+  const count = multiplyExact(diff, 1000n);
+  if (!count) return null;
+  const word = absolute(count) === "1" ? labels.one : labels.many;
+  return `${signed(groupInteger(count))} ${word}`;
 }
 
 function dollarLevel(raw: string): DisplayLevel | null {

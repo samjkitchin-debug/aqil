@@ -1,7 +1,43 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 24 October 2026, macro events and themes
+**Last updated:** 24 October 2026, economic evidence briefing
+
+
+## Economic evidence briefing, 24 October 2026
+
+Risk class R1 display of stored research runs. No new transformation and no new method version. The web app does not recompute the stored changes and does not call a model. `publication_allowed` stays false. No research run was inserted. Preserved database `postgres` was not reset and was not written. A read after the presenter check still showed 25 research runs, and `publication_allowed` was false on every row. Nothing was pushed. Hosted migrations were not applied. `work/aqil-autonomous-build` was not fast-forwarded. GitHub Actions has not run. The commands below are local tests. They are not CI.
+
+Conditions now shows an internal economic reading above the indicator charts. It names `MACRO_READING_SYNTHESIS` 1.0.0, run `d8ec09f0-719e-4b9f-ab88-772ea1c9ae8d`, and payload `08323aecdc1c20e916528c6939992a4d859de09b14e7e529f03d2cf11d10dea6`, and links to Evidence. The stored synthesis reports a divergence, so there is no overall sentence. Family readings from those stored runs:
+
+- Labour: Mixed. September 2026 unemployment 4.2 percent, 12-month change -0.20 percentage points. Payrolls 159.0 million jobs, 12-month change +496,000 jobs and 0.31 percent. Job openings 7.08 million in August 2026, higher. Three-month payroll acceleration is not calculated.
+- Inflation: CPI-U is higher than 12 months earlier. The stored 12-month percent change is 3.7173 percent, from index 324.245 to index 336.298. Those index levels are the endpoints, not the inflation rate.
+- Production: industrial production is higher than 12 months earlier. The stored 12-month percent change is 2.2452 percent.
+- Credit: Mixed. The SLOOS net tightening share for the quarter starting 1 July 2026 is zero after a difference of -8.1 percentage points. That is less net tightening, not net easing. Bank credit for the week of 7 October 2026 is higher over 52 weeks.
+- Interest rates: the federal funds rate and the 10-year yield are higher than one month earlier, in percentage points. They stay separate from the CPI inflation rate. H.15 seasonal adjustment is unknown.
+
+Euro-area HICP stays on its chart, is excluded from the reading, and ends in December 2025. The files are described as latest revised and not a vintage panel. Each chart keeps its explanation and Technical details, and adds one compact line. A block lists broad equity performance, regional relative performance, sector leadership, valuation, earnings revisions, credit spreads, and benchmark total returns as not answered. An economic reading is not an investment conclusion. No ETF or Saxo query was added.
+
+Events read contract, documented here only. A later verified development may be cited as a possible transmission channel, with its own source id, and it is not evidence that a measured series moved. This briefing does not load that input. Conditions does not query the macro-event tables.
+
+The uncommitted chart work stays with this change: payrolls display as jobs, openings as job openings, bank credit copy uses trillions, and the chart curve still breaks on a missing month.
+
+Local results, all exit 0:
+
+- `npm run test:sourced-updates` in `apps/web`: 55 passed, 0 failed. That includes the economic-evidence presenter tests and the existing prospective-assessment presenter tests.
+- `npx tsc --noEmit` in `apps/web`: passed.
+- `npx eslint` on the touched presentation files: exit 0.
+- `npm run check:tokens`: passed.
+
+Research pytest was not run. The research methods and publication gates were not edited. No disposable database was reset.
+
+Signed-in Cursor browser on `http://localhost:3000`. Google sign-in did not block the route.
+
+- `/conditions` at about 1905 pixels: the economic reading is above the charts. Labour, inflation, production, credit, and interest rates are shown. Evidence in the reading has href `/research`.
+- `/conditions` at 390 pixels: the same reading is above the charts, the run id wraps, and there is no horizontal overflow. The main content still has 72 pixels of padding beneath the bottom navigation.
+- Opening `/research` directly showed Macro reading for the same run `d8ec09f0-719e-4b9f-ab88-772ea1c9ae8d`. A click on the in-page Evidence link focused it and did not change the URL. The Next.js dev overlay showed one issue. It was not changed.
+
+Screenshots were taken locally and were not committed.
 
 ## Macro events and themes, 24 October 2026
 
