@@ -1,8 +1,31 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 25 October 2026, three-pillar release sprint
+**Last updated:** 25 October 2026, Bry-Boschan specification stop
 
+## Bry-Boschan specification stop, 25 October 2026
+
+Risk class R2. Local main only. Nothing was pushed, deployed, or applied to the hosted project. Database postgres was not reset and no observation was deleted. Other worktrees were not edited.
+
+Campaign A is blocked. NBER chapter PDF c2148 (58 pages) was read, including the appendix. The appendix is the bituminous-coal sample run, not a program listing. The Spencer fifteen-point coefficients are not printed. The chapter does not state which month receives the twelve-month moving average. Those constants were not invented. date_specific_cycles raises BryBoschanSpecificationBlocked. The method is not registered. publication_allowed stays false. No research run was stored, so there is no run id and no peak or trough list. Replay, recalculation, monitoring, and the NBER overlap diagnostic were not started.
+
+A read-only query of local postgres, with default_transaction_read_only on, found 1,293 live latest_revised rows of fed.g17.IP.B50001.S, from 1919-01-01 to 2026-09-01, with no gaps, no duplicate months, and no fixture rows. The unit is index_2017_100 and the series is seasonally adjusted. This is not a GitHub Actions result.
+
+uv run pytest tests/test_bry_boschan_monthly.py -q passed 9. uv run ruff check and ruff format on that module and test were clean. The full research suite was not re-run. GitHub Actions has not run.
+
+Campaign B did not estimate a factor model. Chapter PDF c10968 and working paper w2772 were read. The coincident system is the log-difference factor model with a factor innovation variance of 1. Table 1 names IP, GMYXP8, MT82, and LPMHU. GMYXP8, MT82, and LPMHU are not stored and have no SOURCE_RIGHTS row. Payroll headcount bls.ce.CES0000000001 is not employee-hours. G.17 is not confirmed as the 1989 CITIBASE industrial-production series. FRED and ALFRED were not used. AQ-102 stays blocked. No NumPy dependency was added.
+
+
+
+## Methodology-first macro programme, 25 October 2026
+
+Risk class R1. Documentation only. No application code, migration, ingest, commit, push, or deploy. Other worktrees were not checked out or edited. The hosted project was not queried.
+
+A read-only query of local `postgres` as `research_worker` matched the coverage register. Observation rows 35,735. Live retrievals 35,648. Fixture retrievals 87. `latest_revised` 35,720. `provider_vintage` 15. Operational dataset identifiers 23, with 34,859 live rows and the same number of distinct periods. OECD rows 789, not operational. `research.research_runs` 25. `fed.g17.IP.B50001.S` is 1,293 `latest_revised` months from 1919-01-01 to 2026-09-01. This is not a GitHub Actions result.
+
+ADR 027 and `docs/macro/` are the methodology direction. The engineering pilot is monthly Bry–Boschan on that industrial-production index. It is not the strategic intelligence product. The strategic milestone is a specified Stock–Watson dynamic factor model after AQ-101. Harding–Pagan quarterly BBQ is not applied to monthly observations. The NBER chronology is a diagnostic, not an exact-match test. Backlog rows AQ-094 to AQ-104 record the work. The specification stop above supersedes this paragraph: AQ-094 is blocked because the Spencer coefficients are not in chapter 2, and the G.17 recount was repeated.
+
+No statistical engine was built. `publication_allowed` was not changed.
 
 ## Three-pillar release sprint, 25 October 2026
 

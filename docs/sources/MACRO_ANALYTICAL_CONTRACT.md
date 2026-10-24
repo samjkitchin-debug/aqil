@@ -88,7 +88,9 @@ Report the latest SLOOS share and the prior quarter, beside the latest H.8 week 
 
 ## Unchanged methods
 
-Do not edit Sahm (`SAHM_UNEMPLOYMENT_GAP`), `PERIOD_LEVEL_CHANGE`, `SLOOS_CIL_LENDING_STANDARDS`, Census (`CENSUS_ADV_DURABLE_ORDERS`), or `MACRO_CONDITIONS_PANEL` 1.0.0. `default_method_registry` still registers only those five. Leave them registered and unchanged.
+Do not edit Sahm (`SAHM_UNEMPLOYMENT_GAP`), `PERIOD_LEVEL_CHANGE`, `SLOOS_CIL_LENDING_STANDARDS`, Census (`CENSUS_ADV_DURABLE_ORDERS`), or `MACRO_CONDITIONS_PANEL` 1.0.0.
+
+**25 October 2026.** The sentence that `default_method_registry` registers only those five is out of date. The registry also registers the four reading methods and `MACRO_READING_SYNTHESIS` is produced by `workflow/record_macro_readings.py`. Code is the registry. This contract's ownership rules for the October reading sprint are historical. New macro-method priority is ADR 027 and `docs/macro/00_METHODOLOGY_PROGRAMME.md`, not a further edit of these readings.
 
 ## File ownership
 

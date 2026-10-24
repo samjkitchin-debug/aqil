@@ -3,6 +3,8 @@
 
 **18 October 2026.** New macro-method work waits until it has a clear decision value for My Wealth or Deploy Capital. The November employment baseline remains a frozen prospective exercise. It is not evidence of forecasting skill.
 
+**25 October 2026. Superseded in part by ADR 027.** The sentence above no longer blocks the methodology-first macro programme in `docs/macro/00_METHODOLOGY_PROGRAMME.md`. My Wealth and Deploy Capital remain separate products. They are not the gate for the monthly Bry–Boschan pilot or for the Stock–Watson data contract. The November employment baseline is unchanged: it is still not evidence of forecasting skill. Language models still do not produce economic conclusions (ADR 005 and ADR 027).
+
 ## 1. Scientific chain of custody
 Aqil's chain is `source → extract → verify → observation → event/indicator → causal candidate → applied named method → competing scenario → market-expectations check → eligible exposure analysis → registered forecast → paper experiment → independent evaluation → versioned learning`. Every arrow has a validator; any failing critical step stops publication or produces a visibly qualified research note.
 

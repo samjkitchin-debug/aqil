@@ -7,7 +7,7 @@ A coordinated specification for Aqil: a calm, evidence-led, long-horizon wealth 
 **Read in this order:**
 1. `01_PRODUCT_CHARTER.md` — why, who, what, what not.
 2. `02_CRITICAL_REVIEW.md` — decisions, holes, failure modes, boundaries.
-3. `03_RESEARCH_ENGINE_AND_METHODS.md` — crown jewel and scientific contract.
+3. `03_RESEARCH_ENGINE_AND_METHODS.md` — crown jewel and scientific contract. Macro methodology from 25 October 2026: `docs/macro/00_METHODOLOGY_PROGRAMME.md` (ADR 027). The status table is `docs/macro/QUANTITATIVE_METHOD_REGISTER.csv`, not `08_METHOD_REGISTER.csv`.
 4. `04_ARCHITECTURE_AND_DATA.md` — implementation architecture and stable contracts.
 5. `05_HUMAN_EXPERIENCE_AND_DESIGN.md` — people-first UX, Aptos/navy/gold design tokens; `RESPONSIVE_LAYOUT_CONTRACT.md` — shell and PWA layout gates.
 6. `06_ENGINEERING_DISCIPLINE.md` — how to instruct Cursor, test, review, release.

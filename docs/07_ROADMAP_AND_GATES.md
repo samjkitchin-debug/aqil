@@ -26,7 +26,15 @@ This section supersedes older sentences below that say authentication, hosted Su
   7. Identify a rights-cleared credit-spread source, or record the block.
   8. Identify a rights-cleared dollar series, or record the block.
   9. Keep the United States reading separate from regional observation panels.
-  10. Leave the AI-infrastructure theme and institutional-capital work on their existing gates. Do not start another macro wave.
+  10. Leave the AI-infrastructure theme and institutional-capital work on their existing gates. Do not open another geography collection wave. The macro research priority is the methodology programme in `docs/macro/00_METHODOLOGY_PROGRAMME.md` (ADR 027): monthly Bry–Boschan on stored industrial production as an engineering pilot, then a Stock–Watson dynamic factor model only after its data contract. That programme does not wait on a further macro data wave.
+
+## Methodology-first macro sequence (25 October 2026)
+
+ADR 027 is the decision. `docs/macro/QUANTITATIVE_METHOD_REGISTER.csv` is the method status. `docs/07_BUILD_BACKLOG.csv` remains the only progress register.
+
+The pilot is not the strategic intelligence product. Harding–Pagan quarterly BBQ is not applied to monthly G.17. The NBER chronology is a diagnostic, not an exact-match test. The worker still has no `jobs` table, no cron, and no pandas or NumPy dependency. `docs/04_ARCHITECTURE_AND_DATA.md` describes a job queue that migrations do not implement. The pilot must not pretend that queue exists.
+
+Hosted U0 stays an operations no-go. It is not the research priority and it is not cancelled.
 
 ## Progress register
 
