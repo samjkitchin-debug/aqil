@@ -415,7 +415,7 @@ def _refresh_g17(now: datetime) -> SourceRefreshResult:
     from aqil_research.adapters.fed_g17.parse import DATASET_ID, SOURCE_ID
     from aqil_research.adapters.fed_g17.stability import StoredG17Point
 
-    return _refresh_registered(
+    result = _refresh_registered(
         now,
         SOURCE_ID,
         DATASET_ID,
@@ -425,6 +425,20 @@ def _refresh_g17(now: datetime) -> SourceRefreshResult:
             retrieved_at=retrieved,
             prior_points=priors,  # type: ignore[arg-type]
         ),
+    )
+    if result.outcome in {"failed_fetch", "failed_rights", "failed_validation", "conflicts"}:
+        return result
+    from aqil_research.workflow.bry_boschan_reading import record_g17_spencer15_reading
+
+    with research_connection() as conn:
+        reading = record_g17_spencer15_reading(conn, decision_at=now)
+    detail = f"{result.detail} spencer15={reading.status}".strip()
+    return SourceRefreshResult(
+        result.source_id,
+        result.outcome,
+        inserted=result.inserted,
+        unchanged=result.unchanged,
+        detail=detail[:500],
     )
 
 

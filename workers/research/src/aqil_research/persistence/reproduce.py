@@ -8,6 +8,7 @@ from dataclasses import dataclass
 import psycopg
 
 from aqil_research.methods.configs import (
+    BRY_BOSCHAN_SPENCER15_PUBLISHED,
     CENSUS_ADV_ORDERS_PUBLISHED,
     MACRO_CONDITIONS_PUBLISHED,
     SAHM_PUBLISHED,
@@ -127,6 +128,7 @@ def _config_for_id(config_id: str) -> dict[str, object]:
         MACRO_CONDITIONS_PUBLISHED,
         SLOOS_CIL_PUBLISHED,
         CENSUS_ADV_ORDERS_PUBLISHED,
+        BRY_BOSCHAN_SPENCER15_PUBLISHED,
     )
     for panel in published_panels:
         if config_id == panel["config_id"]:

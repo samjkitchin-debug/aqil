@@ -52,6 +52,11 @@ INDUSTRIAL_PRODUCTION_PUBLISHED = {
     "label": "Latest-revised industrial production level and 12-month change",
 }
 
+BRY_BOSCHAN_SPENCER15_PUBLISHED = {
+    "config_id": "bry_boschan_spencer15_variant_v1",
+    "label": "Macaulay 15-term Spencer weights and the six-lag five-lead twelve-month average",
+}
+
 CREDIT_STANDARDS_AND_VOLUMES_PUBLISHED = {
     "config_id": "credit_standards_and_volumes_v1",
     "label": "Latest-revised SLOOS share and H.8 bank credit",

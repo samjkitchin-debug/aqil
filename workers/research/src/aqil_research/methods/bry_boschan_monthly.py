@@ -1,11 +1,12 @@
 """Monthly Bry–Boschan specification and the G.17 level-index contract.
 
-Bry and Boschan, chapter 2 (NBER c2148, read 25 October 2026), states the
-censoring windows and the 3.5-standard-deviation ratio rule. It does not
-print the fifteen-point Spencer coefficients, the twelve-month moving-average
-alignment, or the program listing. Dating stays refused until those constants
-are read from that chapter. This module does not smooth a series and does not
-import NumPy.
+The 1971 volume was read on 25 October 2026: front matter c2145, foreword
+c2146, and chapters c2147 to c2150. Chapter 2 states the censoring windows and
+the 3.5-standard-deviation ratio rule. No chapter prints the fifteen-point
+Spencer coefficients or which month receives the twelve-month moving average.
+The foreword says the program listings are mimeographed supplements, outside
+this volume. Dating stays refused. This module does not smooth a series and
+does not import NumPy.
 """
 
 from __future__ import annotations
@@ -43,22 +44,24 @@ CROSSOVER_CONTRACTION_MONTHS = 10
 SPENCER_TERM_MONTHS = 15
 
 DATING_BLOCKER = (
-    "Bry-Boschan dating is blocked. NBER chapter 2 "
-    "(https://www.nber.org/system/files/chapters/c2148/c2148.pdf, 58 pages) "
-    "does not print the fifteen-point Spencer coefficients, does not state "
-    "which month receives the twelve-month moving average, and does not "
-    "include the program listing. The appendix is the bituminous-coal sample "
-    "run. Weights were not invented."
+    "Bry-Boschan dating is blocked. The 1971 volume "
+    "(https://www.nber.org/books-and-chapters/"
+    "cyclical-analysis-time-series-selected-procedures-and-computer-programs, "
+    "chapters c2145 to c2150) does not print the fifteen-point Spencer "
+    "coefficients and does not state which month receives the twelve-month "
+    "moving average. The chapter 2 appendix is the bituminous-coal sample "
+    "run. The foreword places the program listings in mimeographed "
+    "supplements. Weights were not invented."
 )
 
 
 class BryBoschanSpecificationBlocked(RuntimeError):
-    """A chapter-2 constant required for dating was not in the chapter PDF."""
+    """A constant required for dating was not printed in the 1971 volume."""
 
 
 @dataclass(frozen=True, slots=True)
 class BryBoschanMonthlySpec:
-    """Constants read from chapter 2, plus the explicit gaps."""
+    """Constants read from chapter 2, plus the gaps left by the full volume."""
 
     version: str = BRY_BOSCHAN_MONTHLY_1971
     outlier_control_limit: Decimal = OUTLIER_CONTROL_LIMIT

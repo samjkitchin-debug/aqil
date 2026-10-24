@@ -1,7 +1,7 @@
 """G.17 input contract and the blocked Bry–Boschan specification.
 
 Expected turning-point dates are not produced. The dating function raises
-because chapter 2 does not print the Spencer weights.
+because the 1971 volume does not print the Spencer weights.
 """
 
 from __future__ import annotations

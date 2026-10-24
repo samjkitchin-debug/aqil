@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
+from aqil_research.methods.bry_boschan_spencer15 import (
+    BRY_BOSCHAN_SPENCER15_VARIANT,
+    BryBoschanSpencer15Method,
+)
 from aqil_research.methods.census_adv_orders import (
     CENSUS_ADV_ORDERS_METHOD_ID,
     CensusAdvOrdersMethod,
@@ -67,12 +71,14 @@ def default_method_registry() -> MethodRegistry:
     registry.register(PricesAndPolicyMethod())
     registry.register(IndustrialProductionActivityMethod())
     registry.register(CreditStandardsVolumesMethod())
+    registry.register(BryBoschanSpencer15Method())
     return registry
 
 
 __all__ = [
     "MethodRegistry",
     "MethodRegistryError",
+    "BRY_BOSCHAN_SPENCER15_VARIANT",
     "CENSUS_ADV_ORDERS_METHOD_ID",
     "CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID",
     "INDUSTRIAL_PRODUCTION_METHOD_ID",

@@ -1,6 +1,6 @@
 # First campaign: monthly Bry–Boschan on industrial production
 
-**Status:** dating blocked on 25 October 2026. The chapter PDF does not print the Spencer weights. This file does not authorise a later agent to invent them.  
+**Status:** 25 October 2026. The 1971 volume still does not print the Spencer weights or the twelve-month alignment, so `BRY_BOSCHAN_MONTHLY_1971` refuses to date. A labelled variant, `BRY_BOSCHAN_SPENCER15_VARIANT`, uses the Macaulay 1931 weights and the Otsu 2020 twelve-month placement. It is not the 1971 listing and not a FORTRAN replica.  
 **Owner:** founder  
 **Last verified:** 25 October 2026  
 **Series:** `fed.g17.IP.B50001.S`
@@ -9,7 +9,7 @@ The pilot is an engineering validation. The first strategic intelligence milesto
 
 ## 1. Specification
 
-Monthly procedure in Bry and Boschan, NBER, 1971, chapter 2. The frozen card is in `docs/macro/dossiers/BRY_BOSCHAN_MONTHLY.md`. Endpoint, phase, and cycle rules that the chapter prints are copied there. The Spencer coefficients and the twelve-month alignment are not in the chapter PDF, so dating code is refused.
+Monthly procedure in Bry and Boschan, NBER, 1971, chapter 2. The frozen card is in `docs/macro/dossiers/BRY_BOSCHAN_MONTHLY.md`. Endpoint, phase, and cycle rules that the chapter prints are copied there. The full volume, chapters c2145 to c2150, does not print the Spencer coefficients or the twelve-month alignment, so `BRY_BOSCHAN_MONTHLY_1971` still refuses. The labelled variant is specified in the dossier and is not a substitute claim that the book printed the constants.
 
 ## 2. Why this is first
 
@@ -17,7 +17,7 @@ G.17 is already stored: 1,293 `latest_revised` months, 1919-01-01 to 2026-09-01,
 
 ## 3. Research still required before code
 
-AQ-094 stopped dating. Do not code a Spencer curve until the coefficients are read from chapter 2. Do not import weights from a later package.
+Do not code another Spencer curve, and do not describe `BRY_BOSCHAN_SPENCER15_VARIANT` as the 1971 listing. The weights are Macaulay's printed coefficients, not a later software package.
 
 ## 4. Reuse
 

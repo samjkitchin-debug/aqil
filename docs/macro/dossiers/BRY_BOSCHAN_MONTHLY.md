@@ -1,11 +1,11 @@
 # Monthly Bry–Boschan turning-point procedure
 
-**Status:** specification blocked. Dating code was not written.  
+**Status:** 1971 listing still refused. A labelled Spencer-15 variant is implemented and is not that listing.  
 **Role:** engineering-validation pilot. Not the first strategic intelligence capability.  
 **Priority:** P0, implementation rank 1.  
 **Backlog:** AQ-094 through AQ-100.  
-**Last source check:** 25 October 2026, NBER chapter PDF `c2148` (58 pages), including the appendix.  
-**Campaign A classification:** blocked. The input contract was tested. The turning-point procedure was not implemented, because the Spencer coefficients are not in the chapter.
+**Last source check:** 25 October 2026, the full NBER volume: front matter `c2145`, foreword `c2146`, chapter 1 `c2147`, chapter 2 `c2148` (58 pages), chapter 3 `c2149` (88 pages), and chapter 4 `c2150` (67 pages).  
+**Campaign A classification:** the 1971 constant still refuses to date. `BRY_BOSCHAN_SPENCER15_VARIANT` dates with constants printed outside the 1971 volume. It is not a FORTRAN replica.
 
 ## 1. Identity and provenance
 
@@ -21,7 +21,7 @@ The chapter dates specific-cycle peaks and troughs in a single seasonally adjust
 
 ## 3. Mathematical specification
 
-The following is taken from chapter 2 as read on 25 October 2026 from `https://www.nber.org/system/files/chapters/c2148/c2148.pdf`. The PDF is 58 pages. The appendix is a sample run for bituminous-coal production (output tables), not a program listing. No FORTRAN listing is in this file. Where the principles prose and Table 1 disagree, Table 1 is the programmed procedure and the disagreement is named in the frozen card. A constant that the PDF does not print is not supplied from later software.
+The procedure below is taken from chapter 2, `https://www.nber.org/system/files/chapters/c2148/c2148.pdf` (58 pages). The same search on 25 October 2026 covered the rest of the volume at `https://www.nber.org/books-and-chapters/cyclical-analysis-time-series-selected-procedures-and-computer-programs`: front matter `https://www.nber.org/system/files/chapters/c2145/c2145.pdf`, foreword `https://www.nber.org/system/files/chapters/c2146/c2146.pdf`, chapter 1 `https://www.nber.org/system/files/chapters/c2147/c2147.pdf`, chapter 3 `https://www.nber.org/system/files/chapters/c2149/c2149.pdf` (88 pages), and chapter 4 `https://www.nber.org/system/files/chapters/c2150/c2150.pdf` (67 pages). The contents list four chapters. Each appendix is a sample run. There is no program-listing chapter. Sequential files `c2151` to `c2162` are Ilse Mintz, *Dating Postwar Business Cycles* (1969), not this volume. The foreword, book page xiii, says the computer programs are mimeographed supplements available on request, and chapter 1, book page 4, tells users to ask for those descriptions. No FORTRAN listing was found. Chapter 3, book page 79, names a Spencer or Henderson curve as an example of a weighted long-term moving average and prints no coefficients. Where chapter 2 prose and Table 1 disagree, Table 1 is the programmed procedure. A constant that the volume does not print is not supplied from later software.
 
 The procedure looks for swings of business-cycle length: longer than fifteen months and shorter than twelve years from trough to trough or peak to peak. The worked example is seasonally adjusted bituminous-coal production.
 
@@ -42,10 +42,10 @@ Read from the chapter PDF on 25 October 2026. The same constants are in `workers
 
 | Constant | What the chapter prints | Decision |
 | --- | --- | --- |
-| Spencer fifteen-point weights | Footnote 7 calls it a weighted moving average with the highest weights in the centre and negative weights at the ends. The suggestions section calls it a graduated 15-point weight pattern. No coefficient and no divisor are printed. | Blocker. Not copied from any other program. |
-| Program listing | Absent. The appendix is Output Tables for bituminous coal, including the printed control limit 3.500. | Prose and Table 1 govern. They cannot supply the missing weights. |
+| Spencer fifteen-point weights | Chapter 2 footnote 7, book page 19, calls it a weighted moving average with the highest weights in the centre and negative weights at the ends. Book page 56 calls it a graduated 15-point weight pattern. No coefficient and no divisor are printed in any chapter. A search for the 15-term sequence found none. | Blocker. Not copied from any other program. |
+| Program listing | Absent from the volume. The chapter 2 appendix is Output Tables for bituminous coal, including the printed control limit 3.500. The foreword places the listings in mimeographed supplements. | Prose and Table 1 govern. They cannot supply the missing weights. |
 | Outlier rule | Ratios to the preliminary unadjusted Spencer curve A. Control limit 3.5 standard deviations of those ratios, printed as 3.500. The coal output records a mean ratio of 99.99 and a standard deviation of 7.853. Extremes are replaced by the Spencer A value on later smoothed curves. An extreme may still be a final turn. | Frozen as 3.5. The replacement value still depends on the missing weights. |
-| Twelve-month moving-average alignment | The chapter does not say centred, trailing, or a two-by-twelve average, and it does not say which month receives an even-length average. | Blocker. The garbled sample table was not used to infer an alignment. |
+| Twelve-month moving-average alignment | No chapter says centred, trailing, or a two-by-twelve average, and none says which month receives an even-length average. Output Table 2-3, book page 61, is headed 12 months moving average and does not name the receiving month. | Blocker. The sample table was not used to infer an alignment. |
 | Spencer alignment | Highest weights in the centre, so the filter is centred once the weights exist. | Not usable without the coefficients. |
 | Windows of five months | A twelve-month-average peak is higher than the five months on either side, and a trough is lower. Spencer and MCD turns are the highest or lowest value within plus or minus five months of the previous curve's like turn. | Frozen. |
 | MCD span | The smoother is three to six months: three when measured MCD is one or two, six when measured MCD is seven or more. The coal example is four. Footnote 11 defines MCD as the span at which the average irregular change becomes smaller than the average trend-cycle change, and cites Shiskin (1960). The chapter does not specify that decomposition. | The three-to-six cap is frozen. The measurement formula is not operational from this chapter. |
@@ -58,7 +58,15 @@ Read from the chapter PDF on 25 October 2026. The same constants are in `workers
 | Crossover | A twelve-month-average contraction shorter than ten months can make the Spencer searches overlap. If that would put the trough before the peak, both turns are dropped. The MCD step repeats the duration, endpoint, and crossover tests. | Frozen. |
 | Quarterly Harding–Pagan BBQ | Not in chapter 2. | Not a parameter. |
 
-`date_specific_cycles` raises `BryBoschanSpecificationBlocked` and returns no dates. No G.17 peaks or troughs were produced.
+`date_specific_cycles` still raises `BryBoschanSpecificationBlocked` for `BRY_BOSCHAN_MONTHLY_1971` and returns no dates. The 1971 volume was not treated as the source of the weights.
+
+### Labelled variant, `BRY_BOSCHAN_SPENCER15_VARIANT`
+
+The 1971 footnote 7 does not cite a work. There is no bibliography entry for the Spencer curve in chapters c2145 to c2150. The coefficients used by the variant are printed by Frederick R. Macaulay, *The Smoothing of Time Series* (NBER, 1931), book page 55 (`https://www.nber.org/system/files/chapters/c9363/c9363.pdf`): -3, -6, -5, +3, +21, +46, +67, +74, +67, +46, +21, +3, -5, -6, -3, all over 320. The centre weight is dated at month t.
+
+The twelve-month placement is printed by Takeshi Otsu, "Robust Statistics and Business Cycle Dating", Seijo University Economic Papers, no. 228, March 2020, in the section on the Bry-Boschan procedure (`https://www.seijo.ac.jp/education/faeco/academic-journals/jtmo420000001iji-att/228-3otsu.pdf`). The filter dated at month t uses six lags and five leads, so the window is t-6 through t+5. Otsu says this follows the FORTRAN rather than the 1971 prose. Harding-Pagan quarterly BBQ is not used.
+
+Months for cyclical dominance compare mean absolute differences, which is the difference option Otsu names, and are then confined to three through six months as chapter 2 prints. Even spans use the same one-extra-lag split. `publication_allowed` stays false. One local run on stored G.17 is `8fb20325-414f-401b-8c46-bda82ed94e16`: 18 peaks and 19 troughs, MCD 3. A six-month NBER window contained 30 of those 37 dates. That overlap did not change any window.
 
 ## 4. Input data
 
@@ -124,8 +132,8 @@ Blocked, on the evidence of this session. Commands actually run:
 - `uv run pytest tests/test_bry_boschan_monthly.py -q` in `workers/research`: 9 passed. The tests cover a contiguous level sample, a gap, a fixture retrieval, a growth-rate representation, a non-level unit, a series that is not seasonally adjusted, a non-finite value, and the refusal to date.
 - `uv run ruff check` and `uv run ruff format` on the new module and test: clean after format.
 
-No research run was stored. There is no run id and no peak or trough list. Replay, recalculation, monitoring, and the NBER overlap diagnostic were not started, because they require dates from the blocked procedure. Unattended scheduling was not added. `publication_allowed` remains false.
+The 1971 refusal stored no dates. The labelled variant later stored local run `8fb20325-414f-401b-8c46-bda82ed94e16`. Replay matched. The NBER comparison is a diagnostic. No cron was added. `publication_allowed` remains false.
 
 ## 16. Status and priority
 
-AQ-094 records the readable constants and the two blockers that stop dating: the Spencer coefficients, and the twelve-month moving-average alignment. The MCD measurement formula is also not operational from this chapter. AQ-095 recount matches the earlier local count. AQ-096 through AQ-100 stay blocked on those unread constants. The strategic milestone remains `STOCK_WATSON_DFM`.
+AQ-094 keeps the 1971 refusal and records the labelled variant. The 1971 volume still does not print the Spencer coefficients or the twelve-month alignment. Those two constants are taken from the Macaulay and Otsu pages named above, not from the 1971 book. AQ-095 recount stands. AQ-096 through AQ-100 are implemented on the variant only: the method is registered, run `8fb20325-414f-401b-8c46-bda82ed94e16` is stored on local postgres, replay matched, and the G.17 refresh hook was idempotent on disposable database `aqil_research_test`. Health failures were injected in unit tests. The NBER comparison is not a gate. The strategic milestone remains `STOCK_WATSON_DFM`. AQ-102 stays blocked.
