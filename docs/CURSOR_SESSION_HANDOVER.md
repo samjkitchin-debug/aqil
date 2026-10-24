@@ -1,8 +1,100 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 24 October 2026, USTR no-fetch registration
+**Last updated:** 25 October 2026, macro and ETF integration
 
+
+## Macro and ETF integration, 25 October 2026
+
+Risk class R2. Local only. Nothing was pushed, deployed, or applied to the hosted project. Database `postgres` was not reset. OECD rows were not deleted. `aqil_etf` was not written. `EconomicObservation` 1.0 and `supabase/migrations/` were not changed. GitHub Actions has not run. `npm run test:db` was not run.
+
+The three local programmes are on `main` in three commits whose parent is `03df8de`: the certified international series, the Eurostat HICP replacement, and this evidence matrix with the roadmap, backlog, and handover. `origin/main` remains `c9ea596`. Hosted U0 remains no-go. The host was last read on 24 October 2026 with five migrations through `20261017180000`. This session did not query the host.
+
+East Asia and global worktrees were at `03df8de` with no unique commits. Eleven untracked files differed from main. Their bytes were copied to `.local/worktree-recovery/`, which is gitignored. Those worktrees were not stashed, reset, or deleted.
+
+Before the HICP append, live observations on `postgres` were 35,279, of which 789 were the OECD G20 leading indicator. Operational periods were 34,490 across 22 series. After the append, live observations are 35,648. OECD remains 789. Operational periods are 34,859 across 23 series. Fixture rows remain 87. Total observations are 35,735.
+
+The Eurostat all-items index `eurostat.prc_hicp_minr.M.I25.TOTAL.EA` stored 369 periods, 1996-01-01 to 2026-09-01. The first retrieval inserted 369. The second inserted nothing. The live response on 25 October 2026 named ECOICOP version 2, unit I25 (2025=100), coicop18 TOTAL, and geo EA. There was no seasonal-adjustment flag. The ESMS page says the data are not seasonally adjusted. Both ECB series remain 348 periods ending 2025-12-01. No Eurostat core series was stored. `TOT_X_NRG_FOOD` is labelled overall index excluding energy, food, alcohol and tobacco, which is not all-items excluding energy and food.
+
+The four existing Eurostat euro-area series stay on geo EA21, labelled Euro area – 21 countries (from 2026). That is the fixed 21-country aggregate, not changing-composition geo EA. Stored rows were not rewritten.
+
+A BIS re-fetch on 25 October 2026 inserted nothing. The series remains 105 periods and still ends on the quarter starting 2026-01-01. It is a dollar credit stock, not an exchange rate.
+
+US unemployment remains 44 live periods and still has no October 2025 row. CPI-U still has no October 2025 row. Those months were not filled. Japan CPI remains the three-decimal 2025=100 reference index. METI, the Bank of Japan, China, OECD, Census, and the other pending publishers stay out of refresh.
+
+Signed-in `/conditions` at about 1440 pixels and at 390 pixels, with no horizontal overflow. Global and the United States show the stored United States reading and the sentence that an economic reading is not an investment conclusion. Europe, Japan, Other Asia, and China say no regional reading is stored. Europe shows the Eurostat HICP panel at 104.31 for September 2026 and the December 2025 stale warning on the discontinued ECB series. China has no indicator panel. Evidence in the reading opens `/research`.
+
+Local checks, not CI: `npm run test:research` passed 504 on `aqil_research_test`, including Ruff, and printed that the development database was not reset. Web presentation tests passed 60. Typecheck passed. Token check passed. pgTAP was not run.
+
+`docs/sources/etf/ETF_ECONOMIC_EVIDENCE.md` is a proposal. It uses catalogue exposure families. It does not add an ISIN, a weight, a score, or a recommendation. The internal VWRA anchor stays unverified. `instruments.share_classes` remains 0.
+
+## Wave 4 certification, 24 October 2026
+
+Risk class R2. Local only. Nothing was committed, pushed, scheduled, or deployed. The hosted project was not queried and was not migrated. Database `postgres` was not reset and no observation was deleted. GitHub Actions has not run. The next batch was not started. The production build was not run in this certification.
+
+The live recount on `postgres` matched the coverage register. There are 23 live dataset ids and 35,279 live rows. Every live row is `latest_revised`, and each operational series has one row per period. Twenty-two series are operational, 34,490 periods, against the baseline of 10 series and 8,704 periods. Total observations, including 87 fixture rows, are 35,366. US unemployment remains 44 live periods from 2023-01-01 to 2026-09-01. The fixture rows on that dataset were not added or deleted.
+
+The OECD G20 leading indicator remains 789 periods, 1961-01-01 to 2026-09-01, with one live `source_retrievals` row. The rights row is disabled. The collector is not in `workflow/refresh.py`. The series is not on the dashboard. Those rows were not deleted. They are stored without clearance.
+
+Both euro-area HICP series still end on 2025-12-01 and are stale. The BIS series is a dollar credit stock, not an exchange rate, and the quarter starting 2026-01-01 is stale. A latest-revised row is not a vintage. The only `provider_vintage` rows are 15 fixture unemployment rows.
+
+`workflow/refresh.py` does not poll OECD, METI, FRED, Census, the Bank of Japan, NBS, the People's Bank of China, the IMF, MoSPI, the RBI, KOSIS, the Bank of Korea, Taiwan, SingStat, MAS, or Vietnam. The govinfo rights row remains. US unemployment was not backfilled. No method version was changed.
+
+Local checks, not CI: `npm run test:research` passed 499 on `aqil_research_test`, including Ruff, and printed that the development database was not reset. Live observations stayed 35,279 afterwards. Web presentation tests passed 59. Typecheck passed. Token check passed. pgTAP was not run. The events migration was already tracked and was not edited.
+
+Signed-in `/conditions` at about 1920 pixels and at 390 pixels, with no horizontal overflow. Global shows 22 of 22 series and the BIS credit stock, and does not show the OECD indicator. The United States shows the nine US series. Europe shows the euro-area series plus UK CPI and Bank Rate. China says no live series is stored and has no indicator panel. Japan shows the three-decimal CPI reference index and machinery orders. Other Asia shows Malaysian industrial production. Primary navigation stayed Today, My Wealth, and Intelligence. There is no composite score.
+
+## Wave 3 series, 24 October 2026
+
+Risk class R2. Local only. Nothing was committed, pushed, scheduled, or deployed. The hosted project was not migrated. Database `postgres` was not reset. The METI workbook was not requested again. GitHub Actions has not run. This pass did not write the Wave 4 completion report.
+
+The BIS, ONS, Bank of England, and DOSM packages were already present in the main checkout from the worktree. Wave 1 and Wave 2 adapters were not overwritten. OECD stays rights pending and is not registered for refresh. IMF, MoSPI, the RBI, KOSIS, the Bank of Korea, Taiwan MOEA, Taiwan DGBAS, SingStat, MAS, and Vietnam NSO stay pending or technically blocked. No account was created and no key was invented. The govinfo row and the earlier rights rows were left in place.
+
+Each of the four enabled series returned HTTP 200 on 24 October 2026. A second live retrieval through `collect_registered_adapter` inserted nothing.
+
+| Series | Status | Periods | From | To |
+| --- | --- | --- | --- | --- |
+| BIS `Q.USD.3P.N.A.I.B.USD` | operational | 105 | 2000-01-01 | 2026-01-01 |
+| ONS D7BT | operational | 465 | 1988-01-01 | 2026-09-01 |
+| Bank Rate IUDBEDR | operational | 13097 | 1975-01-02 | 2026-10-22 |
+| DOSM absolute industrial production | operational | 140 | 2015-01-01 | 2026-08-01 |
+| OECD G20 composite leading indicator | rights pending | 789 rows remain, not operational | 1961-01-01 | 2026-09-01 |
+
+The OECD rows remain because `research.economic_observations` is append-only. They are not on the dashboard and the collector is not in `refresh.py`. US, euro-area, and Japan observations were not rewritten. US unemployment was not backfilled. Existing method runs still use their current dataset ids. The new series are not inputs.
+
+The BIS quarter starting 1 January 2026 is stale on the dashboard. It is a credit stock in millions of US dollars. Bank Rate omits days the file does not publish, and those days are not filled in.
+
+Signed-in `/conditions` at about 1905 pixels and at 390 pixels, with no horizontal overflow. Global shows US dollar credit to non-banks, 14,747,653.746 million US dollars for the quarter starting 1 January 2026, sourced as the Bank for International Settlements. The Global filter also lists the other tracked series, including UK CPI and Malaysian production. Europe shows UK CPI 144.1 for September 2026 and Bank Rate 3.75% on 22 October 2026, and says credit and currencies have no live series. Other Asia shows Malaysian industrial production 147.996 for August 2026 and says the other families have no live series. China says no live series is stored. The OECD indicator is not shown. The chart window remains 12. Primary navigation stayed Today, My Wealth, and Intelligence.
+
+Local checks, not CI: Wave 3 pytest files passed 65 and did not open database `postgres`. `npm run test:sourced-updates` passed 59. `npm run typecheck` passed. `npm run check:tokens` passed. `npm run test:research` prepared `aqil_research_test`, did not reset `postgres`, and passed 499. Ruff reported all checks passed. GitHub Actions has not run.
+
+## East Asia prices and machinery orders, 24 October 2026
+
+Risk class R2. Local only. Nothing was committed, pushed, scheduled, deployed, or applied to the hosted project. Database `postgres` was not reset. GitHub Actions has not run.
+
+The Statistics Bureau three-decimal reference index and Cabinet Office machinery orders were copied from the East Asia worktree and registered. Both live fetches returned HTTP 200. The first retrieval stored 21 CPI periods, January 2025 to September 2026, and 257 machinery-order periods, April 2005 to August 2026. A second retrieval inserted nothing for either series. The CPI label is the three-decimal reference index, 2025 = 100. It is not the official one-decimal CPI, and the e-Stat series was not stored. Machinery orders are the nominal million-yen series on sheet 季調・月次, column J.
+
+METI industrial production stayed technically blocked. A live download of the workbook returned HTTP 403. The rights row is not enabled for ingest and the adapter is not in the refresh list. No METI observations were stored.
+
+The Bank of Japan call rate and one yen row stay rights pending and were not ingested. NBS stays technically blocked and redistribution is not permitted. The People's Bank of China stays not permitted. No China series was stored. No scraping and no FRED import. US unemployment was not backfilled. The ten US series and the six euro-area series kept their previous period counts.
+
+Signed-in `/conditions?region=japan` at about 1440 pixels and at 390 pixels shows CPI reference index 102.228 for September 2026 and machinery orders for August 2026. The chart window is the latest 12 months. China shows no live series and lists the missing families, with no invented reading. No horizontal overflow on those checks.
+
+Local checks, not CI: the new pytest files passed, and `npm run test:research` passed 498 on `aqil_research_test`. The preparation script recreated that disposable database and did not reset `postgres`. Web presentation tests passed 59. Typecheck passed. Token check passed.
+
+## Japan industrial production, 24 October 2026
+
+Risk class R2. Local only. Nothing was committed, pushed, scheduled, or deployed. The hosted project was not migrated. Database `postgres` was not reset. `aqil_research_test` was not used. `npm run test:research` was not run. GitHub Actions has not run.
+
+The METI fragment was appended to `SOURCE_RIGHTS.csv` because the six live operations are permitted and attribution is required. The govinfo row and the Wave 1 euro-area rows remain. Japan CPI, the call rate, the yen, NBS, and the People's Bank of China stay as fragments and are not enabled for ingest.
+
+An earlier pass registered the METI collector in `workflow/refresh.py`. That registration was removed the same day, and the rights row is not enabled for ingest. Two live calls through `collect_registered_adapter` returned `failed_fetch`. Each request to the workbook received HTTP 403. Inserted 0 and unchanged 0 both times. No METI retrieval was written. `research.economic_observations` stayed at 20492 rows, of which 20405 are live. There is no stored period count or date range. Japan industrial production is not marked operational.
+
+Local checks, not CI: fixture pytest of `test_meti_iip_production.py` and `test_wave2_east_asia_rights.py` passed 11. `npm run test:sourced-updates` passed 58. `npm run typecheck` passed. `npm run check:tokens` passed.
+
+Signed-in `/conditions?region=japan` shows Japan industrial production and says no observation is stored. It lists growth, inflation, labour, monetary policy, credit, liquidity, trade, currencies, energy, and property as having no live series. `/conditions?region=china` says no live series is stored for China. The chart window remains 12.
+
+Still blocked: Statistics Bureau CPI needs an e-Stat application ID. The call rate and the yen need Bank of Japan commercial-reproduction permission. NBS and the People's Bank of China remain technically blocked and rights pending.
 
 ## USTR notice without a new fetch, 24 October 2026
 
@@ -771,3 +863,30 @@ The Today and Intelligence slice is not operational. The 21 October live ingest 
 From `apps/web`: `npm run typecheck`, `npm run lint`, `npm run test:saxo`, `npm run test:wealth`, `npm run test:benchmark`, `npm run test:capital`, `npm run test:learn`, `npm run test:story`, `npm run test:auth`, `npm run build`.  
 From the repo root: `npm run check:tokens`, `npm run test:research`.  
 Database tests need a running local Supabase. Do not apply hosted migrations.
+
+## Wave 1 euro-area coverage — 24 October 2026
+
+Local only. Not committed, not pushed, and GitHub Actions has not run. The development database named postgres was not reset. No hosted migration was applied.
+
+Board package URLs for G.17, H.15, H.8 and SLOOS each returned HTTP 200. None was switched to another provider. The stored United States series were not rewritten. Unemployment remains 44 periods from January 2023.
+
+Headline HICP `ICP.M.U2.Y.000000.3.INX` was re-fetched with no end date and without includeHistory. It still contains 348 months, January 1997 to December 2025. TITLE_COMPL names the European Central Bank and COMPILING_ORG is 4F0. No 2026 month was invented and no Eurostat index was written onto that row.
+
+Stored after a fixture idempotency check, then a second live retrieval that inserted nothing:
+
+- ECB core HICP `ICP.M.U2.Y.XEF000.3.INX`: 348 periods, 1997-01-01 to 2025-12-01.
+- ECB deposit facility `FM.D.U2.EUR.4F.KR.DFR.LEV`: 10159 periods, 1999-01-01 to 2026-10-24.
+- Eurostat real GDP EA21: 126 periods, 1995-01-01 to 2026-04-01 (2026 Q2). Chain-linked volumes, index 2015=100, seasonally and calendar adjusted.
+- Eurostat unemployment EA21: 320 periods, 2000-01-01 to 2026-08-01. Seasonally adjusted, not calendar adjusted.
+- Eurostat industrial production EA21: 428 periods, 1991-01-01 to 2026-08-01. Index 2021=100.
+- Eurostat retail sales volume EA21: 320 periods, 2000-01-01 to 2026-08-01. Index 2021=100. Net turnover was not stored.
+
+EA21 is Eurostat's label for the euro area of 21 countries from 2026. It is not EU27. EA, EA19 and EA20 returned no unemployment values for the bound filter.
+
+Not stored: bank-lending survey `BLS.Q.U2.ALL.O.E.Z.B3.ST.S.WFNET` and BSI loans `BSI.M.U2.N.A.A20.A.1.U6.2240.Z01.E`. Both responses left COMPILING_ORG blank and did not name the ECB or ESCB as compiler.
+
+`npm run test:research` passed 404 tests on aqil_research_test, then ruff check and ruff format check. The development database was not reset. Web presentation tests passed. `npm run typecheck` and `npm run check:tokens` passed.
+
+Signed-in `/conditions` showed 16 stored series. Europe showed the euro-area series and listed credit, currencies, energy and property as missing. China showed no indicator reading and listed the missing families. At 390px the page did not overflow horizontally. The economic reading above the filter still restates the stored United States synthesis. It is not a China or Europe reading.
+
+Wave 2 must not overwrite these adapter packages, the appended rights rows, the govinfo rights row, the coverage register, or the uncommitted events and presentation work.

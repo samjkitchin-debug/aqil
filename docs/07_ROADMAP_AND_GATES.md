@@ -1,6 +1,6 @@
 # AQIL — Execution Roadmap and Stage Gates
 
-**Last reconciled:** 24 October 2026 · **Git baseline:** local `main` `cf2daa5` before this slice, `origin/main` `c9ea596`. Not pushed. See `docs/CURSOR_SESSION_HANDOVER.md`.
+**Last reconciled:** 25 October 2026 · **Git baseline:** local `main` after the three integration commits whose parent is `03df8de`. Not pushed. `origin/main` remains `c9ea596`. See `docs/CURSOR_SESSION_HANDOVER.md`.
 
 ## Operating baseline (24 October 2026)
 
@@ -8,14 +8,25 @@ This section supersedes older sentences below that say authentication, hosted Su
 
 - Live app: `https://aqil-tau.vercel.app`. Google sign-in is the production access path. The running deployment is still `origin/main` at `c9ea596`.
 - Ordinary access is any verified Google account. The allow-list and `access_grants` gate are removed. See ADR 020.
-- Hosted project `ojvswermsbbaltjohqph` was last read on 24 October 2026 with exactly five migrations, through `20261017180000_forward_intelligence.sql`. This session did not query or migrate the host. Nine later local files are not applied, from `20261018200000_verified_prospective_assessment.sql` through `20261024120000_etf_instruments.sql`.
+- Hosted project `ojvswermsbbaltjohqph` was last read on 24 October 2026 with exactly five migrations, through `20261017180000_forward_intelligence.sql`. This certification did not query or migrate the host. Ten later local files are not applied, from `20261018200000_verified_prospective_assessment.sql` through `20261024150000_research_macro_events_themes.sql`. The earlier upgrade rehearsal covered nine files and did not include the events migration. This certification did not run that file.
 - Hosted U0 remains **no-go** until the founder approves the batch. The local bar is now an upgrade rehearsal, not another restatement of that status and not a fresh replay of all 14 files on an empty database. Disposable database `aqil_u0_upgrade` was created from the five-file state, given representative rows and an authentication stub, upgraded with the nine files, checked, and dropped. Preserved databases `postgres` and `aqil_etf` were not written. Detail is in the handover.
 - Production web loaders do not fall back to `127.0.0.1`. A missing research or ETF database URL fails closed. Outside production, the local default remains. That behaviour is on local main and is not on `origin/main`. The running Vercel app is still `c9ea596`. The first private mode after a hosted upgrade is one manual `npm run research:refresh`, with freshness visible. No schedule exists. Automatic updates must not be claimed.
-- Before any hosted apply: take a backup. A code rollback will not undo the nine migrations. Then founder approval, apply, grant checks, the server-only research URL, one manual refresh, and only then one push to `main` so the existing GitHub to Vercel integration deploys. GitHub Actions has not run on `5bb2ca8`. No Vercel CLI deploy. Production Saxo stays off.
+- Before any hosted apply: take a backup. A code rollback will not undo those local migrations. Then founder approval, apply, grant checks, the server-only research URL, one manual refresh, and only then one push to `main` so the existing GitHub to Vercel integration deploys. GitHub Actions has not run on `5bb2ca8`. No Vercel CLI deploy. Production Saxo stays off.
 - Reading model: Today is the briefing and a compact pulse; Intelligence at /conditions is the indicator dashboard; Evidence is the detailed record. Upcoming, Evidence, and Exposures stay section links. No fourth primary destination.
 - Local Saxo reads are real and read-only. Production does not offer Connect Saxo until encrypted, owner-scoped token storage exists. See ADR 021–024.
 - Workflow: localhost → local tests → reviewed commit → one push to `main` → the existing GitHub to Vercel integration. No Vercel CLI deploy, no second Vercel project, no preview build created for its own sake.
-- Next product order: Census advance durable-goods orders stay blocked until a founder sets `CENSUS_API_KEY` for `timeseries/eits/advm3`. One API response is not a vintage panel. SLOOS C&I standards have 146 live observations and one unpublished reading on Intelligence Evidence, including the stored move from 8.1 percent to 0.0 percent. ECB monetary-policy press, accounts and Governing Council decisions are stored beside Employment Situation, CPI and Federal Reserve press. A BEA growth release still needs a machine-readable feed. Exposures still needs a rights-cleared holdings file. Vanguard and iShares automated collection stay prohibited. The Intelligence dashboard is mounted at /conditions. Today uses the compact pulse. Recurring releases are those stored series. `npm run research:refresh` remains a manual local poll. `npm run test:db` writes only to database `aqil_pgtap_test`. Research tests write only to `aqil_research_test`. M5's fixture horizon UI stays unmerged.
+- Local macro store, 25 October 2026, not a GitHub Actions result: 23 operational series and 34,859 live periods, up from the 10-series, 8,704-period baseline. The Eurostat all-items HICP index adds 369 periods, January 1996 to September 2026. Every operational live row is `latest_revised`. A latest-revised row is not a vintage. The two ECB HICP series still end in December 2025 and were not overwritten. The BIS dollar credit stock still ends in the quarter starting 1 January 2026; a re-fetch inserted nothing. The OECD G20 leading indicator has 789 stored periods and is not operational. Existing US method versions still read only their original dataset ids. `PRICES_AND_POLICY` and `MACRO_READING_SYNTHESIS` do not consume the new HICP series. No composite, spread, or new method version was added. Detail is in `docs/sources/MACRO_COVERAGE.csv`, `docs/sources/etf/ETF_ECONOMIC_EVIDENCE.md`, and the handover.
+- Next product order:
+  1. Finish this local integration and its recount.
+  2. Certify the HICP replacement on the dashboard.
+  3. Cite one UCITS share class from a permitted document.
+  4. Map that share class to verified regional and sector exposures.
+  5. Store benchmark returns only where rights and return convention are explicit.
+  6. Identify a rights-cleared source for valuations and earnings, or record the block.
+  7. Identify a rights-cleared credit-spread source, or record the block.
+  8. Identify a rights-cleared dollar series, or record the block.
+  9. Keep the United States reading separate from regional observation panels.
+  10. Leave the AI-infrastructure theme and institutional-capital work on their existing gates. Do not start another macro wave.
 
 ## Progress register
 
