@@ -19,39 +19,38 @@ export const primaryNav: NavItem[] = [
   {
     href: "/conditions",
     label: "Intelligence",
-    description: "Tracked indicators, their state and freshness.",
+    description: "Current conditions, quantitative methods and what the evidence supports.",
   },
 ];
 
-/** Intelligence section home. Upcoming stays on /calendar. */
+/** Intelligence section home. The release calendar stays on /calendar. */
 export const intelligenceHome = "/conditions";
 
 /**
  * Contextual navigation inside Intelligence.
- * Routes stay addressable; they are not extra primary destinations.
+ * The release calendar and the evidence record stay addressable.
+ * They are not primary Intelligence sections.
+ * ETF exposures stay on /explore and are outside this section.
  */
 export const intelligenceNav: NavItem[] = [
   {
     href: "/conditions",
-    label: "Conditions",
-    description: "Tracked indicators, trends and freshness.",
+    label: "Dashboard",
+    description: "Tracked observations, recent changes and upcoming releases.",
   },
   {
-    href: "/calendar",
-    label: "Upcoming",
-    description: "Scheduled economic catalysts.",
+    href: "/intelligence/methodologies",
+    label: "Methodologies",
+    description: "Quantitative methods, their status and whether a result may be shown.",
   },
   {
-    href: "/research",
-    label: "Evidence",
-    description: "Observations, scenarios, sources and outcome review.",
-  },
-  {
-    href: "/explore",
-    label: "Exposures",
-    description: "Vetted ETF look-through. Not a separate product area.",
+    href: "/intelligence/insights",
+    label: "Insights",
+    description: "Findings that cite publication-eligible model results.",
   },
 ];
+
+const intelligenceContextHrefs = ["/calendar", "/research"];
 
 /** Occasional literacy. Not an account control and not a daily destination. */
 export const learnLink: NavItem = {
@@ -67,7 +66,7 @@ export function matchesPath(pathname: string, href: string): boolean {
 }
 
 export function isIntelligencePath(pathname: string): boolean {
-  return intelligenceHrefs.some((href) => matchesPath(pathname, href));
+  return [...intelligenceHrefs, ...intelligenceContextHrefs].some((href) => matchesPath(pathname, href));
 }
 
 export function isPrimaryActive(pathname: string, href: string): boolean {

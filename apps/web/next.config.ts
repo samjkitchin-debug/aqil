@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
       key: "Cache-Control",
       value: "private, no-store, max-age=0",
     };
-    const privateRoutes = ["/", "/explore", "/conditions", "/calendar", "/learn", "/research", "/my-wealth", "/my-wealth/:path*", "/api/:path*"];
+    const privateRoutes = ["/", "/explore", "/conditions", "/calendar", "/learn", "/research", "/intelligence", "/intelligence/:path*", "/my-wealth", "/my-wealth/:path*", "/api/:path*"];
     return privateRoutes.map((source) => ({
       source,
       headers: [privateNoStore],

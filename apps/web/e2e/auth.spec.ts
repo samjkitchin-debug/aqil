@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const privateRoutes = ["/", "/explore", "/calendar", "/learn", "/research", "/my-wealth"];
+const privateRoutes = ["/", "/explore", "/conditions", "/calendar", "/learn", "/research", "/intelligence/methodologies", "/intelligence/insights", "/my-wealth"];
 
 test.describe("authentication gate", () => {
   for (const route of privateRoutes) {

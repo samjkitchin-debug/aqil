@@ -1,7 +1,19 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 25 October 2026, research suite and Stock–Watson block
+**Last updated:** 25 October 2026, Intelligence experience refactor
+
+## Intelligence experience, 25 October 2026
+
+Risk class R1. Frontend only, on branch `work/intelligence-experience` in worktree `C:\Users\gamer\aqil-intelligence`, branched from `21a207e`. The dirty Stock–Watson files on `C:\Users\gamer\aqil` were not edited. Nothing was pushed or deployed. No migration was added. No research-worker file, dossier, or quantitative ledger was edited.
+
+Intelligence sections are Dashboard (`/conditions`), Methodologies (`/intelligence/methodologies`), and Insights (`/intelligence/insights`). Upcoming releases are a block on the dashboard; the full calendar remains `/calendar`. Evidence remains `/research` and is linked from indicator details and the stored family reading, which is collapsed. ETF exposures remain `/explore` and are no longer an Intelligence section. A later investment-intelligence surface can adopt that page. It was not moved into My Wealth.
+
+Dashboard figures are the existing stored observations. Direction is the stored change sentence. Increases are not coloured as favourable. Methodologies reads `research.research_runs` metadata only (`method_id`, `method_version`, `executed_at`, `execution_status`, `publication_allowed`, `data_sufficiency`). Calculation JSON is not selected. A closed publication withholds dates, factor values and scores. Insights states that no cross-method finding is published.
+
+The Stock–Watson card can match `STOCK_WATSON_COINCIDENT_1988` or `STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT` and still will not display a factor until `publication_allowed` is true and a typed time-series presenter exists. Bry–Boschan matches `BRY_BOSCHAN_SPENCER15_VARIANT` on the same rule. This page does not treat the build backlog as a live operational status.
+
+Local checks, not CI: `npm run test:sourced-updates` in `apps/web` passed 69. `npm run typecheck` passed. `npm run lint` passed with the existing unused `_searchParams` warning. `npm run check:tokens` passed. `npm run build` passed, 28 routes. A signed-out browser on port 3010 was redirected from `/conditions` to sign-in. The signed-in dashboard was not opened. Port 3000 was left running. Nothing was pushed.
 
 ## Research suite and Stock–Watson block, 25 October 2026
 
