@@ -1,9 +1,9 @@
 # Stock–Watson dynamic factor model
 
-**Status:** research record. Not an implementation.  
-**Role:** first substantive economic-intelligence milestone. Not the first code to be written.  
+**Status:** local modern refit recorded. Not a 1959–1987 reproduction and not publication eligible.  
+**Role:** first substantive economic-intelligence milestone.  
 **Priority:** P0, implementation rank 2, intelligence rank 1.  
-**Backlog:** AQ-101 records the 1989 coincident contract. AQ-102 stays blocked on rights and on the unfrozen Kalman matrices.  
+**Backlog:** AQ-101 records the 1989 contract. AQ-102 records the 1988 modern refit.  
 **Last source check:** 25 October 2026, NBER chapter PDF `c10968` and working paper `w2772`.
 
 ## 1. Identity and provenance
@@ -158,3 +158,97 @@ Real manufacturing and trade sales were not stored. `CENSUS_API_KEY` is unset. A
 Employee-hours are not an exact BLS match. Datatype 56 is aggregate weekly hours of all employees. `ce.series` has `CES0500000056`, total private, from March 2006, and `CES0500000081`, production and nonsupervisory employees, total private, from January 1964. `CES0000000056` is absent. Neither private series was stored. Payroll headcount is the 1988 LPNAG concept and is not the 1989 hours concept.
 
 No new rights row was added, because nothing is cleared for ingest and the rights test locks the dataset list. AQ-102 stays blocked. No factor code and no NumPy dependency were added.
+
+## 1988 specification selected, 25 October 2026
+
+The first implementation target is Stock and Watson, NBER Working Paper 2772, November 1988, not the 1989 employee-hours model. The two are not mixed.
+
+Frozen from PDF pages 6–8 and 16–17:
+
+- Inputs are the logarithms of industrial production, real personal income less transfer payments (GMYXP8, 1982 dollars), real manufacturing and trade sales (MT82, 1982 dollars), and employees on nonagricultural payrolls (LPNAG).
+- Estimation uses first differences of those logarithms, standardised to mean zero and unit variance on the estimation sample.
+- The factor is an autoregression of order 2. Its innovation variance is 1.
+- Each idiosyncratic component is its own autoregression of order 2. The idiosyncratic matrix is diagonal. Idiosyncratic shocks are uncorrelated with the factor and with each other.
+- The factor enters every equation contemporaneously. There is no lag of the factor in the payroll equation in this paper.
+- Estimation is Gaussian maximum likelihood. The Kalman filter is the real-time estimate. The smoother is retrospective.
+- Page 16 reports likelihood 341.38 for idiosyncratic order 2 and 327.77 for order 1, sample 1959:2–1987:12. Table 1 coefficient digits are not used as frozen numbers.
+
+The 1989 hours model remains a later variant. Its hours-equation lags are still not frozen.
+
+Code: `workers/research/src/aqil_research/methods/stock_watson_1988.py`. It is not registered and it refuses a real-data estimate. `tests/test_stock_watson_1988.py` passed 4 tests: the constants, the panel block, and a higher likelihood at the parameters that simulated the path than at a factor autoregression of zeros. That simulation is separate from the filter. No economic run was stored. `publication_allowed` is false.
+
+## Download check, same day
+
+BEA `https://apps.bea.gov/national/Release/XLS/Survey/Section2All_xls.xlsx` returned HTTP 200, 4,860,244 bytes, without an API key. The shared strings include “Personal income excluding current transfer receipts, Millions of chained (2017) dollars”. FAQ 147 says BEA website information is in the public domain unless stated otherwise. This is the modern official real series, not 1982 dollars, and it was not parsed into observations.
+
+Census `https://www.census.gov/econ_getzippedfile/?programCode=MTIS` returned the official zip. `MTIS-mf.csv` has 416 seasonally adjusted total-business sales rows, unit millions of dollars, periods labelled January 1992 through December 2026. There is no real or 1982-dollar sales series in the file. Those nominal values were not stored and were not deflated.
+
+`CES0500000081` is production and nonsupervisory aggregate weekly hours, total private, from January 1964. It is not the 1989 all-employee nonagricultural hours series and it is not an input to the 1988 model. It was not stored.
+
+## Acceptance, 25 October 2026
+
+The implemented model is `STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT`, version `0.1.0`. The stored estimation run is `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`, executed at 2026-10-25 00:31:12 UTC, `execution_status` completed, `publication_allowed` false. That row was not overwritten.
+
+The panel is the four official series `fed.g17.IP.B50001.S`, `bea.nipa.T20600.W875RX`, `bea.nipa.U002BU.KPMT`, and `bls.ce.CES0000000001`. Levels run from January 1997 to July 2026. The likelihood uses 354 standardised log differences. Income is BEA Table 2.6 account W875RX, millions of chained 2017 dollars. Sales are BEA underlying account KPMT, millions of chained 2017 dollars. Payrolls are total nonfarm employment. This is not CITIBASE GMYXP8, MT82, or LPMHU, and it is not the 1989 employee-hours model.
+
+### Likelihood convention
+
+At the stored parameter vector, with statsmodels `DynamicFactor` (`k_factors=1`, `factor_order=2`, `error_order=2`, `error_var=False`, `error_cov_type="diagonal"`) and `initialize_known` at a zero mean and an identity covariance:
+
+| Quantity | Value |
+| --- | --- |
+| Aqil log likelihood | −1590.5374990458229 |
+| statsmodels log likelihood | −1591.0984133064417 |
+| Difference, statsmodels minus Aqil | −0.5609142606187643 |
+| Difference at observation 0 | −0.5667543434979523 |
+| Sum of differences after observation 0 | +0.005840082879188 |
+| Sum of differences after observation 20 | +2.260698295231123e-10 |
+| Filtered-factor correlation | 0.9999472439069732 |
+| Maximum factor difference | 0.18750309762787143 at the first growth month |
+| Maximum factor difference after month 20 | 1.646203173777394e-10 |
+
+Observation 0 accounts for the gap. Aqil applies the transition and the state-shock covariance before the first likelihood contribution, so the first innovation covariance is `H (T P T' + Q) H'` with `P = I`. statsmodels applies the observation equation directly to the supplied initial state, so the first innovation covariance is `H P H'`. Those two 4×4 matrices were compared on the stored panel. The direct matrix matches statsmodels exactly, including the first log-likelihood contribution −5.190610279858821. Aqil's predictive contribution at the same observation is −4.623855936360869. The design, transition, and shock matrices are the same model. The state ordering in statsmodels is not Aqil's 10×10 companion, which is why a naive matrix subtraction is not zero, but the first innovation covariance under the direct convention matches exactly.
+
+Neither implementation is corrected. Changing Aqil to the direct convention would change the stored likelihood and break exact replay. The authoritative likelihood for this run is Aqil's, because that is the objective that was maximised and the database replay matches it. A regression test may require the filtered factor after index 20 to agree within 1e-8. It must not require the full-sample likelihoods to agree more tightly than about 1 without the same initial-state timing.
+
+### Fitted parameters
+
+L-BFGS-B, two admissible starts, `maxiter` 40, `ftol` 1e-6. Stored message: `CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH`. `converged` is true. Factor innovation variance is fixed at 1. The industrial-production loading is positive. All five AR(2) pairs satisfy `|b| < 1`, `a + b < 1`, and `b - a < 1`. Innovation scales are positive.
+
+Loadings, industrial production, income, sales, payrolls: 0.9074156691709212, 0.592332010645985, 0.7468422714668663, 0.8337971126257162.
+
+Factor autoregression: 0.21593139825856147, −0.20902512910372195.
+
+Idiosyncratic autoregression, same series order: (−0.135055359330801, −0.1853845911590007), (−0.05395491262894935, −0.05349521674490646), (−0.17587617069890396, −0.10032913242621615), (−0.08764350781001158, 0.18173780298752065).
+
+Idiosyncratic innovation scales: 0.3683167232210555, 0.7875917515174838, 0.5955094247543465, 0.5045708876089342.
+
+A finite-difference gradient at this point has norm 0.4146. A further L-BFGS-B run from the same point, 12 iterations, improved the negative log likelihood by 6.1e-5, moved no parameter by more than 2.9e-4, and kept the filtered-path correlation at 0.99999999. Two other admissible starts, stopped at 12 iterations, reached negative log likelihoods 1590.632 and 1590.660, with path correlations 0.999980 and 0.999947. They had not formally converged. No new parameter version was stored. The gradient is not machine zero, so a unique global maximum is not claimed. The stored run remains the fitted model.
+
+A statsmodels cold start did not converge in 25 iterations. A warm start from these parameters reached about −1590.468 on the statsmodels likelihood and still emitted a convergence warning. That number is not an Aqil likelihood and was not adopted.
+
+### Filter updates
+
+`record_filter_update` keeps the stored parameters and the training-sample moments. A changed balanced panel inserts a new completed run and leaves the previous run in place. A failed panel inserts `execution_status` `failed_method` with `update_kind` `filter_failure` and does not replace the last completed factor. The next read selects the latest completed calculation that still contains the loadings. Advisory lock `410221002` returns `locked` when it cannot be acquired. One series arriving ahead of the other three does not move the balanced sample and does not create a new factor.
+
+Disposable database `aqil_research_test` exercised six cases in `tests/test_stock_watson_lifecycle.py`: an unchanged panel twice, one new complete month, one historical revision, one series alone, a held lock, and a negative level. The negative level is rejected because log differences require positive levels. The completed factor count stayed unchanged and a failure row was stored.
+
+### Empirical review on revised data
+
+The filtered factor is the model's own scale, not a GDP growth rate. Its correlation with the equal-weight average of the four standardised log differences is 0.973. Setting one loading to zero and keeping the other parameters fixed changes the path by a maximum absolute amount of 1.692 for production, 0.719 for income, 0.968 for sales, and 1.984 for payrolls. The corresponding correlations with the stored path are 0.956, 0.998, 0.993, and 0.986.
+
+On the stored path, March–November 2001 has 9 months, minimum −0.764, maximum 0.013, mean −0.417. September 2008–June 2009 has 10 months, minimum −2.885, maximum 0.032, mean −1.285. March–May 2020 has 3 months, minimum −14.711, maximum 2.385, mean −5.229. March–June 2021 has 4 months, minimum 0.053, maximum 2.063, mean 0.694. The filtered factor variance has median 0.0850 and maximum 0.1040. The July 2026 filtered value is 0.119 with a filtered standard deviation of 0.292. The 2020 decline is large relative to that variance. It is recorded as an economic movement in the revised sample, not as a failed calculation. These windows use latest revised observations. They are not a real-time historical path and they are not a forecast evaluation.
+
+### Classification
+
+| Gate | Status |
+| --- | --- |
+| Numerically verified | Yes, with the initial-state timing difference documented above |
+| Empirically evaluated | Yes, as a retrospective modern-data refit |
+| Reproducible | Yes. Replay matches the stored likelihood and path. A second unchanged update does not insert a run |
+| Locally operational | Yes. Manual refresh calls the filter update on local postgres |
+| Unattended locally | No. `scripts/register-local-macro-refresh.ps1` prints the monthly command and exits without registering a task |
+| Hosted operational | No |
+| Publication eligible | No |
+
+`npm run test:research` passed 534 tests. Ruff passed after the likelihood formatter change.

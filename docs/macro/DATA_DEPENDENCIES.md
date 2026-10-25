@@ -47,7 +47,7 @@ The 1989 chapter, page 359 of the NBER text, bases the proposed coincident index
 3. Real manufacturing and trade sales, CITIBASE `MT82` (BCD 57). Not stored. Advance durable-goods new orders are not this series.
 4. Employee-hours in non-agricultural establishments, CITIBASE `LPMHU`. Not stored. Payroll employment `bls.ce.CES0000000001` is a headcount, not hours. The chapter says Commerce used employees and Stock–Watson followed Moore in using hours. A headcount is not a silent substitute.
 
-No FRED or ALFRED path is used. AQ-102 stays blocked until GMYXP8, MT82, and LPMHU have rights rows and stored series, and until the Kalman matrices are transcribed from a clean source.
+No FRED or ALFRED path is used. The 1989 CITIBASE series GMYXP8, MT82, and LPMHU remain absent. The 1988 modern refit in the next section is a separate disclosed panel. It does not clear those three series.
 
 US GDP is not an input to that coincident index. It is also not stored, which blocks a US GDP nowcast.
 
@@ -87,3 +87,18 @@ Real personal income less transfers is not stored. The BEA API returned an empty
 Real manufacturing and trade sales are not stored. `CENSUS_API_KEY` is unset. Advance durable-goods orders are not that composite.
 
 Industrial production remains `fed.g17.IP.B50001.S`. The factor is not estimated.
+
+On 25 October 2026 the BEA Section 2 workbook downloaded without a key and names real personal income excluding current transfer receipts in chained 2017 dollars. That file was not ingested. The Census MTIS zip contains 416 seasonally adjusted total-business sales months in millions of dollars from January 1992 and no real series. Nominal sales were not deflated. The selected model is the 1988 payroll specification. Real 1982-dollar sales remain the blocker.
+
+## Milestone: Stock–Watson 1988 modern refit
+
+Method `STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT`. This is not the 1989 hours model and not the 1959–1987 CITIBASE sample.
+
+| Role | Dataset | Holding on 25 October 2026 |
+| --- | --- | --- |
+| Industrial production | `fed.g17.IP.B50001.S` | Live `latest_revised`, index 2017=100, through September 2026 |
+| Real income excluding transfers | `bea.nipa.T20600.W875RX` | Live, millions of chained 2017 dollars, January 1959 to August 2026 |
+| Real manufacturing and trade sales | `bea.nipa.U002BU.KPMT` | Live, millions of chained 2017 dollars, January 1997 to July 2026 |
+| Payroll employment | `bls.ce.CES0000000001` | Live headcount. Not employee-hours |
+
+The balanced level sample is January 1997 to July 2026. A month is included only when all four series have a positive live `latest_revised` value. There is no forward fill. Training-sample means and scales are frozen on a filter update. Re-estimation is manual.

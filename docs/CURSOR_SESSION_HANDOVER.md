@@ -1,7 +1,45 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 25 October 2026, research suite and Stock–Watson block
+**Last updated:** 25 October 2026, Stock-Watson acceptance
+
+## Stock-Watson acceptance, 25 October 2026
+
+Risk class R2. Local only. Nothing was pushed or deployed. The development database was not reset. Run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` was not overwritten. `publication_allowed` remains false.
+
+The 0.561 likelihood gap is the first observation. Aqil predicts with the transition and state shock before that contribution. statsmodels `initialize_known` applies the observation equation to the identity covariance directly. The first-contribution difference is -0.5667543434979523. After month 20 the cumulative likelihood gap is 2.26e-10 and the filtered-factor gap is 1.65e-10. Aqil's likelihood stays authoritative.
+
+The stored L-BFGS-B fit remains the parameter version. A further short run improved the objective by 6.1e-5. The finite-difference gradient norm is 0.415. No second fit was stored.
+
+`tests/test_stock_watson_lifecycle.py` passed inside `npm run test:research` (534 passed). Ruff passed. The monthly task script exits without registering `AqilMacroRefresh`. A query for that task reported that it does not exist.
+
+Classification: numerically verified with the documented timing difference; empirically evaluated on revised data; reproducible; locally operational by manual refresh; not unattended locally; not hosted; not publication eligible.
+
+## BEA ingest and factor replay, 25 October 2026
+
+Risk class R2. Local only. Nothing was pushed. The hosted project was not changed.
+
+`bea.nipa.T20600.W875RX` has 812 live months, January 1959 to August 2026. `bea.nipa.U002BU.KPMT` has 355 live months, January 1997 to July 2026. A second sales ingest inserted 0 and left 355 unchanged. Replaying the stored parameters on the database panel reproduced likelihood -1590.5374990458229 and a filtered-path difference of 0 against run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`. `record_filter_update` returned unchanged, and the run count stayed 1. The filtered factor reached about -2.88 in the 2008–2009 window and about -14.71 in March–May 2020. That is a revised-data description, not a real-time forecast. `publication_allowed` remains false. Hosted scheduling is off. The refresh list includes the two BEA sources and, after a full refresh, calls the filter update. A changed panel is reported and is not re-estimated automatically.
+
+## 1988 factor refit, 25 October 2026
+
+Risk class R2. Local only. Nothing was pushed or deployed. No BEA row was inserted into `economic_observations`. `postgres` was not reset.
+
+BEA underlying workbook `Section0All_xls.xlsx` sheet `U002BU-M` line 1 is account `KPMT`, manufacturing and trade industries, millions of chained 2017 dollars, seasonally adjusted, 1997M01 to 2026M07. BEA Table 2.6 monthly sheet `T20600-M` line 36 is account `W875RX`, personal income excluding current transfer receipts, millions of chained 2017 dollars, 1959M01 to 2026M08. The table is seasonally adjusted at annual rates. Both files are public-domain BEA downloads. Census nominal MTIS was not used.
+
+The balanced level sample is January 1997 to July 2026, 355 months, with stored industrial production and payrolls. Growth rates are 354 log differences. Run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`, method `STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT`, likelihood about -1590.54, optimiser converged. Loadings, industrial production first, are about 0.907, 0.592, 0.747 and 0.834. Factor autoregression is about 0.216 and -0.209. `publication_allowed` is false. The path is filtered, not a real-time vintage and not the 1959–1987 CITIBASE result. A second script invocation would insert another run. Hosted scheduling is off.
+
+## 1988 coincident specification, 25 October 2026
+
+## 1988 coincident specification, 25 October 2026
+
+Risk class R2. Local only. Nothing was pushed or deployed. No observation was inserted. `postgres` was not reset.
+
+The selected model is NBER working paper 2772, not the 1989 hours model. Payroll employment is the fourth input and is already stored as `bls.ce.CES0000000001`. The factor code is `workers/research/src/aqil_research/methods/stock_watson_1988.py`. It is not registered. `pytest tests/test_stock_watson_1988.py` passed 4. A real-data estimate raises `StockWatsonPanelBlocked` because real 1982-dollar manufacturing and trade sales are not stored.
+
+BEA Section2All_xls.xlsx downloaded without a key and names personal income excluding current transfer receipts in millions of chained 2017 dollars. That is not the 1982-dollar CITIBASE series, and it was not ingested. Census MTIS-mf.csv has 416 seasonally adjusted total-business sales months in millions of dollars from January 1992. It is nominal. It was not deflated and not stored. `CES0500000081` was inspected as a later hours candidate and was not stored.
+
+## Research suite and Stock–Watson block, 25 October 2026
 
 ## Research suite and Stock–Watson block, 25 October 2026
 

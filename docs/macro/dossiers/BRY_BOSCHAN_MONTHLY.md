@@ -136,7 +136,7 @@ The 1971 refusal stored no dates. The labelled variant later stored local run `8
 
 ## 16. Status and priority
 
-AQ-094 keeps the 1971 refusal and records the labelled variant. The 1971 volume still does not print the Spencer coefficients or the twelve-month alignment. Those two constants are taken from the Macaulay and Otsu pages named above, not from the 1971 book. AQ-095 recount stands. AQ-096 through AQ-100 are implemented on the variant only: the method is registered, run `8fb20325-414f-401b-8c46-bda82ed94e16` is stored on local postgres, replay matched, and the G.17 refresh hook was idempotent on disposable database `aqil_research_test`. Health failures were injected in unit tests. The NBER comparison is not a gate. The strategic milestone remains `STOCK_WATSON_DFM`. AQ-102 stays blocked.
+AQ-094 keeps the 1971 refusal and records the labelled variant. The 1971 volume still does not print the Spencer coefficients or the twelve-month alignment. Those two constants are taken from the Macaulay and Otsu pages named above, not from the 1971 book. AQ-095 recount stands. AQ-096 through AQ-100 are implemented on the variant only: the method is registered, run `8fb20325-414f-401b-8c46-bda82ed94e16` is stored on local postgres, replay matched, and the G.17 refresh hook was idempotent on disposable database `aqil_research_test`. Health failures were injected in unit tests. The NBER comparison is not a gate. The strategic milestone remains `STOCK_WATSON_DFM`. AQ-102 now records the 1988 modern refit in the Stock-Watson dossier. This dating note does not change that factor.
 
 ### Full research suite, 25 October 2026
 
