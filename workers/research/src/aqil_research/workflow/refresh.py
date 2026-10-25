@@ -167,6 +167,23 @@ def run_registered_refresh(
             )
             report = RefreshReport(now, False, (*results, series))
             _record(report)
+            from aqil_research.workflow.stock_watson_reading import record_filter_update
+
+            with research_connection() as conn:
+                update = record_filter_update(conn, decision_at=now)
+            _record(
+                RefreshReport(
+                    now,
+                    False,
+                    (
+                        SourceRefreshResult(
+                            "stock_watson_coincident_1988_filter",
+                            update.status,
+                            detail=update.detail,
+                        ),
+                    ),
+                )
+            )
             return report
         finally:
             _unlock(lock_conn)
