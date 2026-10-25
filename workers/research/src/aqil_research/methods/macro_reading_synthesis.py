@@ -293,6 +293,28 @@ def _consume(
         failures.append(f"{_plain_name(item.method_id)} could not be read: {exc}")
 
 
+def _rank_clause(
+    rank: object,
+    count: object,
+    basis: object,
+    *,
+    below: object = None,
+    fallback: str,
+) -> str:
+    """Name a level rank and a 12-month-change rank differently."""
+    if basis == "overlapping_twelve_month_percent_change" and count is not None:
+        text = f"Rank {rank} of {count} overlapping 12-month percent changes."
+        if below is not None:
+            text += f" {below} of those changes are strictly below the latest change."
+        return text
+    if basis == "level" and count is not None:
+        text = f"Rank {rank} of {count} stored levels."
+        if below is not None:
+            text += f" {below} stored levels are strictly below this level."
+        return text
+    return fallback
+
+
 def _labour(
     calculation: dict[str, object],
     cited: list[str],
@@ -327,6 +349,12 @@ def _labour(
                 f"{change['change_thousands']} thousands ({change['percent_change']} percent)"
             )
             signs.append(_sign(str(change["percent_change"])))
+        rank = _rank_clause(
+            row.get("rank"),
+            row.get("history_count"),
+            row.get("rank_basis"),
+            fallback=f"Rank {row['rank']} of {row['history_count']} stored values.",
+        )
         cited.append(
             f"{name} was {row['level']} {row['unit']} in {spoken_period(period)} "
             f"(observation {row['observation_id']}), a 12-month change of {movement} "
@@ -334,7 +362,7 @@ def _labour(
             f"(observation {change['start_observation_id']}) to "
             f"{spoken_period(str(change['window_end']))} "
             f"(observation {change['end_observation_id']}). "
-            f"Rank {row['rank']} of {row['history_count']} stored values.",
+            f"{rank}",
         )
     joint = calculation.get("joint")
     if not isinstance(joint, dict):
@@ -375,14 +403,23 @@ def _prices(
     for block in (funds, treasury):
         _append_id(observation_ids, block.get("observation_id"))
         _append_id(observation_ids, block.get("prior_observation_id"))
+    cpi_rank = _rank_clause(
+        cpi.get("rank"),
+        cpi.get("change_count"),
+        cpi.get("rank_basis"),
+        below=cpi.get("values_strictly_below"),
+        fallback=(
+            f"Rank {cpi['rank']}. "
+            f"{cpi['values_strictly_below']} stored values are strictly below this index."
+        ),
+    )
     cited.append(
         "CPI-U 12-month change from "
         f"{spoken_period(str(cpi['comparison_period']))} to "
         f"{spoken_period(str(cpi['period']))} is {cpi['twelve_month_percent_change']} percent "
         f"(index {cpi['comparison_index_level']} to {cpi['index_level']}, {cpi['unit']}). "
         f"{_endpoint_sentence(cpi.get('comparison_observation_id'), cpi.get('observation_id'))}"
-        f"Rank {cpi['rank']}. "
-        f"{cpi['values_strictly_below']} stored values are strictly below this index."
+        f"{cpi_rank}"
     )
     cited.append(
         f"Federal funds was {funds['level_percent_per_year']} percent per year in "
@@ -391,8 +428,18 @@ def _prices(
         f"{funds['one_month_change_percentage_points']} percentage points from "
         f"{spoken_period(str(funds['prior_period']))} "
         f"({_id_clause(funds.get('prior_observation_id'))}). "
-        f"Rank {funds['rank']}. "
-        f"{funds['values_strictly_below']} stored values are strictly below this level."
+        f"{
+            _rank_clause(
+                funds.get('rank'),
+                funds.get('level_count'),
+                funds.get('rank_basis'),
+                below=funds.get('values_strictly_below'),
+                fallback=(
+                    f'Rank {funds["rank"]}. '
+                    f'{funds["values_strictly_below"]} stored values are strictly below this level.'
+                ),
+            )
+        }"
     )
     cited.append(
         f"The 10-year yield was {treasury['level_percent_per_year']} percent per year in "
@@ -401,8 +448,18 @@ def _prices(
         f"{treasury['one_month_change_percentage_points']} percentage points from "
         f"{spoken_period(str(treasury['prior_period']))} "
         f"({_id_clause(treasury.get('prior_observation_id'))}). "
-        f"Rank {treasury['rank']}. "
-        f"{treasury['values_strictly_below']} stored values are strictly below this level. "
+        f"{
+            _rank_clause(
+                treasury.get('rank'),
+                treasury.get('level_count'),
+                treasury.get('rank_basis'),
+                below=treasury.get('values_strictly_below'),
+                fallback=(
+                    f'Rank {treasury["rank"]}. '
+                    f'{treasury["values_strictly_below"]} stored values are strictly below this level.'
+                ),
+            )
+        } "
         "Federal funds and the 10-year yield stay separate levels."
     )
 
@@ -428,13 +485,22 @@ def _production(
     id_text = ""
     if latest_id and earlier_id:
         id_text = f" Earlier observation {earlier_id}. Later observation {latest_id}."
+    production_rank = _rank_clause(
+        calculation.get("historical_rank"),
+        calculation.get("stored_change_count") or calculation.get("stored_value_count"),
+        calculation.get("rank_basis"),
+        below=calculation.get("stored_changes_strictly_below_latest"),
+        fallback=(
+            f"Rank {calculation['historical_rank']} of "
+            f"{calculation['stored_value_count']} stored values."
+        ),
+    )
     cited.append(
         f"Industrial production was {calculation['latest_level']} "
         f"({calculation['unit']}) in {spoken_period(latest)}. "
         f"The 12-month percent change from {spoken_period(earlier)} "
         f"({calculation['earlier_level']}) is {calculation['twelve_month_percent_change']} "
-        f"percent. Rank {calculation['historical_rank']} of "
-        f"{calculation['stored_value_count']} stored values.{id_text} "
+        f"percent. {production_rank}{id_text} "
         "This is production, not a GDP figure.",
     )
 
