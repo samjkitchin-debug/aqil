@@ -74,7 +74,7 @@ Forbidden for every workstream:
 - any adapter package assigned to another workstream
 - provider archives and zip files
 
-The integration owner, on `work/aqil-autonomous-build` only, later merges fragments into `SOURCE_RIGHTS.csv`, registers successful collectors in `workflow/refresh.py`, and runs live ingest. One failed source must not cancel the others.
+The integration owner, on local `main` in `C:\Users\gamer\aqil` only, later merges fragments into `SOURCE_RIGHTS.csv`, registers successful collectors in `workflow/refresh.py`, and runs live ingest. One failed source must not cancel the others.
 
 ## Workstreams
 

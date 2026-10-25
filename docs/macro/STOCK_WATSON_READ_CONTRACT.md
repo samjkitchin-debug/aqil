@@ -2,7 +2,7 @@
 
 **Scientific validation:** numerically verified against statsmodels after the initial state, with the full-sample likelihood difference explained in `docs/macro/dossiers/STOCK_WATSON_DFM.md`. Empirically evaluated on revised data only.
 
-**Operational scheduling:** manual local refresh is implemented. The unattended Windows task is not registered. Hosted scheduling is off.
+**Scheduling:** a manual local refresh can call the filter update. The unattended Windows task is not registered. Hosted scheduling is off. This is not operational acceptance.
 
 **Publication eligibility:** not eligible. `publication_allowed` is false.
 

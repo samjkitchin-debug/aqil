@@ -43,17 +43,14 @@ Use the template in `docs/06_ENGINEERING_DISCIPLINE.md` §10.
 
 ## Branch housekeeping
 
-Two branches stay:
+Ordinary work is local `main` in `C:\Users\gamer\aqil`. Push only when the founder asks. A push to GitHub `main` is a release: the existing GitHub to Vercel integration deploys it.
 
-- `main` is production. Leave it untouched until a deliberate release.
-- `work/aqil-autonomous-build` is the active development branch. Ordinary sequential work happens here.
+A branch or worktree needs a real concurrent-edit reason and a cleanup point. After the tested work is integrated:
 
-A temporary branch and worktree are allowed only while agents must edit in parallel. After the tested work is integrated:
-
-1. Confirm the temporary branch is reachable from `work/aqil-autonomous-build`, or that its patch is already there.
-2. Confirm the worktree has no uncommitted files that are not on the development branch.
+1. Confirm the temporary branch is reachable from local `main`, or that its patch is already there.
+2. Confirm the worktree has no uncommitted files that are not on local `main`.
 3. Remove the temporary worktree, then delete the local branch with an ordinary `git branch -d`.
-4. Do not force-delete a branch that still has a commit the development branch does not contain.
+4. Do not force-delete a branch that still has a commit local `main` does not contain, unless a recovery bundle holds that commit and the handover states why it was superseded rather than merged.
 5. Do not delete a remote branch, and do not create a new permanent branch for a routine milestone.
 
 ## Project rules

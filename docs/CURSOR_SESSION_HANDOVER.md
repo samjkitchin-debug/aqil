@@ -1,7 +1,30 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 25 October 2026, Stock-Watson read model and Intelligence experience
+**Last updated:** 25 October 2026, local main consolidation
+
+## Local main consolidation, 25 October 2026
+
+Risk class R2. Local only. Nothing was pushed, force-pushed, or deployed. Hosted Supabase was not queried or migrated. No migration was added by this consolidation. `publication_allowed` stays false. Stock–Watson is not operationally accepted.
+
+Ordinary work is local `main` in `C:\Users\gamer\aqil`. The merge parent is `060ef3f0d748d16aec36703eefd2c62728dc6adb`. `origin/main` remains `c9ea596afbcdb1e81a995fd592cdf9d73a6c58ba`. Recovery bundle: `C:\Users\gamer\aqil-consolidation-recovery\aqil-pre-cleanup.bundle` (`git bundle verify` reported a complete history). Parked outside Git: `.local-research-bea.xlsx`, `.local-section2.xlsx`, and `workers/research/estimate_sw1988.py`.
+
+Model identities on this tree: `BRY_BOSCHAN_SPENCER15_VARIANT` and `STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT`. The 1988 specification id is `STOCK_WATSON_COINCIDENT_1988`. The modern refit is not in the analytical method registry. Dashboard is `/conditions` and shows stored observations. Methodologies are `/intelligence/methodologies` and show research output only when publication is allowed. Insights is `/intelligence/insights` and states that no cross-method finding is published.
+
+Checks on this tree, not GitHub Actions: `npm run test:research` passed 534 tests, Ruff, and format check. In `apps/web`, `npm run test:sourced-updates` passed 69, `npm run typecheck` passed, and `npm run lint` passed with the existing unused `_searchParams` warning. `npm run check:tokens` passed from the repository root; `apps/web` has no `check:tokens` script. `npm run build` in `apps/web` passed, 28 routes. No database test was run because no migration was integrated. The agent browser at `http://127.0.0.1:3000/conditions` was redirected to sign-in. Signed-in Dashboard, accordions, methodologies, Bry–Boschan, Stock–Watson, Insights, and the desktop and mobile Intelligence nav were not opened. That gate is unverified.
+
+Next quantitative work stays inside ADR 027. Do not mark the modern refit operationally accepted. Do not start another model from AQ-102. AQ-103 stays later and does not backfill unemployment for this specification. AQ-104 stays later: the yield-curve probit is unimplemented. Do not open a geography wave.
+
+These local branches were not merged. They are superseded, and the recovery bundle holds them:
+
+- `auth/google-foundation` (`91325f021366e0ff944c0ae015ee2f8de68a93d7`): the three commits are already on `main` under other hashes.
+- `m5/live-intelligence-coverage` (`a3020538640028e440b00011be0c9a5a5fd98b58`): an older forward wave. `main` has the later forward package. ADR 027 stays on methodologies.
+- `m6/research-methods` (`45167757c594b149c842643c98bef1edc6a03aa3`): SLOOS, Census advanced orders, and macro conditions are already on `main`.
+- `my-wealth/portfolio-slice` (`817b1f2ced47bae8399a944c5b9c097dc6fec4e5`): older than `20261018210000_my_wealth.sql` and the current wealth UI. Wealth stays deferred.
+- `research/employment-situation-2026-11` (`f7aa03b80f06cc3279b0769cc9610a32d9d15815`): no path is absent from `main`.
+- `docs/consolidation-2026-10-18` (`663446ff9a835e704ffade68a46b2b6363873262`): October documentation that would regress this handover and the roadmap.
+
+## Intelligence experience, 25 October 2026
 
 ## Intelligence experience, 25 October 2026
 
@@ -25,7 +48,7 @@ The stored L-BFGS-B fit remains the parameter version. A further short run impro
 
 `tests/test_stock_watson_lifecycle.py` passed inside `npm run test:research` (534 passed). Ruff passed. The monthly task script exits without registering `AqilMacroRefresh`. A query for that task reported that it does not exist.
 
-Classification: numerically verified with the documented timing difference; empirically evaluated on revised data; reproducible; locally operational by manual refresh; not unattended locally; not hosted; not publication eligible.
+Classification: a local modern refit is stored, with the initial-state timing difference documented. Publication is closed. This is not operational acceptance, not unattended scheduling, and not a hosted result.
 
 ## BEA ingest and factor replay, 25 October 2026
 

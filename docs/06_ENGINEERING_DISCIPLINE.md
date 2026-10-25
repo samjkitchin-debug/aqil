@@ -26,7 +26,7 @@ aqil/
 3. Confirm data classification: `synthetic`, `public_rights_verified`, `rights_restricted`, `private_financial` or `unknown`.
 4. Determine risk class **R0 UI**, **R1 content**, **R2 methodology**, **R3 financial ledger/security/regulatory**. The higher class controls tests, review and rollout.
 5. For R2/R3, present impact analysis, original vs changed algorithm/data contracts, historical replay consequences, rollback, migration and security impact **before** implementation/deployment.
-6. Develop on localhost, on `work/aqil-autonomous-build`. Commit locally when a change is coherent. Push to GitHub `main` only as a deliberate release. The existing GitHub → Vercel integration deploys that push. Do not push to review formatting, and do not use `vercel link` or `vercel deploy`. A short-lived branch or worktree is only for parallel editing, and it is removed after its tested work is on the development branch. Do not keep a milestone branch once that work is integrated.
+6. Develop on localhost, on local `main` in `C:\Users\gamer\aqil`. Commit locally when a change is coherent. Push to GitHub `main` only when the founder asks. That push is a release: the existing GitHub → Vercel integration deploys it. Do not push to review formatting, and do not use `vercel link` or `vercel deploy`. A short-lived branch or worktree needs a real concurrent-edit reason, and it is removed after its tested work is on local `main`. Do not keep a milestone branch once that work is integrated.
 
 **Execution checklist**
 

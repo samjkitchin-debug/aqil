@@ -246,7 +246,7 @@ On the stored path, March–November 2001 has 9 months, minimum −0.764, maximu
 | Numerically verified | Yes, with the initial-state timing difference documented above |
 | Empirically evaluated | Yes, as a retrospective modern-data refit |
 | Reproducible | Yes. Replay matches the stored likelihood and path. A second unchanged update does not insert a run |
-| Locally operational | Yes. Manual refresh calls the filter update on local postgres |
+| Locally operational | No. A manual refresh can call the filter update. That is not operational acceptance. The estimator is not in the analytical method registry. `publication_allowed` stays false |
 | Unattended locally | No. `scripts/register-local-macro-refresh.ps1` prints the monthly command and exits without registering a task |
 | Hosted operational | No |
 | Publication eligible | No |
