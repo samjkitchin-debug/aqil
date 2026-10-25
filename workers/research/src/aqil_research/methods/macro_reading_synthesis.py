@@ -456,7 +456,8 @@ def _prices(
                 below=treasury.get('values_strictly_below'),
                 fallback=(
                     f'Rank {treasury["rank"]}. '
-                    f'{treasury["values_strictly_below"]} stored values are strictly below this level.'
+                    f'{treasury["values_strictly_below"]} stored values '
+                    'are strictly below this level.'
                 ),
             )
         } "
