@@ -49,7 +49,7 @@ export function MacroConditionsPanel({ view, variant, seriesLines }: Props) {
       {compact ? (
         <p className="research-meta">
           <Link href="/conditions" prefetch={false} data-testid="macro-full-view">
-            Full indicator view
+            Open the dashboard
           </Link>
         </p>
       ) : null}

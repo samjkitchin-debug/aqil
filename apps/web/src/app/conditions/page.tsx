@@ -1,10 +1,11 @@
 import { Suspense } from "react";
 
-import { PrivatePage } from "@/components/auth/private-page";
 import { AppShell } from "@/components/app-shell";
+import { PrivatePage } from "@/components/auth/private-page";
+import { IntelligenceDashboardSection } from "@/components/intelligence/dashboard-panel";
+import { UpcomingReleases } from "@/components/intelligence/upcoming-releases";
 import { EconomicEvidenceBriefing } from "@/components/research/economic-evidence-briefing";
 import { EventsAndThemesSection } from "@/components/research/events-and-themes";
-import { MacroConditionsSection } from "@/components/research/macro-conditions-panel";
 import { loadEconomicEvidence } from "@/lib/research/load-economic-evidence";
 import { presentEconomicEvidence } from "@/lib/research/present-economic-evidence";
 import {
@@ -14,8 +15,7 @@ import {
   showsStoredUnitedStatesReading,
 } from "@/lib/research/present-macro-conditions";
 
-
-async function ConditionsDashboard({
+async function DashboardBody({
   searchParams,
 }: {
   searchParams: Promise<{ region?: string }>;
@@ -28,20 +28,30 @@ async function ConditionsDashboard({
   const showUnitedStatesReading = showsStoredUnitedStatesReading(region);
   return (
     <>
+      <IntelligenceDashboardSection region={params.region} seriesLines={lines} />
+      <UpcomingReleases />
       {showUnitedStatesReading && loaded.status === "unavailable" ? (
         <p className="research-body" data-testid="economic-reading-unavailable">
           {loaded.reason}
         </p>
       ) : null}
       {showUnitedStatesReading && briefing ? (
-        <EconomicEvidenceBriefing view={briefing} heading={STORED_US_READING_HEADING} />
+        <details className="intel-disclosure">
+          <summary>Stored family reading</summary>
+          <EconomicEvidenceBriefing view={briefing} heading={STORED_US_READING_HEADING} />
+        </details>
       ) : null}
       {showUnitedStatesReading ? null : (
         <p className="research-body" data-testid="regional-reading-absent">
           {NO_REGIONAL_READING}
         </p>
       )}
-      <MacroConditionsSection variant="dashboard" seriesLines={lines} region={params.region} />
+      <details className="intel-disclosure">
+        <summary>Events and themes</summary>
+        <Suspense fallback={<p className="research-body">Loading events and themes…</p>}>
+          <EventsAndThemesSection variant="compact" />
+        </Suspense>
+      </details>
     </>
   );
 }
@@ -55,17 +65,9 @@ export default function ConditionsPage({
     <AppShell title="Intelligence">
       <Suspense fallback={<p className="text-muted">Checking your session…</p>}>
         <PrivatePage nextPath="/conditions">
-          <section aria-labelledby="conditions-heading">
-            <h2 id="conditions-heading" className="research-section-title">
-              Conditions
-            </h2>
-            <Suspense fallback={<p className="research-body">Loading conditions…</p>}>
-              <ConditionsDashboard searchParams={searchParams} />
-            </Suspense>
-            <Suspense fallback={<p className="research-body">Loading events and themes…</p>}>
-              <EventsAndThemesSection variant="compact" />
-            </Suspense>
-          </section>
+          <Suspense fallback={<p className="research-body">Loading the dashboard…</p>}>
+            <DashboardBody searchParams={searchParams} />
+          </Suspense>
         </PrivatePage>
       </Suspense>
     </AppShell>

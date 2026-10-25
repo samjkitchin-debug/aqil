@@ -1,9 +1,21 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 25 October 2026, Stock-Watson acceptance
+**Last updated:** 25 October 2026, Stock-Watson read model and Intelligence experience
 
-## Stock-Watson acceptance, 25 October 2026
+## Intelligence experience, 25 October 2026
+
+Risk class R1. Frontend only. The work was committed on `work/intelligence-experience` (`d4bb2c9`) from `21a207e` and merged onto local `main`. Nothing was pushed or deployed. No migration was added. No research-worker file was edited by that commit.
+
+Intelligence sections are Dashboard (`/conditions`), Methodologies (`/intelligence/methodologies`), and Insights (`/intelligence/insights`). Upcoming releases are a block on the dashboard; the full calendar remains `/calendar`. Evidence remains `/research` and is linked from indicator details and the stored family reading, which is collapsed. ETF exposures remain `/explore` and are no longer an Intelligence section. A later investment-intelligence surface can adopt that page. It was not moved into My Wealth.
+
+Dashboard figures are the existing stored observations. Direction is the stored change sentence. Increases are not coloured as favourable. Methodologies reads `research.research_runs` metadata only (`method_id`, `method_version`, `executed_at`, `execution_status`, `publication_allowed`, `data_sufficiency`). Calculation JSON is not selected. A closed publication withholds dates, factor values and scores. Insights states that no cross-method finding is published.
+
+The Stock–Watson card can match `STOCK_WATSON_COINCIDENT_1988` or `STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT` and still will not display a factor until `publication_allowed` is true and a typed time-series presenter exists. Bry–Boschan matches `BRY_BOSCHAN_SPENCER15_VARIANT` on the same rule. This page does not treat the build backlog as a live operational status.
+
+Checks recorded on that branch, not CI: `npm run test:sourced-updates` in `apps/web` passed 69. `npm run typecheck` passed. `npm run lint` passed with the existing unused `_searchParams` warning. `npm run check:tokens` passed. `npm run build` passed, 28 routes. A signed-out browser on port 3010 was redirected from `/conditions` to sign-in. The signed-in dashboard was not opened. Those checks are not this merge's result.
+
+## Stock-Watson read model, 25 October 2026
 
 Risk class R2. Local only. Nothing was pushed or deployed. The development database was not reset. Run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` was not overwritten. `publication_allowed` remains false.
 
@@ -31,15 +43,11 @@ The balanced level sample is January 1997 to July 2026, 355 months, with stored 
 
 ## 1988 coincident specification, 25 October 2026
 
-## 1988 coincident specification, 25 October 2026
-
 Risk class R2. Local only. Nothing was pushed or deployed. No observation was inserted. `postgres` was not reset.
 
 The selected model is NBER working paper 2772, not the 1989 hours model. Payroll employment is the fourth input and is already stored as `bls.ce.CES0000000001`. The factor code is `workers/research/src/aqil_research/methods/stock_watson_1988.py`. It is not registered. `pytest tests/test_stock_watson_1988.py` passed 4. A real-data estimate raises `StockWatsonPanelBlocked` because real 1982-dollar manufacturing and trade sales are not stored.
 
 BEA Section2All_xls.xlsx downloaded without a key and names personal income excluding current transfer receipts in millions of chained 2017 dollars. That is not the 1982-dollar CITIBASE series, and it was not ingested. Census MTIS-mf.csv has 416 seasonally adjusted total-business sales months in millions of dollars from January 1992. It is nominal. It was not deflated and not stored. `CES0500000081` was inspected as a later hours candidate and was not stored.
-
-## Research suite and Stock–Watson block, 25 October 2026
 
 ## Research suite and Stock–Watson block, 25 October 2026
 

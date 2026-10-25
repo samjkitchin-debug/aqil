@@ -1,0 +1,301 @@
+.intel-lead {
+  max-width: 42rem;
+}
+
+.intel-scope {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.intel-region-title {
+  margin: 0;
+  color: var(--colour-text);
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-heading);
+}
+
+.intel-regions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+.intel-regions a {
+  color: var(--colour-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.intel-regions a[aria-current="page"] {
+  color: var(--colour-brand-navy);
+  box-shadow: inset 0 -2px 0 var(--colour-brand-gold);
+}
+
+.intel-category,
+.intel-disclosure,
+.intel-method-card,
+.intel-insight,
+.intel-releases {
+  margin-top: var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface);
+}
+
+.intel-summary {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+}
+
+.intel-category-name {
+  color: var(--colour-text);
+  font-size: var(--font-size-body);
+  font-weight: 600;
+}
+
+.intel-summary-metrics {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.intel-metric {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.intel-metric-name,
+.intel-metric-change,
+.intel-metric-when,
+.intel-metric-unit,
+.intel-metric-region {
+  color: var(--colour-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.intel-metric-value {
+  color: var(--colour-text);
+  font-size: var(--font-size-h3);
+  line-height: 1.15;
+  font-weight: 600;
+}
+
+.intel-metric-change {
+  color: var(--colour-text);
+  font-size: var(--font-size-sm);
+}
+
+.intel-trend {
+  width: 5.5rem;
+  height: 1.75rem;
+}
+
+.intel-trend path {
+  fill: none;
+  stroke: var(--colour-brand-navy);
+  stroke-width: 2;
+}
+
+.intel-category-body,
+.intel-releases,
+.intel-insight,
+.intel-method-card {
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+.intel-category-body {
+  display: grid;
+  gap: var(--space-5);
+  border-top: 1px solid var(--colour-border);
+}
+
+.intel-indicator {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.intel-indicator-name,
+.intel-section-title,
+.intel-method-name {
+  margin: 0;
+  color: var(--colour-text);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-heading);
+}
+
+.intel-indicator .macro-chart,
+.intel-indicator .macro-chart-plot,
+.intel-indicator .research-chart {
+  max-width: 100%;
+}
+
+.intel-disclosure > summary,
+.intel-releases-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.intel-disclosure > summary {
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  color: var(--colour-text);
+  font-weight: 600;
+}
+
+.intel-disclosure > :not(summary) {
+  padding-inline: var(--space-4);
+}
+
+.intel-disclosure {
+  padding: 0 0 var(--space-2);
+}
+
+.intel-releases-head {
+  margin-bottom: var(--space-2);
+}
+
+.intel-release-list,
+.intel-method-list,
+.intel-reference-list,
+.intel-insight-parts {
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.intel-release-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.intel-release-list li {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.intel-release-when,
+.intel-release-who {
+  color: var(--colour-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.intel-release-list a,
+.intel-reference-list a,
+.intel-method-name a,
+.intel-method-open a {
+  color: var(--colour-link);
+}
+
+.intel-method-list {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.intel-method-card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.intel-method-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.intel-method-facts dt {
+  color: var(--colour-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.intel-method-facts dd {
+  margin: var(--space-1) 0 0;
+  color: var(--colour-text);
+  font-size: var(--font-size-sm);
+}
+
+.intel-method-section {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.intel-insight-parts {
+  display: grid;
+  gap: var(--space-3);
+  padding-left: 0;
+  list-style: none;
+}
+
+.intel-insight-part {
+  font-weight: 600;
+}
+
+.intel-method-open {
+  margin: 0;
+}
+
+.aq-section-link {
+  white-space: normal;
+}
+
+@media (min-width: 48rem) {
+  .aq-section-nav {
+    margin-bottom: var(--space-5);
+  }
+
+  .aq-section-list {
+    display: flex;
+    width: auto;
+    padding: 0;
+    column-gap: var(--space-2);
+  }
+
+  .aq-section-link {
+    padding-inline: var(--space-3);
+    font-size: var(--font-size-sm);
+  }
+
+  .intel-summary {
+    grid-template-columns: 9rem minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .intel-summary-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .intel-indicator {
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 22rem);
+    align-items: start;
+    column-gap: var(--space-6);
+  }
+
+  .intel-method-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .intel-release-list li {
+    grid-template-columns: 14rem minmax(0, 1fr) auto;
+    align-items: baseline;
+    column-gap: var(--space-4);
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .intel-method-facts {
+    grid-template-columns: 1fr;
+  }
+}

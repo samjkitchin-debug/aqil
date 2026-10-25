@@ -111,7 +111,7 @@ export default function CalendarPage() {
         <PrivatePage nextPath="/calendar">
           <p className="research-body mb-[var(--space-4)]">
             Upcoming dates stated by retrieved sources. No inferred or modelled schedule is
-            shown here.
+            shown here. The dashboard lists the next few confirmed releases.
           </p>
           <Suspense fallback={<p className="research-body">Loading calendar…</p>}>
             <CalendarBody />
