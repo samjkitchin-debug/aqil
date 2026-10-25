@@ -1,7 +1,19 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 25 October 2026, PWA icon
+**Last updated:** 25 October 2026, release 0.2.0 prepared
+
+## Production release 0.2.0, 25 October 2026
+
+Risk class R3. The release commit is local until the fast-forward push. Hosted migrations are already applied. This note does not claim GitHub Actions or a signed-in production smoke.
+
+Application version `0.2.0`. Tag `v0.2.0` is created on the release commit. Previous production deployment `dpl_CUs9qafAXXyEC8cDLmJHu9rKmWot` at `c9ea596afbcdb1e81a995fd592cdf9d73a6c58ba` is the rollback target. Project `ojvswermsbbaltjohqph` now has fifteen migrations through `20261024150000`. `auth.users` stayed 2. Wealth, vault, research, and instruments tables that the ten files create are empty. `publication_allowed` is not true. Stock–Watson and the labelled Bry–Boschan variant stay unpublished. Insights stays “no cross-method finding”.
+
+`research_worker` is still `NOLOGIN`. No readable research-worker password was found. `RESEARCH_DATABASE_URL` and `ETF_DATABASE_URL` are unset. The postgres password on Vercel was not reused and was not readable for `pg_dump`. The free-plan backup list was empty. The pre-apply record is `C:\Users\gamer\aqil-release-backups\2026-10-25\`. Saxo variables and the service-role key were removed from Vercel production. Auth site URL is `https://aqil-tau.vercel.app`.
+
+Checks on the PWA commit, not GitHub Actions: `apps/web` `test:auth` 14, `test:sourced-updates` 70, `test:wealth` 60, `test:etf` 11, `test:saxo` 42, typecheck, lint with the existing unused `_searchParams` warning, and `npm run build`. Root `check:tokens` passed. `npm run test:research` passed 534, Ruff, and format. `npm run test:db` passed 12 files and 207 tests. Disposable preparation printed 32 ignored `pg_restore` errors for realtime and default privileges; the pgTAP result was still pass. `npm run test:e2e` passed 145 after Playwright Chromium was installed. The first e2e run failed because the browser binary was missing.
+
+The signed-in production browser pass is not done in this section. Record the live SHA and deployment id after it.
 
 ## PWA icon, 25 October 2026
 

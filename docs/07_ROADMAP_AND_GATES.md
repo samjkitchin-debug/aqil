@@ -1,23 +1,23 @@
 # AQIL — Execution Roadmap and Stage Gates
 
-**Last reconciled:** 25 October 2026 · **Git baseline:** local `main` after the Intelligence merge `060ef3f`, with the consolidation note in `docs/CURSOR_SESSION_HANDOVER.md`. Not pushed. `origin/main` remains `c9ea596`.
+**Last reconciled:** 25 October 2026 · **Application version:** 0.2.0. The release commit is the commit tagged `v0.2.0`. The deployment id is recorded after the GitHub-triggered production deployment.
 
 ## Operating baseline (24 October 2026)
 
 This section supersedes older sentences below that say authentication, hosted Supabase or broker access has not started. It also supersedes any sentence that treats a local test on this tip as a GitHub Actions result.
 
-- Live app: `https://aqil-tau.vercel.app`. Google sign-in is the production access path. The running deployment is still `origin/main` at `c9ea596`.
+- Live app: `https://aqil-tau.vercel.app`. Google sign-in is the production access path. Before this release the aliased deployment was `dpl_CUs9qafAXXyEC8cDLmJHu9rKmWot` at `c9ea596`. That deployment is the rollback target. The push of the `v0.2.0` commit is the new production deployment. No Vercel CLI deploy.
 - Ordinary access is any verified Google account. The allow-list and `access_grants` gate are removed. See ADR 020.
-- Hosted project `ojvswermsbbaltjohqph` was last read on 24 October 2026 with exactly five migrations, through `20261017180000_forward_intelligence.sql`. This certification did not query or migrate the host. Ten later local files are not applied, from `20261018200000_verified_prospective_assessment.sql` through `20261024150000_research_macro_events_themes.sql`. The earlier upgrade rehearsal covered nine files and did not include the events migration. The 25 October 2026 local rehearsal on `aqil_u0_ten` did apply that file. The host was not queried.
-- Hosted U0 remains **no-go** until the founder approves the batch in [`docs/runbooks/U0_HOSTED_RELEASE.md`](runbooks/U0_HOSTED_RELEASE.md). The local bar is the ten-file upgrade rehearsal, not a fresh replay of every file on an empty database. On 25 October 2026 disposable database `aqil_u0_ten` was created from the five-file state, given representative rows and an authentication stub, upgraded with the ten later files including `20261024150000_research_macro_events_themes.sql`, checked, and dropped. The earlier nine-file rehearsal did not include that events migration. Preserved databases `postgres` and `aqil_etf` were not written. Detail is in the handover. This is a local result, not GitHub Actions.
-- Production web loaders do not fall back to `127.0.0.1`. A missing research or ETF database URL fails closed. Outside production, the local default remains. That behaviour is on local main and is not on `origin/main`. The running Vercel app is still `c9ea596`. The first private mode after a hosted upgrade is one manual `npm run research:refresh`, with freshness visible. No schedule exists. Automatic updates must not be claimed.
-- Before any hosted apply: take a backup. A code rollback will not undo those local migrations. Then founder approval, apply, grant checks, the server-only research URL, one manual refresh, and only then one push to `main` so the existing GitHub to Vercel integration deploys. GitHub Actions has not run on `5bb2ca8`. No Vercel CLI deploy. Production Saxo stays off.
+- Hosted project `ojvswermsbbaltjohqph` had five migrations through `20261017180000_forward_intelligence.sql`. On 25 October 2026 the ten later files were applied, through `20261024150000_research_macro_events_themes.sql`. History versions match those filenames. Research, forward, and instruments have no usage for `anon`, `authenticated`, or `service_role`. The Data API exposes `public` and `graphql_public` only. Wealth tables have owner row-level security. `public.saxo_token_vault` has row-level security and no policy. Application tables are empty. `auth.users` stayed at 2. Local research runs, fixtures, and Saxo tokens were not copied.
+- The approved hosted schema apply is recorded in [`docs/runbooks/U0_HOSTED_RELEASE.md`](runbooks/U0_HOSTED_RELEASE.md) and [`docs/RELEASE_HISTORY.md`](RELEASE_HISTORY.md). U0 is not complete: the host has no economic observations, no research runs, and no refresh schedule. The 25 October disposable rehearsal on `aqil_u0_ten` remains a local result, not GitHub Actions. Preserved local databases `postgres` and `aqil_etf` were not the hosted target.
+- Production web loaders do not fall back to `127.0.0.1`. `RESEARCH_DATABASE_URL` and `ETF_DATABASE_URL` are unset. `research_worker` cannot log in, and no readable copy of a research-worker password was found. The postgres password stored on Vercel was not reused. Research and ETF pages stay in the honest unavailable state. No manual refresh was run. No schedule exists. `publication_allowed` was not set true.
+- The free plan backup list was empty and point-in-time recovery was off. A `pg_dump` was not taken because Vercel would not return the sensitive database password. The pre-apply record is outside the repository at `C:\Users\gamer\aqil-release-backups\2026-10-25\`. A code rollback does not undo the ten migrations. No Vercel CLI deploy. Production Saxo stays off: the Saxo variables and the service-role key were removed from the Vercel project.
 - Reading model: Today is the briefing and a compact pulse. Intelligence has three sections: Dashboard at `/conditions` shows stored observations; Methodologies at `/intelligence/methodologies` shows research outputs only when `publication_allowed` is true, and names the other quantitative-register methods as planned with no calculation; Insights at `/intelligence/insights` states that no cross-method finding is published. The release calendar stays `/calendar`. Evidence stays `/research`. ETF exposures stay `/explore` and are not an Intelligence section. No fourth primary destination.
-- Local Saxo reads are real and read-only. Production does not offer Connect Saxo until encrypted, owner-scoped token storage exists. See ADR 021–024.
+- Local Saxo reads are real and read-only. The hosted token vault exists and is empty. Connect Saxo still requires development on localhost. Production does not start a broker connection. See ADR 021–024.
 - Workflow: localhost → local tests → reviewed commit → one push to `main` → the existing GitHub to Vercel integration. No Vercel CLI deploy, no second Vercel project, no preview build created for its own sake.
 - Local macro store, 25 October 2026, not a GitHub Actions result: 23 operational series and 34,859 live periods, up from the 10-series, 8,704-period baseline. The Eurostat all-items HICP index adds 369 periods, January 1996 to September 2026. Every operational live row is `latest_revised`. A latest-revised row is not a vintage. The two ECB HICP series still end in December 2025 and were not overwritten. The BIS dollar credit stock still ends in the quarter starting 1 January 2026; a re-fetch inserted nothing. The OECD G20 leading indicator has 789 stored periods and is not operational. Existing US method versions still read only their original dataset ids. `PRICES_AND_POLICY` and `MACRO_READING_SYNTHESIS` do not consume the new HICP series. No composite, spread, or new method version was added. Detail is in `docs/sources/MACRO_COVERAGE.csv`, `docs/sources/etf/ETF_ECONOMIC_EVIDENCE.md`, and the handover.
 - Next product order:
-  1. Founder approval of the hosted backup, the ten-migration apply, the server-only database URLs, one manual refresh, and one push. The checklist is `docs/runbooks/U0_HOSTED_RELEASE.md`. U0 remains no-go.
+  1. A readable `research_worker` login on the host, then one manual `npm run research:refresh`. Do not invent the password and do not point the web app at the postgres superuser. `publication_allowed` stays false.
   2. A permitted fund document and rights decision, then one run of `cite-etf`.
   3. An ISIN on one genuine holding so the resolver can match it by exact ISIN.
   4. Policy targets in `wealth_allocation_targets`, then the Deploy Capital read switch. The save path stays where it is until then.
@@ -34,7 +34,7 @@ ADR 027 is the decision. `docs/macro/QUANTITATIVE_METHOD_REGISTER.csv` is the me
 
 The pilot is not the strategic intelligence product. Harding–Pagan quarterly BBQ is not applied to monthly G.17. The NBER chronology is a diagnostic, not an exact-match test. The worker still has no `jobs` table, no cron, and no pandas dependency. NumPy, SciPy, and statsmodels are research-worker dependencies for the Stock–Watson filter. That dependency does not make the modern refit operationally accepted, and `publication_allowed` stays false. `docs/04_ARCHITECTURE_AND_DATA.md` describes a job queue that migrations do not implement. The pilot must not pretend that queue exists.
 
-Hosted U0 stays an operations no-go. It is not the research priority and it is not cancelled.
+The hosted schema for this release is applied. U0 is still not a populated research product, and it is not the research priority. G0 remains open.
 
 ## Progress register
 
@@ -58,7 +58,7 @@ Hosted U0 stays an operations no-go. It is not the research priority and it is n
 | Auth doctrine | **Superseded by the operating baseline** | Google sign-in is live. See ADR 020 and `AUTH_AND_SESSION_DOCTRINE.md` |
 | Information security standard | **Implemented — unverified** | `INFORMATION_SECURITY_STANDARD.md` + CI hardening **in working tree; not on `main` until merged** |
 | Static synthetic research story (PR1) | **Implemented — unverified** | The labelled synthetic story is mounted only at `/dev/story`. It is not Today, Evidence, or live intelligence |
-| Hosted Supabase | **Superseded by the operating baseline** | Five foundation migrations are on `ojvswermsbbaltjohqph`. Later migrations are not applied |
+| Hosted Supabase | **Superseded by the operating baseline** | Fifteen migrations are on `ojvswermsbbaltjohqph`, through `20261024150000`. Research rows were not copied |
 | G0 hard evidence (roadmap table) | **Not started** | Rights matrix, UCITS sample, macro source+revision, first hosted verify — see AQ-008–AQ-012 |
 
 **G0 gate remains open.** PR1 repository foundation is largely in place on older commits; **G0 exit criteria** (data feasibility + hosted migration verification) are **not** satisfied. GitHub Actions on this tip has not run.
@@ -73,7 +73,7 @@ These sit beside G0–G8. They are cumulative. U1 includes U0. U2 includes U1. T
 | U1 | Cited funds, portfolio mapping, a saved policy in `public.wealth_allocation_targets`, and an implementation-ready playbook library | Issuer scraping, a second policy file as a permanent store, predictive models |
 | U2 | A read-only, policy-based deployment assessment | Orders, and any requirement for a return-forecast model |
 
-U0 is the engineering priority and is still no-go for the hosted project. The safe local work for the approval package is the upgrade rehearsal and the production fail-closed database URL. Neither has been applied to the host.
+The hosted schema apply is done. U0 still lacks hosted observations, a refresh, cited funds, and production Saxo. The fail-closed database URL is the production behaviour while `RESEARCH_DATABASE_URL` is unset.
 
 ## M1 — Next active milestone (macro intelligence engine slice)
 
