@@ -27,8 +27,8 @@ export async function MethodologyDetail({ slug }: { slug: string }) {
           <dd>{view.domain}</dd>
         </div>
         <div>
-          <dt>Timing</dt>
-          <dd>{view.timingLabel}</dd>
+          <dt>Function</dt>
+          <dd>{view.functionLabel}</dd>
         </div>
         <div>
           <dt>Output</dt>

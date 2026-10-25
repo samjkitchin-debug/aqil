@@ -26,6 +26,7 @@ export type MethodologyPresentation = {
   measures: string;
   domain: string;
   timingLabel: string;
+  functionLabel: string;
   outputLabel: string;
   statusLine: string;
   latestLine: string | null;
@@ -51,6 +52,11 @@ const TIMING_LABEL: Record<MethodologyCatalogueEntry["timing"], string> = {
 const OUTPUT_LABEL: Record<MethodologyCatalogueEntry["outputKind"], string> = {
   "turning-points": "Turning-point chronology",
   "time-series": "Time series",
+  "regime-probabilities": "Regime probabilities",
+  nowcast: "Current-quarter estimate",
+  "recession-probability": "Recession probability",
+  "forecast-distribution": "Forecast distribution",
+  "structural-breaks": "Structural-break chronology",
   unavailable: "No output type is defined",
 };
 
@@ -58,6 +64,7 @@ export function presentMethodology(
   entry: MethodologyCatalogueEntry,
   load: MethodologyRunLoad,
 ): MethodologyPresentation {
+  if (entry.stage === "planned") return presentPlanned(entry);
   const matched = load.status === "ready" ? runsFor(entry, load.runs) : [];
   const latest = matched[0] ?? null;
   const statusLine = statusLineFor(entry, load, latest, matched.length);
@@ -67,6 +74,7 @@ export function presentMethodology(
     measures: entry.measures,
     domain: entry.domain,
     timingLabel: TIMING_LABEL[entry.timing],
+    functionLabel: entry.functionLabel,
     outputLabel: OUTPUT_LABEL[entry.outputKind],
     statusLine,
     latestLine: latest ? latestLine(latest) : null,
@@ -96,6 +104,48 @@ export function presentMethodology(
         id: "technical",
         heading: "Technical evidence",
         paragraphs: technicalEvidence(entry, load, latest),
+      },
+    ],
+  };
+}
+
+function presentPlanned(entry: MethodologyCatalogueEntry): MethodologyPresentation {
+  const intended = OUTPUT_LABEL[entry.outputKind];
+  return {
+    slug: entry.slug,
+    name: entry.name,
+    measures: entry.measures,
+    domain: entry.domain,
+    timingLabel: TIMING_LABEL[entry.timing],
+    functionLabel: entry.functionLabel,
+    outputLabel: intended,
+    statusLine: "Planned.",
+    latestLine: null,
+    references: entry.references,
+    sections: [
+      { id: "overview", heading: "Overview", paragraphs: [entry.measures] },
+      {
+        id: "current-result",
+        heading: "Current result",
+        paragraphs: [
+          "Aqil has not calculated this methodology. There is no factor, no reading, no chronology, no probability, no parameter set and no execution time.",
+        ],
+      },
+      {
+        id: "historical-output",
+        heading: "Intended output",
+        paragraphs: [
+          `If this method is later implemented and publication is allowed, the output type would be: ${intended}. That output does not exist.`,
+        ],
+      },
+      { id: "interpretation", heading: "What it would answer", paragraphs: entry.interpretation },
+      { id: "uncertainty", heading: "Limits", paragraphs: entry.uncertainty },
+      { id: "data", heading: "Data", paragraphs: entry.dataInputs },
+      { id: "validation", heading: "Validation", paragraphs: entry.validation },
+      {
+        id: "operations",
+        heading: "Operational status",
+        paragraphs: ["Planned. There is no schedule, no stored run and no publication decision."],
       },
     ],
   };
@@ -155,7 +205,7 @@ function historicalOutput(entry: MethodologyCatalogueEntry, latest: MethodologyR
     if (entry.outputKind === "time-series") {
       return "A published result would be a time series. That series is not shown.";
     }
-    return "No historical output is defined for this methodology.";
+    return `A published result would be: ${OUTPUT_LABEL[entry.outputKind]}. That output is not shown.`;
   }
   return "A publication-eligible run exists. Historical output stays hidden until a presenter for this output type exists.";
 }

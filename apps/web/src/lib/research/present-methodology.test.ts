@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { METHODOLOGY_CATALOGUE, methodologyBySlug } from "./methodology-catalogue.ts";
+import {
+  EXCLUDED_REGISTER_ROWS,
+  METHODOLOGY_CATALOGUE,
+  methodologyBySlug,
+} from "./methodology-catalogue.ts";
 import { presentMethodology, type MethodologyRunMeta } from "./present-methodology.ts";
 
 const bry = methodologyBySlug("bry-boschan-spencer15");
@@ -25,13 +29,62 @@ function prose(entrySlug: string, runs: MethodologyRunMeta[]): string {
   return JSON.stringify(presentMethodology(entry, { status: "ready", runs }));
 }
 
-test("the catalogue names the two programme methodologies and no invented output", () => {
-  assert.deepEqual(
-    METHODOLOGY_CATALOGUE.map((entry) => entry.slug),
-    ["bry-boschan-spencer15", "stock-watson-1988"],
-  );
+const REGISTER_ROWS = [
+  "BRY_BOSCHAN_MONTHLY",
+  "STOCK_WATSON_DFM",
+  "STATIC_PCA",
+  "CFNAI",
+  "KALMAN_FILTER",
+  "DIFFUSION_INDEX",
+  "HARDING_PAGAN_BBQ",
+  "MIXED_FREQUENCY_NOWCAST",
+  "HAMILTON_MARKOV_SWITCHING",
+  "YIELD_CURVE_PROBIT",
+  "FINANCIAL_CONDITIONS",
+  "GILCHRIST_ZAKRAJSEK_EBP",
+  "BIS_CREDIT_GAP",
+  "GROWTH_AT_RISK",
+  "INFLATION_TREND",
+  "PHILLIPS_CURVE",
+  "BAI_PERRON_BREAKS",
+  "ADVANCED_FORECASTING",
+  "PORTFOLIO_RESEARCH",
+] as const;
+
+test("the catalogue keeps the two in-development methods and names every other programme row", () => {
   assert.equal(bry?.queryMethodIds.includes("BRY_BOSCHAN_SPENCER15_VARIANT"), true);
   assert.equal(factor?.outputKind, "time-series");
+  assert.equal(bry?.stage, "in-development");
+  assert.equal(factor?.stage, "in-development");
+  const shown = new Set(METHODOLOGY_CATALOGUE.map((entry) => entry.registerId));
+  const excluded = new Set(EXCLUDED_REGISTER_ROWS.map((row) => row.id));
+  assert.deepEqual(
+    REGISTER_ROWS.filter((id) => !shown.has(id)).sort(),
+    [...excluded].sort(),
+  );
+  for (const id of REGISTER_ROWS) {
+    assert.equal(shown.has(id) !== excluded.has(id), true, id);
+  }
+  const slugs = METHODOLOGY_CATALOGUE.map((entry) => entry.slug);
+  assert.equal(new Set(slugs).size, slugs.length);
+});
+
+test("planned methods have no run query and no fabricated result", () => {
+  const planned = METHODOLOGY_CATALOGUE.filter((entry) => entry.stage === "planned");
+  assert.equal(planned.length > 0, true);
+  for (const entry of planned) {
+    assert.deepEqual(entry.queryMethodIds, []);
+    const view = presentMethodology(entry, {
+      status: "ready",
+      runs: [run({ methodId: entry.registerId, publicationAllowed: true })],
+    });
+    const text = JSON.stringify(view);
+    assert.equal(view.statusLine, "Planned.");
+    assert.equal(view.latestLine, null);
+    assert.match(text, /has not calculated/);
+    assert.equal(text.includes(entry.registerId), false);
+    assert.equal(/\d+\.\d{3}/.test(text), false);
+  }
 });
 
 test("a closed publication withholds calculated output", () => {

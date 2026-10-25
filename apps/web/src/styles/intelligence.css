@@ -195,9 +195,22 @@
   color: var(--colour-link);
 }
 
+.intel-method-group {
+  margin-top: var(--space-6);
+}
+
+.intel-method-group > .intel-section-title {
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-h3);
+}
+
 .intel-method-list {
   display: grid;
   gap: var(--space-4);
+}
+
+.intel-method-card--planned {
+  background: var(--colour-surface-subtle);
 }
 
 .intel-method-card {

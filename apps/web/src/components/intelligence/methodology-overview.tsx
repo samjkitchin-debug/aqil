@@ -1,36 +1,55 @@
 import Link from "next/link";
 
-import { METHODOLOGY_CATALOGUE, methodologyQueryIds } from "@/lib/research/methodology-catalogue";
+import {
+  METHODOLOGY_CATALOGUE,
+  METHODOLOGY_GROUPS,
+  methodologyQueryIds,
+} from "@/lib/research/methodology-catalogue";
 import { loadMethodologyRuns } from "@/lib/research/load-methodology-runs";
 import { presentMethodology, type MethodologyPresentation } from "@/lib/research/present-methodology";
 
 export async function MethodologyOverviewSection() {
   const load = await loadMethodologyRuns(methodologyQueryIds());
-  const items = METHODOLOGY_CATALOGUE.map((entry) => presentMethodology(entry, load));
+  const items = METHODOLOGY_CATALOGUE.map((entry) => ({
+    entry,
+    view: presentMethodology(entry, load),
+  }));
   return (
     <div data-testid="methodology-overview">
       <p className="research-body intel-lead">
-        Each card is one quantitative method. A stored run is described only as far as its publication state allows. Calculated output stays hidden while publication is closed.
+        Each card is one quantitative method. A stored run is described only as far as its publication state allows. A planned method has no calculation.
       </p>
-      <ul className="intel-method-list">
-        {items.map((item) => (
-          <li key={item.slug}>
-            <MethodologyCard item={item} />
-          </li>
-        ))}
-      </ul>
+      {METHODOLOGY_GROUPS.map((group) => {
+        const groupItems = items.filter((item) => item.entry.group === group.id);
+        if (groupItems.length === 0) return null;
+        return (
+          <section key={group.id} className="intel-method-group" aria-labelledby={`methods-${group.id}`}>
+            <h2 id={`methods-${group.id}`} className="intel-section-title">
+              {group.heading}
+            </h2>
+            <p className="research-meta">{group.note}</p>
+            <ul className="intel-method-list">
+              {groupItems.map((item) => (
+                <li key={item.view.slug}>
+                  <MethodologyCard item={item.view} planned={item.entry.stage === "planned"} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })}
     </div>
   );
 }
 
-function MethodologyCard({ item }: { item: MethodologyPresentation }) {
+function MethodologyCard({ item, planned }: { item: MethodologyPresentation; planned: boolean }) {
   return (
-    <article className="intel-method-card">
-      <h2 className="intel-method-name">
+    <article className={planned ? "intel-method-card intel-method-card--planned" : "intel-method-card"}>
+      <h3 className="intel-method-name">
         <Link href={`/intelligence/methodologies/${item.slug}`} prefetch={false}>
           {item.name}
         </Link>
-      </h2>
+      </h3>
       <p className="research-body">{item.measures}</p>
       <dl className="intel-method-facts">
         <div>
@@ -38,8 +57,8 @@ function MethodologyCard({ item }: { item: MethodologyPresentation }) {
           <dd>{item.domain}</dd>
         </div>
         <div>
-          <dt>Timing</dt>
-          <dd>{item.timingLabel}</dd>
+          <dt>Function</dt>
+          <dd>{item.functionLabel}</dd>
         </div>
         <div>
           <dt>Output</dt>
