@@ -64,6 +64,8 @@ CADENCE = {
     "ons_mm23_cpi_d7bt": "each_refresh",
     "boe_official_bank_rate": "each_refresh",
     "dosm_ipi_abs": "each_refresh",
+    "bea_real_personal_income_ex_transfers": "each_refresh",
+    "bea_real_manufacturing_trade_sales": "each_refresh",
     "bls_cps_unemployment_rate": "weekly",
 }
 
@@ -139,6 +141,8 @@ def default_refresh_steps() -> tuple[RefreshStep, ...]:
         ("ons_mm23_cpi_d7bt", _refresh_ons_cpi),
         ("boe_official_bank_rate", _refresh_boe_bank_rate),
         ("dosm_ipi_abs", _refresh_dosm_ipi),
+        ("bea_real_personal_income_ex_transfers", _refresh_bea_income),
+        ("bea_real_manufacturing_trade_sales", _refresh_bea_sales),
     )
 
 
@@ -778,6 +782,42 @@ def _record(report: RefreshReport) -> None:
                         source.unchanged,
                     ),
                 )
+
+
+def _refresh_bea_income(now: datetime) -> SourceRefreshResult:
+    from aqil_research.workflow.bea_factor_inputs import refresh_bea_series
+
+    with research_connection() as conn:
+        inserted, unchanged = refresh_bea_series(
+            conn,
+            "bea_real_personal_income_ex_transfers",
+            now,
+        )
+        conn.commit()
+    return SourceRefreshResult(
+        "bea_real_personal_income_ex_transfers",
+        "completed",
+        inserted=inserted,
+        unchanged=unchanged,
+    )
+
+
+def _refresh_bea_sales(now: datetime) -> SourceRefreshResult:
+    from aqil_research.workflow.bea_factor_inputs import refresh_bea_series
+
+    with research_connection() as conn:
+        inserted, unchanged = refresh_bea_series(
+            conn,
+            "bea_real_manufacturing_trade_sales",
+            now,
+        )
+        conn.commit()
+    return SourceRefreshResult(
+        "bea_real_manufacturing_trade_sales",
+        "completed",
+        inserted=inserted,
+        unchanged=unchanged,
+    )
 
 
 def _try_lock(conn: psycopg.Connection) -> bool:

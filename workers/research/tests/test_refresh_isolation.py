@@ -55,6 +55,8 @@ def test_default_steps_are_official_live_sources() -> None:
         "ons_mm23_cpi_d7bt",
         "boe_official_bank_rate",
         "dosm_ipi_abs",
+        "bea_real_personal_income_ex_transfers",
+        "bea_real_manufacturing_trade_sales",
     ]
 
 
