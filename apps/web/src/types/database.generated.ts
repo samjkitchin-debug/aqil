@@ -1,11 +1,38 @@
-
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
   
   "public": {
           Tables: {
-            "user_settings": {
+            "saxo_source_units": {
+                  Row: {
+                    "ciphertext": string,"content_hash": string,"created_at": string,"environment": string,"id": string,"kind": string,"retrieved_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "ciphertext": string,"content_hash": string,"created_at"?: string,"environment": string,"id"?: string,"kind": string,"retrieved_at": string,"user_id": string
+                  }
+                  Update: {
+                    "ciphertext"?: string,"content_hash"?: string,"created_at"?: string,"environment"?: string,"id"?: string,"kind"?: string,"retrieved_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"saxo_token_vault": {
+                  Row: {
+                    "ciphertext": string,"environment": string,"generation": number,"rotated_at": string | null,"status": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "ciphertext": string,"environment": string,"generation"?: number,"rotated_at"?: string | null,"status"?: string,"user_id": string
+                  }
+                  Update: {
+                    "ciphertext"?: string,"environment"?: string,"generation"?: number,"rotated_at"?: string | null,"status"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"user_settings": {
                   Row: {
                     "created_at": string,"locale": string,"timezone": string,"updated_at": string,"user_id": string
                   }
@@ -114,6 +141,50 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"wealth_journal_events": {
+                  Row: {
+                    "account_id": string,"batch_id": string | null,"cash_amount_minor": number | null,"correction_of": string | null,"created_at": string,"currency": string,"event_type": string,"fees_minor": number,"fx_rate_id": string | null,"id": string,"idempotency_key": string,"instrument_id": string | null,"occurred_on": string,"quantity": number | null,"settled_on": string | null,"source_ref": string | null,"source_type": string,"split_denominator": number | null,"split_numerator": number | null,"tax_minor": number,"transfer_group_id": string | null,"unit_price_minor": number | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "account_id": string,"batch_id"?: string | null,"cash_amount_minor"?: number | null,"correction_of"?: string | null,"created_at"?: string,"currency": string,"event_type": string,"fees_minor"?: number,"fx_rate_id"?: string | null,"id"?: string,"idempotency_key": string,"instrument_id"?: string | null,"occurred_on": string,"quantity"?: number | null,"settled_on"?: string | null,"source_ref"?: string | null,"source_type": string,"split_denominator"?: number | null,"split_numerator"?: number | null,"tax_minor"?: number,"transfer_group_id"?: string | null,"unit_price_minor"?: number | null,"user_id": string
+                  }
+                  Update: {
+                    "account_id"?: string,"batch_id"?: string | null,"cash_amount_minor"?: number | null,"correction_of"?: string | null,"created_at"?: string,"currency"?: string,"event_type"?: string,"fees_minor"?: number,"fx_rate_id"?: string | null,"id"?: string,"idempotency_key"?: string,"instrument_id"?: string | null,"occurred_on"?: string,"quantity"?: number | null,"settled_on"?: string | null,"source_ref"?: string | null,"source_type"?: string,"split_denominator"?: number | null,"split_numerator"?: number | null,"tax_minor"?: number,"transfer_group_id"?: string | null,"unit_price_minor"?: number | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "wealth_journal_events_account_id_fkey"
+      columns: ["account_id"]
+isOneToOne: false
+      referencedRelation: "wealth_accounts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "wealth_journal_events_batch_id_fkey"
+      columns: ["batch_id"]
+isOneToOne: false
+      referencedRelation: "wealth_import_batches"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "wealth_journal_events_correction_of_fkey"
+      columns: ["correction_of"]
+isOneToOne: false
+      referencedRelation: "wealth_journal_events"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "wealth_journal_events_fx_rate_id_fkey"
+      columns: ["fx_rate_id"]
+isOneToOne: false
+      referencedRelation: "wealth_fx_rates"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "wealth_journal_events_instrument_id_fkey"
+      columns: ["instrument_id"]
+isOneToOne: false
+      referencedRelation: "wealth_instruments"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"wealth_profiles": {
                   Row: {
