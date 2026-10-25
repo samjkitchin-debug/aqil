@@ -160,6 +160,7 @@ test("public routes stay reachable without a session", () => {
   assert.equal(isPublicPath("/tos"), true);
   assert.equal(isPublicPath("/auth/callback"), true);
   assert.equal(isPublicPath("/auth/google"), true);
+  assert.equal(isPublicPath("/icons/icon-192.png"), true);
   assert.equal(isPublicPath("/research"), false);
   assert.equal(isPublicPath("/my-wealth"), false);
 });

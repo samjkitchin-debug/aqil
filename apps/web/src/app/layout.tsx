@@ -17,6 +17,9 @@ export const metadata: Metadata = {
     title: "Aqil",
     statusBarStyle: "default",
   },
+  icons: {
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export const viewport: Viewport = {

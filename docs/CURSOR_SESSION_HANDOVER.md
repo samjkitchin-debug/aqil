@@ -1,7 +1,13 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 25 October 2026, local main consolidation
+**Last updated:** 25 October 2026, PWA icon
+
+## PWA icon, 25 October 2026
+
+Risk class R0. Local only. Nothing was pushed or deployed.
+
+The installed icon is a white tile with the word Aqil in navy (`#152f4b`). `apps/web/public/icons/icon.svg` is a rounded square. The 192 and 512 maskable PNGs, and the 180 Apple touch icon, are full-bleed white so the phone mask supplies the rounding. The word sits inside the central safe circle. Letterforms are Source Sans 3 Semibold under the SIL Open Font Licence. Aptos is not embedded. The browser-tab favicon is unchanged. Paths under `/icons/` are public, so the icon loads before sign-in. No backlog row covers this icon. `npm run test:auth` in `apps/web` passed 13. The icon was not installed on a phone.
 
 ## Local main consolidation, 25 October 2026
 
