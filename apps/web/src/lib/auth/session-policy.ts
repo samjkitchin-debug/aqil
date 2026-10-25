@@ -87,19 +87,40 @@ export function configuredAppOrigin(env: {
 
 /**
  * Next.js 16 prefetch uses `next-router-prefetch` or `next-router-segment-prefetch`.
+ * `1` is the loading-boundary prefetch. Partial prefetching also sends `2`
+ * (PPR runtime) and `3` (runtime shell). The segment header carries a path
+ * such as `/_tree`, not only `1`.
  * A real navigation sets `sec-fetch-mode: navigate` or `rsc` without those headers.
  * Server Actions set `next-action` and must reach the action.
  */
+const NEXT_PREFETCH_VALUES = new Set(["1", "2", "3"]);
+
 export function isPrefetchRequest(headers: { get(name: string): string | null }): boolean {
   if (headers.get("next-action")) return false;
   if (headers.get("sec-fetch-mode") === "navigate") return false;
+  const segmentPrefetch = headers.get("next-router-segment-prefetch");
   const nextPrefetch =
-    headers.get("next-router-prefetch") === "1" || headers.get("next-router-segment-prefetch") === "1";
+    NEXT_PREFETCH_VALUES.has(headers.get("next-router-prefetch") ?? "") ||
+    (segmentPrefetch !== null && segmentPrefetch.length > 0);
   const purpose = `${headers.get("purpose") ?? ""} ${headers.get("sec-purpose") ?? ""}`.toLowerCase();
   const browserPrefetch = purpose.includes("prefetch");
   if (!nextPrefetch && !browserPrefetch) return false;
   if (headers.get("rsc") === "1" && !nextPrefetch) return false;
   return true;
+}
+
+/**
+ * A full page load sets `sec-fetch-mode: navigate` or `sec-fetch-dest: document`.
+ * Next strips `rsc` and `next-router-prefetch` before the proxy runs, so those
+ * headers cannot separate a prefetch from a client navigation. A prefetch uses
+ * `fetch`, which the browser marks as `cors` / `empty`. Callers without fetch
+ * metadata still count as document loads so they receive the login redirect.
+ */
+export function isBrowserDocumentNavigation(headers: { get(name: string): string | null }): boolean {
+  const mode = headers.get("sec-fetch-mode");
+  const dest = headers.get("sec-fetch-dest");
+  if (mode === "navigate" || dest === "document") return true;
+  return !mode && !dest;
 }
 
 /** Auth helpers do not set document cache policy. Private routes set it in next.config.ts. */

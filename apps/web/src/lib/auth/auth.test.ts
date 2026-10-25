@@ -18,6 +18,7 @@ import {
   configuredAppOrigin,
   documentCacheControl,
   hasAuthSessionCookie,
+  isBrowserDocumentNavigation,
   isPrefetchRequest,
   isProviderEnabled,
   shouldContactAuthServer,
@@ -117,12 +118,32 @@ test("public routes do not contact the auth server", () => {
   assert.equal(configuredAppOrigin({ nodeEnv: "development" }).ok, true);
 });
 
+test("a client fetch is not a document navigation", () => {
+  assert.equal(
+    isBrowserDocumentNavigation(new Headers({ "sec-fetch-mode": "cors", "sec-fetch-dest": "empty" })),
+    false,
+  );
+  assert.equal(
+    isBrowserDocumentNavigation(
+      new Headers({ "sec-fetch-mode": "cors", "sec-fetch-dest": "empty", "next-router-prefetch": "3" }),
+    ),
+    false,
+  );
+  assert.equal(isBrowserDocumentNavigation(new Headers({ "sec-fetch-mode": "navigate", "sec-fetch-dest": "document" })), true);
+  assert.equal(isBrowserDocumentNavigation(new Headers()), true);
+});
+
 test("prefetch of a private route is recognisable and does not bounce", () => {
   assert.equal(isPrefetchRequest(new Headers({ "next-router-prefetch": "1" })), true);
+  assert.equal(isPrefetchRequest(new Headers({ "next-router-prefetch": "2" })), true);
+  assert.equal(isPrefetchRequest(new Headers({ "next-router-prefetch": "3" })), true);
   assert.equal(isPrefetchRequest(new Headers({ "next-router-segment-prefetch": "1" })), true);
+  assert.equal(isPrefetchRequest(new Headers({ "next-router-segment-prefetch": "/_tree" })), true);
   assert.equal(isPrefetchRequest(new Headers({ rsc: "1", "next-router-state-tree": "%5B%5D" })), false);
+  assert.equal(isPrefetchRequest(new Headers({ "sec-fetch-mode": "navigate", "next-router-prefetch": "3" })), false);
   assert.equal(isPrefetchRequest(new Headers({ "sec-fetch-mode": "navigate", "sec-purpose": "prefetch" })), false);
   assert.equal(isPrefetchRequest(new Headers({ "next-action": "abc", "next-router-prefetch": "1" })), false);
+  assert.equal(isPrefetchRequest(new Headers({ "next-action": "abc", "next-router-prefetch": "2" })), false);
   assert.equal(isPrefetchRequest(new Headers()), false);
 });
 

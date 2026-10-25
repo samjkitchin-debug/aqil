@@ -6,6 +6,7 @@ import { safeNextPath } from "@/lib/auth/safe-next";
 import {
   classifyAuthFailure,
   hasAuthSessionCookie,
+  isBrowserDocumentNavigation,
   isPrefetchRequest,
   shouldContactAuthServer,
 } from "@/lib/auth/session-policy";
@@ -33,6 +34,25 @@ function redirectTo(request: NextRequest, session: NextResponse, pathname: strin
   return redirect;
 }
 
+/**
+ * Document loads go to the login page. A client prefetch is also a fetch, and
+ * Next removes the prefetch header before this proxy, so an HTTP redirect would
+ * be followed and replayed. An empty 204 keeps that fetch from navigating.
+ */
+function rejectUnauthenticated(
+  request: NextRequest,
+  session: NextResponse,
+  reason: "unavailable" | "signed_out" | "session_ended",
+  next: string,
+) {
+  if (!isBrowserDocumentNavigation(request.headers)) {
+    return new NextResponse(null, { status: 204 });
+  }
+  const redirect = redirectTo(request, session, "/login", `?error=${reason}&next=${encodeURIComponent(next)}`);
+  if (reason === "session_ended") clearLocalAuthCookies(request, redirect);
+  return redirect;
+}
+
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isPublic = isPublicPath(pathname);
@@ -50,10 +70,10 @@ export async function proxy(request: NextRequest) {
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const next = safeNextPath(`${pathname}${request.nextUrl.search}`);
   if (!url || !anon) {
-    return redirectTo(request, session, "/login", `?error=unavailable&next=${encodeURIComponent(next)}`);
+    return rejectUnauthenticated(request, session, "unavailable", next);
   }
   if (!hasAuthSessionCookie(request.cookies.getAll().map((cookie) => cookie.name))) {
-    return redirectTo(request, session, "/login", `?error=signed_out&next=${encodeURIComponent(next)}`);
+    return rejectUnauthenticated(request, session, "signed_out", next);
   }
 
   const supabase = createServerClient(url, anon, {
@@ -84,11 +104,7 @@ export async function proxy(request: NextRequest) {
         : status === "terminal_invalid_session"
           ? "session_ended"
           : "signed_out";
-    const redirect = redirectTo(request, session, "/login", `?error=${reason}&next=${encodeURIComponent(next)}`);
-    if (status === "terminal_invalid_session") {
-      clearLocalAuthCookies(request, redirect);
-    }
-    return redirect;
+    return rejectUnauthenticated(request, session, reason, next);
   }
 
   return session;
