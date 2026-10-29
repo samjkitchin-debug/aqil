@@ -1,0 +1,138 @@
+-- Server-side read login for the web application.
+-- The role stays NOLOGIN in Git. A deploy step enables LOGIN and sets the password
+-- outside this file. The password is not the postgres administrator password.
+-- anon, authenticated, and service_role receive no research or forward privileges.
+
+do $$
+begin
+  create role research_reader
+    nologin
+    nosuperuser
+    nocreatedb
+    nocreaterole
+    noinherit;
+exception
+  when duplicate_object then null;
+end $$;
+
+comment on role research_reader is
+  'Read-only research access for the server-side web application. No insert. Not a Data API role.';
+
+grant connect on database postgres to research_reader;
+
+revoke all on schema research from research_reader;
+revoke all on schema forward from research_reader;
+grant usage on schema research to research_reader;
+grant usage on schema forward to research_reader;
+
+grant select on table research.source_retrievals to research_reader;
+grant select on table research.economic_observations to research_reader;
+
+grant select (
+  run_id,
+  executed_at,
+  execution_status,
+  primary_dataset_id,
+  source_id,
+  method_id,
+  method_version,
+  analytical_payload_hash,
+  data_sufficiency,
+  missing_data_reason,
+  calculation,
+  statistical_interpretation,
+  limitations,
+  observation_ids,
+  narrative,
+  analysis_mode,
+  publication_allowed
+) on table research.research_runs to research_reader;
+
+grant select (
+  event_id,
+  event_key,
+  category,
+  epistemic_class,
+  claim_scope,
+  summary,
+  event_on,
+  event_dates_stated,
+  indicator_source_ids,
+  channel_note,
+  surface_on_today,
+  surface_reason,
+  surfaced_at,
+  record_class,
+  investment_implication,
+  recorded_at
+) on table research.macro_events to research_reader;
+
+grant select (event_id, role, cluster_key, update_id)
+  on table research.macro_event_evidence to research_reader;
+
+grant select (
+  assessment_id,
+  recorded_at,
+  supersedes_assessment_id,
+  record_class,
+  real_economy_activity,
+  earnings,
+  market_prices,
+  media_attention
+) on table research.theme_assessments to research_reader;
+
+grant select (
+  assessment_id,
+  dimension,
+  status,
+  measure_kind,
+  explanation,
+  amount,
+  unit,
+  period_start,
+  period_end,
+  reporting_entity,
+  relationship,
+  update_id
+) on table research.theme_dimension_evidence to research_reader;
+
+grant select (
+  update_id,
+  schema_version,
+  source_id,
+  title,
+  canonical_url,
+  published_at,
+  retrieved_at,
+  retrieval_id,
+  content_hash,
+  correction_of,
+  status
+) on table research.sourced_updates to research_reader;
+
+grant select (
+  assessment_id,
+  captured_at,
+  lifecycle_status,
+  publication_allowed,
+  horizon_months,
+  capture_note
+) on table research.prospective_assessments to research_reader;
+
+grant select (
+  event_id,
+  title,
+  scheduled_at,
+  timezone,
+  status,
+  source_id,
+  source_locator,
+  last_verified_at,
+  date_precision,
+  evidence_class
+) on table forward.catalyst_events to research_reader;
+
+revoke all on schema research from anon, authenticated, service_role;
+revoke all on schema forward from anon, authenticated, service_role;
+revoke all on all tables in schema research from anon, authenticated, service_role;
+revoke all on all tables in schema forward from anon, authenticated, service_role;

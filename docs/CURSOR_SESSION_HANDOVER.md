@@ -1,7 +1,17 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 25 October 2026, release 0.2.0 prepared
+**Last updated:** 30 October 2026, hosted research read
+
+## Hosted research read, 30 October 2026
+
+Risk class R3. Migration `20261029212358_research_reader` is applied on `ojvswermsbbaltjohqph`. `research_reader` can log in and select the dashboard tables. It cannot insert. `anon`, `authenticated`, and `service_role` still have no usage on `research` or `forward`. `research_worker` can log in and inherits `research_writer`. Its password is outside Git and is not on Vercel.
+
+`RESEARCH_DATABASE_URL` is a sensitive production variable for `research_reader` on the session pooler. The web client uses that URL with TLS. A Vercel deployment after this variable is what removes "The research database is not configured."
+
+Live dashboard series imported from the local operational store: 23 retrievals, 34,859 observations, 27 verified BLS calendar rows, and 5 family-reading runs. The second import inserted nothing. `publication_allowed` is false on those runs. Bry–Boschan and Stock–Watson runs were not copied. Fixtures were not copied. `auth.users` stayed 2. Wealth and the Saxo vault stayed empty. The pre-import count file is `C:\Users\gamer\aqil-release-backups\2026-10-30\PRE_IMPORT_COUNTS.txt`. Research rows are append-only, so promoting an older Vercel deployment does not remove them.
+
+Manual refresh, when used, is one local `npm run research:refresh` with `RESEARCH_DATABASE_URL` set to the `research_worker` pooler URL from the same backup folder. Do not put that URL on Vercel. Do not enable a schedule.
 
 ## Production release 0.2.0, 25 October 2026
 
