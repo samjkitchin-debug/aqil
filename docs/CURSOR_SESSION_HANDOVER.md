@@ -1074,3 +1074,30 @@ AQ-094 to AQ-102 notes were extended. No new backlog id. Diffusion and Harding�
 `npm run test:research` passed 561 tests, Ruff check, and Ruff format. `scripts/prepare-research-test-db.ps1` rebuilt only `aqil_research_test`. Two earlier failures were that dirty disposable database. `test_refresh_hook_is_idempotent_until_a_month_changes` returned unchanged because G.17 was already stored. `test_stock_watson_lifecycle.py` saw a leftover negative level, so the filter update said log differences require positive levels. Assertions were not weakened. Both passed after the disposable database was prepared. `apps/web` present-methodology tests passed 7. GitHub Actions has not run.
 
 Nothing in these results should stop batch 2, provided publication stays closed, the refit is not marked operationally accepted, diffusion is not treated as confirmation of the factor, and characteristics are not described as BBQ.
+
+## Quantitative methods certification, 30 October 2026
+
+Risk class R2. Local only. Branch `research/quantitative-methods` in `C:\Users\gamer\aqil-quant-methods`. Nothing was pushed, deployed, or applied to hosted Supabase. `publication_allowed` stays false. The preserved database `postgres` on `127.0.0.1` port 55432 was not reset. No VAR code was written.
+
+The certification is `docs/macro/METHODOLOGY_CERTIFICATION.md`.
+
+Registration commit: `2a52262e08f1860e0eac7ecf9fe8722a5fd89526`. This handover section is committed with the certification. Its parent is that registration commit.
+
+`default_method_registry` now also includes `HAMILTON_MONTHLY_REGIME_SWITCHING`, `BAI_PERRON_MEAN_SHIFTS`, `AUTOREGRESSIVE_BENCHMARK`, and `LEAD_LAG_CROSS_CORRELATION`. `refresh.py` was not changed. These are full-sample estimates, not idempotent single-series refresh hooks.
+
+Stored runs, left in place:
+
+- Hamilton monthly variant run `4629b31d-b0de-4a2f-a987-9e5d3f94747e`. BIC lag 2. Seeded recovery maximum absolute error about 0.016. Lower-mean expected duration about 2 months. Not a persistent recession regime and not empirically qualified. Not a reproduction of Hamilton 1989 quarterly US GNP. Filtered and smoothed probabilities are separate. Neither is real-time.
+- Bai–Perron intercept-only mean shifts run `2f4c14eb-44f2-40dc-913f-bf7945e972cd`. Primary trimming selects no break on G.17 log-growth. That is a valid result. Looser trims are sensitivity, not a second selected model. `point_estimates_only`. The 1998 and 2003 papers were not line-checked. Not the general regressor model.
+- Autoregressive benchmark run `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e`. AIC lag 12. Horizon 1 beat the historical mean. Horizon 12 did not. Not empirically qualified as a forecast.
+- Lead–lag run `94152391-c3a8-48d7-8f2e-8c4d1dfdb811`. Strongest correlations are contemporaneous. None of those peaks is stable across 1997-2007 and 2010-2019. Not a structural lead. This blocks a small VAR.
+
+Batch 3 stays blocked. Estrella–Mishkin still needs the 10-year minus 3-month Treasury spread. AQ-104 stays the dependency. The stored 10-year yield and the federal funds rate are not that spread. US GDP is not stored, and there is no vintage panel. Euro-area GDP does not remove the nowcast block. Financial conditions, the excess bond premium, the BIS credit gap, and yield-spread substitutes were not estimated and were not proxied.
+
+Catalogue slugs with stored runs: `hamilton-markov-switching`, `bai-perron-breaks`, `autoregressive-benchmark`, and `lead-lag`, alongside the batch 1 cards. `harding-pagan-bbq` stays planned. Payloads stay withheld.
+
+Hamilton, Bai–Perron mean shifts, the autoregressive benchmark, and lead–lag have no backlog ids. That gap remains, as it does for diffusion and Harding-Pagan characteristics.
+
+`npm run test:research` passed 597 tests, then Ruff check and Ruff format. Targeted batch 2 modules passed 36. Catalogue unit tests passed 8. GitHub Actions has not run.
+
+Local `main` is `c03842692c0a18b41ed63fb527cbb9534f44c0ab`. The merge base remains `df0ed5583a58a132ad02ea4b94da4860851892ae`. Main's reader-role commits were not merged into this branch. The main checkout was not edited.
