@@ -1055,7 +1055,7 @@ Wave 2 must not overwrite these adapter packages, the appended rights rows, the 
 
 Risk class R2. Local only. Branch `research/quantitative-methods` in `C:\Users\gamer\aqil-quant-methods`. Nothing was pushed, deployed, or applied to hosted Supabase. `publication_allowed` stays false. The preserved database `postgres` on `127.0.0.1` port 55432 was not reset. Batch 2 was not started. `docs/macro/METHODOLOGY_CERTIFICATION.md` was not written.
 
-Integration commit: pending-hash
+Integration commit: `3c5c138c692d19bea37220b15fd52be912c768c7`
 
 Stored runs, left in place:
 
