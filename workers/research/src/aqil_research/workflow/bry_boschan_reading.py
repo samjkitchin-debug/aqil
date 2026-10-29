@@ -3,6 +3,9 @@
 There is no jobs table and no cron. A caller, including the G.17 refresh
 hook, invokes this function. The same inputs do not append another run.
 publication_allowed stays false.
+
+Stored chronologies are retrospective_full_sample. The Spencer smoother is
+centred, so the dates are not a contemporaneous recession call.
 """
 
 from __future__ import annotations

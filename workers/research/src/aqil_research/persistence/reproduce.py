@@ -7,6 +7,11 @@ from dataclasses import dataclass
 
 import psycopg
 
+from aqil_research.methods.bry_boschan_spencer15 import (
+    BRY_BOSCHAN_SPENCER15_VARIANT,
+    BryBoschanSpencer15Method,
+    legacy_variant_implementation_hash,
+)
 from aqil_research.methods.configs import (
     BRY_BOSCHAN_SPENCER15_PUBLISHED,
     CENSUS_ADV_ORDERS_PUBLISHED,
@@ -14,6 +19,9 @@ from aqil_research.methods.configs import (
     SAHM_PUBLISHED,
     SAHM_SENSITIVITY,
     SLOOS_CIL_PUBLISHED,
+)
+from aqil_research.methods.harding_pagan_characteristics import (
+    HARDING_PAGAN_CHARACTERISTICS_PUBLISHED,
 )
 from aqil_research.methods.registry import default_method_registry
 from aqil_research.persistence.calculation_normalize import normalize_calculation_payload
@@ -91,6 +99,12 @@ def recompute_stored_run(conn: psycopg.Connection, run_id: str) -> ResearchRun:
         store.append(row)
 
     method_config = _config_for_id(stored.config_id)
+    registry = default_method_registry()
+    if (
+        stored.method_id == BRY_BOSCHAN_SPENCER15_VARIANT
+        and stored.implementation_hash == legacy_variant_implementation_hash()
+    ):
+        registry.register(BryBoschanSpencer15Method(payload_revision="legacy"))
     request = ResearchExecutionRequest(
         source_id=stored.source_id,
         dataset_id=stored.dataset_id,
@@ -107,7 +121,7 @@ def recompute_stored_run(conn: psycopg.Connection, run_id: str) -> ResearchRun:
         request,
         store=store,
         rights_records=load_source_rights(),
-        method_registry=default_method_registry(),
+        method_registry=registry,
         executed_at=stored.executed_at,
         run_id=stored.run_id,
     )
@@ -129,6 +143,7 @@ def _config_for_id(config_id: str) -> dict[str, object]:
         SLOOS_CIL_PUBLISHED,
         CENSUS_ADV_ORDERS_PUBLISHED,
         BRY_BOSCHAN_SPENCER15_PUBLISHED,
+        HARDING_PAGAN_CHARACTERISTICS_PUBLISHED,
     )
     for panel in published_panels:
         if config_id == panel["config_id"]:

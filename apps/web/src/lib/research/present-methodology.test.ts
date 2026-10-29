@@ -37,6 +37,7 @@ const REGISTER_ROWS = [
   "KALMAN_FILTER",
   "DIFFUSION_INDEX",
   "HARDING_PAGAN_BBQ",
+  "HARDING_PAGAN_CHARACTERISTICS",
   "MIXED_FREQUENCY_NOWCAST",
   "HAMILTON_MARKOV_SWITCHING",
   "YIELD_CURVE_PROBIT",
@@ -51,11 +52,24 @@ const REGISTER_ROWS = [
   "PORTFOLIO_RESEARCH",
 ] as const;
 
-test("the catalogue keeps the two in-development methods and names every other programme row", () => {
+test("the catalogue names the stored methods and every other programme row", () => {
   assert.equal(bry?.queryMethodIds.includes("BRY_BOSCHAN_SPENCER15_VARIANT"), true);
   assert.equal(factor?.outputKind, "time-series");
   assert.equal(bry?.stage, "in-development");
   assert.equal(factor?.stage, "in-development");
+  const inDevelopment = METHODOLOGY_CATALOGUE.filter((entry) => entry.stage === "in-development")
+    .map((entry) => entry.slug)
+    .sort();
+  assert.deepEqual(inDevelopment, [
+    "bry-boschan-spencer15",
+    "diffusion-index",
+    "harding-pagan-characteristics",
+    "stock-watson-1988",
+  ]);
+  const bbq = methodologyBySlug("harding-pagan-bbq");
+  assert.equal(bbq?.stage, "planned");
+  assert.deepEqual(bbq?.queryMethodIds, []);
+  assert.equal(bbq?.registerId, "HARDING_PAGAN_BBQ");
   const shown = new Set(METHODOLOGY_CATALOGUE.map((entry) => entry.registerId));
   const excluded = new Set(EXCLUDED_REGISTER_ROWS.map((row) => row.id));
   assert.deepEqual(
@@ -97,6 +111,35 @@ test("a closed publication withholds calculated output", () => {
   assert.equal(text.includes("likelihood"), false);
   assert.equal(text.includes("0.907"), false);
   assert.equal("output" in view, false);
+});
+
+test("unpublished diffusion and characteristics stay withheld", () => {
+  const diffusion = methodologyBySlug("diffusion-index");
+  const characteristics = methodologyBySlug("harding-pagan-characteristics");
+  assert.ok(diffusion);
+  assert.ok(characteristics);
+  assert.deepEqual(diffusion.queryMethodIds, ["RESTRICTED_COINCIDENT_DIFFUSION"]);
+  assert.deepEqual(characteristics.queryMethodIds, ["HARDING_PAGAN_CHARACTERISTICS"]);
+  for (const entry of [diffusion, characteristics]) {
+    const view = presentMethodology(entry, {
+      status: "ready",
+      runs: [run({ methodId: entry.queryMethodIds[0], publicationAllowed: false })],
+    });
+    const text = JSON.stringify(view);
+    assert.match(view.statusLine, /not eligible for publication/);
+    assert.match(text, /withheld/);
+    assert.equal(text.includes("0.336"), false);
+    assert.equal(text.includes("0.000629"), false);
+    assert.equal("output" in view, false);
+  }
+  const bbq = methodologyBySlug("harding-pagan-bbq");
+  assert.ok(bbq);
+  const bbqView = presentMethodology(bbq, {
+    status: "ready",
+    runs: [run({ methodId: "HARDING_PAGAN_BBQ", publicationAllowed: true })],
+  });
+  assert.equal(bbqView.statusLine, "Planned.");
+  assert.equal(JSON.stringify(bbqView).includes("HARDING_PAGAN_BBQ"), false);
 });
 
 test("an eligible run still has no presenter", () => {

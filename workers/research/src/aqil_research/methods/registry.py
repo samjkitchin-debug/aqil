@@ -16,6 +16,10 @@ from aqil_research.methods.credit_standards_volumes import (
     CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID,
     CreditStandardsVolumesMethod,
 )
+from aqil_research.methods.harding_pagan_characteristics import (
+    HARDING_PAGAN_CHARACTERISTICS,
+    HardingPaganCharacteristicsMethod,
+)
 from aqil_research.methods.industrial_production_activity import (
     INDUSTRIAL_PRODUCTION_METHOD_ID,
     IndustrialProductionActivityMethod,
@@ -34,9 +38,19 @@ from aqil_research.methods.prices_and_policy import (
     PricesAndPolicyMethod,
 )
 from aqil_research.methods.protocol import AnalyticalMethod
+from aqil_research.methods.restricted_coincident_diffusion import (
+    METHOD_ID as RESTRICTED_COINCIDENT_DIFFUSION_METHOD_ID,
+)
+from aqil_research.methods.restricted_coincident_diffusion import (
+    RestrictedCoincidentDiffusionMethod,
+)
 from aqil_research.methods.sahm import SAHM_METHOD_ID
 from aqil_research.methods.sahm_registered import SahmAnalyticalMethod
 from aqil_research.methods.sloos_cil import SLOOS_CIL_METHOD_ID, SloosCilMethod
+from aqil_research.methods.stock_watson_1988_fit import (
+    SPECIFICATION_ID as STOCK_WATSON_MODERN_REFIT_ID,
+)
+from aqil_research.methods.stock_watson_1988_fit import StockWatsonModernRefitMethod
 
 
 class MethodRegistryError(Exception):
@@ -72,6 +86,9 @@ def default_method_registry() -> MethodRegistry:
     registry.register(IndustrialProductionActivityMethod())
     registry.register(CreditStandardsVolumesMethod())
     registry.register(BryBoschanSpencer15Method())
+    registry.register(StockWatsonModernRefitMethod())
+    registry.register(RestrictedCoincidentDiffusionMethod())
+    registry.register(HardingPaganCharacteristicsMethod())
     return registry
 
 
@@ -79,6 +96,9 @@ __all__ = [
     "MethodRegistry",
     "MethodRegistryError",
     "BRY_BOSCHAN_SPENCER15_VARIANT",
+    "HARDING_PAGAN_CHARACTERISTICS",
+    "RESTRICTED_COINCIDENT_DIFFUSION_METHOD_ID",
+    "STOCK_WATSON_MODERN_REFIT_ID",
     "CENSUS_ADV_ORDERS_METHOD_ID",
     "CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID",
     "INDUSTRIAL_PRODUCTION_METHOD_ID",

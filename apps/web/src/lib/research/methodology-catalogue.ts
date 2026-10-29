@@ -67,12 +67,12 @@ export const METHODOLOGY_GROUPS: readonly { id: MethodologyGroup; heading: strin
   {
     id: "current",
     heading: "In development",
-    note: "These two methods have implementation work. A stored run is described only as far as its publication state allows. The backlog does not open another methodology while the Stock–Watson refit remains partial and unpublished.",
+    note: "Bry–Boschan, the Stock–Watson refit, restricted coincident diffusion, and Harding–Pagan characteristics have stored runs. A stored run is described only as far as its publication state allows. The Stock–Watson refit is not operationally accepted. Quarterly BBQ has not been run.",
   },
   {
     id: "activity",
     heading: "Economic activity and cycles",
-    note: "Planned dating, breadth and regime methods. None of these has a stored Aqil calculation.",
+    note: "Planned quarterly dating and regime methods. Quarterly BBQ has not been run, and Hamilton has no stored calculation.",
   },
   {
     id: "forecasting",
@@ -139,6 +139,7 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     ],
     uncertainty: [
       "This is the labelled Spencer-15 variant. It is not the 1971 programme listing and not a FORTRAN replica.",
+      "The stored chronology is a full-sample retrospective dating. The centred smoother means it is not a contemporaneous recession call.",
       "Agreement with a reference chronology is not an acceptance test and is not shown here as a score.",
       "The calculated dates stay unpublished until the research system marks a run eligible and a turning-point presenter exists.",
     ],
@@ -175,8 +176,9 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
       "A factor path would not be a recession probability and would not be a forecast skill claim unless that is the stated output.",
     ],
     uncertainty: [
-      "The method registry shipped with this application does not register a factor estimator.",
-      "Another part of the programme may be writing runs under the identifiers below. This page does not read those working files.",
+      "The modern refit estimator is registered so a replay can use the same method id. The refit is not operationally accepted.",
+      "The 1988 payroll specification remains blocked. Employee-hours and the 1982-dollar series are not stored.",
+      "Stored runs may exist for the identifiers below. This page does not read calculation JSON from those runs.",
       "Loadings, likelihood and the factor path are not selected, even when a run row exists.",
       "Static principal components, the Chicago Fed National Activity Index and the Kalman filter are supporting techniques for this family. They are not separate methodologies and do not have their own cards.",
     ],
@@ -194,27 +196,66 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
       },
     ],
   },
-  planned({
+  {
     slug: "diffusion-index",
     registerId: "DIFFUSION_INDEX",
-    name: "Diffusion index",
+    name: "Restricted coincident diffusion",
     measures:
-      "Reports the share of a named panel that is improving. It is a breadth statistic, not a dynamic factor and not a recession call.",
+      "Reports the share of four coincident series whose level rose over three months. It is a breadth statistic on that restricted panel. It is not a dynamic factor and not the Chicago Fed 85-indicator index.",
     domain: "Economic activity",
     timing: "contemporaneous",
     functionLabel: "Contemporaneous measurement",
     outputKind: "time-series",
-    group: "activity",
+    stage: "in-development",
+    group: "current",
+    queryMethodIds: ["RESTRICTED_COINCIDENT_DIFFUSION"],
     interpretation: [
-      "A diffusion index answers how widely a movement is shared. It does not estimate a common factor.",
+      "The share answers how widely a three-month rise is shared across the four series. It does not estimate a common factor.",
+      "A month with a missing series omits that series from the denominator. Nothing is interpolated.",
     ],
     uncertainty: [
-      "The register has not chosen the panel or the formula. No Aqil diffusion series exists.",
+      "This is the restricted four-series measure. It is not the Chicago Fed 85-indicator index.",
+      "A correlation with the Stock–Watson factor is not independent confirmation.",
+      "The calculated share stays unpublished until publication is allowed and a presenter exists.",
     ],
-    dataInputs: ["A defined panel with a common history. That panel is not fixed in the register."],
-    validation: ["No specification is documented, so nothing has been validated."],
+    dataInputs: [
+      "Industrial production, real personal income excluding transfers, real manufacturing and trade sales, and total nonfarm payroll employment, latest revised, on the balanced months used by the modern refit.",
+    ],
+    validation: [
+      "The page does not plot the share. Publication of the series is a separate decision.",
+    ],
     references: [],
-  }),
+  },
+  {
+    slug: "harding-pagan-characteristics",
+    registerId: "HARDING_PAGAN_CHARACTERISTICS",
+    name: "Harding–Pagan characteristics",
+    measures:
+      "Reports phase duration, amplitude, and pairwise concordance from Spencer-15 turning points in monthly level series. It does not date a quarterly series, and it is not the Harding–Pagan BBQ procedure.",
+    domain: "Economic activity",
+    timing: "retrospective",
+    functionLabel: "Historical dating",
+    outputKind: "turning-points",
+    stage: "in-development",
+    group: "current",
+    queryMethodIds: ["HARDING_PAGAN_CHARACTERISTICS"],
+    interpretation: [
+      "A phase is the span from one Spencer-15 turn to the next in that series.",
+      "Concordance is the share of months in which two series are in the same phase. Payroll, income, and sales turns are not NBER recession dates.",
+    ],
+    uncertainty: [
+      "Quarterly BBQ has not been implemented. This card is not that method.",
+      "The chronology is a full-sample retrospective dating on latest-revised levels. It is not a contemporaneous recession call.",
+      "The calculated characteristics stay unpublished until publication is allowed and a presenter exists.",
+    ],
+    dataInputs: [
+      "Industrial production, real personal income excluding transfers, real manufacturing and trade sales, and total nonfarm payroll employment, as latest-revised levels.",
+    ],
+    validation: [
+      "Dates come from the labelled Spencer-15 variant. This page does not replay that algorithm or show the dates.",
+    ],
+    references: [],
+  },
   planned({
     slug: "harding-pagan-bbq",
     registerId: "HARDING_PAGAN_BBQ",

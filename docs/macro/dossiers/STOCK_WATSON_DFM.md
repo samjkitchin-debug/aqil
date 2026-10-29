@@ -252,3 +252,26 @@ On the stored path, March–November 2001 has 9 months, minimum −0.764, maximu
 | Publication eligible | No |
 
 `npm run test:research` passed 534 tests. Ruff passed after the likelihood formatter change.
+
+## Re-estimation, 30 October 2026
+
+The preserved run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` was not overwritten. Its executed time is still 2026-10-25 00:31:12 UTC. `publication_allowed` on that row is false.
+
+The re-estimate used five starting points: the three coded starts, the preserved parameter vector, and one refinement from the best of those. It is the 1988 order on the balanced latest-revised panel from January 1997. Payroll headcount is not employee-hours. 2017 chained dollars are not 1982 dollars. This is not the CITIBASE 1959–87 payroll specification. The path is `latest_revised`. It is not a real-time vintage and not a GDP nowcast.
+
+The central finite-difference gradient of the negative log likelihood, at the reported point, has Euclidean norm 0.000629256724018139 with step 1e-5 and 0.0006230932677271997 with step 1e-4. Both are inside the coded limits of 1e-3 and 1e-2. Maximum likelihood is claimed for this point. L-BFGS reported `CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH`. That message is not, by itself, the claim.
+
+Log likelihood is −1590.5371942126505, against −1590.5374990458229 on the preserved run. The improvement is about 0.000305, below the 0.001 rule for adopting a new parameter version. The new row is `940955f1-50d5-4c06-9d90-5ceebd05d352`, with `adopted_parameter_version` false and `overwrote_preserved_run` false. `publication_allowed` is false. The preserved run remains the parameter version. The refit is not operationally accepted.
+
+The largest absolute gap between the new filtered path and the preserved filtered path is 0.003158. The largest absolute gap between the new filtered path and the new smoothed path is 0.461. The filtered values were not copied from the smoother.
+
+The earlier finite-difference norm of about 0.415 was the note on run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`. This re-estimate does not replace that note and does not edit that row.
+
+Registration, for the integrator, inside `default_method_registry`:
+
+```python
+from aqil_research.methods.stock_watson_1988_fit import StockWatsonModernRefitMethod
+
+registry.register(StockWatsonModernRefitMethod())
+```
+

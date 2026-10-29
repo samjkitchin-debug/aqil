@@ -1050,3 +1050,27 @@ Not stored: bank-lending survey `BLS.Q.U2.ALL.O.E.Z.B3.ST.S.WFNET` and BSI loans
 Signed-in `/conditions` showed 16 stored series. Europe showed the euro-area series and listed credit, currencies, energy and property as missing. China showed no indicator reading and listed the missing families. At 390px the page did not overflow horizontally. The economic reading above the filter still restates the stored United States synthesis. It is not a China or Europe reading.
 
 Wave 2 must not overwrite these adapter packages, the appended rights rows, the govinfo rights row, the coverage register, or the uncommitted events and presentation work.
+
+## Quantitative methods batch 1, 30 October 2026
+
+Risk class R2. Local only. Branch `research/quantitative-methods` in `C:\Users\gamer\aqil-quant-methods`. Nothing was pushed, deployed, or applied to hosted Supabase. `publication_allowed` stays false. The preserved database `postgres` on `127.0.0.1` port 55432 was not reset. Batch 2 was not started. `docs/macro/METHODOLOGY_CERTIFICATION.md` was not written.
+
+Integration commit: pending-hash
+
+Stored runs, left in place:
+
+- Spencer-15 retrospective run `3955f7f4-08f8-4e7b-9ded-b3f6eea6633f`. Kept run `8fb20325-414f-401b-8c46-bda82ed94e16`. Both have 18 peaks and 19 troughs. Chronology class `retrospective_full_sample`. `date_specific_cycles()` still refuses. A read-only replay of the kept run on `postgres` matched the full payload through the legacy implementation hash.
+- Harding–Pagan characteristics run `0d667a12-5a9c-45e0-b04a-8aea4196bc19`. Method id `HARDING_PAGAN_CHARACTERISTICS`. This is not quarterly BBQ.
+- Sahm short sample run `f3db281d-9f6d-4c4c-974f-ba4b9bd68131`. September 2025 gap 0.23 and not triggered. October 2025 was not interpolated. Sahm was not reimplemented. The AQ-103 unemployment backfill was not done.
+- Stock–Watson re-estimate `940955f1-50d5-4c06-9d90-5ceebd05d352`. Gradient norms about 0.000629 and 0.000623. Likelihood gain about 0.000305, so `adopted_parameter_version` is false. Preserved parameter version `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`. The refit is not operationally accepted. The 1988 panel block stays.
+- Restricted coincident diffusion run `1f747c9f-4851-4588-a4dc-d8fb1ff30558`. Correlation with the preserved filtered factor about 0.336 on 352 months. That is not independent confirmation and not the Chicago Fed 85-indicator index.
+
+`default_method_registry` now includes `STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT`, `RESTRICTED_COINCIDENT_DIFFUSION`, and `HARDING_PAGAN_CHARACTERISTICS`. Registration does not set `publication_allowed` true. `refresh.py` was not changed. The diffusion recorder appends a run on every call, so it was not hooked. Characteristics are idempotent, but they depend on four series and the existing refresh hook does not rerun that kind of method when any one input changes. The Stock–Watson path already replays the frozen filter. It was not turned into a re-estimate.
+
+Catalogue: `diffusion-index` is in development for the restricted measure. `harding-pagan-characteristics` was added. `harding-pagan-bbq` stays planned. Calculation JSON stays withheld.
+
+AQ-094 to AQ-102 notes were extended. No new backlog id. Diffusion and Harding–Pagan characteristics are in the quantitative register only. That backlog gap remains.
+
+`npm run test:research` passed 561 tests, Ruff check, and Ruff format. `scripts/prepare-research-test-db.ps1` rebuilt only `aqil_research_test`. Two earlier failures were that dirty disposable database. `test_refresh_hook_is_idempotent_until_a_month_changes` returned unchanged because G.17 was already stored. `test_stock_watson_lifecycle.py` saw a leftover negative level, so the filter update said log differences require positive levels. Assertions were not weakened. Both passed after the disposable database was prepared. `apps/web` present-methodology tests passed 7. GitHub Actions has not run.
+
+Nothing in these results should stop batch 2, provided publication stays closed, the refit is not marked operationally accepted, diffusion is not treated as confirmation of the factor, and characteristics are not described as BBQ.
