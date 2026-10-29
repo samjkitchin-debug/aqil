@@ -1,6 +1,6 @@
 # Hosted operations
 
-**Status:** schema applied on 25 October 2026. Research data was not loaded.  
+**Status:** schema applied. Live dashboard observations were loaded on 30 October 2026. Bry–Boschan and Stock–Watson stay unpublished.  
 **Project:** Supabase `ojvswermsbbaltjohqph`, Vercel `aqil` (`prj_EcU4I2q7iDMeqHmcQybO3TG9WwQ5`), production `https://aqil-tau.vercel.app`  
 **Application:** 0.2.0, tag `v0.2.0`
 
@@ -43,7 +43,7 @@ Values are not recorded here. Production target only.
 | `POSTGRES_HOST` | Set. `db.ojvswermsbbaltjohqph.supabase.co`. |
 | `POSTGRES_PASSWORD` | Set, sensitive. Not readable through the API. Not reused. |
 | `POSTGRES_DATABASE` | Set. `postgres`. |
-| `RESEARCH_DATABASE_URL` | Unset. |
+| `RESEARCH_DATABASE_URL` | Set, sensitive, production only. Role `research_reader` on the session pooler, port 5432, `uselibpqcompat=true&sslmode=require`. Not the `postgres` user. |
 | `ETF_DATABASE_URL` | Unset. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Removed from the project on 25 October 2026. |
 | `SUPABASE_SECRET_KEY` | Removed from the project on 25 October 2026. |
