@@ -50,6 +50,8 @@ const REGISTER_ROWS = [
   "BAI_PERRON_BREAKS",
   "ADVANCED_FORECASTING",
   "PORTFOLIO_RESEARCH",
+  "AUTOREGRESSIVE_BENCHMARK",
+  "LEAD_LAG_CROSS_CORRELATION",
 ] as const;
 
 test("the catalogue names the stored methods and every other programme row", () => {
@@ -61,9 +63,13 @@ test("the catalogue names the stored methods and every other programme row", () 
     .map((entry) => entry.slug)
     .sort();
   assert.deepEqual(inDevelopment, [
+    "autoregressive-benchmark",
+    "bai-perron-breaks",
     "bry-boschan-spencer15",
     "diffusion-index",
+    "hamilton-markov-switching",
     "harding-pagan-characteristics",
+    "lead-lag",
     "stock-watson-1988",
   ]);
   const bbq = methodologyBySlug("harding-pagan-bbq");
@@ -151,6 +157,42 @@ test("an eligible run still has no presenter", () => {
   assert.match(view.statusLine, /no presenter/);
   const current = view.sections.find((section) => section.id === "current-result");
   assert.match(current?.paragraphs.join(" ") ?? "", /stay hidden/);
+});
+
+test("unpublished batch 2 methods stay withheld", () => {
+  const cases = [
+    ["hamilton-markov-switching", "HAMILTON_MONTHLY_REGIME_SWITCHING"],
+    ["bai-perron-breaks", "BAI_PERRON_MEAN_SHIFTS"],
+    ["autoregressive-benchmark", "AUTOREGRESSIVE_BENCHMARK"],
+    ["lead-lag", "LEAD_LAG_CROSS_CORRELATION"],
+  ] as const;
+  for (const [slug, methodId] of cases) {
+    const entry = methodologyBySlug(slug);
+    assert.ok(entry);
+    assert.equal(entry.stage, "in-development");
+    assert.deepEqual(entry.queryMethodIds, [methodId]);
+    const view = presentMethodology(entry, {
+      status: "ready",
+      runs: [run({ methodId, publicationAllowed: false })],
+    });
+    const text = JSON.stringify(view);
+    assert.match(view.statusLine, /not eligible for publication/);
+    assert.match(text, /withheld/);
+    assert.equal(text.includes("0.016"), false);
+    assert.equal(text.includes("4629b31d"), false);
+    assert.equal(text.includes("is a leading indicator"), false);
+    assert.equal("output" in view, false);
+  }
+  const hamilton = methodologyBySlug("hamilton-markov-switching");
+  const bai = methodologyBySlug("bai-perron-breaks");
+  const benchmark = methodologyBySlug("autoregressive-benchmark");
+  const leadLag = methodologyBySlug("lead-lag");
+  assert.match(hamilton?.measures ?? "", /not a reproduction/);
+  assert.match(bai?.measures ?? "", /not the general Bai–Perron regressor model/);
+  assert.match(benchmark?.measures ?? "", /not a qualified forecast/);
+  assert.match(leadLag?.measures ?? "", /no series receives leading-indicator status/);
+  const bbq = methodologyBySlug("harding-pagan-bbq");
+  assert.equal(bbq?.stage, "planned");
 });
 
 test("Stock–Watson without a run does not invent a factor", () => {

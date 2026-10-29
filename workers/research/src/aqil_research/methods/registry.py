@@ -4,6 +4,14 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
+from aqil_research.methods.autoregressive_benchmark import (
+    AUTOREGRESSIVE_BENCHMARK,
+    AutoregressiveBenchmarkMethod,
+)
+from aqil_research.methods.bai_perron_mean_shifts import (
+    BAI_PERRON_MEAN_SHIFTS,
+    BaiPerronMeanShiftsMethod,
+)
 from aqil_research.methods.bry_boschan_spencer15 import (
     BRY_BOSCHAN_SPENCER15_VARIANT,
     BryBoschanSpencer15Method,
@@ -16,6 +24,10 @@ from aqil_research.methods.credit_standards_volumes import (
     CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID,
     CreditStandardsVolumesMethod,
 )
+from aqil_research.methods.hamilton_monthly import (
+    METHOD_ID as HAMILTON_MONTHLY_METHOD_ID,
+)
+from aqil_research.methods.hamilton_monthly import HamiltonMonthlyMethod
 from aqil_research.methods.harding_pagan_characteristics import (
     HARDING_PAGAN_CHARACTERISTICS,
     HardingPaganCharacteristicsMethod,
@@ -27,6 +39,10 @@ from aqil_research.methods.industrial_production_activity import (
 from aqil_research.methods.labour_market import (
     LABOUR_MARKET_METHOD_ID,
     LabourMarketConditionsMethod,
+)
+from aqil_research.methods.lead_lag import (
+    LEAD_LAG_CROSS_CORRELATION,
+    LeadLagCrossCorrelationMethod,
 )
 from aqil_research.methods.macro_conditions import (
     MACRO_CONDITIONS_METHOD_ID,
@@ -89,6 +105,10 @@ def default_method_registry() -> MethodRegistry:
     registry.register(StockWatsonModernRefitMethod())
     registry.register(RestrictedCoincidentDiffusionMethod())
     registry.register(HardingPaganCharacteristicsMethod())
+    registry.register(HamiltonMonthlyMethod())
+    registry.register(BaiPerronMeanShiftsMethod())
+    registry.register(AutoregressiveBenchmarkMethod())
+    registry.register(LeadLagCrossCorrelationMethod())
     return registry
 
 
@@ -96,7 +116,11 @@ __all__ = [
     "MethodRegistry",
     "MethodRegistryError",
     "BRY_BOSCHAN_SPENCER15_VARIANT",
+    "AUTOREGRESSIVE_BENCHMARK",
+    "BAI_PERRON_MEAN_SHIFTS",
+    "HAMILTON_MONTHLY_METHOD_ID",
     "HARDING_PAGAN_CHARACTERISTICS",
+    "LEAD_LAG_CROSS_CORRELATION",
     "RESTRICTED_COINCIDENT_DIFFUSION_METHOD_ID",
     "STOCK_WATSON_MODERN_REFIT_ID",
     "CENSUS_ADV_ORDERS_METHOD_ID",

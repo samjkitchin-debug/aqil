@@ -57,6 +57,8 @@ const OUTPUT_LABEL: Record<MethodologyCatalogueEntry["outputKind"], string> = {
   "recession-probability": "Recession probability",
   "forecast-distribution": "Forecast distribution",
   "structural-breaks": "Structural-break chronology",
+  "benchmark-comparison": "Benchmark comparison",
+  "cross-correlation": "Cross-correlation",
   unavailable: "No output type is defined",
 };
 
