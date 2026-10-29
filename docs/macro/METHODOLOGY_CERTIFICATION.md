@@ -126,11 +126,11 @@ Branch: `research/quantitative-methods`.
 
 Registration commit: `2a52262e08f1860e0eac7ecf9fe8722a5fd89526`.
 
-This certification is the following commit on that branch. Its parent is the registration commit. The hash of this commit is not written here, because writing it would change the hash. The worktree is clean after the commit, the branch is not pushed, and it is not merged into `main`.
+Certification commit: `b2f6096d9f9b47d8c3a35be67679b4d2816f0691`. Its parent is the registration commit. That commit was not amended.
 
-Local `main` is `c03842692c0a18b41ed63fb527cbb9534f44c0ab`. It is not `df0ed5583a58a132ad02ea4b94da4860851892ae`. The merge base of this branch and `main` is still `df0ed5583a58a132ad02ea4b94da4860851892ae`, so this branch contains that base. `main` has two later commits: `8fd00ac` (hosted research reader role) and `c038426` (reader migration stored as UTF-8). Those commits were not merged into this branch. The reader migration and the modified `apps/web/public/icons/icon.svg` in the main checkout were not taken, staged, reverted, or copied.
+Local `main` was merged into this branch. Merge commit: `790b5fd91fe7f8c361fa68f75768a24767b9bc33`. Parents: `b2f6096d9f9b47d8c3a35be67679b4d2816f0691` and `c03842692c0a18b41ed63fb527cbb9534f44c0ab`. The merge was clean. It brought in `8fd00ac` (hosted research reader role) and `c038426` (reader migration stored as UTF-8). `main` itself was not updated. Nothing was pushed. This branch was not merged into `main`.
 
-The main checkout at `C:\Users\gamer\aqil` was not edited. It still has the uncommitted icon change. This branch was not merged into that checkout.
+The main checkout at `C:\Users\gamer\aqil` was not edited. It still has the uncommitted `apps/web/public/icons/icon.svg` change. That file was not included in the merge.
 
 ## J. Next priorities
 

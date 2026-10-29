@@ -1,7 +1,7 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 30 October 2026, hosted research read
+**Last updated:** 30 October 2026, main merged into quantitative methods
 
 ## Hosted research read, 30 October 2026
 
@@ -1110,4 +1110,12 @@ Hamilton, Bai–Perron mean shifts, the autoregressive benchmark, and lead–lag
 
 `npm run test:research` passed 597 tests, then Ruff check and Ruff format. Targeted batch 2 modules passed 36. Catalogue unit tests passed 8. GitHub Actions has not run.
 
-Local `main` is `c03842692c0a18b41ed63fb527cbb9534f44c0ab`. The merge base remains `df0ed5583a58a132ad02ea4b94da4860851892ae`. Main's reader-role commits were not merged into this branch. The main checkout was not edited.
+Certification commit: `b2f6096d9f9b47d8c3a35be67679b4d2816f0691`. At that commit, local `main` was `c03842692c0a18b41ed63fb527cbb9534f44c0ab` and the reader-role commits were not yet on this branch. The next section records the merge.
+
+## Main merged into quantitative methods, 30 October 2026
+
+Risk class R2. Local only. Branch `research/quantitative-methods` in `C:\Users\gamer\aqil-quant-methods`. Nothing was pushed. `main` itself was not updated. This branch was not merged into `main`. Hosted Supabase was not migrated by this merge. `publication_allowed` was not set true. The preserved database `postgres` on `127.0.0.1` port 55432 was not reset.
+
+Local `main` remains `c03842692c0a18b41ed63fb527cbb9534f44c0ab`. Merge commit: `790b5fd91fe7f8c361fa68f75768a24767b9bc33`. It merged `main` into `research/quantitative-methods`. Parents are `b2f6096d9f9b47d8c3a35be67679b4d2816f0691` and `c03842692c0a18b41ed63fb527cbb9534f44c0ab`. The merge was clean. It includes `8fd00ac` (hosted research reader role) and `c038426` (reader migration stored as UTF-8). The uncommitted `apps/web/public/icons/icon.svg` in `C:\Users\gamer\aqil` was left untouched and was not part of the merge.
+
+No Python, catalogue, or web test file changed. `npm run test:research` was not run for this merge.
