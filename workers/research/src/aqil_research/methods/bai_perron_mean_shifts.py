@@ -61,12 +61,7 @@ from aqil_research.methods.bry_boschan_monthly import (
     assess_g17_level_input,
 )
 from aqil_research.methods.parameters import MethodParameterDocument
-from aqil_research.methods.protocol import (
-    MethodContext,
-    MethodDependency,
-    MethodExecutionResult,
-    bind_dependency,
-)
+from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
 
 BAI_PERRON_MEAN_SHIFTS = "BAI_PERRON_MEAN_SHIFTS"
 METHOD_VERSION = "1.0.0"
@@ -224,23 +219,6 @@ class BaiPerronMeanShiftsMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return (G17_DATASET_ID,)
-
-    def dependency(self) -> MethodDependency:
-        return bind_dependency(
-            self.required_dataset_ids(),
-            frequency=("monthly",),
-            minimum_history=(
-                "2 monthly log-growth observations; the trim is "
-                f"max({SEGMENT_FLOOR}, floor({TRIM_NUMERATOR}/{TRIM_DENOMINATOR} of the sample)) "
-                "and a shorter sample selects no break"
-            ),
-            parameter_policy="none",
-            new_observation_requires_recalculation=True,
-            refit_is_different_command=False,
-        )
-
-    def accepted_config_payload(self) -> dict[str, object]:
-        return dict(PUBLISHED_CONFIG)
 
     def parse_config(self, payload: dict[str, object]) -> BaiPerronMeanShiftsConfig:
         return BaiPerronMeanShiftsConfig.model_validate(payload)

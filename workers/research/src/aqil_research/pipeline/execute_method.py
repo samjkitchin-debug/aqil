@@ -1,11 +1,10 @@
 """Append one registered method run.
 
 The default command calculates with the method's accepted configuration.
-``--refit`` is refused unless the method declares a separate refit command.
-No method currently does. Stock–Watson keeps ``fixed_accepted``: its registered
-``run`` estimates, and a completed row that omits ``adopted_parameter_version``
-is read as adopted. This module does not call that estimator and does not
-write the preserved runs.
+``--refit`` is refused unless that method declares ``refit_separate``.
+Stock–Watson is the only current method that does. Its default calculation
+uses the accepted parameter version and does not adopt a new one. A refit
+appends another run with ``adopted_parameter_version`` false.
 
 ``new_observation_requires_recalculation`` on the dependency is metadata only.
 Nothing here installs a trigger, a job, or a schedule.
@@ -21,6 +20,7 @@ import psycopg
 from aqil_research.contracts.observation import AnalysisMode, EconomicObservation
 from aqil_research.methods.protocol import AnalyticalMethod
 from aqil_research.methods.registry import MethodRegistry, default_method_registry
+from aqil_research.methods.stock_watson_1988_fit import SPECIFICATION_ID
 from aqil_research.persistence.observation_store import PostgresResearchObservationStore
 from aqil_research.persistence.runs import save_research_run
 from aqil_research.pipeline.models import ResearchExecutionRequest, ResearchRun
@@ -47,19 +47,6 @@ def execution_refusal(method: AnalyticalMethod, *, refit: bool) -> str | None:
         return (
             f"Refit is not available for {method.method_id}. "
             "This method does not declare a separate refit command."
-        )
-    if refit:
-        return (
-            f"Refit is declared for {method.method_id} "
-            "but this command has no separate refit entry."
-        )
-    if dependency.parameter_policy == "fixed_accepted":
-        return (
-            f"Calculation with the accepted parameters is not available for {method.method_id}. "
-            "The registered run estimates a new parameter vector, and a stored row without "
-            "adopted_parameter_version is treated as adopted. Refit is not available, so this "
-            "command will not append an estimate and will not replace the preserved "
-            "parameter version."
         )
     return None
 
@@ -118,6 +105,7 @@ def execute_registered_method(
     except RightsGateError as exc:
         raise MethodExecutionRefused(str(exc)) from exc
 
+    method_config = _method_config(conn, method, refit=refit)
     store = PeriodCutoffStore(PostgresResearchObservationStore(conn), cutoff)
     series = store.as_of(primary, wall, AnalysisMode.LATEST_REVISED)
     if series:
@@ -135,7 +123,7 @@ def execute_registered_method(
             analysis_mode=AnalysisMode.LATEST_REVISED,
             evaluation_period=evaluation.isoformat(),
             method_id=method.method_id,
-            method_config=method.accepted_config_payload(),
+            method_config=method_config,
             collect=False,
         ),
         store=store,
@@ -151,6 +139,75 @@ def execute_registered_method(
         raise RuntimeError("refusing to write a preserved research run")
     save_research_run(conn, run)
     return run
+
+
+def _method_config(
+    conn: psycopg.Connection,
+    method: AnalyticalMethod,
+    *,
+    refit: bool,
+) -> dict[str, object]:
+    if refit:
+        refit_config = getattr(method, "refit_config_payload", None)
+        payload = refit_config() if refit_config is not None else None
+        if not isinstance(payload, dict):
+            raise MethodExecutionRefused(f"Refit is not available for {method.method_id}.")
+        return payload
+    payload = dict(method.accepted_config_payload())
+    if method.dependency().parameter_policy != "refit_separate":
+        return payload
+    parameters = _accepted_stock_watson_parameters(conn, method.method_id)
+    if parameters is None:
+        raise MethodExecutionRefused(
+            f"The accepted parameter version is not available for {method.method_id}. "
+            "This command will not append an estimate and will not replace the "
+            "preserved parameter version."
+        )
+    payload["execution_mode"] = "calculate"
+    payload["accepted_parameters"] = parameters
+    return payload
+
+
+def _accepted_stock_watson_parameters(
+    conn: psycopg.Connection,
+    method_id: str,
+) -> dict[str, object] | None:
+    """Latest completed vector whose adopted flag is absent or true.
+
+    An explicit false, including the unadopted re-estimate, is not selected.
+    """
+    if method_id != SPECIFICATION_ID:
+        return None
+    row = conn.execute(
+        """
+        select calculation
+        from research.research_runs
+        where method_id = %s
+          and execution_status = 'completed'
+          and calculation ? 'loadings_ip_income_sales_payroll'
+          and coalesce(calculation->>'adopted_parameter_version', 'true') = 'true'
+          and run_id <> %s
+        order by executed_at desc
+        limit 1
+        """,
+        (method_id, UNADOPTED_REESTIMATE_RUN_ID),
+    ).fetchone()
+    if row is None or not isinstance(row[0], dict):
+        return None
+    calculation = row[0]
+    required = (
+        "loadings_ip_income_sales_payroll",
+        "factor_ar",
+        "idiosyncratic_ar",
+        "idiosyncratic_scale",
+    )
+    if any(key not in calculation for key in required):
+        return None
+    parameters: dict[str, object] = {key: calculation[key] for key in required}
+    moments = calculation.get("moments")
+    if isinstance(moments, dict):
+        parameters["moments"] = moments
+    return parameters
 
 
 def _within_cutoff(

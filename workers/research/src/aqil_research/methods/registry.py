@@ -8,10 +8,8 @@ from aqil_research.methods.autoregressive_benchmark import (
     AUTOREGRESSIVE_BENCHMARK,
     AutoregressiveBenchmarkMethod,
 )
-from aqil_research.methods.bai_perron_mean_shifts import (
-    BAI_PERRON_MEAN_SHIFTS,
-    BaiPerronMeanShiftsMethod,
-)
+from aqil_research.methods.bai_perron_bound import RegisteredBaiPerronMeanShiftsMethod
+from aqil_research.methods.bai_perron_mean_shifts import BAI_PERRON_MEAN_SHIFTS
 from aqil_research.methods.bry_boschan_spencer15 import (
     BRY_BOSCHAN_SPENCER15_VARIANT,
     BryBoschanSpencer15Method,
@@ -109,7 +107,7 @@ def default_method_registry() -> MethodRegistry:
     registry.register(RestrictedCoincidentDiffusionMethod())
     registry.register(HardingPaganCharacteristicsMethod())
     registry.register(HamiltonMonthlyMethod())
-    registry.register(BaiPerronMeanShiftsMethod())
+    registry.register(RegisteredBaiPerronMeanShiftsMethod())
     registry.register(AutoregressiveBenchmarkMethod())
     registry.register(LeadLagCrossCorrelationMethod())
     return registry

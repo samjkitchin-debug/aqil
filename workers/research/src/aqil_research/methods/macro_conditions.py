@@ -66,6 +66,11 @@ class MacroConditionsMethod:
                 "and two Census months with two vintages of the prior month"
             ),
             parameter_policy="none",
+            depends_on_method_ids=(
+                SahmAnalyticalMethod.method_id,
+                SLOOS_CIL_METHOD_ID,
+                CENSUS_ADV_ORDERS_METHOD_ID,
+            ),
             new_observation_requires_recalculation=True,
             refit_is_different_command=False,
         )

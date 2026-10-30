@@ -31,7 +31,7 @@ from aqil_research.methods.harding_pagan_characteristics import (
     HARDING_PAGAN_CHARACTERISTICS_PUBLISHED,
 )
 from aqil_research.methods.lead_lag import PUBLISHED_CONFIG as LEAD_LAG_PUBLISHED
-from aqil_research.methods.registry import default_method_registry
+from aqil_research.methods.registry import MethodRegistry, default_method_registry
 from aqil_research.methods.restricted_coincident_diffusion import (
     PUBLISHED_CONFIG as RESTRICTED_COINCIDENT_DIFFUSION_PUBLISHED,
 )
@@ -110,13 +110,15 @@ def recompute_stored_run(conn: psycopg.Connection, run_id: str) -> ResearchRun:
     for row in observations:
         store.append(row)
 
-    method_config = reproduction_config(stored.config_id)
     registry = default_method_registry()
     if (
         stored.method_id == BRY_BOSCHAN_SPENCER15_VARIANT
         and stored.implementation_hash == legacy_variant_implementation_hash()
     ):
         registry.register(BryBoschanSpencer15Method(payload_revision="legacy"))
+    method_config = replay_configuration(registry, stored)
+    if not observation_ids:
+        raise ValueError(f"stored run {stored.run_id} has no frozen observation evidence")
     request = ResearchExecutionRequest(
         source_id=stored.source_id,
         dataset_id=stored.dataset_id,
@@ -143,6 +145,26 @@ def recompute_stored_run(conn: psycopg.Connection, run_id: str) -> ResearchRun:
             "adapter_ids": list(stored.adapter_ids),
         },
     )
+
+
+def replay_configuration(
+    registry: MethodRegistry,
+    stored: ResearchRun,
+) -> dict[str, object]:
+    """Resolve a stored config id through the registry.
+
+    A config id that parses is not enough. The stored hash must be the method's
+    own configuration hash. Otherwise the run stays unsupported.
+    """
+    payload = reproduction_config(stored.config_id)
+    method = registry.get(stored.method_id)
+    parsed = method.parse_config(payload)
+    if method.config_hash(parsed) != stored.config_hash:
+        raise ValueError(
+            "stored configuration is not sufficient to replay "
+            f"{stored.method_id}: {stored.config_id}"
+        )
+    return payload
 
 
 def reproduction_config(config_id: str) -> dict[str, object]:

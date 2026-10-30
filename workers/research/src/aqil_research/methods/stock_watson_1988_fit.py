@@ -12,6 +12,7 @@ import hashlib
 import math
 from dataclasses import dataclass
 from datetime import date
+from typing import Literal
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict, Field
@@ -44,10 +45,18 @@ MODERN_REFIT_DATASETS = (
 ACCEPTED_CONFIG = {
     "config_id": "sw1988-modern-1997-2026m07",
     "label": "Accepted modern coincident parameters, January 1997 to July 2026",
+    "execution_mode": "calculate",
+}
+REFIT_CONFIG = {
+    "config_id": "stock-watson-modern-refit-v1",
+    "label": "Separate refit of the modern coincident factor",
+    "maxiter": 40,
+    "execution_mode": "refit",
 }
 MULTISTART_CONFIG = {
     "config_id": "sw1988-modern-multistart",
     "label": "Multi-start re-estimate on the latest revised panel",
+    "execution_mode": "refit",
 }
 NOT_THE_CITIBASE_SPECIFICATION = (
     "Payroll headcount is not employee-hours. "
@@ -480,12 +489,26 @@ def smoothed_factor(observations, **kwargs) -> list[float]:
     return [float(state[0]) for state in smoothed_means]
 
 
+class AcceptedFactorParameters(BaseModel):
+    """Parameter vector already accepted. A calculate run does not re-estimate it."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    loadings_ip_income_sales_payroll: list[float] = Field(min_length=4, max_length=4)
+    factor_ar: list[float] = Field(min_length=2, max_length=2)
+    idiosyncratic_ar: list[list[float]] = Field(min_length=4, max_length=4)
+    idiosyncratic_scale: list[float] = Field(min_length=4, max_length=4)
+    moments: dict[str, dict[str, float]] | None = None
+
+
 class StockWatsonModernRefitConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     config_id: str = Field(min_length=1)
     label: str = Field(min_length=1)
     maxiter: int = Field(default=40, ge=1, le=80)
+    execution_mode: Literal["calculate", "refit"] = "calculate"
+    accepted_parameters: AcceptedFactorParameters | None = None
 
 
 def modern_refit_implementation_hash() -> str:
@@ -522,20 +545,20 @@ class StockWatsonModernRefitMethod:
         return MODERN_REFIT_DATASETS
 
     def dependency(self) -> MethodDependency:
-        # fixed_accepted: the preserved run is the parameter version.
-        # method.run estimates, and record_modern_reestimate can adopt a new
-        # version, so there is no safe separate refit command.
         return bind_dependency(
             self.required_dataset_ids(),
             frequency=("monthly",),
             minimum_history=("37 shared monthly levels from January 1997 (36 growth-rate months)"),
-            parameter_policy="fixed_accepted",
+            parameter_policy="refit_separate",
             new_observation_requires_recalculation=True,
-            refit_is_different_command=False,
+            refit_is_different_command=True,
         )
 
     def accepted_config_payload(self) -> dict[str, object]:
         return dict(ACCEPTED_CONFIG)
+
+    def refit_config_payload(self) -> dict[str, object]:
+        return dict(REFIT_CONFIG)
 
     def parse_config(self, payload: dict[str, object]) -> StockWatsonModernRefitConfig:
         return StockWatsonModernRefitConfig.model_validate(payload)
@@ -543,10 +566,16 @@ class StockWatsonModernRefitMethod:
     def config_hash(self, config: BaseModel) -> str:
         if not isinstance(config, StockWatsonModernRefitConfig):
             raise TypeError("expected StockWatsonModernRefitConfig")
+        scalars = {
+            "maxiter": str(config.maxiter),
+            "execution_mode": config.execution_mode,
+        }
+        if config.accepted_parameters is not None:
+            scalars["accepted_parameters"] = config.accepted_parameters.model_dump_json()
         return MethodParameterDocument(
             config_id=config.config_id,
             label=config.label,
-            scalars={"maxiter": str(config.maxiter)},
+            scalars=scalars,
         ).config_hash()
 
     def run(self, context: MethodContext, config: BaseModel) -> MethodExecutionResult:
@@ -556,6 +585,8 @@ class StockWatsonModernRefitMethod:
             return _insufficient(
                 "the modern refit reads a latest-revised panel, not a real-time vintage"
             )
+        if config.execution_mode == "calculate":
+            return _calculate_with_accepted_parameters(context, config)
         panel, level_periods, observation_ids = _standardised_panel(context.inputs_by_dataset)
         if panel is None or level_periods is None:
             return _insufficient(
@@ -600,6 +631,8 @@ class StockWatsonModernRefitMethod:
                 "optimizer_converged": fitted.converged,
                 "starts_evaluated": fitted.starts_evaluated,
                 "not_a_gdp_nowcast": True,
+                "adopted_parameter_version": False,
+                "update_kind": "reestimate",
             },
             observation_ids=tuple(observation_ids),
             assumptions=(
@@ -610,6 +643,7 @@ class StockWatsonModernRefitMethod:
             ),
             limitations=(
                 "publication_allowed is false.",
+                "The refit is not adopted as the parameter version.",
                 "The refit is not operationally accepted.",
                 "The filtered factor is not the smoother.",
                 "The path is latest revised. It is not a real-time vintage and not a GDP nowcast.",
@@ -632,6 +666,145 @@ class StockWatsonModernRefitMethod:
                 f"{NOT_THE_CITIBASE_SPECIFICATION}"
             ),
         )
+
+
+def _calculate_with_accepted_parameters(
+    context: MethodContext,
+    config: StockWatsonModernRefitConfig,
+) -> MethodExecutionResult:
+    """Filter the current panel with the accepted parameter vector. Do not estimate."""
+    parameters = config.accepted_parameters
+    if parameters is None:
+        return _insufficient("The accepted parameter version is not available.")
+    if any(len(pair) != 2 for pair in parameters.idiosyncratic_ar):
+        return _insufficient("The accepted parameter version is not an 18-parameter vector.")
+    panel, level_periods, observation_ids = _panel_for_accepted_parameters(
+        context.inputs_by_dataset,
+        parameters.moments,
+    )
+    if panel is None or level_periods is None:
+        return _insufficient(
+            "the four modern series do not share 36 growth-rate months from January 1997"
+        )
+    loadings = tuple(parameters.loadings_ip_income_sales_payroll)
+    factor_ar = (float(parameters.factor_ar[0]), float(parameters.factor_ar[1]))
+    idiosyncratic = tuple((float(pair[0]), float(pair[1])) for pair in parameters.idiosyncratic_ar)
+    scales = tuple(parameters.idiosyncratic_scale)
+    observations = tuple(
+        tuple(panel[series][time] for series in range(4)) for time in range(len(panel[0]))
+    )
+    try:
+        likelihood = gaussian_log_likelihood(
+            observations,
+            loadings=loadings,
+            factor_ar=factor_ar,
+            idiosyncratic_ar=idiosyncratic,
+            idiosyncratic_innovation_scale=scales,
+        )
+        path = _filtered_factor(
+            observations,
+            loadings=loadings,
+            factor_ar=factor_ar,
+            idiosyncratic_ar=idiosyncratic,
+            idiosyncratic_innovation_scale=scales,
+        )
+    except (TypeError, ValueError, ZeroDivisionError) as exc:
+        return _insufficient(f"The accepted parameter version could not be applied: {exc}")
+    if not math.isfinite(likelihood) or any(not math.isfinite(value) for value in path):
+        return _insufficient("The accepted parameter version produced a non-finite factor.")
+    last_growth = level_periods[-1]
+    return MethodExecutionResult(
+        sufficiency="sufficient",
+        calculation={
+            "specification": SPECIFICATION_ID,
+            "publication_allowed": PUBLICATION_ALLOWED,
+            "operationally_accepted": OPERATIONALLY_ACCEPTED,
+            "real_time": False,
+            "input_vintage": "latest_revised",
+            "sample_levels": [level_periods[0].isoformat(), level_periods[-1].isoformat()],
+            "growth_start": level_periods[1].isoformat(),
+            "loadings_ip_income_sales_payroll": list(loadings),
+            "factor_ar": list(factor_ar),
+            "idiosyncratic_ar": [list(pair) for pair in idiosyncratic],
+            "idiosyncratic_scale": list(scales),
+            "log_likelihood": likelihood,
+            "filtered_factor": list(path),
+            "filtered_factor_is_not_the_smoother": True,
+            "moments": parameters.moments,
+            "adopted_parameter_version": False,
+            "update_kind": "calculate",
+            "not_a_gdp_nowcast": True,
+        },
+        observation_ids=tuple(observation_ids),
+        assumptions=(
+            "The calculation uses the accepted parameter version.",
+            "A calculate run does not replace that parameter version.",
+            NOT_THE_CITIBASE_SPECIFICATION,
+        ),
+        limitations=(
+            "publication_allowed is false.",
+            "This calculation is not a new adopted parameter version.",
+            "The path is latest revised. It is not a real-time vintage and not a GDP nowcast.",
+        ),
+        missing_reason=None,
+        statistical_interpretation=(
+            "Coincident factor calculated with the accepted parameter version through "
+            f"{last_growth.isoformat()}. The parameter version was not replaced."
+        ),
+        causal_hypothesis="none",
+        investment_implication="no_action",
+        narrative=(
+            "Calculation with the accepted parameter version. "
+            "publication_allowed is false. The parameter version was not replaced."
+        ),
+    )
+
+
+def _panel_for_accepted_parameters(
+    inputs_by_dataset: dict,
+    moments: dict[str, dict[str, float]] | None,
+) -> tuple[list[list[float]] | None, list[date] | None, list[str]]:
+    """Same level sample as the refit. Frozen moments are applied when supplied."""
+    series: dict[str, dict[date, tuple[float, str]]] = {}
+    for dataset_id in MODERN_REFIT_DATASETS:
+        rows = inputs_by_dataset.get(dataset_id)
+        if not rows:
+            return None, None, []
+        series[dataset_id] = {}
+        for period, observation in rows.items():
+            if period < SAMPLE_START:
+                continue
+            if observation.series_provenance != SeriesProvenance.LATEST_REVISED:
+                continue
+            series[dataset_id][period] = (
+                float(observation.decimal_value()),
+                observation.observation_id,
+            )
+    months = set.intersection(*(set(series[dataset_id]) for dataset_id in MODERN_REFIT_DATASETS))
+    ordered = sorted(months)
+    if len(ordered) < 37:
+        return None, None, []
+    names = ("production", "income", "sales", "payroll")
+    observation_ids: list[str] = []
+    panel: list[list[float]] = []
+    for dataset_id, name in zip(MODERN_REFIT_DATASETS, names, strict=True):
+        levels = [series[dataset_id][period][0] for period in ordered]
+        for period in ordered:
+            observation_ids.append(series[dataset_id][period][1])
+        try:
+            growth = log_difference(levels)
+            moment = moments.get(name) if moments else None
+            if moment is not None:
+                scale = float(moment["scale"])
+                if scale == 0:
+                    return None, None, []
+                standardised = [(value - float(moment["mean"])) / scale for value in growth]
+            else:
+                standardised, _mean, _scale = standardise(growth)
+        except (KeyError, TypeError, ValueError):
+            return None, None, []
+        panel.append(standardised)
+    return panel, ordered, observation_ids
 
 
 def _insufficient(reason: str) -> MethodExecutionResult:
