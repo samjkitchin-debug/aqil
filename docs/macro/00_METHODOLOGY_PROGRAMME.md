@@ -92,7 +92,7 @@ Minimum metadata, already largely present on `research.research_runs`:
 
 The pilot stores this on the existing run row. It does not add a model-registry schema.
 
-The Methodologies page reads `apps/web/src/lib/research/methodology-catalogue.ts`. That file is a presentation map, not a second register. A register row appears as a card, or in `EXCLUDED_REGISTER_ROWS` with a reason. Supporting techniques for the dynamic factor, and the deferred portfolio row, are excluded. Planned cards have no research-run query and must not show a calculation. Moving a card from planned to in development means the research system has a versioned output, the catalogue names that output kind and the run identifiers, and the page still withholds the payload until `publication_allowed` is true and a presenter for that output kind exists. A matching method identifier alone does not promote the card.
+The Methodologies page reads `apps/web/src/lib/research/methodology-catalogue.ts`. That file is a presentation map, not a second register. A register row appears as a card, or in `EXCLUDED_REGISTER_ROWS` with a reason. Supporting techniques for the dynamic factor, and the deferred portfolio row, are excluded. Planned cards have no research-run query and must not show a calculation. Moving a card from planned to in development means the research system has a versioned output, the catalogue names that output kind and the run identifiers, and a signed-in session may see that stored calculation. `publication_allowed` stays false until the editorial gate is met. A signed-out session does not receive the calculation. A matching method identifier alone does not promote the card.
 
 ## Persisted results
 

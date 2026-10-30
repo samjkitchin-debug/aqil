@@ -47,6 +47,7 @@ from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
 BRY_BOSCHAN_SPENCER15_VARIANT = "BRY_BOSCHAN_SPENCER15_VARIANT"
 VARIANT_VERSION = "1.0.0"
 PUBLICATION_ALLOWED = False
+CHRONOLOGY_CLASS = "retrospective_full_sample"
 
 SPENCER_WEIGHTS: tuple[int, ...] = (
     -3,
@@ -279,8 +280,12 @@ def _enforce_alternation(turns: list[_Turn]) -> list[_Turn]:
     return ordered
 
 
-def _drop_short_cycles(turns: list[_Turn]) -> list[_Turn]:
-    """Drop the lower peak or higher trough when like turns are under fifteen months apart."""
+def _drop_short_cycles(
+    turns: list[_Turn],
+    *,
+    minimum_cycle_months: int = MINIMUM_CYCLE_MONTHS,
+) -> list[_Turn]:
+    """Drop the lower peak or higher trough when like turns are under the cycle bound."""
     ordered = sorted(turns, key=lambda item: item.index)
     changed = True
     while changed:
@@ -290,7 +295,7 @@ def _drop_short_cycles(turns: list[_Turn]) -> list[_Turn]:
             for index in range(len(group) - 1):
                 left = group[index]
                 right = group[index + 1]
-                if right.index - left.index >= MINIMUM_CYCLE_MONTHS:
+                if right.index - left.index >= minimum_cycle_months:
                     continue
                 dropped = left if _prefer(left, right) is right else right
                 ordered = [
@@ -305,14 +310,18 @@ def _drop_short_cycles(turns: list[_Turn]) -> list[_Turn]:
     return ordered
 
 
-def _drop_short_phases(turns: list[_Turn]) -> list[_Turn]:
-    """Drop the later turn of a phase shorter than five months."""
+def _drop_short_phases(
+    turns: list[_Turn],
+    *,
+    minimum_phase_months: int = MINIMUM_PHASE_MONTHS,
+) -> list[_Turn]:
+    """Drop the later turn of a phase shorter than the phase bound."""
     ordered = sorted(turns, key=lambda item: item.index)
     changed = True
     while changed:
         changed = False
         for index in range(len(ordered) - 1):
-            if ordered[index + 1].index - ordered[index].index >= MINIMUM_PHASE_MONTHS:
+            if ordered[index + 1].index - ordered[index].index >= minimum_phase_months:
                 continue
             ordered.pop(index + 1)
             changed = True
@@ -320,9 +329,14 @@ def _drop_short_phases(turns: list[_Turn]) -> list[_Turn]:
     return ordered
 
 
-def _drop_endpoints(turns: list[_Turn], size: int) -> list[_Turn]:
-    last = size - 1 - ENDPOINT_BAN_MONTHS
-    return [turn for turn in turns if ENDPOINT_BAN_MONTHS <= turn.index <= last]
+def _drop_endpoints(
+    turns: list[_Turn],
+    size: int,
+    *,
+    endpoint_ban_months: int = ENDPOINT_BAN_MONTHS,
+) -> list[_Turn]:
+    last = size - 1 - endpoint_ban_months
+    return [turn for turn in turns if endpoint_ban_months <= turn.index <= last]
 
 
 def _drop_end_dominance(turns: list[_Turn], curve: list[Decimal | None]) -> list[_Turn]:
@@ -384,12 +398,19 @@ def _refine(
     return _enforce_alternation(refined)
 
 
-def _censor(turns: list[_Turn], curve: list[Decimal | None]) -> list[_Turn]:
-    ordered = _drop_endpoints(turns, len(curve))
+def _censor(
+    turns: list[_Turn],
+    curve: list[Decimal | None],
+    *,
+    minimum_cycle_months: int = MINIMUM_CYCLE_MONTHS,
+    minimum_phase_months: int = MINIMUM_PHASE_MONTHS,
+    endpoint_ban_months: int = ENDPOINT_BAN_MONTHS,
+) -> list[_Turn]:
+    ordered = _drop_endpoints(turns, len(curve), endpoint_ban_months=endpoint_ban_months)
     ordered = _drop_end_dominance(ordered, curve)
-    ordered = _drop_short_cycles(ordered)
+    ordered = _drop_short_cycles(ordered, minimum_cycle_months=minimum_cycle_months)
     ordered = _enforce_alternation(ordered)
-    ordered = _drop_short_phases(ordered)
+    ordered = _drop_short_phases(ordered, minimum_phase_months=minimum_phase_months)
     return _enforce_alternation(ordered)
 
 
@@ -432,8 +453,16 @@ def months_for_cyclical_dominance(
 
 def date_spencer15_variant(
     levels: tuple[tuple[date, Decimal], ...] | list[tuple[date, Decimal]],
+    *,
+    minimum_cycle_months: int = MINIMUM_CYCLE_MONTHS,
+    minimum_phase_months: int = MINIMUM_PHASE_MONTHS,
+    endpoint_ban_months: int = ENDPOINT_BAN_MONTHS,
 ) -> Spencer15Dates:
-    """Date specific-cycle peaks and troughs with the labelled variant."""
+    """Date specific-cycle peaks and troughs with the labelled variant.
+
+    The default bounds are the production constants. A caller that passes
+    other bounds is running a sensitivity case, not the stored chronology.
+    """
     ordered = tuple(sorted(levels, key=lambda item: item[0]))
     if len(ordered) < len(SPENCER_WEIGHTS) + MINIMUM_CYCLE_MONTHS:
         return Spencer15Dates((), (), MCD_FLOOR)
@@ -443,39 +472,166 @@ def date_spencer15_variant(
     adjusted = replace_extremes(values, spencer_a)
     spencer_b = centred_spencer(adjusted)
     ma12 = moving_average(adjusted, MA12_LAGS + MA12_LEADS + 1)
-    ma_turns = _censor(_local_turns(ma12, LOCAL_RADIUS), ma12)
+    bounds = {
+        "minimum_cycle_months": minimum_cycle_months,
+        "minimum_phase_months": minimum_phase_months,
+        "endpoint_ban_months": endpoint_ban_months,
+    }
+    ma_turns = _censor(_local_turns(ma12, LOCAL_RADIUS), ma12, **bounds)
     ma_turns = _drop_crossovers(ma_turns, spencer_b, LOCAL_RADIUS)
-    spencer_turns = _censor(_refine(ma_turns, spencer_b, LOCAL_RADIUS), spencer_b)
+    spencer_turns = _censor(_refine(ma_turns, spencer_b, LOCAL_RADIUS), spencer_b, **bounds)
     mcd = months_for_cyclical_dominance(values, spencer_a)
     short_curve = moving_average(values, mcd)
-    short_turns = _censor(_refine(spencer_turns, short_curve, LOCAL_RADIUS), short_curve)
+    short_turns = _censor(
+        _refine(spencer_turns, short_curve, LOCAL_RADIUS),
+        short_curve,
+        **bounds,
+    )
     final_radius = max(FINAL_WINDOW_FLOOR, mcd)
     final_curve: list[Decimal | None] = list(values)
-    final_turns = _censor(_refine(short_turns, final_curve, final_radius), final_curve)
+    final_turns = _censor(
+        _refine(short_turns, final_curve, final_radius),
+        final_curve,
+        **bounds,
+    )
     peaks = tuple(periods[turn.index] for turn in final_turns if turn.kind == "peak")
     troughs = tuple(periods[turn.index] for turn in final_turns if turn.kind == "trough")
     return Spencer15Dates(peaks, troughs, mcd)
 
 
-def variant_implementation_hash() -> str:
-    payload = "|".join(
-        (
-            BRY_BOSCHAN_SPENCER15_VARIANT,
-            VARIANT_VERSION,
-            ",".join(str(weight) for weight in SPENCER_WEIGHTS),
-            str(SPENCER_DIVISOR),
-            f"{MA12_LAGS}lags{MA12_LEADS}leads",
-            "mcd=absolute-difference",
+def _iso_dates(values: tuple[date, ...]) -> list[str]:
+    return [item.isoformat() for item in values]
+
+
+def _bound_case(
+    production: Spencer15Dates,
+    alternate: Spencer15Dates,
+    *,
+    bounds: dict[str, int],
+    statement: str,
+) -> dict[str, object]:
+    return {
+        "bounds": bounds,
+        "peak_count": len(alternate.peaks),
+        "trough_count": len(alternate.troughs),
+        "peaks": _iso_dates(alternate.peaks),
+        "troughs": _iso_dates(alternate.troughs),
+        "peaks_not_in_production": _iso_dates(
+            tuple(item for item in alternate.peaks if item not in production.peaks),
         ),
-    )
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+        "peaks_only_in_production": _iso_dates(
+            tuple(item for item in production.peaks if item not in alternate.peaks),
+        ),
+        "troughs_not_in_production": _iso_dates(
+            tuple(item for item in alternate.troughs if item not in production.troughs),
+        ),
+        "troughs_only_in_production": _iso_dates(
+            tuple(item for item in production.troughs if item not in alternate.troughs),
+        ),
+        "same_dates_as_production": (
+            alternate.peaks == production.peaks and alternate.troughs == production.troughs
+        ),
+        "statement": statement,
+    }
+
+
+def length_bound_sensitivity(
+    levels: tuple[tuple[date, Decimal], ...] | list[tuple[date, Decimal]],
+    *,
+    production: Spencer15Dates | None = None,
+) -> dict[str, object]:
+    """Compare the documented phase and endpoint bounds with the production chronology.
+
+    Production dates stay on the module constants. This dictionary is a
+    separate diagnostic. It does not replace those dates.
+    """
+    baseline = production if production is not None else date_spencer15_variant(levels)
+    phase_off = date_spencer15_variant(levels, minimum_phase_months=1)
+    endpoint_off = date_spencer15_variant(levels, endpoint_ban_months=0)
+    return {
+        "diagnostic_id": "length_bound_sensitivity",
+        "replaces_production_chronology": False,
+        "production_bounds": {
+            "minimum_cycle_months": MINIMUM_CYCLE_MONTHS,
+            "minimum_phase_months": MINIMUM_PHASE_MONTHS,
+            "endpoint_ban_months": ENDPOINT_BAN_MONTHS,
+        },
+        "production_peak_count": len(baseline.peaks),
+        "production_trough_count": len(baseline.troughs),
+        "without_five_month_phase_rule": _bound_case(
+            baseline,
+            phase_off,
+            bounds={
+                "minimum_cycle_months": MINIMUM_CYCLE_MONTHS,
+                "minimum_phase_months": 1,
+                "endpoint_ban_months": ENDPOINT_BAN_MONTHS,
+            },
+            statement=(
+                "The five-month phase rule is not applied. A one-month phase is allowed. "
+                "The fifteen-month cycle bound and the six-month endpoint ban stay at "
+                "the production values."
+            ),
+        ),
+        "without_six_month_endpoint_ban": _bound_case(
+            baseline,
+            endpoint_off,
+            bounds={
+                "minimum_cycle_months": MINIMUM_CYCLE_MONTHS,
+                "minimum_phase_months": MINIMUM_PHASE_MONTHS,
+                "endpoint_ban_months": 0,
+            },
+            statement=(
+                "The six-month endpoint ban is not applied. The fifteen-month cycle bound "
+                "and the five-month phase bound stay at the production values."
+            ),
+        ),
+    }
+
+
+def _variant_hash_tokens(*, include_diagnostics: bool) -> str:
+    tokens = [
+        BRY_BOSCHAN_SPENCER15_VARIANT,
+        VARIANT_VERSION,
+        ",".join(str(weight) for weight in SPENCER_WEIGHTS),
+        str(SPENCER_DIVISOR),
+        f"{MA12_LAGS}lags{MA12_LEADS}leads",
+        "mcd=absolute-difference",
+    ]
+    if include_diagnostics:
+        tokens.extend(
+            (
+                f"chronology={CHRONOLOGY_CLASS}",
+                "length-bound-sensitivity=phase-rule-and-endpoint-ban",
+            ),
+        )
+    return hashlib.sha256("|".join(tokens).encode("utf-8")).hexdigest()
+
+
+def legacy_variant_implementation_hash() -> str:
+    """Hash of the payload stored before the retrospective diagnostics.
+
+    Run 8fb20325-414f-401b-8c46-bda82ed94e16 keeps this hash. Replay of that
+    run uses it so the dating lists still match without the later fields.
+    """
+    return _variant_hash_tokens(include_diagnostics=False)
+
+
+def variant_implementation_hash() -> str:
+    return _variant_hash_tokens(include_diagnostics=True)
 
 
 class BryBoschanSpencer15Method:
     method_id = BRY_BOSCHAN_SPENCER15_VARIANT
     method_version = VARIANT_VERSION
 
+    def __init__(self, *, payload_revision: Literal["current", "legacy"] = "current") -> None:
+        if payload_revision not in {"current", "legacy"}:
+            raise ValueError("payload_revision must be current or legacy")
+        self.payload_revision = payload_revision
+
     def implementation_hash(self) -> str:
+        if self.payload_revision == "legacy":
+            return legacy_variant_implementation_hash()
         return variant_implementation_hash()
 
     def required_dataset_ids(self) -> tuple[str, ...]:
@@ -521,17 +677,22 @@ class BryBoschanSpencer15Method:
             for period in sorted(series)
             if assessment.sample_start <= period <= assessment.sample_end
         ]
-        dated = date_spencer15_variant(
-            tuple(
-                (observation.period_start, observation.decimal_value()) for observation in chosen
-            ),
+        level_pairs = tuple(
+            (observation.period_start, observation.decimal_value()) for observation in chosen
         )
+        dated = date_spencer15_variant(level_pairs)
         peaks = [item.isoformat() for item in dated.peaks]
         troughs = [item.isoformat() for item in dated.troughs]
+        if self.payload_revision == "legacy":
+            return _legacy_execution(dated, peaks, troughs, chosen)
+        nber_diagnostic = nber_reference_diagnostic(dated.peaks, dated.troughs)
         return MethodExecutionResult(
             sufficiency="sufficient",
             calculation={
                 "variant_id": BRY_BOSCHAN_SPENCER15_VARIANT,
+                "chronology_class": CHRONOLOGY_CLASS,
+                "centred_spencer_smoother": True,
+                "contemporaneous_recession_call": False,
                 "peaks": peaks,
                 "troughs": troughs,
                 "mcd_months": dated.mcd_months,
@@ -539,6 +700,18 @@ class BryBoschanSpencer15Method:
                 "spencer_citation": MACAULAY_CITATION,
                 "ma12_citation": OTSU_CITATION,
                 "not_a_fortran_replica": True,
+                "revision_sensitivity": {
+                    "status": "blocked",
+                    "reason": (
+                        "Inputs are latest_revised. Revision sensitivity needs a vintage "
+                        "panel, and none was invented."
+                    ),
+                },
+                "length_bound_sensitivity": length_bound_sensitivity(
+                    level_pairs,
+                    production=dated,
+                ),
+                "nber_reference_diagnostic": nber_diagnostic,
             },
             observation_ids=tuple(observation.observation_id for observation in chosen),
             assumptions=(
@@ -546,27 +719,90 @@ class BryBoschanSpencer15Method:
                 "Spencer weights and the divisor 320 are Macaulay 1931, page 55.",
                 "The twelve-month average dated at t uses t-6 through t+5.",
                 "Months for cyclical dominance compare absolute differences.",
+                (
+                    "The stored chronology is retrospective_full_sample. The Spencer "
+                    "smoother is centred, so these dates are not a contemporaneous "
+                    "recession call."
+                ),
             ),
             limitations=(
                 NOT_THE_1971_LISTING,
                 "The 1971 volume still does not print these two constants.",
-                "NBER reference-cycle overlap is not an acceptance test.",
+                "NBER reference-cycle overlap is a diagnostic and is not an acceptance test.",
+                (
+                    "Revision sensitivity is blocked because the inputs are latest_revised. "
+                    "No vintage panel was invented."
+                ),
+                (
+                    "Length-bound sensitivity is a separate diagnostic. The production "
+                    "dates keep the documented cycle, phase, and endpoint bounds."
+                ),
                 "publication_allowed stays false.",
             ),
             missing_reason=None,
             statistical_interpretation=(
                 "Specific-cycle peaks and troughs in the industrial production index "
-                "under the labelled Spencer-15 variant. This is not a reference-cycle date "
-                "and not a forecast."
+                "under the labelled Spencer-15 variant. The chronology is retrospective "
+                "full sample. This is not a reference-cycle date, not a contemporaneous "
+                "recession call, and not a forecast."
             ),
             causal_hypothesis=CAUSAL_HYPOTHESIS,
             investment_implication="no_action",
             narrative=(
                 f"Spencer-15 variant dated {len(peaks)} peaks and {len(troughs)} troughs "
-                "in industrial production. publication_allowed is false. "
-                "This is not the 1971 listing."
+                "in industrial production. The chronology is retrospective full sample. "
+                "The centred Spencer smoother means these dates are not a contemporaneous "
+                "recession call. Publication allowed is false. This is not the 1971 listing."
             ),
         )
+
+
+def _legacy_execution(
+    dated: Spencer15Dates,
+    peaks: list[str],
+    troughs: list[str],
+    chosen: list,
+) -> MethodExecutionResult:
+    """Payload shape of the run stored before the retrospective diagnostics."""
+    return MethodExecutionResult(
+        sufficiency="sufficient",
+        calculation={
+            "variant_id": BRY_BOSCHAN_SPENCER15_VARIANT,
+            "peaks": peaks,
+            "troughs": troughs,
+            "mcd_months": dated.mcd_months,
+            "publication_allowed": PUBLICATION_ALLOWED,
+            "spencer_citation": MACAULAY_CITATION,
+            "ma12_citation": OTSU_CITATION,
+            "not_a_fortran_replica": True,
+        },
+        observation_ids=tuple(observation.observation_id for observation in chosen),
+        assumptions=(
+            NOT_THE_1971_LISTING,
+            "Spencer weights and the divisor 320 are Macaulay 1931, page 55.",
+            "The twelve-month average dated at t uses t-6 through t+5.",
+            "Months for cyclical dominance compare absolute differences.",
+        ),
+        limitations=(
+            NOT_THE_1971_LISTING,
+            "The 1971 volume still does not print these two constants.",
+            "NBER reference-cycle overlap is not an acceptance test.",
+            "publication_allowed stays false.",
+        ),
+        missing_reason=None,
+        statistical_interpretation=(
+            "Specific-cycle peaks and troughs in the industrial production index "
+            "under the labelled Spencer-15 variant. This is not a reference-cycle date "
+            "and not a forecast."
+        ),
+        causal_hypothesis=CAUSAL_HYPOTHESIS,
+        investment_implication="no_action",
+        narrative=(
+            f"Spencer-15 variant dated {len(peaks)} peaks and {len(troughs)} troughs "
+            "in industrial production. publication_allowed is false. "
+            "This is not the 1971 listing."
+        ),
+    )
 
 
 def _insufficient(reason: str) -> MethodExecutionResult:

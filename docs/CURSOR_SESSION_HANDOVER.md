@@ -1,7 +1,21 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 30 October 2026, hosted research read
+**Last updated:** 31 October 2026, quantitative production visibility
+
+## Signed-in methodology results, 31 October 2026
+
+Risk class R2. Branch `research/quantitative-production` in `C:\Users\gamer\aqil-quant-prod`, based on `da055629e01d910b8e1a6069d7992ee4e1acf7cf`. `publication_allowed` stays false. Nothing in this note is a publication approval.
+
+A signed-in detail page reads `research.research_runs.calculation` on the server and shows the stored figures. A signed-out session does not. The list page does not select the JSON. The hosted `research_reader` already had select on `calculation`, so no migration was added. The named runs are on local postgres (`127.0.0.1:55432`, database `postgres`) and are absent from hosted project `ojvswermsbbaltjohqph`. They were not copied. Hosted Supabase was not changed. Nothing was deployed. Local postgres was not reset.
+
+Displayed runs, unchanged as stored rows: Spencer-15 `3955f7f4-08f8-4e7b-9ded-b3f6eea6633f` and `8fb20325-414f-401b-8c46-bda82ed94e16` (18 peaks, 19 troughs); Stock–Watson parameter version `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` (re-estimate `940955f1-50d5-4c06-9d90-5ceebd05d352` not adopted); Harding–Pagan `0d667a12-5a9c-45e0-b04a-8aea4196bc19`; Sahm `f3db281d-9f6d-4c4c-974f-ba4b9bd68131` (September 2025 gap 0.23, not triggered, October 2025 not interpolated); diffusion `1f747c9f-4851-4588-a4dc-d8fb1ff30558`; Hamilton `4629b31d-b0de-4a2f-a987-9e5d3f94747e` (filtered probability, lower-mean duration about 2 months, not a recession label); Bai–Perron `2f4c14eb-44f2-40dc-913f-bf7945e972cd` (no break); autoregression `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e` (twelve-month horizon loses to the historical mean); lead–lag `94152391-c3a8-48d7-8f2e-8c4d1dfdb811` (contemporaneous and unstable).
+
+The main checkout at `C:\Users\gamer\aqil` was not edited. Its uncommitted `apps/web/public/icons/icon.svg` change was left in place.
+
+Checks on this worktree: methodology unit tests passed 14. `npm run test:research` passed 598 tests, then Ruff check and Ruff format (405 files already formatted). The disposable database `aqil_research_test` was rebuilt. The development database `postgres` was not reset. Web typecheck passed with `tsc --noEmit`. ESLint passed on the methodology files that changed. GitHub Actions has not run.
+
+This browser, opened at `http://127.0.0.1:3011/intelligence/methodologies/stock-watson-1988`, was redirected to `/login?error=signed_out`. The page offered Continue with Google. The stored calculation was not shown. A 390-pixel signed-in layout was not opened in this browser. Production was not deployed.
 
 ## Hosted research read, 30 October 2026
 
@@ -1060,3 +1074,62 @@ Not stored: bank-lending survey `BLS.Q.U2.ALL.O.E.Z.B3.ST.S.WFNET` and BSI loans
 Signed-in `/conditions` showed 16 stored series. Europe showed the euro-area series and listed credit, currencies, energy and property as missing. China showed no indicator reading and listed the missing families. At 390px the page did not overflow horizontally. The economic reading above the filter still restates the stored United States synthesis. It is not a China or Europe reading.
 
 Wave 2 must not overwrite these adapter packages, the appended rights rows, the govinfo rights row, the coverage register, or the uncommitted events and presentation work.
+
+## Quantitative methods batch 1, 30 October 2026
+
+Risk class R2. Local only. Branch `research/quantitative-methods` in `C:\Users\gamer\aqil-quant-methods`. Nothing was pushed, deployed, or applied to hosted Supabase. `publication_allowed` stays false. The preserved database `postgres` on `127.0.0.1` port 55432 was not reset. Batch 2 was not started. `docs/macro/METHODOLOGY_CERTIFICATION.md` was not written.
+
+Integration commit: `3c5c138c692d19bea37220b15fd52be912c768c7`
+
+Stored runs, left in place:
+
+- Spencer-15 retrospective run `3955f7f4-08f8-4e7b-9ded-b3f6eea6633f`. Kept run `8fb20325-414f-401b-8c46-bda82ed94e16`. Both have 18 peaks and 19 troughs. Chronology class `retrospective_full_sample`. `date_specific_cycles()` still refuses. A read-only replay of the kept run on `postgres` matched the full payload through the legacy implementation hash.
+- Harding–Pagan characteristics run `0d667a12-5a9c-45e0-b04a-8aea4196bc19`. Method id `HARDING_PAGAN_CHARACTERISTICS`. This is not quarterly BBQ.
+- Sahm short sample run `f3db281d-9f6d-4c4c-974f-ba4b9bd68131`. September 2025 gap 0.23 and not triggered. October 2025 was not interpolated. Sahm was not reimplemented. The AQ-103 unemployment backfill was not done.
+- Stock–Watson re-estimate `940955f1-50d5-4c06-9d90-5ceebd05d352`. Gradient norms about 0.000629 and 0.000623. Likelihood gain about 0.000305, so `adopted_parameter_version` is false. Preserved parameter version `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`. The refit is not operationally accepted. The 1988 panel block stays.
+- Restricted coincident diffusion run `1f747c9f-4851-4588-a4dc-d8fb1ff30558`. Correlation with the preserved filtered factor about 0.336 on 352 months. That is not independent confirmation and not the Chicago Fed 85-indicator index.
+
+`default_method_registry` now includes `STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT`, `RESTRICTED_COINCIDENT_DIFFUSION`, and `HARDING_PAGAN_CHARACTERISTICS`. Registration does not set `publication_allowed` true. `refresh.py` was not changed. The diffusion recorder appends a run on every call, so it was not hooked. Characteristics are idempotent, but they depend on four series and the existing refresh hook does not rerun that kind of method when any one input changes. The Stock–Watson path already replays the frozen filter. It was not turned into a re-estimate.
+
+Catalogue: `diffusion-index` is in development for the restricted measure. `harding-pagan-characteristics` was added. `harding-pagan-bbq` stays planned. Calculation JSON stays withheld.
+
+AQ-094 to AQ-102 notes were extended. No new backlog id. Diffusion and Harding–Pagan characteristics are in the quantitative register only. That backlog gap remains.
+
+`npm run test:research` passed 561 tests, Ruff check, and Ruff format. `scripts/prepare-research-test-db.ps1` rebuilt only `aqil_research_test`. Two earlier failures were that dirty disposable database. `test_refresh_hook_is_idempotent_until_a_month_changes` returned unchanged because G.17 was already stored. `test_stock_watson_lifecycle.py` saw a leftover negative level, so the filter update said log differences require positive levels. Assertions were not weakened. Both passed after the disposable database was prepared. `apps/web` present-methodology tests passed 7. GitHub Actions has not run.
+
+Nothing in these results should stop batch 2, provided publication stays closed, the refit is not marked operationally accepted, diffusion is not treated as confirmation of the factor, and characteristics are not described as BBQ.
+
+## Quantitative methods certification, 30 October 2026
+
+Risk class R2. Local only. Branch `research/quantitative-methods` in `C:\Users\gamer\aqil-quant-methods`. Nothing was pushed, deployed, or applied to hosted Supabase. `publication_allowed` stays false. The preserved database `postgres` on `127.0.0.1` port 55432 was not reset. No VAR code was written.
+
+The certification is `docs/macro/METHODOLOGY_CERTIFICATION.md`.
+
+Registration commit: `2a52262e08f1860e0eac7ecf9fe8722a5fd89526`. This handover section is committed with the certification. Its parent is that registration commit.
+
+`default_method_registry` now also includes `HAMILTON_MONTHLY_REGIME_SWITCHING`, `BAI_PERRON_MEAN_SHIFTS`, `AUTOREGRESSIVE_BENCHMARK`, and `LEAD_LAG_CROSS_CORRELATION`. `refresh.py` was not changed. These are full-sample estimates, not idempotent single-series refresh hooks.
+
+Stored runs, left in place:
+
+- Hamilton monthly variant run `4629b31d-b0de-4a2f-a987-9e5d3f94747e`. BIC lag 2. Seeded recovery maximum absolute error about 0.016. Lower-mean expected duration about 2 months. Not a persistent recession regime and not empirically qualified. Not a reproduction of Hamilton 1989 quarterly US GNP. Filtered and smoothed probabilities are separate. Neither is real-time.
+- Bai–Perron intercept-only mean shifts run `2f4c14eb-44f2-40dc-913f-bf7945e972cd`. Primary trimming selects no break on G.17 log-growth. That is a valid result. Looser trims are sensitivity, not a second selected model. `point_estimates_only`. The 1998 and 2003 papers were not line-checked. Not the general regressor model.
+- Autoregressive benchmark run `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e`. AIC lag 12. Horizon 1 beat the historical mean. Horizon 12 did not. Not empirically qualified as a forecast.
+- Lead–lag run `94152391-c3a8-48d7-8f2e-8c4d1dfdb811`. Strongest correlations are contemporaneous. None of those peaks is stable across 1997-2007 and 2010-2019. Not a structural lead. This blocks a small VAR.
+
+Batch 3 stays blocked. Estrella–Mishkin still needs the 10-year minus 3-month Treasury spread. AQ-104 stays the dependency. The stored 10-year yield and the federal funds rate are not that spread. US GDP is not stored, and there is no vintage panel. Euro-area GDP does not remove the nowcast block. Financial conditions, the excess bond premium, the BIS credit gap, and yield-spread substitutes were not estimated and were not proxied.
+
+Catalogue slugs with stored runs: `hamilton-markov-switching`, `bai-perron-breaks`, `autoregressive-benchmark`, and `lead-lag`, alongside the batch 1 cards. `harding-pagan-bbq` stays planned. Payloads stay withheld.
+
+Hamilton, Bai–Perron mean shifts, the autoregressive benchmark, and lead–lag have no backlog ids. That gap remains, as it does for diffusion and Harding-Pagan characteristics.
+
+`npm run test:research` passed 597 tests, then Ruff check and Ruff format. Targeted batch 2 modules passed 36. Catalogue unit tests passed 8. GitHub Actions has not run.
+
+Certification commit: `b2f6096d9f9b47d8c3a35be67679b4d2816f0691`. At that commit, local `main` was `c03842692c0a18b41ed63fb527cbb9534f44c0ab` and the reader-role commits were not yet on this branch. The next section records the merge.
+
+## Main merged into quantitative methods, 30 October 2026
+
+Risk class R2. Local only. Branch `research/quantitative-methods` in `C:\Users\gamer\aqil-quant-methods`. Nothing was pushed. `main` itself was not updated. This branch was not merged into `main`. Hosted Supabase was not migrated by this merge. `publication_allowed` was not set true. The preserved database `postgres` on `127.0.0.1` port 55432 was not reset.
+
+Local `main` remains `c03842692c0a18b41ed63fb527cbb9534f44c0ab`. Merge commit: `790b5fd91fe7f8c361fa68f75768a24767b9bc33`. It merged `main` into `research/quantitative-methods`. Parents are `b2f6096d9f9b47d8c3a35be67679b4d2816f0691` and `c03842692c0a18b41ed63fb527cbb9534f44c0ab`. The merge was clean. It includes `8fd00ac` (hosted research reader role) and `c038426` (reader migration stored as UTF-8). The uncommitted `apps/web/public/icons/icon.svg` in `C:\Users\gamer\aqil` was left untouched and was not part of the merge.
+
+No Python, catalogue, or web test file changed. `npm run test:research` was not run for this merge.

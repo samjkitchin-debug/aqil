@@ -10,7 +10,7 @@ from statsmodels.tsa.statespace.dynamic_factor import DynamicFactor
 from aqil_research.methods.stock_watson_1988 import (
     simulate_coincident_path,
 )
-from aqil_research.methods.stock_watson_1988_fit import _filtered_factor
+from aqil_research.methods.stock_watson_1988_fit import _filtered_factor, smoothed_factor
 
 LOADINGS = (0.7, 0.5, 0.4, 0.6)
 FACTOR_AR = (0.4, 0.1)
@@ -69,6 +69,19 @@ def test_statsmodels_matches_aqil_after_the_initial_state_dies_out() -> None:
     )
     gap = np.max(np.abs(filtered.filtered_state[0, 20:] - aqil_path[20:]))
     assert gap < 1e-8
+    smoothed = model.smooth(mapped)
+    aqil_smoothed = np.asarray(
+        smoothed_factor(
+            draw.observations,
+            loadings=LOADINGS,
+            factor_ar=FACTOR_AR,
+            idiosyncratic_ar=IDIOSYNCRATIC,
+            idiosyncratic_innovation_scale=SCALES,
+        )
+    )
+    smooth_gap = np.max(np.abs(smoothed.smoothed_state[0, 20:] - aqil_smoothed[20:]))
+    assert smooth_gap < 1e-8
+    assert abs(aqil_path[0] - aqil_smoothed[0]) > 1e-4
     # The first observations absorb the identity initial covariance. After that
     # the filtered factors match. The total likelihood can still differ by the
     # burn-in, so the acceptance check is the post-burn-in path.

@@ -1,7 +1,9 @@
 import Link from "next/link";
 
+import { MethodologyPrivateResult } from "@/components/intelligence/methodology-private-result";
 import { methodologyBySlug } from "@/lib/research/methodology-catalogue";
 import { loadMethodologyRuns } from "@/lib/research/load-methodology-runs";
+import { loadPrivateMethodologyResult } from "@/lib/research/load-methodology-result";
 import { presentMethodology } from "@/lib/research/present-methodology";
 
 const TECHNICAL_ID = "technical";
@@ -10,7 +12,9 @@ export async function MethodologyDetail({ slug }: { slug: string }) {
   const entry = methodologyBySlug(slug);
   if (!entry) return null;
   const load = await loadMethodologyRuns(entry.queryMethodIds);
-  const view = presentMethodology(entry, load);
+  const stored = await loadPrivateMethodologyResult(entry.queryMethodIds);
+  const privateResult = stored.status === "ready" ? stored.result : null;
+  const view = presentMethodology(entry, load, privateResult);
   const narrative = view.sections.filter((section) => section.id !== TECHNICAL_ID);
   const technical = view.sections.find((section) => section.id === TECHNICAL_ID);
   return (
@@ -38,18 +42,28 @@ export async function MethodologyDetail({ slug }: { slug: string }) {
       <p className="research-body" data-testid="methodology-detail-status">
         {view.statusLine}
       </p>
-      {narrative.map((section) => (
-        <section key={section.id} aria-labelledby={`method-${section.id}`} className="intel-method-section">
-          <h3 id={`method-${section.id}`} className="intel-section-title">
-            {section.heading}
-          </h3>
-          {section.paragraphs.map((paragraph) => (
-            <p key={paragraph} className="research-body">
-              {paragraph}
-            </p>
-          ))}
-        </section>
-      ))}
+      {stored.status === "unavailable" ? (
+        <p className="research-body">{stored.reason} No figure is invented in its place.</p>
+      ) : null}
+      {narrative.map((section) => {
+        if (section.id === "historical-output" && view.privateResult) return null;
+        return (
+          <section key={section.id} aria-labelledby={`method-${section.id}`} className="intel-method-section">
+            <h3 id={`method-${section.id}`} className="intel-section-title">
+              {section.heading}
+            </h3>
+            {section.id === "current-result" && view.privateResult ? (
+              <MethodologyPrivateResult result={view.privateResult} />
+            ) : (
+              section.paragraphs.map((paragraph) => (
+                <p key={paragraph} className="research-body">
+                  {paragraph}
+                </p>
+              ))
+            )}
+          </section>
+        );
+      })}
       {view.references.length > 0 ? (
         <section aria-labelledby="method-references" className="intel-method-section">
           <h3 id="method-references" className="intel-section-title">

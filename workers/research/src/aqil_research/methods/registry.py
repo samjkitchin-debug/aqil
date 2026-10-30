@@ -4,6 +4,14 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
+from aqil_research.methods.autoregressive_benchmark import (
+    AUTOREGRESSIVE_BENCHMARK,
+    AutoregressiveBenchmarkMethod,
+)
+from aqil_research.methods.bai_perron_mean_shifts import (
+    BAI_PERRON_MEAN_SHIFTS,
+    BaiPerronMeanShiftsMethod,
+)
 from aqil_research.methods.bry_boschan_spencer15 import (
     BRY_BOSCHAN_SPENCER15_VARIANT,
     BryBoschanSpencer15Method,
@@ -16,6 +24,14 @@ from aqil_research.methods.credit_standards_volumes import (
     CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID,
     CreditStandardsVolumesMethod,
 )
+from aqil_research.methods.hamilton_monthly import (
+    METHOD_ID as HAMILTON_MONTHLY_METHOD_ID,
+)
+from aqil_research.methods.hamilton_monthly import HamiltonMonthlyMethod
+from aqil_research.methods.harding_pagan_characteristics import (
+    HARDING_PAGAN_CHARACTERISTICS,
+    HardingPaganCharacteristicsMethod,
+)
 from aqil_research.methods.industrial_production_activity import (
     INDUSTRIAL_PRODUCTION_METHOD_ID,
     IndustrialProductionActivityMethod,
@@ -23,6 +39,10 @@ from aqil_research.methods.industrial_production_activity import (
 from aqil_research.methods.labour_market import (
     LABOUR_MARKET_METHOD_ID,
     LabourMarketConditionsMethod,
+)
+from aqil_research.methods.lead_lag import (
+    LEAD_LAG_CROSS_CORRELATION,
+    LeadLagCrossCorrelationMethod,
 )
 from aqil_research.methods.macro_conditions import (
     MACRO_CONDITIONS_METHOD_ID,
@@ -34,9 +54,19 @@ from aqil_research.methods.prices_and_policy import (
     PricesAndPolicyMethod,
 )
 from aqil_research.methods.protocol import AnalyticalMethod
+from aqil_research.methods.restricted_coincident_diffusion import (
+    METHOD_ID as RESTRICTED_COINCIDENT_DIFFUSION_METHOD_ID,
+)
+from aqil_research.methods.restricted_coincident_diffusion import (
+    RestrictedCoincidentDiffusionMethod,
+)
 from aqil_research.methods.sahm import SAHM_METHOD_ID
 from aqil_research.methods.sahm_registered import SahmAnalyticalMethod
 from aqil_research.methods.sloos_cil import SLOOS_CIL_METHOD_ID, SloosCilMethod
+from aqil_research.methods.stock_watson_1988_fit import (
+    SPECIFICATION_ID as STOCK_WATSON_MODERN_REFIT_ID,
+)
+from aqil_research.methods.stock_watson_1988_fit import StockWatsonModernRefitMethod
 
 
 class MethodRegistryError(Exception):
@@ -72,6 +102,13 @@ def default_method_registry() -> MethodRegistry:
     registry.register(IndustrialProductionActivityMethod())
     registry.register(CreditStandardsVolumesMethod())
     registry.register(BryBoschanSpencer15Method())
+    registry.register(StockWatsonModernRefitMethod())
+    registry.register(RestrictedCoincidentDiffusionMethod())
+    registry.register(HardingPaganCharacteristicsMethod())
+    registry.register(HamiltonMonthlyMethod())
+    registry.register(BaiPerronMeanShiftsMethod())
+    registry.register(AutoregressiveBenchmarkMethod())
+    registry.register(LeadLagCrossCorrelationMethod())
     return registry
 
 
@@ -79,6 +116,13 @@ __all__ = [
     "MethodRegistry",
     "MethodRegistryError",
     "BRY_BOSCHAN_SPENCER15_VARIANT",
+    "AUTOREGRESSIVE_BENCHMARK",
+    "BAI_PERRON_MEAN_SHIFTS",
+    "HAMILTON_MONTHLY_METHOD_ID",
+    "HARDING_PAGAN_CHARACTERISTICS",
+    "LEAD_LAG_CROSS_CORRELATION",
+    "RESTRICTED_COINCIDENT_DIFFUSION_METHOD_ID",
+    "STOCK_WATSON_MODERN_REFIT_ID",
     "CENSUS_ADV_ORDERS_METHOD_ID",
     "CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID",
     "INDUSTRIAL_PRODUCTION_METHOD_ID",

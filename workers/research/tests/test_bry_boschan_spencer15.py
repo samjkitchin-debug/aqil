@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import io
+import math
 from datetime import UTC, date, datetime
 from decimal import Decimal
 
@@ -17,25 +18,47 @@ from aqil_research.adapters.fed_g17.parse import (
     SERIES_ID,
 )
 from aqil_research.collection.service import collect_registered_adapter
+from aqil_research.contracts.observation import (
+    AnalysisMode,
+    AvailabilityPrecision,
+    EconomicObservation,
+    Frequency,
+    QualityStatus,
+    SeasonalAdjustment,
+    SeriesProvenance,
+)
 from aqil_research.methods.bry_boschan_monthly import (
     BRY_BOSCHAN_MONTHLY_1971,
+    G17_DATASET_ID,
     date_specific_cycles,
 )
 from aqil_research.methods.bry_boschan_spencer15 import (
     BRY_BOSCHAN_SPENCER15_VARIANT,
+    CHRONOLOGY_CLASS,
+    ENDPOINT_BAN_MONTHS,
     MA12_LAGS,
     MA12_LEADS,
+    MINIMUM_CYCLE_MONTHS,
+    MINIMUM_PHASE_MONTHS,
     SPENCER_DIVISOR,
     SPENCER_WEIGHTS,
     BryBoschanSpencer15Method,
+    _drop_endpoints,
+    _drop_short_cycles,
+    _drop_short_phases,
+    _enforce_alternation,
+    _Turn,
     assess_spencer15_health,
     centred_spencer,
     date_spencer15_variant,
+    legacy_variant_implementation_hash,
+    length_bound_sensitivity,
     moving_average,
     nber_reference_diagnostic,
     spencer_weights_sum,
 )
 from aqil_research.methods.configs import BRY_BOSCHAN_SPENCER15_PUBLISHED
+from aqil_research.methods.protocol import MethodContext
 from aqil_research.methods.registry import default_method_registry
 from aqil_research.persistence.connection import research_connection
 from aqil_research.workflow.bry_boschan_reading import (
@@ -184,6 +207,215 @@ def test_health_failures_are_injected_and_nber_disagreement_is_not() -> None:
     far = nber_reference_diagnostic((date(2002, 7, 1),), ())
     assert far["gates_the_method"] is False
     assert "not mathematical proof" in str(far["statement"])
+
+
+def _month_gap(left: date, right: date) -> int:
+    return abs((left.year - right.year) * 12 + (left.month - right.month))
+
+
+def test_alternation_keeps_the_more_extreme_contiguous_turn() -> None:
+    turns = [
+        _Turn(10, "peak", Decimal(3)),
+        _Turn(14, "peak", Decimal(8)),
+        _Turn(30, "trough", Decimal(1)),
+        _Turn(34, "trough", Decimal(0)),
+    ]
+    kept = _enforce_alternation(turns)
+    assert [turn.kind for turn in kept] == ["peak", "trough"]
+    assert kept[0].index == 14
+    assert kept[1].index == 34
+
+
+def test_short_phase_uses_the_five_month_constant() -> None:
+    short_end = 20 + MINIMUM_PHASE_MONTHS - 1
+    kept_end = 50 + MINIMUM_PHASE_MONTHS
+    turns = [
+        _Turn(20, "peak", Decimal(5)),
+        _Turn(short_end, "trough", Decimal(1)),
+        _Turn(50, "peak", Decimal(6)),
+        _Turn(kept_end, "trough", Decimal(2)),
+    ]
+    kept = _drop_short_phases(turns)
+    indexes = [turn.index for turn in kept]
+    assert short_end not in indexes
+    assert kept_end in indexes
+    assert MINIMUM_PHASE_MONTHS == 5
+
+
+def test_short_cycle_uses_the_fifteen_month_constant() -> None:
+    short_peak = 10 + MINIMUM_CYCLE_MONTHS - 1
+    kept_trough = 40 + MINIMUM_CYCLE_MONTHS
+    turns = [
+        _Turn(10, "peak", Decimal(5)),
+        _Turn(short_peak, "peak", Decimal(9)),
+        _Turn(40, "trough", Decimal(1)),
+        _Turn(kept_trough, "trough", Decimal(2)),
+    ]
+    kept = {(turn.kind, turn.index) for turn in _drop_short_cycles(turns)}
+    assert ("peak", 10) not in kept
+    assert ("peak", short_peak) in kept
+    assert ("trough", 40) in kept
+    assert ("trough", kept_trough) in kept
+    assert MINIMUM_CYCLE_MONTHS == 15
+
+
+def test_endpoint_censor_uses_the_six_month_constant() -> None:
+    size = 48
+    banned_start = ENDPOINT_BAN_MONTHS - 1
+    allowed_start = ENDPOINT_BAN_MONTHS
+    allowed_end = size - 1 - ENDPOINT_BAN_MONTHS
+    banned_end = allowed_end + 1
+    turns = [
+        _Turn(banned_start, "peak", Decimal(1)),
+        _Turn(allowed_start, "trough", Decimal(1)),
+        _Turn(allowed_end, "peak", Decimal(1)),
+        _Turn(banned_end, "trough", Decimal(1)),
+    ]
+    kept = [turn.index for turn in _drop_endpoints(turns, size)]
+    assert kept == [allowed_start, allowed_end]
+    relaxed = [turn.index for turn in _drop_endpoints(turns, size, endpoint_ban_months=0)]
+    assert relaxed == [banned_start, allowed_start, allowed_end, banned_end]
+    assert ENDPOINT_BAN_MONTHS == 6
+
+
+def test_dated_output_obeys_alternation_phase_cycle_and_endpoint_rules() -> None:
+    levels = []
+    for index in range(240):
+        raw = 100 + 40 * math.sin(2 * math.pi * index / 48)
+        levels.append((_month(index), Decimal(str(raw))))
+    dated = date_spencer15_variant(tuple(levels))
+    combined = sorted(
+        [("peak", item) for item in dated.peaks] + [("trough", item) for item in dated.troughs],
+        key=lambda item: item[1],
+    )
+    assert combined
+    first = levels[0][0]
+    last = levels[-1][0]
+    for index in range(len(combined) - 1):
+        assert combined[index][0] != combined[index + 1][0]
+        assert _month_gap(combined[index][1], combined[index + 1][1]) >= MINIMUM_PHASE_MONTHS
+    for kind in ("peak", "trough"):
+        group = [item[1] for item in combined if item[0] == kind]
+        for index in range(len(group) - 1):
+            assert _month_gap(group[index], group[index + 1]) >= MINIMUM_CYCLE_MONTHS
+    for _kind, turn in combined:
+        assert _month_gap(turn, first) >= ENDPOINT_BAN_MONTHS
+        assert _month_gap(turn, last) >= ENDPOINT_BAN_MONTHS
+
+
+def test_length_bound_sensitivity_is_separate_from_production_dates() -> None:
+    levels = _asymmetric_peak()
+    production = date_spencer15_variant(levels)
+    repeated = date_spencer15_variant(
+        levels,
+        minimum_cycle_months=MINIMUM_CYCLE_MONTHS,
+        minimum_phase_months=MINIMUM_PHASE_MONTHS,
+        endpoint_ban_months=ENDPOINT_BAN_MONTHS,
+    )
+    assert repeated.peaks == production.peaks
+    assert repeated.troughs == production.troughs
+    diagnostic = length_bound_sensitivity(levels)
+    assert diagnostic["replaces_production_chronology"] is False
+    assert diagnostic["production_bounds"] == {
+        "minimum_cycle_months": MINIMUM_CYCLE_MONTHS,
+        "minimum_phase_months": MINIMUM_PHASE_MONTHS,
+        "endpoint_ban_months": ENDPOINT_BAN_MONTHS,
+    }
+    assert diagnostic["production_peak_count"] == len(production.peaks)
+    assert diagnostic["production_trough_count"] == len(production.troughs)
+    phase_case = diagnostic["without_five_month_phase_rule"]
+    endpoint_case = diagnostic["without_six_month_endpoint_ban"]
+    assert isinstance(phase_case, dict)
+    assert isinstance(endpoint_case, dict)
+    assert phase_case["bounds"]["minimum_phase_months"] == 1
+    assert phase_case["bounds"]["minimum_cycle_months"] == MINIMUM_CYCLE_MONTHS
+    assert endpoint_case["bounds"]["endpoint_ban_months"] == 0
+    assert endpoint_case["bounds"]["minimum_phase_months"] == MINIMUM_PHASE_MONTHS
+    unchanged = date_spencer15_variant(levels)
+    assert unchanged.peaks == production.peaks
+    assert unchanged.troughs == production.troughs
+
+
+def test_method_labels_the_chronology_retrospective_full_sample() -> None:
+    levels = _asymmetric_peak()
+    series = {period: _g17_observation(period, value) for period, value in levels}
+    context = MethodContext(
+        inputs_by_dataset={G17_DATASET_ID: series},
+        evaluation_period=max(series),
+        analysis_mode=AnalysisMode.LATEST_REVISED,
+        primary_dataset_id=G17_DATASET_ID,
+    )
+    method = BryBoschanSpencer15Method()
+    result = method.run(context, method.parse_config(dict(BRY_BOSCHAN_SPENCER15_PUBLISHED)))
+    assert result.sufficiency == "sufficient"
+    assert result.calculation is not None
+    assert result.calculation["chronology_class"] == CHRONOLOGY_CLASS
+    assert result.calculation["contemporaneous_recession_call"] is False
+    assert result.calculation["centred_spencer_smoother"] is True
+    assert result.calculation["publication_allowed"] is False
+    revision = result.calculation["revision_sensitivity"]
+    assert isinstance(revision, dict)
+    assert revision["status"] == "blocked"
+    sensitivity = result.calculation["length_bound_sensitivity"]
+    assert isinstance(sensitivity, dict)
+    assert sensitivity["replaces_production_chronology"] is False
+    diagnostic = result.calculation["nber_reference_diagnostic"]
+    assert isinstance(diagnostic, dict)
+    assert diagnostic["gates_the_method"] is False
+    assert "centred Spencer smoother" in result.narrative
+    assert "retrospective full sample" in result.narrative
+
+
+def test_legacy_revision_keeps_dating_lists_and_omits_new_diagnostics() -> None:
+    levels = _asymmetric_peak()
+    series = {period: _g17_observation(period, value) for period, value in levels}
+    context = MethodContext(
+        inputs_by_dataset={G17_DATASET_ID: series},
+        evaluation_period=max(series),
+        analysis_mode=AnalysisMode.LATEST_REVISED,
+        primary_dataset_id=G17_DATASET_ID,
+    )
+    config = dict(BRY_BOSCHAN_SPENCER15_PUBLISHED)
+    current = default_method_registry().get(BRY_BOSCHAN_SPENCER15_VARIANT)
+    legacy = BryBoschanSpencer15Method(payload_revision="legacy")
+    assert current.implementation_hash() != legacy.implementation_hash()
+    assert legacy.implementation_hash() == legacy_variant_implementation_hash()
+    current_result = current.run(context, current.parse_config(config))
+    legacy_result = legacy.run(context, legacy.parse_config(config))
+    assert current_result.calculation is not None
+    assert legacy_result.calculation is not None
+    assert legacy_result.calculation["peaks"] == current_result.calculation["peaks"]
+    assert legacy_result.calculation["troughs"] == current_result.calculation["troughs"]
+    assert legacy_result.calculation["publication_allowed"] is False
+    assert "chronology_class" not in legacy_result.calculation
+    assert "length_bound_sensitivity" not in legacy_result.calculation
+    assert "nber_reference_diagnostic" not in legacy_result.calculation
+    assert "retrospective full sample" not in legacy_result.narrative
+    assert current_result.calculation["chronology_class"] == CHRONOLOGY_CLASS
+
+
+def _g17_observation(period: date, value: Decimal) -> EconomicObservation:
+    retrieved = datetime(2026, 10, 25, 8, 0, tzinfo=UTC)
+    return EconomicObservation(
+        observation_id=f"g17-{period.isoformat()}",
+        dataset_id=G17_DATASET_ID,
+        provider_id="federal_reserve_board",
+        source_id="federal_reserve_g17_total_ip",
+        rights_record_id="federal_reserve_g17_total_ip",
+        period_start=period,
+        frequency=Frequency.MONTHLY,
+        geography="US",
+        unit="index_2017_100",
+        seasonal_adjustment=SeasonalAdjustment.SEASONALLY_ADJUSTED,
+        raw_value=format(value, "f"),
+        quality_status=QualityStatus.OBSERVED,
+        series_provenance=SeriesProvenance.LATEST_REVISED,
+        provider_vintage_date=date(2026, 10, 17),
+        availability_precision=AvailabilityPrecision.UNKNOWN,
+        retrieved_at=retrieved,
+        first_seen_at=retrieved,
+        adapter_version="spencer15_label_test_v1",
+    )
 
 
 def _package(periods: list[str], values: list[str]) -> dict[str, object]:
