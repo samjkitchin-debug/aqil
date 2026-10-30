@@ -1,7 +1,25 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 31 October 2026, quantitative V1 execution contract
+**Last updated:** 31 October 2026, quantitative V1 source binding
+
+## Source binding, 31 October 2026
+
+Risk class R2. Branch `research/quantitative-v1-sources` in `C:\Users\gamer\aqil-quant-sources`, started at `d9821cb87dde0e5811ea4cd724ff9804b9c09dd8`. `publication_allowed` stays false. Nothing was pushed. Hosted Supabase was not written. Local `postgres` on `127.0.0.1:55432` was not reset and research runs were not deleted.
+
+That binding is now merged into `research/quantitative-v1` in `C:\Users\gamer\aqil-quant-v1`. The methods already on this branch stay registered, including Stock–Watson calculate-versus-refit separation, which does not overwrite run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`. No Estrella–Mishkin method, nowcast, or scheduler was added by the merge. On this worktree the targeted source tests passed 32. The development database `postgres` was not reset. Nothing was pushed.
+
+The Board H.15 zip names `RIFLGFCM03_N.M`, market yield on U.S. Treasury securities at 3-month constant maturity, quoted on an investment basis. 541 months, 1981-09-01 to 2026-09-01, were stored as `fed.h15.RIFLGFCM03_N.M`. The same file also names discount-basis bill `RIFSGFSM03_N.M`. That bill was not stored. Federal funds was not used. FRED was not downloaded or stored.
+
+Estrella–Mishkin was not implemented. NBER dates are not an approved stored input. They exist only as a hardcoded diagnostic chronology in the Spencer-15 method, cited from the NBER page dated 14 March 2023. No new chronology was scraped. The 1998 equation was not copied from the article, so no probit was written.
+
+The official LN flat file `ln.data.1.AllData` contains monthly `LNS14000000`, titled `(Seas) Unemployment Rate`, from 1948-01-01 to 2026-09-01. 944 values were read. 2025-10-01 is absent and was not interpolated. 923 rows were inserted and 21 unchanged values kept their first identity. Existing fixture rows were not deleted. This is revised history, not a real-time Sahm evaluation. AQ-103 is not done.
+
+BEA workbook `Section1All_xls.xlsx`, sheet `T10106-Q`, line 1, account `A191RX`, is real gross domestic product, millions of chained 2017 dollars, seasonally adjusted at annual rates. 319 quarters, 1947-01-01 to 2026-07-01, were stored as `bea.nipa.T10106.A191RX`. The sheet says data published 29 October 2026. Euro-area GDP was not copied onto this id. No nowcast was written.
+
+ALFRED was not ingested. Philadelphia Fed real-time data was not ingested. Real-time claims remain blocked. `refresh.py`, `protocol.py`, `cli.py`, and `execute_method.py` were not edited. No `--refit`.
+
+Targeted tests passed: `test_bls_ln_history`, `test_bea_real_gdp`, `test_fed_h15`, `test_source_rights`, `test_source_lifecycle` (32). The full suite, production build, and browser tests were not run.
 
 ## Execution contract, 31 October 2026
 

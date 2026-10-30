@@ -160,7 +160,7 @@ The observation path is implemented: rights, adapters, `research.try_insert_obse
 
 Nine deterministic methods are registered in `workers/research/src/aqil_research/methods/registry.py`. Sahm (2019) is the only recognised published rule among them. The labour, prices, production, and credit readings are ranks and twelve-month changes. They are not a dynamic factor model. The worker dependencies are `httpx`, `psycopg`, and `pydantic`. NumPy, pandas, and a Kalman library are not installed. There is no production cron.
 
-US industrial production `fed.g17.IP.B50001.S` is 1,293 `latest_revised` months, January 1919 to September 2026, one row per month. US unemployment in the live file is 44 months from January 2023. US GDP is not stored. Euro-area real GDP is stored quarterly.
+US industrial production `fed.g17.IP.B50001.S` is 1,293 `latest_revised` months, January 1919 to September 2026, one row per month. US unemployment `bls.ln.LNS14000000` now includes the official flat-file revised history, 944 months from January 1948 to September 2026, with October 2025 absent. That longer file is not a real-time Sahm evaluation. US real GDP `bea.nipa.T10106.A191RX` is stored quarterly from 1947Q1 to 2026Q3. Euro-area real GDP remains a separate series.
 
 ## Shared work the pilot may add
 

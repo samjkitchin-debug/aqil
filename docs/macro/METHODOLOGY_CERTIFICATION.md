@@ -98,9 +98,9 @@ Lead–lag peaks on the four coincident growth rates are contemporaneous, and th
 
 No VAR code was written. The lead–lag result shows the four coincident growth relationships are not stable across 1997–2007 and 2010–2019, so a small VAR is not justified. The block is recorded on `ADVANCED_FORECASTING` in the quantitative register and in this certification.
 
-Estrella–Mishkin is blocked. The stored 10-year yield and the federal funds rate are not the 10-year minus 3-month Treasury spread. AQ-104 stays the dependency. No new series was ingested.
+Estrella–Mishkin is blocked. `fed.h15.RIFLGFCM03_N.M` is stored. The probit was not estimated: NBER dates are not an approved stored input, and the 1998 equation was not copied from the article.
 
-The US GDP nowcast is blocked. US GDP is not stored. There is no vintage panel. Euro-area GDP does not remove that block.
+The US GDP nowcast is blocked. Quarterly real GDP `bea.nipa.T10106.A191RX` is stored as latest-revised history. There is no vintage panel. ALFRED and Philadelphia Fed real-time data were not ingested. Real-time claims remain blocked. Euro-area GDP was not copied onto the US series.
 
 Financial conditions, the excess bond premium, the BIS credit gap, and yield-spread substitutes are blocked. The required series are not stored. They were not proxied.
 

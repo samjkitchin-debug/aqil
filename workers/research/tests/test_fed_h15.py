@@ -20,6 +20,7 @@ from aqil_research.adapters.fed_h15.series import (
     FEDERAL_FUNDS,
     METHOD_COMPATIBILITY_NOTE,
     PACKAGE_URL,
+    TREASURY_3M,
     TREASURY_10Y,
     H15Series,
 )
@@ -80,6 +81,26 @@ def test_rights_fragments_clear_first_live_use() -> None:
         assert "not a vintage panel" in note
         assert "not a near-term forward spread" in note
         assert series.dataset_id in note
+
+
+def test_three_month_fragment_is_the_constant_maturity_yield() -> None:
+    path = REPO / "docs" / "sources" / "fragments" / f"{TREASURY_3M.source_id}.csv"
+    record = load_source_rights(path)[0]
+    assert record.dataset_id == "fed.h15.RIFLGFCM03_N.M"
+    assert record.series_or_dataset_code == "H15/H15/RIFLGFCM03_N.M"
+    assert record.assessed_on == date(2026, 10, 31)
+    assert record.m1_role == M1Role.FIRST_LIVE_PROVIDER
+    assert "RIFLGFCM03_N.M" in record.evidence_note
+    assert (
+        "3-month  constant maturity" in record.evidence_note
+        or "double space" in record.evidence_note
+    )
+    assert "RIFSGFSM03_N.M" in record.evidence_note
+    assert "not stored" in record.evidence_note
+    assert "federal funds" in record.evidence_note.casefold()
+    assert "FRED" in record.evidence_note
+    assert METHOD_COMPATIBILITY_NOTE in record.evidence_note
+    assert TREASURY_3M.series_name != "RIFSPFF_N.M"
 
 
 def test_adapter_docstring_states_method_compatibility() -> None:
@@ -256,6 +277,7 @@ def test_live_board_file_is_counted_in_memory(monkeypatch: pytest.MonkeyPatch) -
     expected = {
         FEDERAL_FUNDS: (867, date(1954, 7, 1), date(2026, 9, 30), "0.80"),
         TREASURY_10Y: (882, date(1953, 4, 1), date(2026, 9, 30), "2.83"),
+        TREASURY_3M: (541, date(1981, 9, 1), date(2026, 9, 30), "15.61"),
     }
     for series, (count, start, end, first_value) in expected.items():
         extract = read_h15_series(download.content, series)
@@ -265,6 +287,11 @@ def test_live_board_file_is_counted_in_memory(monkeypatch: pytest.MonkeyPatch) -
         assert extract.rows[0].value == first_value
         assert extract.rows[-1].period_end == end
         assert " ".join(extract.long_description.split()) == series.long_description
+        if series is TREASURY_3M:
+            assert "3-month  constant maturity" in extract.long_description
+            assert "discount basis" not in extract.long_description
+            assert series.series_name != "RIFSGFSM03_N.M"
+            assert series.series_name != FEDERAL_FUNDS.series_name
         result = FedH15Adapter(
             series=series,
             config=FedH15AdapterConfig(live=True),
