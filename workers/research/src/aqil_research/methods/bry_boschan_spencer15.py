@@ -41,8 +41,14 @@ from aqil_research.methods.bry_boschan_monthly import (
     G17InputPoint,
     assess_g17_level_input,
 )
+from aqil_research.methods.configs import BRY_BOSCHAN_SPENCER15_PUBLISHED
 from aqil_research.methods.parameters import MethodParameterDocument
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 
 BRY_BOSCHAN_SPENCER15_VARIANT = "BRY_BOSCHAN_SPENCER15_VARIANT"
 VARIANT_VERSION = "1.0.0"
@@ -636,6 +642,23 @@ class BryBoschanSpencer15Method:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return (G17_DATASET_ID,)
+
+    def dependency(self) -> MethodDependency:
+        dating_floor = len(SPENCER_WEIGHTS) + MINIMUM_CYCLE_MONTHS
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("monthly",),
+            minimum_history=(
+                "one contiguous monthly level; turning points stay empty below "
+                f"{dating_floor} months"
+            ),
+            parameter_policy="none",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(BRY_BOSCHAN_SPENCER15_PUBLISHED)
 
     def parse_config(self, payload: dict[str, object]) -> BryBoschanSpencer15Config:
         return BryBoschanSpencer15Config.model_validate(payload)

@@ -7,6 +7,12 @@ from dataclasses import dataclass
 
 import psycopg
 
+from aqil_research.methods.autoregressive_benchmark import (
+    PUBLISHED_CONFIG as AUTOREGRESSIVE_BENCHMARK_PUBLISHED,
+)
+from aqil_research.methods.bai_perron_mean_shifts import (
+    PUBLISHED_CONFIG as BAI_PERRON_MEAN_SHIFTS_PUBLISHED,
+)
 from aqil_research.methods.bry_boschan_spencer15 import (
     BRY_BOSCHAN_SPENCER15_VARIANT,
     BryBoschanSpencer15Method,
@@ -20,10 +26,16 @@ from aqil_research.methods.configs import (
     SAHM_SENSITIVITY,
     SLOOS_CIL_PUBLISHED,
 )
+from aqil_research.methods.hamilton_monthly import HAMILTON_MONTHLY_PUBLISHED
 from aqil_research.methods.harding_pagan_characteristics import (
     HARDING_PAGAN_CHARACTERISTICS_PUBLISHED,
 )
+from aqil_research.methods.lead_lag import PUBLISHED_CONFIG as LEAD_LAG_PUBLISHED
 from aqil_research.methods.registry import default_method_registry
+from aqil_research.methods.restricted_coincident_diffusion import (
+    PUBLISHED_CONFIG as RESTRICTED_COINCIDENT_DIFFUSION_PUBLISHED,
+)
+from aqil_research.methods.stock_watson_1988_fit import ACCEPTED_CONFIG, MULTISTART_CONFIG
 from aqil_research.persistence.calculation_normalize import normalize_calculation_payload
 from aqil_research.persistence.observation_store import load_observations_by_ids
 from aqil_research.persistence.runs import load_research_run, load_run_observation_ids
@@ -98,7 +110,7 @@ def recompute_stored_run(conn: psycopg.Connection, run_id: str) -> ResearchRun:
     for row in observations:
         store.append(row)
 
-    method_config = _config_for_id(stored.config_id)
+    method_config = reproduction_config(stored.config_id)
     registry = default_method_registry()
     if (
         stored.method_id == BRY_BOSCHAN_SPENCER15_VARIANT
@@ -133,7 +145,8 @@ def recompute_stored_run(conn: psycopg.Connection, run_id: str) -> ResearchRun:
     )
 
 
-def _config_for_id(config_id: str) -> dict[str, object]:
+def reproduction_config(config_id: str) -> dict[str, object]:
+    """Return the payload the method's parser already accepts for this config id."""
     if config_id == SAHM_PUBLISHED.config_id:
         return SAHM_PUBLISHED.model_dump(mode="json")
     if config_id == SAHM_SENSITIVITY.config_id:
@@ -144,6 +157,13 @@ def _config_for_id(config_id: str) -> dict[str, object]:
         CENSUS_ADV_ORDERS_PUBLISHED,
         BRY_BOSCHAN_SPENCER15_PUBLISHED,
         HARDING_PAGAN_CHARACTERISTICS_PUBLISHED,
+        HAMILTON_MONTHLY_PUBLISHED,
+        BAI_PERRON_MEAN_SHIFTS_PUBLISHED,
+        AUTOREGRESSIVE_BENCHMARK_PUBLISHED,
+        LEAD_LAG_PUBLISHED,
+        RESTRICTED_COINCIDENT_DIFFUSION_PUBLISHED,
+        ACCEPTED_CONFIG,
+        MULTISTART_CONFIG,
     )
     for panel in published_panels:
         if config_id == panel["config_id"]:

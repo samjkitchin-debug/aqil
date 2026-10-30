@@ -86,6 +86,9 @@ class MethodRegistry:
             raise MethodRegistryError(f"unknown method_id: {method_id}")
         return method
 
+    def registered(self) -> tuple[AnalyticalMethod, ...]:
+        return tuple(self._methods.values())
+
     def parse_config(self, method_id: str, payload: dict[str, object]) -> BaseModel:
         return self.get(method_id).parse_config(payload)
 

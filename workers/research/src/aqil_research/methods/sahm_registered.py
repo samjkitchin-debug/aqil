@@ -5,8 +5,16 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 from aqil_research.interpret.sahm import render_sahm_narrative
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.configs import SAHM_PUBLISHED
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 from aqil_research.methods.sahm import (
+    AVERAGE_WINDOW_MONTHS,
+    LOOKBACK_MONTHS,
     SAHM_METHOD_ID,
     SAHM_METHOD_VERSION,
     SahmConfig,
@@ -26,6 +34,23 @@ class SahmAnalyticalMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return ("bls.ln.LNS14000000",)
+
+    def dependency(self) -> MethodDependency:
+        months = LOOKBACK_MONTHS + AVERAGE_WINDOW_MONTHS
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("monthly",),
+            minimum_history=(
+                f"{months} monthly observations covering the three-month average "
+                "and the 12-month lookback"
+            ),
+            parameter_policy="none",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return SAHM_PUBLISHED.model_dump(mode="json")
 
     def parse_config(self, payload: dict[str, object]) -> SahmConfig:
         return SahmConfig.model_validate(payload)

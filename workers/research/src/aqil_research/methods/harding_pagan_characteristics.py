@@ -53,12 +53,19 @@ from aqil_research.methods.bry_boschan_monthly import (
 from aqil_research.methods.bry_boschan_spencer15 import (
     BRY_BOSCHAN_SPENCER15_VARIANT,
     CHRONOLOGY_CLASS,
+    MINIMUM_CYCLE_MONTHS,
     PUBLICATION_ALLOWED,
+    SPENCER_WEIGHTS,
     date_spencer15_variant,
     variant_implementation_hash,
 )
 from aqil_research.methods.parameters import MethodParameterDocument
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 
 HARDING_PAGAN_CHARACTERISTICS = "HARDING_PAGAN_CHARACTERISTICS"
 CHARACTERISTICS_VERSION = "1.0.0"
@@ -311,6 +318,23 @@ class HardingPaganCharacteristicsMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return tuple(spec.dataset_id for spec in COINCIDENT_LEVEL_SERIES)
+
+    def dependency(self) -> MethodDependency:
+        dating_floor = len(SPENCER_WEIGHTS) + MINIMUM_CYCLE_MONTHS
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("monthly",),
+            minimum_history=(
+                "one contiguous monthly level before a series is dated; "
+                f"turning points stay empty below {dating_floor} months"
+            ),
+            parameter_policy="none",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(HARDING_PAGAN_CHARACTERISTICS_PUBLISHED)
 
     def parse_config(self, payload: dict[str, object]) -> HardingPaganCharacteristicsConfig:
         return HardingPaganCharacteristicsConfig.model_validate(payload)

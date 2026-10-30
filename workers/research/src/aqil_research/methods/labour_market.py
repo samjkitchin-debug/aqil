@@ -27,7 +27,13 @@ from aqil_research.contracts.observation import (
     QualityStatus,
     SeasonalAdjustment,
 )
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.configs import LABOUR_MARKET_PUBLISHED
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 
 LABOUR_MARKET_METHOD_ID = "LABOUR_MARKET_CONDITIONS"
 LABOUR_MARKET_METHOD_VERSION = "1.1.0"
@@ -107,6 +113,19 @@ class LabourMarketConditionsMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return tuple(spec.dataset_id for spec in _SERIES_SPECS)
+
+    def dependency(self) -> MethodDependency:
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("monthly",),
+            minimum_history=("the latest month and the month 12 months earlier on each series"),
+            parameter_policy="none",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(LABOUR_MARKET_PUBLISHED)
 
     def parse_config(self, payload: dict[str, object]) -> LabourMarketConfig:
         return LabourMarketConfig.model_validate(payload)

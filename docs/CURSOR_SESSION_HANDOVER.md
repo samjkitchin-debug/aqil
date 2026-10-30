@@ -1,7 +1,19 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 31 October 2026, quantitative production visibility
+**Last updated:** 31 October 2026, quantitative V1 execution contract
+
+## Execution contract, 31 October 2026
+
+Risk class R2. Branch `research/quantitative-v1` in `C:\Users\gamer\aqil-quant-v1`, parent `9eac587355cab5203c4e64477c789e0558950762`. `publication_allowed` stays false. Nothing was pushed. PR #18 was not retargeted. The development database `postgres` was not reset and its preserved runs were not replaced. Hosted Supabase was not written. `scripts/prepare-research-test-db.ps1` rebuilt only `aqil_research_test`.
+
+`aqil-research execute-method --method-id ID` looks the method up in `default_method_registry()`, loads that method's required series from the observation store, and appends a run through `execute_research_run` and `save_research_run`. Optional `--cutoff YYYY-MM-DD`. `--refit` is rejected for every registered method. Stock–Watson stays `fixed_accepted`. Its registered run estimates, and a completed row without `adopted_parameter_version` is read as adopted, so the default command does not estimate and does not write `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` or `940955f1-50d5-4c06-9d90-5ceebd05d352`. The Sahm-only `run` command is unchanged. `refresh.py` was not changed. No jobs table and no schedule.
+
+Replay now knows the seven stored config ids. The four parser hashes that already matched were left on those payloads. Diffusion and the two Stock–Watson ids are registered with the parsers those methods already have. The stored rows were not rewritten. A missing `adopted_parameter_version` on the preserved Stock–Watson run is still treated as adopted.
+
+Checks on this worktree, before this handover paragraph: pytest passed 605 on `aqil_research_test`. Ruff check passed. Ruff format reported 407 files already formatted. `npm run test:research` was not invoked as one script. GitHub Actions has not run. This is not a publication approval.
+
+Later method work should add `dependency()` and `accepted_config_payload()` on any new registered method, and should not loosen an existing minimum history, enable `--refit` for Stock–Watson, or edit `protocol.py`, `pipeline/execute_method.py`, `cli.py`, `cli_ops.py`, or the replay map in `persistence/reproduce.py` except to register a new config id.
 
 ## Signed-in methodology results, 31 October 2026
 

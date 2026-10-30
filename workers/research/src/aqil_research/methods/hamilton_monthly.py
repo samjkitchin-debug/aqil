@@ -43,7 +43,12 @@ from aqil_research.methods.bry_boschan_spencer15 import (
     NBER_REFERENCE_TURNS,
 )
 from aqil_research.methods.parameters import MethodParameterDocument
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 
 METHOD_ID = "HAMILTON_MONTHLY_REGIME_SWITCHING"
 METHOD_VERSION = "1.0.0"
@@ -399,6 +404,23 @@ class HamiltonMonthlyMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return (G17_DATASET_ID,)
+
+    def dependency(self) -> MethodDependency:
+        growth_months = CANDIDATE_LAGS[-1] + MINIMUM_MODELLED_MONTHS
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("monthly",),
+            minimum_history=(
+                f"{growth_months} monthly log-growth observations "
+                f"({MINIMUM_MODELLED_MONTHS} modelled months after the longest candidate lag)"
+            ),
+            parameter_policy="none",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(HAMILTON_MONTHLY_PUBLISHED)
 
     def parse_config(self, payload: dict[str, object]) -> HamiltonMonthlyConfig:
         return HamiltonMonthlyConfig.model_validate(payload)

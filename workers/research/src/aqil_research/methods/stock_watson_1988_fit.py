@@ -19,7 +19,12 @@ from scipy.optimize import minimize
 
 from aqil_research.contracts.observation import AnalysisMode, SeriesProvenance
 from aqil_research.methods.parameters import MethodParameterDocument
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 from aqil_research.methods.stock_watson_1988 import gaussian_log_likelihood
 
 SPECIFICATION_ID = "STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT"
@@ -36,6 +41,14 @@ MODERN_REFIT_DATASETS = (
     "bea.nipa.U002BU.KPMT",
     "bls.ce.CES0000000001",
 )
+ACCEPTED_CONFIG = {
+    "config_id": "sw1988-modern-1997-2026m07",
+    "label": "Accepted modern coincident parameters, January 1997 to July 2026",
+}
+MULTISTART_CONFIG = {
+    "config_id": "sw1988-modern-multistart",
+    "label": "Multi-start re-estimate on the latest revised panel",
+}
 NOT_THE_CITIBASE_SPECIFICATION = (
     "Payroll headcount is not employee-hours. "
     "2017 chained dollars are not 1982 dollars. "
@@ -507,6 +520,22 @@ class StockWatsonModernRefitMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return MODERN_REFIT_DATASETS
+
+    def dependency(self) -> MethodDependency:
+        # fixed_accepted: the preserved run is the parameter version.
+        # method.run estimates, and record_modern_reestimate can adopt a new
+        # version, so there is no safe separate refit command.
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("monthly",),
+            minimum_history=("37 shared monthly levels from January 1997 (36 growth-rate months)"),
+            parameter_policy="fixed_accepted",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(ACCEPTED_CONFIG)
 
     def parse_config(self, payload: dict[str, object]) -> StockWatsonModernRefitConfig:
         return StockWatsonModernRefitConfig.model_validate(payload)

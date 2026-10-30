@@ -18,8 +18,18 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from aqil_research.contracts.observation import AnalysisMode, SeriesProvenance
 from aqil_research.methods.parameters import MethodParameterDocument
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 from aqil_research.methods.stock_watson_1988_fit import MODERN_REFIT_DATASETS
+
+PUBLISHED_CONFIG = {
+    "config_id": "restricted-coincident-diffusion",
+    "label": "Restricted coincident diffusion",
+}
 
 METHOD_ID = "RESTRICTED_COINCIDENT_DIFFUSION"
 METHOD_VERSION = "0.1.0"
@@ -191,6 +201,19 @@ class RestrictedCoincidentDiffusionMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return DATASETS
+
+    def dependency(self) -> MethodDependency:
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("monthly",),
+            minimum_history="36 shared monthly levels from January 1997",
+            parameter_policy="none",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(PUBLISHED_CONFIG)
 
     def parse_config(self, payload: dict[str, object]) -> RestrictedCoincidentDiffusionConfig:
         return RestrictedCoincidentDiffusionConfig.model_validate(payload)

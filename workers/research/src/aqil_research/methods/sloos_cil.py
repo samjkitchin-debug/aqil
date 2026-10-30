@@ -9,7 +9,13 @@ from decimal import ROUND_HALF_UP, Decimal
 from pydantic import BaseModel, ConfigDict, Field
 
 from aqil_research.contracts.observation import EconomicObservation, Frequency
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.configs import SLOOS_CIL_PUBLISHED
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 
 SLOOS_CIL_METHOD_ID = "SLOOS_CIL_LENDING_STANDARDS"
 SLOOS_CIL_METHOD_VERSION = "1.0.0"
@@ -33,6 +39,19 @@ class SloosCilMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return (SLOOS_DATASET_ID,)
+
+    def dependency(self) -> MethodDependency:
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("quarterly",),
+            minimum_history="one quarterly observation on or before the evaluation period",
+            parameter_policy="none",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(SLOOS_CIL_PUBLISHED)
 
     def parse_config(self, payload: dict[str, object]) -> SloosCilConfig:
         return SloosCilConfig.model_validate(payload)

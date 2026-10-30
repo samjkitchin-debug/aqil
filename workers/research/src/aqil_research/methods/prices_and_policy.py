@@ -22,7 +22,13 @@ from aqil_research.contracts.observation import (
     SeasonalAdjustment,
     SeriesProvenance,
 )
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.configs import PRICES_AND_POLICY_PUBLISHED
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 
 PRICES_AND_POLICY_METHOD_ID = "PRICES_AND_POLICY"
 PRICES_AND_POLICY_METHOD_VERSION = "1.1.0"
@@ -104,6 +110,22 @@ class PricesAndPolicyMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return (CPI_DATASET_ID, FED_FUNDS_DATASET_ID, TREASURY_10Y_DATASET_ID)
+
+    def dependency(self) -> MethodDependency:
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("monthly",),
+            minimum_history=(
+                "13 monthly CPI observations for the 12-month change, "
+                "and the evaluation month plus the prior month for each rate"
+            ),
+            parameter_policy="none",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(PRICES_AND_POLICY_PUBLISHED)
 
     def parse_config(self, payload: dict[str, object]) -> PricesAndPolicyConfig:
         return PricesAndPolicyConfig.model_validate(payload)

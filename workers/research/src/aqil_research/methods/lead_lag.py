@@ -33,7 +33,12 @@ from aqil_research.contracts.observation import (
     SeriesProvenance,
 )
 from aqil_research.methods.parameters import MethodParameterDocument
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 
 LEAD_LAG_CROSS_CORRELATION = "LEAD_LAG_CROSS_CORRELATION"
 METHOD_VERSION = "0.1.0"
@@ -405,6 +410,21 @@ class LeadLagCrossCorrelationMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return DATASET_IDS
+
+    def dependency(self) -> MethodDependency:
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("monthly",),
+            minimum_history=(
+                f"{MIN_SUBSAMPLE_GROWTH_MONTHS} balanced monthly log-growth observations"
+            ),
+            parameter_policy="none",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(PUBLISHED_CONFIG)
 
     def parse_config(self, payload: dict[str, object]) -> LeadLagConfig:
         return LeadLagConfig.model_validate(payload)

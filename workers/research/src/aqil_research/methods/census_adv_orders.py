@@ -8,7 +8,13 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.configs import CENSUS_ADV_ORDERS_PUBLISHED
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 
 CENSUS_ADV_ORDERS_METHOD_ID = "CENSUS_ADV_DURABLE_ORDERS"
 CENSUS_ADV_ORDERS_METHOD_VERSION = "1.0.0"
@@ -32,6 +38,21 @@ class CensusAdvOrdersMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return (CENSUS_DATASET_ID,)
+
+    def dependency(self) -> MethodDependency:
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("monthly",),
+            minimum_history=(
+                "the evaluation month and the prior month, with two vintages of the prior month"
+            ),
+            parameter_policy="none",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(CENSUS_ADV_ORDERS_PUBLISHED)
 
     def vintage_history_dataset_ids(self) -> tuple[str, ...]:
         return (CENSUS_DATASET_ID,)

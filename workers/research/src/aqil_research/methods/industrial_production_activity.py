@@ -21,7 +21,13 @@ from aqil_research.contracts.observation import (
     SeasonalAdjustment,
     SeriesProvenance,
 )
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.configs import INDUSTRIAL_PRODUCTION_PUBLISHED
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 
 INDUSTRIAL_PRODUCTION_METHOD_ID = "INDUSTRIAL_PRODUCTION_ACTIVITY"
 INDUSTRIAL_PRODUCTION_METHOD_VERSION = "1.1.0"
@@ -65,6 +71,19 @@ class IndustrialProductionActivityMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return (INDUSTRIAL_PRODUCTION_DATASET_ID,)
+
+    def dependency(self) -> MethodDependency:
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("monthly",),
+            minimum_history=(f"the latest month and the month {MONTHS_BACK} months earlier"),
+            parameter_policy="none",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(INDUSTRIAL_PRODUCTION_PUBLISHED)
 
     def parse_config(self, payload: dict[str, object]) -> IndustrialProductionActivityConfig:
         return IndustrialProductionActivityConfig.model_validate(payload)
