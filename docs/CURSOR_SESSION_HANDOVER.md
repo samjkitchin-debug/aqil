@@ -1,7 +1,29 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 31 October 2026, quantitative V1 views and inventory
+**Last updated:** 31 October 2026, feasible V1 method registration
+
+## Feasible V1 registration, 31 October 2026
+
+Risk class R2. Branch `research/quantitative-v1` in `C:\Users\gamer\aqil-quant-v1`. `publication_allowed` stays false. Nothing was pushed. PR #18 was not retargeted. Nothing was merged to `main`. Hosted Supabase was not read or written. Database `postgres` on `127.0.0.1:55432` was not reset. No `pg_dump` was created. `workers/research/src/aqil_research/workflow/refresh.py` was not changed. No scheduler, cron, or jobs table was added.
+
+`default_method_registry()` now includes `INFLATION_AUTOREGRESSION`, `EX_POST_REAL_FUNDS_RATE`, `ACTIVITY_LEVEL_COINTEGRATION`, `IP_GROWTH_CUSUM`, and `ESTRELLA_MISHKIN_TERM_SPREAD`. The older CPI-U and trailing-funds modules remain registered. Their stored runs were not replaced. `--refit` was not passed. Replay match rules were not weakened.
+
+Local append-only runs, all `latest_revised` and `publication_allowed` false:
+
+- `INFLATION_AUTOREGRESSION` `f0adeed5-991a-4115-be21-f4cbe4c122c7` is `completed_insufficient`. The latest contiguous logarithmic-change sample is shorter than 144 months. October 2025 CPI was not interpolated. Not empirically qualified. Not a Taylor rule.
+- `EX_POST_REAL_FUNDS_RATE` `e340659b-b693-480a-8e6d-a64b24b90f99`. September 2025 funds rate 4.22 percent, subsequent twelve-month CPI inflation 3.7173 percent, ex-post real rate 0.5027 percentage points. Not a Taylor rule.
+- `ACTIVITY_LEVEL_COINTEGRATION` `314ef1b5-c691-4c0c-a3c4-1fb4577254a4`. Does not reject no-cointegration. Not causal.
+- `IP_GROWTH_CUSUM` `8dd294fc-aa4c-47c5-af43-777dc75d9e3a`. Stays inside the five percent boundary. Not a selected break date. Not Bai–Perron.
+- `ESTRELLA_MISHKIN_TERM_SPREAD` `cbfdaf86-8446-435e-8ceb-7f43557613f1`. September 2026 spread 0.90 percentage points (4.99 minus 4.09). Not a recession probability. No probit coefficients were estimated.
+
+`fed.h15.RIFLGFCM03_N.M` is stored: 541 distinct months, 1 September 1981 to 1 September 2026. No extra ingest was required. Discount-basis `RIFSGFSM03_N.M` has 0 rows. Unemployment `bls.ln.LNS14000000` has 1,054 stored rows and 944 distinct months, 1 January 1948 to 1 September 2026. October 2025 is absent. The coverage row's 944 distinct periods match the distinct months, so that row was not rewritten. AQ-103 is not done. US real GDP remains 319 quarters and was not turned into a nowcast.
+
+Preserved runs still have `publication_allowed` false, including Stock–Watson `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` and unadopted `940955f1-50d5-4c06-9d90-5ceebd05d352`.
+
+The execution contract and the inventory in section M of `docs/macro/METHODOLOGY_CERTIFICATION.md` exist, so a later orchestra can design one refresher. It is not ready to run unattended. The three prerequisites still missing are a hosted backup, a hosted BEA ingest, and the scheduler. This session did not build them. Track B stops here: no hosted write and no `pg_dump`.
+
+Signed-in pages can read the new stored calculations. Planned cards with empty query lists stay empty. `harding-pagan-bbq` stays planned. Signed-out sessions still receive no calculation. Test counts for this commit are in section M. GitHub Actions has not run.
 
 ## Quantitative V1 views, 31 October 2026
 
@@ -11,7 +33,7 @@ Signed-in methodology cards now query `CPI_U_INFLATION_AUTREGRESSION`, `EX_POST_
 
 Stored local runs, read and not rewritten: CPI-U `bcbf15bc-590e-4738-9bc1-bbe951b12079` (AIC lag 12, OLS persistence about 0.803, October 2025 CPI missing); ex-post real funds `cf73c312-dc83-49d6-ba46-2ea02054d336` (September 2026 funds 3.75, inflation about 3.7173, real rate about 0.0327 percentage points); Engle–Granger `570e2f51-1871-4c0e-88c9-c40652093613` (does not reject no-cointegration, statistic about -2.865, MacKinnon five percent about -3.342); CUSUM `4943ca23-38bb-447f-8b8a-95c75b5fcd70` (does not cross, largest absolute CUSUM about 47.93 in February 1973, boundary about 66.98). Stock–Watson preserved run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` was not replaced. `--refit` stays rejected unless the method declares a separate refit command. Only Stock–Watson does, and that command does not replace the preserved run.
 
-The inventory is section L of `docs/macro/METHODOLOGY_CERTIFICATION.md`. Estrella–Mishkin stays unimplemented: `fed.h15.RIFLGFCM03_N.M` is stored (541 months, September 1981–September 2026) and NBER dates are not an approved stored input. US real GDP `bea.nipa.T10106.A191RX` is stored (319 quarters, 1947 Q1–2026 Q3) and no nowcast was implemented. Unemployment `bls.ln.LNS14000000` is revised history from January 1948 with October 2025 still missing. That is not a real-time Sahm evaluation.
+The inventory for those four calculations is section L of `docs/macro/METHODOLOGY_CERTIFICATION.md`. The later spread method is section M. It is not a probit. `fed.h15.RIFLGFCM03_N.M` is stored (541 months, September 1981–September 2026) and NBER dates are not an approved stored input. US real GDP `bea.nipa.T10106.A191RX` is stored (319 quarters, 1947 Q1–2026 Q3) and no nowcast was implemented. Unemployment `bls.ln.LNS14000000` is revised history from January 1948 with October 2025 still missing. That is not a real-time Sahm evaluation.
 
 The daily refresher is not built. The execute-method contract is stable enough to design one later. It is not stable enough to run one. Still missing: a verified hosted logical dump and point-in-time recovery, a hosted BEA ingest, and no copying of local runs.
 

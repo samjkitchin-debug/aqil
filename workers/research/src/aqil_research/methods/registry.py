@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
+from aqil_research.methods.activity_cointegration import (
+    ACTIVITY_LEVEL_COINTEGRATION,
+    ActivityLevelCointegrationMethod,
+)
 from aqil_research.methods.autoregressive_benchmark import (
     AUTOREGRESSIVE_BENCHMARK,
     AutoregressiveBenchmarkMethod,
@@ -34,9 +38,17 @@ from aqil_research.methods.engle_granger_cointegration import (
     ENGLE_GRANGER_COINTEGRATION,
     EngleGrangerCointegrationMethod,
 )
+from aqil_research.methods.estrella_mishkin import (
+    METHOD_ID as ESTRELLA_MISHKIN_TERM_SPREAD,
+)
+from aqil_research.methods.estrella_mishkin import EstrellaMishkinSpreadMethod
 from aqil_research.methods.ex_post_real_federal_funds import (
     EX_POST_REAL_FEDERAL_FUNDS_RATE,
     ExPostRealFederalFundsRateMethod,
+)
+from aqil_research.methods.ex_post_real_funds_rate import (
+    EX_POST_REAL_FUNDS_RATE,
+    ExPostRealFundsRateMethod,
 )
 from aqil_research.methods.hamilton_monthly import (
     METHOD_ID as HAMILTON_MONTHLY_METHOD_ID,
@@ -50,6 +62,11 @@ from aqil_research.methods.industrial_production_activity import (
     INDUSTRIAL_PRODUCTION_METHOD_ID,
     IndustrialProductionActivityMethod,
 )
+from aqil_research.methods.inflation_autoregression import (
+    INFLATION_AUTOREGRESSION,
+    InflationAutoregressionMethod,
+)
+from aqil_research.methods.ip_growth_cusum import IP_GROWTH_CUSUM, IpGrowthCusumMethod
 from aqil_research.methods.labour_market import (
     LABOUR_MARKET_METHOD_ID,
     LabourMarketConditionsMethod,
@@ -127,6 +144,11 @@ def default_method_registry() -> MethodRegistry:
     registry.register(AutoregressiveBenchmarkMethod())
     registry.register(CpiUInflationAutoregressionMethod())
     registry.register(ExPostRealFederalFundsRateMethod())
+    registry.register(InflationAutoregressionMethod())
+    registry.register(ExPostRealFundsRateMethod())
+    registry.register(ActivityLevelCointegrationMethod())
+    registry.register(IpGrowthCusumMethod())
+    registry.register(EstrellaMishkinSpreadMethod())
     registry.register(LeadLagCrossCorrelationMethod())
     registry.register(EngleGrangerCointegrationMethod())
     registry.register(CusumRecursiveResidualsMethod())
@@ -155,6 +177,11 @@ __all__ = [
     "SLOOS_CIL_METHOD_ID",
     "CPI_U_INFLATION_AUTREGRESSION",
     "EX_POST_REAL_FEDERAL_FUNDS_RATE",
+    "INFLATION_AUTOREGRESSION",
+    "EX_POST_REAL_FUNDS_RATE",
+    "ACTIVITY_LEVEL_COINTEGRATION",
+    "IP_GROWTH_CUSUM",
+    "ESTRELLA_MISHKIN_TERM_SPREAD",
     "ENGLE_GRANGER_COINTEGRATION",
     "CUSUM_RECURSIVE_RESIDUALS",
     "default_method_registry",

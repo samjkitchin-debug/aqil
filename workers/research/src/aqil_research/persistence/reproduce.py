@@ -7,6 +7,9 @@ from dataclasses import dataclass
 
 import psycopg
 
+from aqil_research.methods.activity_cointegration import (
+    PUBLISHED_CONFIG as ACTIVITY_LEVEL_COINTEGRATION_PUBLISHED,
+)
 from aqil_research.methods.autoregressive_benchmark import (
     PUBLISHED_CONFIG as AUTOREGRESSIVE_BENCHMARK_PUBLISHED,
 )
@@ -35,13 +38,21 @@ from aqil_research.methods.cusum_recursive_residuals import (
 from aqil_research.methods.engle_granger_cointegration import (
     PUBLISHED_CONFIG as ENGLE_GRANGER_COINTEGRATION_PUBLISHED,
 )
+from aqil_research.methods.estrella_mishkin import ESTRELLA_MISHKIN_PUBLISHED
 from aqil_research.methods.ex_post_real_federal_funds import (
     PUBLISHED_CONFIG as EX_POST_REAL_FEDERAL_FUNDS_PUBLISHED,
+)
+from aqil_research.methods.ex_post_real_funds_rate import (
+    PUBLISHED_CONFIG as EX_POST_REAL_FUNDS_RATE_PUBLISHED,
 )
 from aqil_research.methods.hamilton_monthly import HAMILTON_MONTHLY_PUBLISHED
 from aqil_research.methods.harding_pagan_characteristics import (
     HARDING_PAGAN_CHARACTERISTICS_PUBLISHED,
 )
+from aqil_research.methods.inflation_autoregression import (
+    PUBLISHED_CONFIG as INFLATION_AUTOREGRESSION_PUBLISHED,
+)
+from aqil_research.methods.ip_growth_cusum import PUBLISHED_CONFIG as IP_GROWTH_CUSUM_PUBLISHED
 from aqil_research.methods.lead_lag import PUBLISHED_CONFIG as LEAD_LAG_PUBLISHED
 from aqil_research.methods.registry import MethodRegistry, default_method_registry
 from aqil_research.methods.restricted_coincident_diffusion import (
@@ -202,6 +213,11 @@ def reproduction_config(config_id: str) -> dict[str, object]:
         CUSUM_RECURSIVE_RESIDUALS_PUBLISHED,
         CPI_U_INFLATION_AUTREGRESSION_PUBLISHED,
         EX_POST_REAL_FEDERAL_FUNDS_PUBLISHED,
+        INFLATION_AUTOREGRESSION_PUBLISHED,
+        EX_POST_REAL_FUNDS_RATE_PUBLISHED,
+        ACTIVITY_LEVEL_COINTEGRATION_PUBLISHED,
+        IP_GROWTH_CUSUM_PUBLISHED,
+        ESTRELLA_MISHKIN_PUBLISHED,
     )
     for panel in published_panels:
         if config_id == panel["config_id"]:
