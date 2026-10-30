@@ -142,3 +142,29 @@ Only where the dependency is real, in this order:
 4. US GDP plus a vintage panel before a nowcast. Euro-area GDP does not remove that requirement.
 
 This certification does not recommend an architectural reset and does not recommend a composite score.
+
+## K. Signed-in visibility, 31 October 2026
+
+Publication approval stays separate from private visibility. `publication_allowed` remains false on every run named in this certification. A signed-in methodologies page may read the stored calculation and show the preserved figures. A signed-out session does not receive that JSON.
+
+The hosted `research_reader` role already has select on `research.research_runs.calculation`. No new grant was added. The named quantitative runs are on local postgres and are not on the hosted project. They were not copied. Hosted Supabase was not migrated and was not deployed.
+
+The preserved Stock–Watson parameter version remains `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`. Re-estimate `940955f1-50d5-4c06-9d90-5ceebd05d352` stays unadopted. The page plots the preserved filtered factor, not the re-estimate and not the smoother. The 1988 CITIBASE panel stays blocked.
+
+Spencer-15 runs `8fb20325-414f-401b-8c46-bda82ed94e16` and `3955f7f4-08f8-4e7b-9ded-b3f6eea6633f` stay the dating record: 18 peaks and 19 troughs, retrospective full sample. The 1971 listing still refuses to date. The page does not call the variant a FORTRAN reproduction.
+
+Harding–Pagan characteristics remain run `0d667a12-5a9c-45e0-b04a-8aea4196bc19`. Quarterly BBQ was not run on monthly industrial production.
+
+Sahm remains run `f3db281d-9f6d-4c4c-974f-ba4b9bd68131`. The stored result is the September 2025 gap of 0.23 percentage points, not triggered. October 2025 is not interpolated. There is no stored monthly gap path, so the page does not plot one.
+
+Diffusion remains run `1f747c9f-4851-4588-a4dc-d8fb1ff30558`. The correlation of about 0.336 is not independent confirmation and the share is not the Chicago Fed index.
+
+Hamilton remains run `4629b31d-b0de-4a2f-a987-9e5d3f94747e`. The page plots the filtered lower-mean probability, not the smoothed path. The lower-mean expected duration is about 2 months. That is not a recession label and the fit is not empirically qualified. A later code note records a six-month duration alternative that is not estimated and not adopted. The stored run was not replaced.
+
+Bai–Perron remains run `2f4c14eb-44f2-40dc-913f-bf7945e972cd`. The primary result is no break. Sensitivity is not a second selected model.
+
+The autoregression remains run `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e`. The twelve-month horizon loses to the historical mean. It is not a qualified forecast.
+
+Lead–lag remains run `94152391-c3a8-48d7-8f2e-8c4d1dfdb811`. The strongest correlations are contemporaneous and not stable. That is not a leading-indicator assignment.
+
+No VAR, nowcast, or Estrella–Mishkin estimate was added. The three-month Treasury yield is still absent.

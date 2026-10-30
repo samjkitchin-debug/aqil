@@ -34,6 +34,7 @@ from aqil_research.methods.hamilton_monthly import (
     LagScore,
     _order_by_lower_mean,
     choose_lag,
+    minimum_duration_alternative,
     seeded_parameter_recovery,
 )
 from aqil_research.methods.protocol import MethodContext
@@ -208,6 +209,21 @@ def test_short_sample_is_not_estimated() -> None:
     assert result.calculation is not None
     assert result.calculation["empirically_qualified"] is False
     assert "minimum" in str(result.missing_reason)
+
+
+def test_six_month_duration_alternative_is_not_identified_at_two_months() -> None:
+    record = minimum_duration_alternative(2.0)
+    assert record["predeclared"] is True
+    assert record["estimated"] is False
+    assert record["identified"] is False
+    assert record["adopted"] is False
+    assert record["recession_label"] is False
+    assert record["minimum_months"] == 6.0
+    assert "not a recession label" in str(record["reason"])
+    longer = minimum_duration_alternative(8.0)
+    assert longer["estimated"] is False
+    assert longer["adopted"] is False
+    assert longer["identified"] is False
 
 
 def test_non_positive_index_is_rejected() -> None:

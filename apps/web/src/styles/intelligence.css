@@ -243,6 +243,34 @@
   display: grid;
   gap: var(--space-2);
   margin-top: var(--space-5);
+  min-width: 0;
+}
+
+.intel-method-result,
+.intel-method-result dd,
+.intel-method-dates,
+.intel-method-limits {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.intel-method-dates,
+.intel-method-limits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--colour-text);
+  font-size: var(--font-size-sm);
+}
+
+.intel-method-limits {
+  display: grid;
+  padding-left: var(--space-4);
+  list-style: disc;
 }
 
 .intel-insight-parts {

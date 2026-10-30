@@ -2,8 +2,10 @@
  * User-facing methodology register.
  *
  * Descriptions are the research question. They are not calculated results.
- * Live numbers must come from a publication-eligible, typed model result.
- * This module does not read dossiers, CSV registers, or calculation JSON.
+ * Live numbers must come from a stored research run, read on the server for a
+ * signed-in reader. publication_allowed remains the publication gate and is
+ * not set true to force display. This module does not read dossiers, CSV
+ * registers, or calculation JSON.
  *
  * Promoting a planned card later is a research-system change plus a catalogue
  * edit: set stage to in-development, add the run identifiers, and add a
@@ -15,8 +17,9 @@
  * - output_kind matching this entry
  * - a schema-validated result for that kind
  * - executed_at, input dataset ids, and publication_allowed
- * The web shows the result only when publication_allowed is true and a
- * presenter exists for that output_kind. Until then, run metadata is enough.
+ * A signed-in detail page may show the stored calculation. A signed-out
+ * reader is redirected before that read. publication_allowed stays the
+ * publication gate. Metadata on the list does not include the calculation.
  */
 
 export type MethodologyTiming = "retrospective" | "contemporaneous" | "predictive";
@@ -38,8 +41,9 @@ export type MethodologyGroup = "current" | "activity" | "forecasting" | "inflati
 
 /**
  * A planned entry has no research-run query. An in-development entry may query
- * run metadata. Publication of a payload still requires publication_allowed
- * and a presenter. Detecting a method id must not by itself promote a card.
+ * run metadata. A signed-in detail page may read the stored calculation.
+ * Publication still requires publication_allowed. Detecting a method id must
+ * not by itself promote a card or mark a run approved for publication.
  */
 export type MethodologyStage = "in-development" | "planned";
 
@@ -69,7 +73,7 @@ export const METHODOLOGY_GROUPS: readonly { id: MethodologyGroup; heading: strin
   {
     id: "current",
     heading: "In development",
-    note: "Bry–Boschan, the Stock–Watson refit, restricted coincident diffusion, Harding–Pagan characteristics, the Hamilton monthly variant, Bai–Perron mean shifts, the autoregressive benchmark, and lead–lag correlations have stored runs. A stored run is described only as far as its publication state allows. The Stock–Watson refit is not operationally accepted. The Hamilton variant is a monthly industrial-production calculation, and it is not empirically qualified. Bai–Perron on this card is intercept-only mean shifts. The autoregression is not a qualified forecast. Lead–lag correlations are not a leading-indicator assignment. Quarterly BBQ has not been run.",
+    note: "Bry–Boschan, the Stock–Watson refit, restricted coincident diffusion, Harding–Pagan characteristics, the Sahm rule, the Hamilton monthly variant, Bai–Perron mean shifts, the autoregressive benchmark, and lead–lag correlations have stored runs. A signed-in reader can open the stored result. That is not publication approval. The Stock–Watson refit is not operationally accepted. The Hamilton variant is not empirically qualified. The autoregression is not a qualified forecast. Lead–lag correlations are not a leading-indicator assignment. Quarterly BBQ has not been run.",
   },
   {
     id: "activity",
@@ -143,7 +147,7 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
       "This is the labelled Spencer-15 variant. It is not the 1971 programme listing and not a FORTRAN replica.",
       "The stored chronology is a full-sample retrospective dating. The centred smoother means it is not a contemporaneous recession call.",
       "Agreement with a reference chronology is not an acceptance test and is not shown here as a score.",
-      "The calculated dates stay unpublished until the research system marks a run eligible and a turning-point presenter exists.",
+      "A signed-in reader can see the stored dates. They are not approved for publication.",
     ],
     dataInputs: ["Federal Reserve G.17 industrial production, total index, latest revised."],
     validation: [
@@ -180,8 +184,8 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     uncertainty: [
       "The modern refit estimator is registered so a replay can use the same method id. The refit is not operationally accepted.",
       "The 1988 payroll specification remains blocked. Employee-hours and the 1982-dollar series are not stored.",
-      "Stored runs may exist for the identifiers below. This page does not read calculation JSON from those runs.",
-      "Loadings, likelihood and the factor path are not selected, even when a run row exists.",
+      "A signed-in reader sees the preserved filtered factor. The unadopted re-estimate is not plotted in its place.",
+      "Loadings and the likelihood are read from the stored run. They are not approved for publication.",
       "Static principal components, the Chicago Fed National Activity Index and the Kalman filter are supporting techniques for this family. They are not separate methodologies and do not have their own cards.",
     ],
     dataInputs: [
@@ -224,7 +228,7 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
       "Industrial production, real personal income excluding transfers, real manufacturing and trade sales, and total nonfarm payroll employment, latest revised, on the balanced months used by the modern refit.",
     ],
     validation: [
-      "The page does not plot the share. Publication of the series is a separate decision.",
+      "A signed-in reader can see the stored share. Publication of the series is a separate decision.",
     ],
     references: [],
   },
@@ -248,7 +252,7 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     uncertainty: [
       "Quarterly BBQ has not been implemented. This card is not that method.",
       "The chronology is a full-sample retrospective dating on latest-revised levels. It is not a contemporaneous recession call.",
-      "The calculated characteristics stay unpublished until publication is allowed and a presenter exists.",
+      "A signed-in reader can see the stored characteristics. They are not approved for publication.",
     ],
     dataInputs: [
       "Industrial production, real personal income excluding transfers, real manufacturing and trade sales, and total nonfarm payroll employment, as latest-revised levels.",
@@ -278,7 +282,7 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     uncertainty: [
       "The stored calculation uses the latest-revised industrial-production file. It is not a real-time forecast.",
       "The method is not empirically qualified as a forecast and is not approved for publication.",
-      "The calculated errors stay unpublished until publication is allowed and a presenter exists.",
+      "A signed-in reader can see the stored comparison. It is not approved for publication.",
     ],
     dataInputs: ["Federal Reserve G.17 industrial production, total index, latest revised, as monthly log-growth."],
     validation: [
@@ -306,13 +310,13 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     uncertainty: [
       "Significance uses a standard error that accounts for serial dependence.",
       "The correlations are estimated on latest-revised growth. They are not a real-time signal.",
-      "The calculated correlations stay unpublished until publication is allowed and a presenter exists.",
+      "A signed-in reader can see the stored correlations. They are not approved for publication.",
     ],
     dataInputs: [
       "Industrial production, real personal income excluding transfers, real manufacturing and trade sales, and total nonfarm payroll employment, latest revised, as monthly log-growth.",
     ],
     validation: [
-      "This page does not show the correlations and does not treat a peak as a leading indicator.",
+      "A stored peak is not treated as a leading indicator.",
     ],
     references: [],
   },
@@ -338,6 +342,33 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     references: [],
   }),
   {
+    slug: "sahm-rule",
+    registerId: "SAHM_UNEMPLOYMENT_GAP",
+    name: "Sahm rule",
+    measures:
+      "Measures how far the three-month average unemployment rate has risen above its low in the prior twelve months. The stored result uses the short live sample. It is not a long-history comparison.",
+    domain: "Labour market",
+    timing: "retrospective",
+    functionLabel: "Recession association",
+    outputKind: "time-series",
+    stage: "in-development",
+    group: "current",
+    queryMethodIds: ["SAHM_UNEMPLOYMENT_GAP"],
+    interpretation: [
+      "A trigger is the published association with a recession already under way. It is not an NBER determination and not a forecast.",
+    ],
+    uncertainty: [
+      "The live unemployment file is short. October 2025 is missing and is not interpolated.",
+      "A longer history is not estimated from another source. The result is latest revised, not a real-time vintage.",
+      "Not approved for publication.",
+    ],
+    dataInputs: ["US unemployment rate, latest revised, on the stored live months. A missing month fails the window."],
+    validation: [
+      "The existing Sahm calculator is the rule. This page reads the stored gap and does not recompute it.",
+    ],
+    references: [],
+  },
+  {
     slug: "hamilton-markov-switching",
     registerId: "HAMILTON_MARKOV_SWITCHING",
     name: "Hamilton monthly variant",
@@ -358,12 +389,12 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
       "This is not a reproduction of the 1989 quarterly GNP model. The paper was not line-checked.",
       "Neither probability path is a real-time assessment. The input is the latest-revised index.",
       "The stored fit is not empirically qualified and is not approved for publication.",
-      "The calculated probabilities stay unpublished until publication is allowed and a presenter exists.",
+      "A signed-in reader can see the stored filtered probability. It is not approved for publication.",
     ],
     dataInputs: ["Federal Reserve G.17 industrial production, total index, latest revised, transformed to monthly log-growth."],
     validation: [
       "Lag length is chosen inside a predeclared set. A seeded recovery checks the estimator. It is not a recession claim.",
-      "This page does not show the probabilities.",
+      "Smoothed probabilities are not plotted as if they were filtered.",
     ],
     references: [],
   },
@@ -570,7 +601,7 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     dataInputs: ["Federal Reserve G.17 industrial production, total index, latest revised, as monthly log-growth."],
     validation: [
       "The primary minimum segment is the larger of 24 months and 15 percent of the sample.",
-      "This page does not show break dates.",
+      "A signed-in reader can see the stored selection. A looser trim is sensitivity, not a second model.",
     ],
     references: [],
   },

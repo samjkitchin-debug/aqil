@@ -107,6 +107,52 @@ QUALIFICATION_STATEMENT = (
     "A retrospective full-sample fit is not an operational qualification and "
     "not an empirical qualification."
 )
+MINIMUM_LOWER_MEAN_DURATION_MONTHS = 6.0
+MINIMUM_DURATION_ALTERNATIVE = "constrained_minimum_lower_mean_duration_6_months"
+
+
+def minimum_duration_alternative(lower_mean_expected_months: float) -> dict[str, object]:
+    """One predeclared alternative. It is not a second selected model.
+
+    The unrestricted fit stays the stored result. A constrained re-estimate is
+    not run. If the unrestricted lower-mean expected duration is below six
+    months, this alternative is not identified and is not adopted. No further
+    specification is tried in order to produce a recession label.
+    """
+    record: dict[str, object] = {
+        "alternative": MINIMUM_DURATION_ALTERNATIVE,
+        "predeclared": True,
+        "estimated": False,
+        "adopted": False,
+        "recession_label": False,
+        "minimum_months": MINIMUM_LOWER_MEAN_DURATION_MONTHS,
+    }
+    if not math.isfinite(lower_mean_expected_months):
+        record["identified"] = False
+        record["reason"] = (
+            "The unrestricted lower-mean duration was not finite, so the "
+            "constrained specification was not estimated."
+        )
+        return record
+    record["unrestricted_lower_mean_expected_months"] = lower_mean_expected_months
+    if lower_mean_expected_months < MINIMUM_LOWER_MEAN_DURATION_MONTHS:
+        record["identified"] = False
+        record["reason"] = (
+            "The unrestricted lower-mean expected duration is below the "
+            "predeclared six-month floor. The constrained specification was "
+            "not estimated, is not identified, and is not a recession label. "
+            "No further specifications were tried."
+        )
+        return record
+    record["identified"] = False
+    record["reason"] = (
+        "The unrestricted duration meets the six-month floor. That is not "
+        "identification of a constrained model. The constrained specification "
+        "was not estimated and is not adopted."
+    )
+    return record
+
+
 NBER_DIAGNOSTIC_STATEMENT = (
     "Comparison with NBER dates is a retrospective diagnostic. It does not "
     "gate the method and it is not identification."
@@ -985,6 +1031,9 @@ def _calculation(
             "higher_mean": _num(stored.expected_durations[1]),
             "formula": "1 / (1 - probability of staying in the regime)",
         },
+        "minimum_duration_alternative": minimum_duration_alternative(
+            float(stored.expected_durations[0]),
+        ),
         "filtered_regime_probabilities_note": FILTERED_PROBABILITY_NOTE,
         "smoothed_regime_probabilities_note": SMOOTHED_PROBABILITY_NOTE,
         "filtered_regime_probabilities": _probability_records(

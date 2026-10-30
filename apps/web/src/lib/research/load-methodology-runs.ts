@@ -2,6 +2,7 @@ import "server-only";
 
 import { connection } from "next/server";
 
+import { resolveAccess } from "@/lib/auth/access";
 import { resolveResearchDatabaseUrl } from "@/lib/data/private-database-url";
 import type { MethodologyRunMeta } from "@/lib/research/present-methodology";
 
@@ -12,6 +13,7 @@ type RunRow = {
   execution_status: string;
   publication_allowed: boolean;
   data_sufficiency: string;
+  calculation_stored: boolean;
 };
 
 export type LoadMethodologyRunsResult =
@@ -26,14 +28,16 @@ function researchDatabaseUrl() {
 }
 
 /**
- * Read run metadata only. The calculation column is not selected, so an
- * unpublished factor path or turning-point list cannot reach the page.
+ * Read run metadata for the methodologies list.
+ * The calculation JSON is not selected. A signed-in detail page loads it separately.
  */
 export async function loadMethodologyRuns(
   methodIds: readonly string[],
 ): Promise<LoadMethodologyRunsResult> {
   await connection();
   if (methodIds.length === 0) return { status: "ready", runs: [] };
+  const access = await resolveAccess();
+  const includeStoredFlag = access.status === "authenticated_authorised";
   const database = researchDatabaseUrl();
   if (database.status === "unavailable") return database;
   try {
@@ -43,7 +47,8 @@ export async function loadMethodologyRuns(
     try {
       const result = await client.query<RunRow>(
         `select method_id, method_version, executed_at, execution_status,
-                publication_allowed, data_sufficiency
+                publication_allowed, data_sufficiency,
+                ${includeStoredFlag ? "(calculation is not null)" : "false"} as calculation_stored
          from research.research_runs
          where method_id = any($1::text[])
          order by executed_at desc`,
@@ -58,6 +63,7 @@ export async function loadMethodologyRuns(
           executionStatus: row.execution_status,
           publicationAllowed: row.publication_allowed === true,
           dataSufficiency: row.data_sufficiency,
+          calculationStored: row.calculation_stored === true,
         })),
       };
     } finally {

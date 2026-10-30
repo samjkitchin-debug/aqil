@@ -1,7 +1,23 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 30 October 2026, main merged into quantitative methods
+**Last updated:** 31 October 2026, quantitative production visibility
+
+## Signed-in methodology results, 31 October 2026
+
+Risk class R2. Branch `research/quantitative-production` in `C:\Users\gamer\aqil-quant-prod`, based on `da055629e01d910b8e1a6069d7992ee4e1acf7cf`. `publication_allowed` stays false. Nothing in this note is a publication approval.
+
+A signed-in detail page reads `research.research_runs.calculation` on the server and shows the stored figures. A signed-out session does not. The list page does not select the JSON. The hosted `research_reader` already had select on `calculation`, so no migration was added. The named runs are on local postgres (`127.0.0.1:55432`, database `postgres`) and are absent from hosted project `ojvswermsbbaltjohqph`. They were not copied. Hosted Supabase was not changed. Nothing was deployed. Local postgres was not reset.
+
+Displayed runs, unchanged as stored rows: Spencer-15 `3955f7f4-08f8-4e7b-9ded-b3f6eea6633f` and `8fb20325-414f-401b-8c46-bda82ed94e16` (18 peaks, 19 troughs); Stock–Watson parameter version `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` (re-estimate `940955f1-50d5-4c06-9d90-5ceebd05d352` not adopted); Harding–Pagan `0d667a12-5a9c-45e0-b04a-8aea4196bc19`; Sahm `f3db281d-9f6d-4c4c-974f-ba4b9bd68131` (September 2025 gap 0.23, not triggered, October 2025 not interpolated); diffusion `1f747c9f-4851-4588-a4dc-d8fb1ff30558`; Hamilton `4629b31d-b0de-4a2f-a987-9e5d3f94747e` (filtered probability, lower-mean duration about 2 months, not a recession label); Bai–Perron `2f4c14eb-44f2-40dc-913f-bf7945e972cd` (no break); autoregression `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e` (twelve-month horizon loses to the historical mean); lead–lag `94152391-c3a8-48d7-8f2e-8c4d1dfdb811` (contemporaneous and unstable).
+
+The main checkout at `C:\Users\gamer\aqil` was not edited. Its uncommitted `apps/web/public/icons/icon.svg` change was left in place.
+
+Checks on this worktree: methodology unit tests passed 14. `npm run test:research` passed 598 tests, then Ruff check and Ruff format (405 files already formatted). The disposable database `aqil_research_test` was rebuilt. The development database `postgres` was not reset. Web typecheck passed with `tsc --noEmit`. ESLint passed on the methodology files that changed. GitHub Actions has not run.
+
+A signed-in local session at `http://localhost:3011` opened Methodologies, Bry–Boschan (18 peaks and 19 troughs, run `3955f7f4-08f8-4e7b-9ded-b3f6eea6633f`), Stock–Watson (preserved run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`, filtered factor, not operationally accepted), Sahm (1 September 2025 gap 0.23, not triggered, run `f3db281d-9f6d-4c4c-974f-ba4b9bd68131`), Hamilton (filtered probability, lower-mean duration 1.993 months, not a recession label, run `4629b31d-b0de-4a2f-a987-9e5d3f94747e`), and the autoregression (twelve-month horizon did not beat the historical mean, run `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e`). The Hamilton page was also opened at 390 pixels wide. Publication allowed stayed no. Production was not deployed, so the hosted site was not opened.
+
+## Hosted research read, 30 October 2026
 
 ## Hosted research read, 30 October 2026
 

@@ -6,6 +6,7 @@ import {
   METHODOLOGY_CATALOGUE,
   methodologyBySlug,
 } from "./methodology-catalogue.ts";
+import { extractPrivateResult, type StoredMethodologyRun } from "./private-methodology-result.ts";
 import { presentMethodology, type MethodologyRunMeta } from "./present-methodology.ts";
 
 const bry = methodologyBySlug("bry-boschan-spencer15");
@@ -19,6 +20,7 @@ function run(overrides: Partial<MethodologyRunMeta> = {}): MethodologyRunMeta {
     executionStatus: "completed",
     publicationAllowed: false,
     dataSufficiency: "sufficient",
+    calculationStored: false,
     ...overrides,
   };
 }
@@ -52,6 +54,7 @@ const REGISTER_ROWS = [
   "PORTFOLIO_RESEARCH",
   "AUTOREGRESSIVE_BENCHMARK",
   "LEAD_LAG_CROSS_CORRELATION",
+  "SAHM_UNEMPLOYMENT_GAP",
 ] as const;
 
 test("the catalogue names the stored methods and every other programme row", () => {
@@ -70,6 +73,7 @@ test("the catalogue names the stored methods and every other programme row", () 
     "hamilton-markov-switching",
     "harding-pagan-characteristics",
     "lead-lag",
+    "sahm-rule",
     "stock-watson-1988",
   ]);
   const bbq = methodologyBySlug("harding-pagan-bbq");
@@ -199,8 +203,63 @@ test("Stock–Watson without a run does not invent a factor", () => {
   const text = prose("stock-watson-1988", []);
   assert.match(text, /No stored run matches this methodology/);
   assert.equal(text.includes("converged"), false);
-  assert.match(text, /not selected/);
+  assert.match(text, /not operationally accepted/);
 });
+
+test("a signed-in private result shows stored dates and stays unpublished", () => {
+  assert.ok(bry);
+  const stored = storedRun({
+    methodId: "BRY_BOSCHAN_SPENCER15_VARIANT",
+    calculation: {
+      variant_id: "BRY_BOSCHAN_SPENCER15_VARIANT",
+      chronology_class: "retrospective_full_sample",
+      peaks: ["2008-01-01", "2020-02-01"],
+      troughs: ["2009-06-01"],
+      mcd_months: 3,
+      input_vintage: "latest_revised",
+    },
+  });
+  const result = extractPrivateResult(stored);
+  const view = presentMethodology(bry, { status: "ready", runs: [run({ calculationStored: true })] }, result);
+  const text = JSON.stringify(view);
+  assert.equal(result.publicationAllowed, false);
+  assert.match(view.statusLine, /not eligible for publication/);
+  assert.match(text, /2 peaks and 1 trough are stored/);
+  assert.match(text, /Not approved for publication/);
+  assert.equal(text.includes("publication_allowed\":true"), false);
+});
+
+test("the list withholds figures when only metadata is loaded", () => {
+  assert.ok(bry);
+  const view = presentMethodology(bry, {
+    status: "ready",
+    runs: [run({ calculationStored: true })],
+  });
+  const text = JSON.stringify(view);
+  assert.match(view.statusLine, /private result/);
+  assert.match(text, /withheld/);
+  assert.equal(text.includes("2008-01-01"), false);
+  assert.equal(view.privateResult, null);
+});
+
+function storedRun(overrides: Partial<StoredMethodologyRun> & { calculation?: Record<string, unknown> | null }): StoredMethodologyRun {
+  return {
+    runId: "run-1",
+    methodId: "BRY_BOSCHAN_SPENCER15_VARIANT",
+    methodVersion: "1.0.0",
+    executedAt: "2026-10-30T08:00:00.000Z",
+    executionStatus: "completed",
+    publicationAllowed: false,
+    dataSufficiency: "sufficient",
+    analysisMode: "latest_revised",
+    primaryDatasetId: "fed.g17.IP.B50001.S",
+    missingDataReason: null,
+    statisticalInterpretation: "Stored.",
+    limitations: ["publication_allowed stays false."],
+    calculation: null,
+    ...overrides,
+  };
+}
 
 test("run metadata failure is stated and not replaced with a result", () => {
   assert.ok(factor);
