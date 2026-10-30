@@ -60,13 +60,13 @@ Unemployment `bls.ln.LNS14000000` has 44 live months from 2023-01. It is not one
 | Method | Held and relevant | Missing for the usual published form |
 |--------|-------------------|--------------------------------------|
 | Diffusion / PCA | G.17 and payrolls are long. CPI is long. Joint use with unemployment is limited by 44 months | A written panel. Not a reason to collect a region |
-| Mixed-frequency nowcast of US GDP | Nothing that is US GDP | US GDP and its monthly indicators, plus vintages before a real-time claim |
+| Mixed-frequency nowcast of US GDP | Quarterly real GDP `bea.nipa.T10106.A191RX`, latest revised, 1947Q1 to 2026Q3 | Vintages. ALFRED and Philadelphia Fed real-time data were not ingested. Real-time claims remain blocked. |
 | Euro-area nowcast, not selected | Quarterly real GDP, IP, unemployment, retail volume, HICP | A decision to make this the target, and a vintage policy |
-| Yield-curve probit | `fed.h15.RIFLGFCY10_N.M` | A three-month Treasury yield. Do not subtract the federal funds rate and call it the Estrella–Mishkin spread (`AQ-104`) |
+| Yield-curve probit | `fed.h15.RIFLGFCY10_N.M` and `fed.h15.RIFLGFCM03_N.M` | The 1998 equation was not copied from the article, and NBER dates are not an approved stored input. The probit was not estimated (`AQ-104`). |
 | BIS credit-to-GDP gap | `bis.ws_gli.Q.USD.3P.N.A.I.B.USD` is a dollar credit stock outside the US | The BIS credit-to-GDP gap series itself, and GDP |
 | NFCI, excess bond premium | Nothing matching those inputs | Rights-cleared financial series named by the method |
 | Trimmed-mean inflation | CPI-U all-items index | Component price indexes |
-| Sahm rule, already implemented | Unemployment, short live sample | A longer unemployment history if the rule is to be studied before 2023. Not required for the Bry–Boschan pilot |
+| Sahm rule, already implemented | Unemployment, now including revised flat-file history from 1948 | Not a real-time evaluation. AQ-103 is not done. |
 
 OECD G20 CLI is an institutional leading indicator already stored without rights clearance. It is not an input to the pilot or to the 1989 coincident specification, and it is not a Stock–Watson model.
 
@@ -76,7 +76,7 @@ Every new series needs a `docs/sources/SOURCE_RIGHTS.csv` row before ingest. FRE
 
 ## Vintage policy for the first two methods
 
-The pilot's runs are `latest_revised` retrospective calculations. The dynamic factor model may be estimated on revised data for numerical checks. Neither result is a real-time historical forecast until vintages exist. Candidate later sources are ALFRED, if rights change, and Philadelphia Fed real-time data. Neither is approved here.
+The pilot's runs are `latest_revised` retrospective calculations. The dynamic factor model may be estimated on revised data for numerical checks. Neither result is a real-time historical forecast until vintages exist. ALFRED was not ingested. Philadelphia Fed real-time data was not ingested. Real-time claims remain blocked.
 
 ## Stock–Watson panel check, 25 October 2026
 

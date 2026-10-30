@@ -9,6 +9,7 @@ from uuid import uuid4
 import httpx
 
 from aqil_research.adapters.bea_workbook import (
+    BeaMonth,
     manufacturing_trade_sales,
     personal_income_ex_transfers,
 )
@@ -97,6 +98,60 @@ def _retrieval(conn, source_id: str, dataset_id: str, payload: bytes, notes: lis
             ),
         )
     return retrieval_id, True
+
+
+GDP_URL = "https://apps.bea.gov/national/Release/XLS/Survey/Section1All_xls.xlsx"
+GDP_SOURCE_ID = "bea_real_gross_domestic_product"
+GDP_DATASET_ID = "bea.nipa.T10106.A191RX"
+
+
+def store_real_gross_domestic_product(conn, now: datetime) -> tuple[int, int, BeaMonth, BeaMonth]:
+    """Ingest Table 1.1.6 line 1. This is revised quarterly GDP, not a nowcast."""
+    from aqil_research.adapters.bea_workbook import real_gross_domestic_product
+
+    payload = _download(GDP_URL)
+    extracted = real_gross_domestic_product(payload)
+    if extracted.published_on > now.date():
+        raise RuntimeError("BEA publication date is after this retrieval")
+    published = datetime(
+        extracted.published_on.year,
+        extracted.published_on.month,
+        extracted.published_on.day,
+        tzinfo=UTC,
+    )
+    notes = [
+        f"{extracted.sheet_name} line {extracted.line_number} {extracted.account_code}",
+        extracted.unit_text,
+        f"published {extracted.published_on.isoformat()}",
+    ]
+    retrieval_id, _created = _retrieval(conn, GDP_SOURCE_ID, GDP_DATASET_ID, payload, notes)
+    observations = tuple(
+        EconomicObservation(
+            observation_id=f"{GDP_SOURCE_ID}-{item.period_start.isoformat()}",
+            dataset_id=GDP_DATASET_ID,
+            provider_id="bea",
+            source_id=GDP_SOURCE_ID,
+            rights_record_id=GDP_SOURCE_ID,
+            period_start=item.period_start,
+            frequency=Frequency.QUARTERLY,
+            geography="US",
+            unit="millions_chained_2017_dollars",
+            seasonal_adjustment=SeasonalAdjustment.SEASONALLY_ADJUSTED,
+            raw_value=item.value,
+            quality_status=QualityStatus.OBSERVED,
+            series_provenance=SeriesProvenance.LATEST_REVISED,
+            provider_vintage_date=extracted.published_on,
+            source_release_at=published,
+            availability_precision=AvailabilityPrecision.UNKNOWN,
+            retrieved_at=now,
+            first_seen_at=now,
+            source_locator=GDP_URL,
+            adapter_version="bea-workbook-0.1.0",
+        )
+        for item in extracted.quarters
+    )
+    result = PostgresObservationStore(conn, retrieval_id=retrieval_id).append_many(observations)
+    return result.inserted, result.unchanged, extracted.quarters[0], extracted.quarters[-1]
 
 
 def refresh_bea_series(conn, source_id: str, now: datetime) -> tuple[int, int]:
