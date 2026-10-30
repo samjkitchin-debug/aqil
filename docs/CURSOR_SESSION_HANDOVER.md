@@ -15,9 +15,7 @@ The main checkout at `C:\Users\gamer\aqil` was not edited. Its uncommitted `apps
 
 Checks on this worktree: methodology unit tests passed 14. `npm run test:research` passed 598 tests, then Ruff check and Ruff format (405 files already formatted). The disposable database `aqil_research_test` was rebuilt. The development database `postgres` was not reset. Web typecheck passed with `tsc --noEmit`. ESLint passed on the methodology files that changed. GitHub Actions has not run.
 
-A signed-in local session at `http://localhost:3011` opened Methodologies, Bry–Boschan (18 peaks and 19 troughs, run `3955f7f4-08f8-4e7b-9ded-b3f6eea6633f`), Stock–Watson (preserved run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`, filtered factor, not operationally accepted), Sahm (1 September 2025 gap 0.23, not triggered, run `f3db281d-9f6d-4c4c-974f-ba4b9bd68131`), Hamilton (filtered probability, lower-mean duration 1.993 months, not a recession label, run `4629b31d-b0de-4a2f-a987-9e5d3f94747e`), and the autoregression (twelve-month horizon did not beat the historical mean, run `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e`). The Hamilton page was also opened at 390 pixels wide. Publication allowed stayed no. Production was not deployed, so the hosted site was not opened.
-
-## Hosted research read, 30 October 2026
+This browser, opened at `http://127.0.0.1:3011/intelligence/methodologies/stock-watson-1988`, was redirected to `/login?error=signed_out`. The page offered Continue with Google. The stored calculation was not shown. A 390-pixel signed-in layout was not opened in this browser. Production was not deployed.
 
 ## Hosted research read, 30 October 2026
 

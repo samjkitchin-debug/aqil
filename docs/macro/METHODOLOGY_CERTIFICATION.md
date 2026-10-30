@@ -167,4 +167,6 @@ The autoregression remains run `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e`. The twelv
 
 Lead–lag remains run `94152391-c3a8-48d7-8f2e-8c4d1dfdb811`. The strongest correlations are contemporaneous and not stable. That is not a leading-indicator assignment.
 
-No VAR, nowcast, or Estrella–Mishkin estimate was added. The three-month Treasury yield is still absent.
+No VAR, nowcast, or Estrella–Mishkin estimate was added. The three-month Treasury yield is still absent. The stored likelihoods on the preserved run and the re-estimate are about -1590.537499 and -1590.537194. The gain is about 0.000305, below the 0.001 adoption margin. Hamilton's stored lower-mean expected duration is about 1.993 months.
+
+`npm run test:research` passed 598 tests, then Ruff check and Ruff format, 405 files already formatted. Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. Web methodology unit tests passed 14. Web typecheck passed. Token styling passed. GitHub Actions was not run.
