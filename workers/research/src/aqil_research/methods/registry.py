@@ -18,9 +18,17 @@ from aqil_research.methods.census_adv_orders import (
     CENSUS_ADV_ORDERS_METHOD_ID,
     CensusAdvOrdersMethod,
 )
+from aqil_research.methods.cpi_u_inflation_autoregression import (
+    CPI_U_INFLATION_AUTREGRESSION,
+    CpiUInflationAutoregressionMethod,
+)
 from aqil_research.methods.credit_standards_volumes import (
     CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID,
     CreditStandardsVolumesMethod,
+)
+from aqil_research.methods.ex_post_real_federal_funds import (
+    EX_POST_REAL_FEDERAL_FUNDS_RATE,
+    ExPostRealFederalFundsRateMethod,
 )
 from aqil_research.methods.hamilton_monthly import (
     METHOD_ID as HAMILTON_MONTHLY_METHOD_ID,
@@ -110,6 +118,8 @@ def default_method_registry() -> MethodRegistry:
     registry.register(RegisteredBaiPerronMeanShiftsMethod())
     registry.register(AutoregressiveBenchmarkMethod())
     registry.register(LeadLagCrossCorrelationMethod())
+    registry.register(CpiUInflationAutoregressionMethod())
+    registry.register(ExPostRealFederalFundsRateMethod())
     return registry
 
 
@@ -133,5 +143,7 @@ __all__ = [
     "PRICES_AND_POLICY_METHOD_ID",
     "SAHM_METHOD_ID",
     "SLOOS_CIL_METHOD_ID",
+    "CPI_U_INFLATION_AUTREGRESSION",
+    "EX_POST_REAL_FEDERAL_FUNDS_RATE",
     "default_method_registry",
 ]
