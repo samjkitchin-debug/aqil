@@ -26,6 +26,14 @@ from aqil_research.methods.credit_standards_volumes import (
     CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID,
     CreditStandardsVolumesMethod,
 )
+from aqil_research.methods.cusum_recursive_residuals import (
+    CUSUM_RECURSIVE_RESIDUALS,
+    CusumRecursiveResidualsMethod,
+)
+from aqil_research.methods.engle_granger_cointegration import (
+    ENGLE_GRANGER_COINTEGRATION,
+    EngleGrangerCointegrationMethod,
+)
 from aqil_research.methods.ex_post_real_federal_funds import (
     EX_POST_REAL_FEDERAL_FUNDS_RATE,
     ExPostRealFederalFundsRateMethod,
@@ -117,9 +125,11 @@ def default_method_registry() -> MethodRegistry:
     registry.register(HamiltonMonthlyMethod())
     registry.register(RegisteredBaiPerronMeanShiftsMethod())
     registry.register(AutoregressiveBenchmarkMethod())
-    registry.register(LeadLagCrossCorrelationMethod())
     registry.register(CpiUInflationAutoregressionMethod())
     registry.register(ExPostRealFederalFundsRateMethod())
+    registry.register(LeadLagCrossCorrelationMethod())
+    registry.register(EngleGrangerCointegrationMethod())
+    registry.register(CusumRecursiveResidualsMethod())
     return registry
 
 
@@ -145,5 +155,7 @@ __all__ = [
     "SLOOS_CIL_METHOD_ID",
     "CPI_U_INFLATION_AUTREGRESSION",
     "EX_POST_REAL_FEDERAL_FUNDS_RATE",
+    "ENGLE_GRANGER_COINTEGRATION",
+    "CUSUM_RECURSIVE_RESIDUALS",
     "default_method_registry",
 ]
