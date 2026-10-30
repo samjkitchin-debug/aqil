@@ -55,6 +55,15 @@ const REGISTER_ROWS = [
   "AUTOREGRESSIVE_BENCHMARK",
   "LEAD_LAG_CROSS_CORRELATION",
   "SAHM_UNEMPLOYMENT_GAP",
+  "CPI_U_INFLATION_AUTREGRESSION",
+  "EX_POST_REAL_FEDERAL_FUNDS_RATE",
+  "ENGLE_GRANGER_COINTEGRATION",
+  "CUSUM_RECURSIVE_RESIDUALS",
+  "INFLATION_AUTOREGRESSION",
+  "EX_POST_REAL_FUNDS_RATE",
+  "ACTIVITY_LEVEL_COINTEGRATION",
+  "IP_GROWTH_CUSUM",
+  "ESTRELLA_MISHKIN_TERM_SPREAD",
 ] as const;
 
 test("the catalogue names the stored methods and every other programme row", () => {
@@ -66,12 +75,21 @@ test("the catalogue names the stored methods and every other programme row", () 
     .map((entry) => entry.slug)
     .sort();
   assert.deepEqual(inDevelopment, [
+    "activity-level-cointegration",
     "autoregressive-benchmark",
     "bai-perron-breaks",
     "bry-boschan-spencer15",
+    "cpi-u-inflation-autoregression",
+    "cusum-recursive-residuals",
     "diffusion-index",
+    "engle-granger-cointegration",
+    "estrella-mishkin-spread",
+    "ex-post-real-federal-funds-rate",
+    "ex-post-real-funds-rate",
     "hamilton-markov-switching",
     "harding-pagan-characteristics",
+    "inflation-autoregression",
+    "ip-growth-cusum",
     "lead-lag",
     "sahm-rule",
     "stock-watson-1988",
@@ -260,6 +278,80 @@ function storedRun(overrides: Partial<StoredMethodologyRun> & { calculation?: Re
     ...overrides,
   };
 }
+
+test("a missing V1 run says the result is unavailable and does not invent figures", () => {
+  for (const slug of [
+    "cpi-u-inflation-autoregression",
+    "ex-post-real-federal-funds-rate",
+    "engle-granger-cointegration",
+    "cusum-recursive-residuals",
+    "inflation-autoregression",
+    "ex-post-real-funds-rate",
+    "activity-level-cointegration",
+    "ip-growth-cusum",
+    "estrella-mishkin-spread",
+  ]) {
+    const entry = methodologyBySlug(slug);
+    assert.ok(entry);
+    assert.equal(entry.stage, "in-development");
+    assert.equal(entry.queryMethodIds.length, 1);
+    const view = presentMethodology(entry, { status: "ready", runs: [] });
+    const text = JSON.stringify(view);
+    assert.equal(view.statusLine, "The stored result is unavailable.");
+    assert.match(text, /The stored result is unavailable/);
+    assert.equal(text.includes("0.803"), false);
+    assert.equal(text.includes("3.7173"), false);
+    assert.equal(text.includes("-2.865"), false);
+    assert.equal(text.includes("47.93"), false);
+    assert.equal(view.privateResult, null);
+  }
+  const bbq = methodologyBySlug("harding-pagan-bbq");
+  assert.deepEqual(bbq?.queryMethodIds, []);
+});
+
+test("a closed V1 publication still shows a signed-in private result", () => {
+  const entry = methodologyBySlug("engle-granger-cointegration");
+  assert.ok(entry);
+  const stored = storedRun({
+    methodId: "ENGLE_GRANGER_COINTEGRATION",
+    calculation: {
+      statistic: -1.5,
+      critical_value_five_percent: -3.1,
+      rejects_no_cointegration_at_five_percent: false,
+      null_hypothesis: "no_cointegration",
+      causal_claim: false,
+      input_vintage: "latest_revised",
+      sample_start: "1950-01-01",
+      sample_end: "1951-01-01",
+    },
+  });
+  const result = extractPrivateResult(stored);
+  const view = presentMethodology(
+    entry,
+    { status: "ready", runs: [run({ methodId: "ENGLE_GRANGER_COINTEGRATION", calculationStored: true })] },
+    result,
+  );
+  const text = JSON.stringify(view);
+  assert.equal(result.publicationAllowed, false);
+  assert.match(view.statusLine, /not eligible for publication/);
+  assert.match(text, /does not reject no-cointegration/);
+  assert.match(text, /-1\.5/);
+  assert.equal(text.includes("-2.865"), false);
+  assert.equal(text.includes("publication_allowed\":true"), false);
+});
+
+test("the list withholds V1 figures when only metadata is loaded", () => {
+  const entry = methodologyBySlug("cpi-u-inflation-autoregression");
+  assert.ok(entry);
+  const view = presentMethodology(entry, {
+    status: "ready",
+    runs: [run({ methodId: "CPI_U_INFLATION_AUTREGRESSION", calculationStored: true })],
+  });
+  const text = JSON.stringify(view);
+  assert.match(text, /withheld/);
+  assert.equal(view.privateResult, null);
+  assert.equal(text.includes("0.803"), false);
+});
 
 test("run metadata failure is stated and not replaced with a result", () => {
   assert.ok(factor);

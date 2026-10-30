@@ -144,5 +144,186 @@ test("the Sahm gap is the stored month and is not a plotted path", () => {
   assert.match(result.headline, /Not triggered/);
   assert.match(result.standing, /October 2025 is not interpolated/);
   assert.match(result.limitations.join(" "), /no gap path/);
+  assert.match(result.limitations.join(" "), /longer revised unemployment history was not used/);
+  assert.equal(result.publicationAllowed, false);
+});
+
+test("CPI persistence is read from the stored calculation", () => {
+  const result = extractPrivateResult(
+    stored({
+      methodId: "CPI_U_INFLATION_AUTREGRESSION",
+      primaryDatasetId: "bls.cu.CUSR0000SA0",
+      calculation: {
+        aic_lag: 2,
+        persistence: 0.25,
+        modelled_transformation: "monthly_log_change",
+        persistence_estimator: "ols_sum_of_ar_coefficients",
+        input_vintage: "latest_revised",
+        product_forecast: false,
+        empirically_qualified_as_forecast: false,
+        andrews_chen_median_unbiased: false,
+        growth_start: "1950-02-01",
+        growth_end: "1951-01-01",
+      },
+    }),
+  );
+  assert.match(result.headline, /AIC lag 2/);
+  assert.match(result.headline, /0\.25/);
+  assert.match(result.standing, /Not a forecast/);
+  assert.match(result.standing, /Not the Andrews–Chen median-unbiased estimator/);
+  assert.match(result.limitations.join(" "), /monthly log change/);
+  assert.equal(result.limitations.join(" ").includes("October 2025"), false);
+  assert.equal(result.headline.includes("0.803"), false);
+  assert.equal(result.publicationAllowed, false);
+});
+
+test("a CPI sample that ends in September 2025 records the missing October print", () => {
+  const result = extractPrivateResult(
+    stored({
+      methodId: "CPI_U_INFLATION_AUTREGRESSION",
+      calculation: {
+        aic_lag: 1,
+        persistence: 0.1,
+        growth_end: "2025-09-01",
+        andrews_chen_median_unbiased: false,
+        product_forecast: false,
+        empirically_qualified_as_forecast: false,
+        input_vintage: "latest_revised",
+      },
+    }),
+  );
+  assert.match(result.limitations.join(" "), /October 2025 CPI is missing/);
+  assert.equal(result.headline.includes("0.803"), false);
+});
+
+test("the ex-post real rate is the stored identity and not a Taylor rule", () => {
+  const result = extractPrivateResult(
+    stored({
+      methodId: "EX_POST_REAL_FEDERAL_FUNDS_RATE",
+      calculation: {
+        latest_period: "1999-01-01",
+        latest_federal_funds_rate_percent: "1.50",
+        latest_cpi_u_inflation_percent: "1.25",
+        latest_ex_post_real_rate_percentage_points: "0.25",
+        not_taylor_rule: true,
+        not_ex_ante: true,
+        input_vintage: "latest_revised",
+        months: [
+          { period: "1998-12-01", ex_post_real_rate_percentage_points: "0.10" },
+          { period: "1999-01-01", ex_post_real_rate_percentage_points: "0.25" },
+        ],
+      },
+    }),
+  );
+  assert.match(result.headline, /1 January 1999/);
+  assert.match(result.headline, /1\.5 percent/);
+  assert.match(result.headline, /1\.25/);
+  assert.match(result.headline, /0\.25 percentage points/);
+  assert.match(result.standing, /Not a Taylor rule/);
+  assert.match(result.standing, /Not an ex-ante real rate/);
+  assert.equal(result.series?.points[1]?.value, 0.25);
+  assert.equal(result.headline.includes("3.7173"), false);
+  assert.equal(result.headline.includes("3.75"), false);
+  assert.equal(result.publicationAllowed, false);
+});
+
+test("Engle–Granger reads the stored decision and stays non-causal", () => {
+  const result = extractPrivateResult(
+    stored({
+      methodId: "ENGLE_GRANGER_COINTEGRATION",
+      calculation: {
+        statistic: -1.5,
+        critical_value_five_percent: -3.1,
+        rejects_no_cointegration_at_five_percent: false,
+        causal_claim: false,
+        null_hypothesis: "no_cointegration",
+        input_vintage: "latest_revised",
+      },
+    }),
+  );
+  assert.match(result.headline, /does not reject no-cointegration/);
+  assert.match(result.headline, /-1\.5/);
+  assert.match(result.headline, /-3\.1/);
+  assert.match(result.standing, /Not causal/);
+  assert.equal(result.series, null);
+  assert.equal(result.headline.includes("-2.865"), false);
+});
+
+test("CUSUM reads the stored extreme and does not invent a break date", () => {
+  const result = extractPrivateResult(
+    stored({
+      methodId: "CUSUM_RECURSIVE_RESIDUALS",
+      calculation: {
+        crosses_conventional_boundary: false,
+        maximum_absolute_cusum: 10.5,
+        boundary_at_extreme: 20.25,
+        extreme_period: "1980-01-01",
+        selected_break_date: null,
+        input_vintage: "latest_revised",
+      },
+    }),
+  );
+  assert.match(result.headline, /does not cross the five percent boundary/);
+  assert.match(result.headline, /10\.5/);
+  assert.match(result.headline, /1 January 1980/);
+  assert.match(result.headline, /20\.25/);
+  assert.match(result.standing, /Not a selected break date/);
+  assert.equal(result.series, null);
+  assert.equal(result.headline.includes("47.93"), false);
+});
+
+test("a V1 calculation without its figures says the result is unavailable", () => {
+  const result = extractPrivateResult(
+    stored({
+      methodId: "CPI_U_INFLATION_AUTREGRESSION",
+      calculation: { input_vintage: "latest_revised" },
+    }),
+  );
+  assert.equal(result.headline, "The stored result is unavailable.");
+  assert.equal(result.headline.includes("0.803"), false);
+  assert.equal(result.publicationAllowed, false);
+});
+
+test("the ex-post real funds rate is subsequent inflation and not a Taylor rule", () => {
+  const result = extractPrivateResult(
+    stored({
+      methodId: "EX_POST_REAL_FUNDS_RATE",
+      calculation: {
+        funds_month: "2019-01-01",
+        inflation_end_month: "2020-01-01",
+        federal_funds_percent_per_year: "2.50",
+        inflation_percent: "1.25",
+        real_funds_rate_percent_per_year: "1.25",
+        taylor_rule: false,
+        input_vintage: "latest_revised",
+      },
+    }),
+  );
+  assert.match(result.headline, /1\.25/);
+  assert.match(result.standing, /Not a Taylor rule/);
+  assert.match(result.standing, /Subsequent twelve-month inflation/);
+  assert.equal(result.series, null);
+  assert.equal(JSON.stringify(result).includes("Taylor rule recommendation"), false);
+});
+
+test("the term spread is a yield difference and not a recession probability", () => {
+  const result = extractPrivateResult(
+    stored({
+      methodId: "ESTRELLA_MISHKIN_TERM_SPREAD",
+      calculation: {
+        evaluation_period: "2020-01-01",
+        ten_year_yield: "1.80",
+        three_month_yield: "1.50",
+        spread: "0.30",
+        real_time_probability: false,
+        probit_estimated: false,
+        input_vintage: "latest_revised",
+      },
+    }),
+  );
+  assert.match(result.headline, /0\.3/);
+  assert.match(result.standing, /Not a recession probability/);
+  assert.match(result.facts.map((item) => item.value).join(" "), /No/);
+  assert.equal(JSON.stringify(result).toLowerCase().includes("recession probability is"), false);
   assert.equal(result.publicationAllowed, false);
 });

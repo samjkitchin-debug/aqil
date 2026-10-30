@@ -1,7 +1,25 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 31 October 2026, quantitative V1 source binding
+**Last updated:** 31 October 2026, quantitative V1 views and inventory
+
+## Quantitative V1 views, 31 October 2026
+
+Risk class R2. Branch `research/quantitative-v1` in `C:\Users\gamer\aqil-quant-v1`. `publication_allowed` stays false. Nothing was pushed. Nothing was merged to `main`. Hosted Supabase was not written. Local research runs were not copied. Database `postgres` on `127.0.0.1:55432` was not reset. No scheduler, nowcast, Estrella–Mishkin probit, Taylor rule, or LLM interpretation was added.
+
+Signed-in methodology cards now query `CPI_U_INFLATION_AUTREGRESSION`, `EX_POST_REAL_FEDERAL_FUNDS_RATE`, `ENGLE_GRANGER_COINTEGRATION`, and `CUSUM_RECURSIVE_RESIDUALS`. The page reads the stored calculation. If that run is absent, it says the result is unavailable. Signed-out sessions still receive no calculation JSON. `harding-pagan-bbq` stays planned with an empty query list. The earlier cards remain: Spencer-15, Stock–Watson, Harding–Pagan characteristics, diffusion, Hamilton, Bai–Perron, the autoregressive benchmark, lead–lag, and Sahm. Sahm run `f3db281d-9f6d-4c4c-974f-ba4b9bd68131` was not replaced.
+
+Stored local runs, read and not rewritten: CPI-U `bcbf15bc-590e-4738-9bc1-bbe951b12079` (AIC lag 12, OLS persistence about 0.803, October 2025 CPI missing); ex-post real funds `cf73c312-dc83-49d6-ba46-2ea02054d336` (September 2026 funds 3.75, inflation about 3.7173, real rate about 0.0327 percentage points); Engle–Granger `570e2f51-1871-4c0e-88c9-c40652093613` (does not reject no-cointegration, statistic about -2.865, MacKinnon five percent about -3.342); CUSUM `4943ca23-38bb-447f-8b8a-95c75b5fcd70` (does not cross, largest absolute CUSUM about 47.93 in February 1973, boundary about 66.98). Stock–Watson preserved run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` was not replaced. `--refit` stays rejected unless the method declares a separate refit command. Only Stock–Watson does, and that command does not replace the preserved run.
+
+The inventory is section L of `docs/macro/METHODOLOGY_CERTIFICATION.md`. Estrella–Mishkin stays unimplemented: `fed.h15.RIFLGFCM03_N.M` is stored (541 months, September 1981–September 2026) and NBER dates are not an approved stored input. US real GDP `bea.nipa.T10106.A191RX` is stored (319 quarters, 1947 Q1–2026 Q3) and no nowcast was implemented. Unemployment `bls.ln.LNS14000000` is revised history from January 1948 with October 2025 still missing. That is not a real-time Sahm evaluation.
+
+The daily refresher is not built. The execute-method contract is stable enough to design one later. It is not stable enough to run one. Still missing: a verified hosted logical dump and point-in-time recovery, a hosted BEA ingest, and no copying of local runs.
+
+Track B blocker: production delivery is not successful. `C:\Users\gamer\aqil-release-backups\2026-10-25` is migration files, not a `pg_dump`. `C:\Users\gamer\aqil-release-backups\2026-10-30` is pre-import counts, not a logical dump. The free-plan backup list was empty and point-in-time recovery was off. The hosted database password was not readable, so no dump was taken. No hosted migration was applied and no local run was copied.
+
+Untracked method drafts were moved out of the package tree into `C:\Users\gamer\aqil-quant-v1-strays` and were not committed. The docstring-only edit in `workers/research/src/aqil_research/adapters/fed_h15/__init__.py` was left unstaged.
+
+Checks before this commit, not GitHub Actions: `npm run test:research` collected 636 tests and passed them, then Ruff saw an uncommitted registry edit that imported drafts which are not part of this commit. That edit was restored and was not committed. On the restored tree, Ruff check passed and Ruff format reported 423 files already formatted. Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. Methodology unit tests in `present-methodology.test.ts` and `private-methodology-result.test.ts` passed 23. `npm run typecheck` passed. `npm run lint` in `apps/web` passed with the existing unused `_searchParams` warning. `npm run check:tokens` passed. `npm run build` passed, 50 routes. A signed-in browser session was not available. On this worktree at `http://127.0.0.1:3021`, lead–lag and the CPI-U card both returned 307 to `/login?error=signed_out` at desktop width and at 390 pixels. The responses were `private, no-store` and did not include the stored figures. The signed-in stored numbers were not opened.
 
 ## Source binding, 31 October 2026
 

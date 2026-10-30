@@ -170,3 +170,72 @@ Lead–lag remains run `94152391-c3a8-48d7-8f2e-8c4d1dfdb811`. The strongest cor
 No VAR, nowcast, or Estrella–Mishkin estimate was added. The three-month Treasury yield is still absent. The stored likelihoods on the preserved run and the re-estimate are about -1590.537499 and -1590.537194. The gain is about 0.000305, below the 0.001 adoption margin. Hamilton's stored lower-mean expected duration is about 1.993 months.
 
 `npm run test:research` passed 598 tests, then Ruff check and Ruff format, 405 files already formatted. Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. Web methodology unit tests passed 14. Web typecheck passed. Token styling passed. GitHub Actions was not run.
+
+## L. Quantitative V1 inventory, 31 October 2026
+
+This section records the integration branch after the official yield, GDP, and unemployment history were merged. It does not replace sections A to K. Section K said the three-month yield was still absent. That yield is now stored. No earlier run named above was replaced. `publication_allowed` stays false. Nothing in this section is a publication approval, a forecast, or a real-time claim.
+
+The daily refresher is not built. `aqil-research execute-method --method-id` is the execution contract: it resolves one method on `default_method_registry()`, reads that method's required series, and appends a run. `--refit` is rejected for every method that does not declare a separate refit command. That is every method below except Stock–Watson. Stock–Watson's separate refit still does not replace preserved run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`. A later refresher must not assume that a new observation rewrites a stored run, that `publication_allowed` becomes true, or that `latest_revised` is a vintage.
+
+The execute-method contract is stable enough for a daily refresher to be designed later. It is not stable enough to run one. The remaining prerequisites are a verified hosted logical dump and point-in-time recovery, a hosted ingest of the BEA series that are on local postgres and were not copied, and a ban on copying local research runs onto the host.
+
+### Stored V1 calculations
+
+Figures below were read from local `postgres` (`127.0.0.1:55432`). They were not copied to the host.
+
+| Record | CPI-U autoregression | Ex-post real federal funds rate | Engle–Granger | CUSUM of recursive residuals |
+| --- | --- | --- | --- | --- |
+| Name | CPI-U inflation autoregression | Ex-post real federal funds rate | Engle–Granger cointegration | CUSUM of recursive residuals |
+| Variant | OLS sum of autoregressive coefficients. Not Andrews–Chen median-unbiased | Funds rate minus trailing 12-month CPI percent change. Not a Taylor rule. Not ex-ante | Residual test on log levels. Not causal | Predeclared lag 12. Not a selected break date |
+| Code | `workers/research/src/aqil_research/methods/cpi_u_inflation_autoregression.py` | `workers/research/src/aqil_research/methods/ex_post_real_federal_funds.py` | `workers/research/src/aqil_research/methods/engle_granger_cointegration.py` | `workers/research/src/aqil_research/methods/cusum_recursive_residuals.py` |
+| Series | `bls.cu.CUSR0000SA0` | `fed.h15.RIFSPFF_N.M` and `bls.cu.CUSR0000SA0` | `fed.g17.IP.B50001.S` and `bls.ce.CES0000000001` | `fed.g17.IP.B50001.S` |
+| Frequency | Monthly | Monthly | Monthly | Monthly |
+| Transformations | Monthly log change. Gaps not filled | Twelve-month percent change, not a log change | Natural log levels | Monthly log-growth |
+| Parameter version | 1.0.0. Policy `none` | 1.0.0. Policy `none` | 1.0.0. Policy `none` | 1.0.0. Policy `none` |
+| execute-method id | `CPI_U_INFLATION_AUTREGRESSION` | `EX_POST_REAL_FEDERAL_FUNDS_RATE` | `ENGLE_GRANGER_COINTEGRATION` | `CUSUM_RECURSIVE_RESIDUALS` |
+| Refit rule | `--refit` rejected | `--refit` rejected | `--refit` rejected | `--refit` rejected |
+| Run | `bcbf15bc-590e-4738-9bc1-bbe951b12079` | `cf73c312-dc83-49d6-ba46-2ea02054d336` | `570e2f51-1871-4c0e-88c9-c40652093613` | `4943ca23-38bb-447f-8b8a-95c75b5fcd70` |
+| Validation label | Implemented. Historically evaluated on latest-revised data. Not a forecast. Not operational. Not approved for publication | Same, and not a policy rule | Historically evaluated. Does not reject no-cointegration. Not causal. Not operational. Not approved for publication | Historically evaluated. Does not cross the boundary. Not a break date. Not operational. Not approved for publication |
+| Vintage class | `latest_revised` | `latest_revised` | `latest_revised` | `latest_revised` |
+| Publication flag | false | false | false | false |
+| A refresher must not assume | October 2025 CPI exists, the OLS sum is median-unbiased, or this run is rewritten in place | An output gap, a Taylor rule, an ex-ante rate, or a policy prescription | Causality, a leading indicator, or ordinary ADF critical values | That February 1973 is a selected break, or that the lag was chosen by AIC |
+
+Stored readings, not a market view:
+
+CPI-U run `bcbf15bc-590e-4738-9bc1-bbe951b12079`: AIC lag 12. Ordinary least squares persistence about 0.803. Monthly log changes from February 1947 to September 2025. October 2025 CPI is missing and was not interpolated. Not a forecast. Not the Andrews–Chen median-unbiased estimator.
+
+Ex-post real rate run `cf73c312-dc83-49d6-ba46-2ea02054d336`: September 2026 federal funds rate 3.75 percent. Trailing 12-month CPI inflation about 3.7173. Real rate about 0.0327 percentage points. Not a Taylor rule. Not ex-ante.
+
+Engle–Granger run `570e2f51-1871-4c0e-88c9-c40652093613`: does not reject no-cointegration. Statistic about -2.865. MacKinnon five percent critical value about -3.342. Not causal.
+
+CUSUM run `4943ca23-38bb-447f-8b8a-95c75b5fcd70`: does not cross the five percent boundary. Largest absolute CUSUM about 47.93 in February 1973, where the boundary is about 66.98. Not a selected break date.
+
+Signed-in methodology pages read these stored fields. If the run is absent, the page says the result is unavailable. Signed-out sessions still receive no calculation JSON. `publication_allowed` false still allows the signed-in private result.
+
+### Blocks that remain
+
+Estrella–Mishkin: yield `fed.h15.RIFLGFCM03_N.M` is stored (541 months, September 1981–September 2026). The probit is not implemented because NBER dates are not an approved stored input. The 1998 equation was not copied from the article. The discount-basis bill was not stored. Federal funds was not used as the spread.
+
+US real GDP `bea.nipa.T10106.A191RX` is stored, 319 quarters, 1947 Q1–2026 Q3. A nowcast is not implemented. There are no vintages. ALFRED was not ingested. Philadelphia Fed real-time data was not ingested. Euro-area GDP was not copied onto this series.
+
+Unemployment `bls.ln.LNS14000000` is revised history from January 1948, 944 distinct months through September 2026. October 2025 is still missing and was not interpolated. This is not a real-time Sahm evaluation. Existing Sahm run `f3db281d-9f6d-4c4c-974f-ba4b9bd68131` remains the short-sample result. It was not replaced.
+
+Still blocked, for the reasons already in the quantitative V1 plan:
+
+- Quarterly BBQ: the journal defaults are not line-checked, and the method must not be run on monthly industrial production.
+- The 1971 Bry–Boschan listing: the programme listing is not in the volume, so `date_specific_cycles()` still refuses to date.
+- The 1988 CITIBASE Stock–Watson panel: employee-hours and the 1982-dollar series are not stored. Preserved run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` is not replaced.
+- A small VAR: lead–lag run `94152391-c3a8-48d7-8f2e-8c4d1dfdb811` shows the four coincident growth relationships are contemporaneous and not stable across 1997–2007 and 2010–2019.
+- NFCI, the excess bond premium, and the BIS credit-to-GDP gap: the required series are not stored and were not proxied. The stored BIS dollar-credit series is not the gap.
+- Phillips curve: no equation and no slack measure have been named.
+- Taylor rule: no output gap is estimated. The ex-post real funds identity is not that rule.
+- Trimmed-mean CPI: component indexes are not stored.
+- ALFRED vintages stay prohibited. There is no vintage panel.
+
+### Track B
+
+Production delivery is not successful. `C:\Users\gamer\aqil-release-backups\2026-10-25` holds the five migration files that were already applied, not a `pg_dump`. `C:\Users\gamer\aqil-release-backups\2026-10-30` holds pre-import counts, not a logical dump. The hosted project is on the free plan. The backup list was empty and point-in-time recovery was off. The database password was not readable from Vercel, so `supabase db dump` was not run in this session and must not be improvised. No hosted migration was applied. No local run was copied.
+
+### Test evidence for this inventory
+
+`npm run test:research` passed 636 tests. Ruff check then passed on the restored tree, and Ruff format reported 423 files already formatted. A transient uncommitted registry edit was not part of that pass and was not committed. Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. Methodology unit tests passed 23. Web typecheck passed. Lint passed with the existing unused `_searchParams` warning. Token styling passed. `npm run build` passed, 50 routes. GitHub Actions has not run. The SHA is the views commit on `research/quantitative-v1`.

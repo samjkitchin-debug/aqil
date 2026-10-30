@@ -34,6 +34,9 @@ export type MethodologyOutputKind =
   | "structural-breaks"
   | "benchmark-comparison"
   | "cross-correlation"
+  | "persistence-summary"
+  | "cointegration-test"
+  | "stability-diagnostic"
   | "unavailable";
 
 /** Where the card sits. `current` is work already under way. Planned groups follow the register. */
@@ -73,7 +76,7 @@ export const METHODOLOGY_GROUPS: readonly { id: MethodologyGroup; heading: strin
   {
     id: "current",
     heading: "In development",
-    note: "Bry–Boschan, the Stock–Watson refit, restricted coincident diffusion, Harding–Pagan characteristics, the Sahm rule, the Hamilton monthly variant, Bai–Perron mean shifts, the autoregressive benchmark, and lead–lag correlations have stored runs. A signed-in reader can open the stored result. That is not publication approval. The Stock–Watson refit is not operationally accepted. The Hamilton variant is not empirically qualified. The autoregression is not a qualified forecast. Lead–lag correlations are not a leading-indicator assignment. Quarterly BBQ has not been run.",
+    note: "Bry–Boschan, the Stock–Watson refit, restricted coincident diffusion, Harding–Pagan characteristics, the Sahm rule, the Hamilton monthly variant, Bai–Perron mean shifts, the autoregressive benchmark, lead–lag correlations, the CPI-U autoregression, the ex-post real federal funds rate, Engle–Granger cointegration, and the CUSUM of recursive residuals have stored runs. A signed-in reader can open the stored result. That is not publication approval. The Stock–Watson refit is not operationally accepted. The Hamilton variant is not empirically qualified. The autoregression is not a qualified forecast. Lead–lag correlations are not a leading-indicator assignment. The CPI-U fit is not a forecast. The real rate is not a Taylor rule. Cointegration is not a causal claim. The CUSUM is not a selected break date. Quarterly BBQ has not been run.",
   },
   {
     id: "activity",
@@ -83,12 +86,12 @@ export const METHODOLOGY_GROUPS: readonly { id: MethodologyGroup; heading: strin
   {
     id: "forecasting",
     heading: "Growth and forecasting",
-    note: "Planned nowcasts and the later forecasting family. No nowcast has been produced. A small vector autoregression was not opened.",
+    note: "Planned nowcasts and the later forecasting family. US real GDP is stored as latest-revised history and no nowcast has been produced. A small vector autoregression was not opened.",
   },
   {
     id: "inflation",
     heading: "Inflation and monetary conditions",
-    note: "Planned inflation and yield-curve methods. No specification in this group has been selected for estimation. The yield-curve probit stays blocked: the stored ten-year yield and the federal funds rate are not the ten-year minus three-month Treasury spread.",
+    note: "Planned trend inflation, the Phillips curve, and the yield-curve probit. The CPI-U autoregression, the ex-post real federal funds rate, and the 10-year minus 3-month spread are listed under in development. The spread is not a recession probability. The probit stays blocked: coefficients were not estimated.",
   },
   {
     id: "financial",
@@ -98,7 +101,7 @@ export const METHODOLOGY_GROUPS: readonly { id: MethodologyGroup; heading: strin
   {
     id: "structural",
     heading: "Structural economic change",
-    note: "The intercept-only mean-shift result is listed under in development. The general regressor model has not been estimated.",
+    note: "The intercept-only mean-shift result and the CUSUM of recursive residuals are listed under in development. The CUSUM is not a selected break date. The general regressor model has not been estimated.",
   },
 ];
 
@@ -358,8 +361,8 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
       "A trigger is the published association with a recession already under way. It is not an NBER determination and not a forecast.",
     ],
     uncertainty: [
-      "The live unemployment file is short. October 2025 is missing and is not interpolated.",
-      "A longer history is not estimated from another source. The result is latest revised, not a real-time vintage.",
+      "The stored run remains the short sample. A longer revised history from January 1948 is stored and was not used for this result.",
+      "October 2025 is still missing and is not interpolated. This is not a real-time Sahm evaluation.",
       "Not approved for publication.",
     ],
     dataInputs: ["US unemployment rate, latest revised, on the stored live months. A missing month fails the window."],
@@ -413,9 +416,11 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
       "A nowcast would be an estimate of a current or recent national-accounts outcome. It would not be the coincident factor.",
     ],
     uncertainty: [
-      "Primary equations have not been verified. US GDP is not stored. This does not start before the dynamic-factor data contract.",
+      "Primary equations have not been verified. US real GDP is stored as latest-revised quarterly history. There is no vintage panel, so no nowcast has been implemented.",
     ],
-    dataInputs: ["A target quarterly series and the monthly series the chosen specification names. Those inputs are not assembled."],
+    dataInputs: [
+      "bea.nipa.T10106.A191RX is stored from 1947 Q1 to 2026 Q3. ALFRED vintages are not stored. Euro-area GDP is not this series.",
+    ],
     validation: ["No nowcast has been calculated. A monthly factor is not a nowcast."],
     references: [],
   }),
@@ -454,7 +459,9 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     interpretation: [
       "The intended output is a trend time series. It is not the published twelve-month change in CPI already shown on the dashboard.",
     ],
-    uncertainty: ["No published trend method has been selected, so no parameters exist."],
+    uncertainty: [
+      "No published trend method has been selected, so no parameters exist. Trimmed-mean CPI stays blocked because component indexes are not stored.",
+    ],
     dataInputs: ["US CPI is stored. A component index for a trimmed mean is not the same object and is not assumed."],
     validation: ["Nothing has been estimated. The stored CPI change is not this method."],
     references: [],
@@ -473,7 +480,9 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     interpretation: [
       "A chosen specification would relate inflation to slack. It would not be an ad hoc curve fitted for the page.",
     ],
-    uncertainty: ["No equation, slack measure or sample has been named."],
+    uncertainty: [
+      "No equation, slack measure, or sample has been named. Revised unemployment history is not this specification.",
+    ],
     dataInputs: ["An inflation series and a slack series named by the specification. Neither choice is made."],
     validation: ["No fit exists. A near-term empirical relationship is not implied."],
     references: [],
@@ -493,9 +502,12 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
       "The intended output is a probability of a stated future recession event. It is not a dating of past turning points.",
     ],
     uncertainty: [
-      "The paper has not been line-checked. The three-month Treasury yield required by the later task is not stored.",
+      "The three-month constant-maturity yield is stored. The probit is not implemented because NBER dates are not an approved stored input.",
+      "The 1998 equation was not copied from the article. The federal funds rate is not the spread.",
     ],
-    dataInputs: ["A rights-cleared three-month yield and the longer yield the specification names. Acquisition has not started."],
+    dataInputs: [
+      "fed.h15.RIFLGFCM03_N.M is stored. Recession dates are not an approved stored input, so the probit has no approved outcome series.",
+    ],
     validation: ["The probit is unimplemented. No probability is shown."],
     references: [],
   }),
@@ -602,6 +614,267 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     validation: [
       "The primary minimum segment is the larger of 24 months and 15 percent of the sample.",
       "A signed-in reader can see the stored selection. A looser trim is sensitivity, not a second model.",
+    ],
+    references: [],
+  },
+  {
+    slug: "cpi-u-inflation-autoregression",
+    registerId: "CPI_U_INFLATION_AUTREGRESSION",
+    name: "CPI-U inflation autoregression",
+    measures:
+      "Fits an autoregression to the monthly log change of CPI-U and reports the ordinary least squares sum of the autoregressive coefficients. The fit is not a forecast and not the Andrews–Chen median-unbiased estimator.",
+    domain: "Inflation",
+    timing: "retrospective",
+    functionLabel: "Persistence summary",
+    outputKind: "persistence-summary",
+    stage: "in-development",
+    group: "current",
+    queryMethodIds: ["CPI_U_INFLATION_AUTREGRESSION"],
+    interpretation: [
+      "The lag is the one chosen by AIC inside the predeclared maximum.",
+      "Persistence is the sum of the ordinary least squares coefficients, excluding the intercept.",
+    ],
+    uncertainty: [
+      "The modelled series is the monthly log change. It is not the twelve-month percent change.",
+      "October 2025 CPI is missing and is not interpolated.",
+      "The stored figure is not the Andrews–Chen median-unbiased estimator and is not a forecast.",
+      "A signed-in reader can see the stored fit. It is not approved for publication.",
+    ],
+    dataInputs: ["US CPI-U, seasonally adjusted, latest revised, as monthly log changes."],
+    validation: [
+      "This page reads the stored lag and persistence. It does not replay the regression.",
+    ],
+    references: [],
+  },
+  {
+    slug: "ex-post-real-federal-funds-rate",
+    registerId: "EX_POST_REAL_FEDERAL_FUNDS_RATE",
+    name: "Ex-post real federal funds rate",
+    measures:
+      "Subtracts trailing twelve-month CPI-U inflation from the federal funds rate in the same month. The result is an ex-post identity. It is not a Taylor rule and not an ex-ante real rate.",
+    domain: "Monetary conditions",
+    timing: "retrospective",
+    functionLabel: "Contemporaneous measurement",
+    outputKind: "time-series",
+    stage: "in-development",
+    group: "current",
+    queryMethodIds: ["EX_POST_REAL_FEDERAL_FUNDS_RATE"],
+    interpretation: [
+      "The real rate is the funds rate minus realised inflation over the previous twelve months.",
+      "A positive reading is not a policy prescription.",
+    ],
+    uncertainty: [
+      "Inflation is a percent change of the index, not a monthly log change.",
+      "No output gap is estimated. This is not a Taylor rule and not an ex-ante rate.",
+      "A signed-in reader can see the stored identity. It is not approved for publication.",
+    ],
+    dataInputs: [
+      "Federal funds rate, latest revised, and CPI-U, latest revised, aligned on the same month.",
+    ],
+    validation: [
+      "This page reads the stored funds rate, inflation, and real rate. It does not recompute them.",
+    ],
+    references: [],
+  },
+  {
+    slug: "engle-granger-cointegration",
+    registerId: "ENGLE_GRANGER_COINTEGRATION",
+    name: "Engle–Granger cointegration",
+    measures:
+      "Tests whether the log levels of industrial production and payroll employment share a cointegrating residual. A failure to reject no-cointegration is a result. It is not a causal claim.",
+    domain: "Economic activity",
+    timing: "retrospective",
+    functionLabel: "Structural analysis",
+    outputKind: "cointegration-test",
+    stage: "in-development",
+    group: "current",
+    queryMethodIds: ["ENGLE_GRANGER_COINTEGRATION"],
+    interpretation: [
+      "The null is no cointegration. The reported comparison is with the MacKinnon five percent critical value for two series and a constant.",
+      "The normalisation is predeclared. It does not assign a cause.",
+    ],
+    uncertainty: [
+      "The inputs are latest-revised log levels. Growth-rate lead–lag is not repeated here as causality.",
+      "A signed-in reader can see the stored test. It is not approved for publication.",
+    ],
+    dataInputs: [
+      "Industrial production and total nonfarm payroll employment, latest revised, as natural log levels.",
+    ],
+    validation: [
+      "This page reads the stored statistic and critical value. It does not rerun the test.",
+    ],
+    references: [],
+  },
+  {
+    slug: "cusum-recursive-residuals",
+    registerId: "CUSUM_RECURSIVE_RESIDUALS",
+    name: "CUSUM of recursive residuals",
+    measures:
+      "Compares the CUSUM of recursive residuals from a predeclared industrial-production log-growth autoregression with a five percent boundary. Staying inside the boundary is a result. It is not a selected break date.",
+    domain: "Structural change",
+    timing: "retrospective",
+    functionLabel: "Structural analysis",
+    outputKind: "stability-diagnostic",
+    stage: "in-development",
+    group: "current",
+    queryMethodIds: ["CUSUM_RECURSIVE_RESIDUALS"],
+    interpretation: [
+      "A crossing would be an absolute CUSUM outside the conventional five percent boundary.",
+      "The largest absolute CUSUM is a point on that path. It is not a break date.",
+    ],
+    uncertainty: [
+      "The lag is predeclared. It is not the lag selected by the autoregressive benchmark.",
+      "The input is latest-revised log-growth. This is not a real-time stability test.",
+      "A signed-in reader can see the stored comparison. It is not approved for publication.",
+    ],
+    dataInputs: ["Federal Reserve G.17 industrial production, total index, latest revised, as monthly log-growth."],
+    validation: [
+      "This page reads the stored CUSUM extreme and the boundary at that month. It does not rerun the recursion.",
+    ],
+    references: [],
+  },
+  {
+    slug: "inflation-autoregression",
+    registerId: "INFLATION_AUTOREGRESSION",
+    name: "CPI-U inflation autoregression",
+    measures:
+      "Fits an autoregression to the monthly logarithmic change in CPI-U and compares held-out errors with the historical mean. A fit is not a product forecast and not a Taylor rule.",
+    domain: "Inflation",
+    timing: "retrospective",
+    functionLabel: "Persistence summary",
+    outputKind: "persistence-summary",
+    stage: "in-development",
+    group: "current",
+    queryMethodIds: ["INFLATION_AUTOREGRESSION"],
+    interpretation: [
+      "The lag is chosen by AIC on the pre-holdout sample, inside a predeclared maximum.",
+      "Persistence is the sum of the slope coefficients. A half-life is shown only when that sum is between 0 and 1.",
+    ],
+    uncertainty: [
+      "The modelled series is the monthly logarithmic change. It is not the twelve-month percent change.",
+      "Beating the historical mean at one horizon does not qualify the method as a forecast.",
+      "This is not a Taylor rule. A signed-in reader can see the stored fit. It is not approved for publication.",
+    ],
+    dataInputs: ["US CPI-U, seasonally adjusted, latest revised, as monthly logarithmic changes."],
+    validation: [
+      "This page reads the stored lag, persistence, and horizon comparison. It does not replay the regression.",
+    ],
+    references: [],
+  },
+  {
+    slug: "ex-post-real-funds-rate",
+    registerId: "EX_POST_REAL_FUNDS_RATE",
+    name: "Ex-post real federal funds rate",
+    measures:
+      "Subtracts CPI-U inflation over the following twelve months from the federal funds rate in month t. The result is retrospective. It is not a Taylor rule.",
+    domain: "Monetary conditions",
+    timing: "retrospective",
+    functionLabel: "Contemporaneous measurement",
+    outputKind: "time-series",
+    stage: "in-development",
+    group: "current",
+    queryMethodIds: ["EX_POST_REAL_FUNDS_RATE"],
+    interpretation: [
+      "Inflation uses the CPI-U index at month t and twelve months later. It is subsequent to the funds rate.",
+      "A positive reading is not a policy prescription.",
+    ],
+    uncertainty: [
+      "The real rate at month t uses a price index that was not known at month t.",
+      "No output gap or inflation target is estimated. This is not a Taylor rule.",
+      "A signed-in reader can see the stored identity. It is not approved for publication.",
+    ],
+    dataInputs: [
+      "Federal funds effective rate, latest revised, and CPI-U, latest revised, twelve months apart.",
+    ],
+    validation: [
+      "This page reads the stored funds rate, subsequent inflation, and real rate. It does not recompute them.",
+    ],
+    references: [],
+  },
+  {
+    slug: "activity-level-cointegration",
+    registerId: "ACTIVITY_LEVEL_COINTEGRATION",
+    name: "Activity-level cointegration",
+    measures:
+      "Tests whether the log levels of industrial production and payroll employment share a cointegrating residual. A failure to reject no-cointegration is a result. It is not a causal claim.",
+    domain: "Economic activity",
+    timing: "retrospective",
+    functionLabel: "Structural analysis",
+    outputKind: "cointegration-test",
+    stage: "in-development",
+    group: "current",
+    queryMethodIds: ["ACTIVITY_LEVEL_COINTEGRATION"],
+    interpretation: [
+      "The null is no cointegration. The decision uses the five percent critical value returned by the test.",
+      "Log industrial production is the left-hand side. That ordering is not a cause.",
+    ],
+    uncertainty: [
+      "The inputs are latest-revised log levels. A vector autoregression is not estimated.",
+      "A signed-in reader can see the stored test. It is not approved for publication.",
+    ],
+    dataInputs: [
+      "Industrial production and total nonfarm payroll employment, latest revised, as natural log levels.",
+    ],
+    validation: [
+      "This page reads the stored statistic and critical value. It does not rerun the test.",
+    ],
+    references: [],
+  },
+  {
+    slug: "ip-growth-cusum",
+    registerId: "IP_GROWTH_CUSUM",
+    name: "Industrial-production CUSUM",
+    measures:
+      "Compares the CUSUM of recursive residuals from a predeclared lag-1 autoregression of industrial-production log-growth with a five percent boundary. Staying inside the boundary is a result. It is not a selected break date and not a Bai–Perron mean shift.",
+    domain: "Structural change",
+    timing: "retrospective",
+    functionLabel: "Structural analysis",
+    outputKind: "stability-diagnostic",
+    stage: "in-development",
+    group: "current",
+    queryMethodIds: ["IP_GROWTH_CUSUM"],
+    interpretation: [
+      "A crossing is a cumulative sum strictly outside the returned five percent boundary.",
+      "The largest absolute CUSUM is a point on that path. It is not a break date.",
+    ],
+    uncertainty: [
+      "The lag is predeclared at 1. An information criterion does not choose it.",
+      "The input is latest-revised log-growth. This is not a real-time stability test and not a Bai–Perron search.",
+      "A signed-in reader can see the stored comparison. It is not approved for publication.",
+    ],
+    dataInputs: ["Federal Reserve G.17 industrial production, total index, latest revised, as monthly log-growth."],
+    validation: [
+      "This page reads the stored CUSUM extreme and the boundary at that month. It does not rerun the recursion.",
+    ],
+    references: [],
+  },
+  {
+    slug: "estrella-mishkin-spread",
+    registerId: "ESTRELLA_MISHKIN_TERM_SPREAD",
+    name: "10-year minus 3-month spread",
+    measures:
+      "Reports the latest revised difference between the 10-year and 3-month constant-maturity yields. It is not a recession probability.",
+    domain: "Monetary conditions",
+    timing: "retrospective",
+    functionLabel: "Yield spread",
+    outputKind: "time-series",
+    stage: "in-development",
+    group: "current",
+    queryMethodIds: ["ESTRELLA_MISHKIN_TERM_SPREAD"],
+    interpretation: [
+      "The spread is the 10-year investment-basis yield minus the 3-month investment-basis yield.",
+      "The June 1996 article states a horizon. This page does not turn the spread into a probability.",
+    ],
+    uncertainty: [
+      "No probit coefficients were estimated. The article does not print them.",
+      "The 3-month series is not the discount-basis Treasury bill, and the federal funds rate is not the short rate.",
+      "A signed-in reader can see the stored spread. It is not approved for publication.",
+    ],
+    dataInputs: [
+      "Latest revised H.15 10-year and 3-month constant-maturity yields, both quoted on an investment basis.",
+    ],
+    validation: [
+      "This page reads the stored yields and their difference. It does not estimate a probit.",
     ],
     references: [],
   },

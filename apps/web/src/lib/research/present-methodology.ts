@@ -64,8 +64,23 @@ const OUTPUT_LABEL: Record<MethodologyCatalogueEntry["outputKind"], string> = {
   "structural-breaks": "Structural-break chronology",
   "benchmark-comparison": "Benchmark comparison",
   "cross-correlation": "Cross-correlation",
+  "persistence-summary": "Persistence summary",
+  "cointegration-test": "Cointegration test",
+  "stability-diagnostic": "Stability diagnostic",
   unavailable: "No output type is defined",
 };
+
+const STORED_RESULT_METHOD_IDS = new Set([
+  "CPI_U_INFLATION_AUTREGRESSION",
+  "EX_POST_REAL_FEDERAL_FUNDS_RATE",
+  "ENGLE_GRANGER_COINTEGRATION",
+  "CUSUM_RECURSIVE_RESIDUALS",
+  "INFLATION_AUTOREGRESSION",
+  "EX_POST_REAL_FUNDS_RATE",
+  "ACTIVITY_LEVEL_COINTEGRATION",
+  "IP_GROWTH_CUSUM",
+  "ESTRELLA_MISHKIN_TERM_SPREAD",
+]);
 
 export function presentMethodology(
   entry: MethodologyCatalogueEntry,
@@ -183,7 +198,12 @@ function statusLineFor(
     return "No method identifier is registered for this page.";
   }
   if (load.status === "unavailable") return load.reason;
-  if (!latest) return "No stored run matches this methodology.";
+  if (!latest) {
+    if (entry.queryMethodIds.some((id) => STORED_RESULT_METHOD_IDS.has(id))) {
+      return "The stored result is unavailable.";
+    }
+    return "No stored run matches this methodology.";
+  }
   if (!latest.publicationAllowed) {
     const base =
       count === 1
@@ -207,6 +227,9 @@ function currentResult(
     return "The current result cannot be described because run metadata could not be read. No output is invented in its place.";
   }
   if (!latest) {
+    if (entry.queryMethodIds.some((id) => STORED_RESULT_METHOD_IDS.has(id))) {
+      return "The stored result is unavailable. No figure is invented.";
+    }
     return `No stored run is available for ${entry.name}. Nothing is plotted.`;
   }
   if (privateResult) return privateResult.headline;
