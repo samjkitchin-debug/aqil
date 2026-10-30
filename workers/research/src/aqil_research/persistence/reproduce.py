@@ -26,6 +26,12 @@ from aqil_research.methods.configs import (
     SAHM_SENSITIVITY,
     SLOOS_CIL_PUBLISHED,
 )
+from aqil_research.methods.cusum_recursive_residuals import (
+    PUBLISHED_CONFIG as CUSUM_RECURSIVE_RESIDUALS_PUBLISHED,
+)
+from aqil_research.methods.engle_granger_cointegration import (
+    PUBLISHED_CONFIG as ENGLE_GRANGER_COINTEGRATION_PUBLISHED,
+)
 from aqil_research.methods.hamilton_monthly import HAMILTON_MONTHLY_PUBLISHED
 from aqil_research.methods.harding_pagan_characteristics import (
     HARDING_PAGAN_CHARACTERISTICS_PUBLISHED,
@@ -164,6 +170,8 @@ def reproduction_config(config_id: str) -> dict[str, object]:
         RESTRICTED_COINCIDENT_DIFFUSION_PUBLISHED,
         ACCEPTED_CONFIG,
         MULTISTART_CONFIG,
+        ENGLE_GRANGER_COINTEGRATION_PUBLISHED,
+        CUSUM_RECURSIVE_RESIDUALS_PUBLISHED,
     )
     for panel in published_panels:
         if config_id == panel["config_id"]:
