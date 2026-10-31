@@ -67,6 +67,7 @@ from aqil_research.methods.restricted_coincident_diffusion import (
 from aqil_research.methods.stock_watson_1988_fit import (
     ACCEPTED_CONFIG,
     MULTISTART_CONFIG,
+    REFIT_CONFIG,
     SPECIFICATION_ID,
 )
 from aqil_research.persistence.calculation_normalize import normalize_calculation_payload
@@ -425,6 +426,7 @@ def reproduction_config(config_id: str) -> dict[str, object]:
         LEAD_LAG_PUBLISHED,
         RESTRICTED_COINCIDENT_DIFFUSION_PUBLISHED,
         ACCEPTED_CONFIG,
+        REFIT_CONFIG,
         MULTISTART_CONFIG,
         ENGLE_GRANGER_COINTEGRATION_PUBLISHED,
         CUSUM_RECURSIVE_RESIDUALS_PUBLISHED,

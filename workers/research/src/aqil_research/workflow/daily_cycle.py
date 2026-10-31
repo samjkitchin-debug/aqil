@@ -25,7 +25,7 @@ from aqil_research.adapters.source_registry import (
 from aqil_research.methods.protocol import AnalyticalMethod
 from aqil_research.methods.registry import MethodRegistry
 from aqil_research.vintages.store import AppendResult, ObservationStore
-from aqil_research.workflow.refresh import LOCK_KEY
+from aqil_research.workflow.refresh import LOCK_KEY, SourceRefreshResult
 
 ExecuteMethod = Callable[[psycopg.Connection, str, MethodRegistry], str]
 Sleep = Callable[[], None]
@@ -258,6 +258,102 @@ def _try_lock(conn: psycopg.Connection) -> bool:
 
 def _unlock(conn: psycopg.Connection) -> None:
     conn.execute("select pg_advisory_unlock(%s)", (LOCK_KEY,))
+
+
+def record_refresh_cycle(
+    conn: psycopg.Connection,
+    now: datetime,
+    sources: tuple[SourceRefreshResult, ...],
+) -> CycleReport:
+    """Persist one cycle for a refresh that already fetched. ``--refit`` is not used."""
+    from aqil_research.methods.registry import default_method_registry
+    from aqil_research.pipeline.execute_method import execute_registered_method
+    from aqil_research.workflow.refresh import source_dataset_ids
+
+    current = now if now.tzinfo is not None else now.replace(tzinfo=UTC)
+    draft = _Draft()
+    changed: set[str] = set()
+    source_failed = False
+    for source in sources:
+        outcome, detail, datasets = _refresh_event(source, source_dataset_ids)
+        if outcome in {"failed", "rights_blocked", "invalid"}:
+            source_failed = True
+        if outcome == "success":
+            changed.update(datasets)
+        draft.add("source", source.source_id, outcome, detail)
+        if outcome != "failed":
+            _add_stale_event(conn, draft, source.source_id, current.date())
+    registry = default_method_registry()
+    present = {
+        row[0]
+        for row in conn.execute("select distinct dataset_id from research.economic_observations")
+    }
+    method_failed = False
+
+    def execute(connection: psycopg.Connection, method_id: str, chosen: MethodRegistry) -> str:
+        run = execute_registered_method(connection, method_id, registry=chosen)
+        return run.run_id
+
+    for method in registry.enabled():
+        outcome, detail = _run_method(conn, method, registry, present, changed, execute)
+        if outcome == "failed":
+            method_failed = True
+        draft.add("method", method.method_id, outcome, detail)
+    status = "partial" if source_failed or method_failed else "completed"
+    cycle_id = str(uuid4())
+    _persist(conn, cycle_id, current, current, status, draft.events)
+    return CycleReport(cycle_id, current, current, status, False, tuple(draft.events), False)
+
+
+def _refresh_event(
+    source: SourceRefreshResult,
+    dataset_ids,
+) -> tuple[str, str, set[str]]:
+    outcome = source.outcome
+    detail = source.detail or outcome
+    inserted = source.inserted
+    if outcome in {"failed", "failed_fetch", "conflicts"}:
+        return "failed", detail, set()
+    if outcome == "failed_rights":
+        return "rights_blocked", detail, set()
+    if outcome == "failed_validation":
+        return "invalid", detail, set()
+    if inserted > 0:
+        return "success", detail, set(dataset_ids(source.source_id))
+    if outcome in {"unchanged", "completed", "success", "skipped_fresh", "not_requested"}:
+        return "unchanged", detail, set()
+    return "failed", detail, set()
+
+
+def _add_stale_event(
+    conn: psycopg.Connection,
+    draft: _Draft,
+    source_id: str,
+    today: date,
+) -> None:
+    from aqil_research.workflow.refresh import _DATA_FREQUENCY, source_dataset_ids
+
+    owned = source_dataset_ids(source_id)
+    frequency = _DATA_FREQUENCY.get(source_id)
+    if not owned or frequency is None:
+        return
+    row = conn.execute(
+        """
+        select max(period_start)
+        from research.economic_observations
+        where dataset_id = any(%s)
+        """,
+        (list(owned),),
+    ).fetchone()
+    latest = None if row is None else row[0]
+    freshness = classify_source_freshness(
+        data_frequency=frequency,
+        latest_period=latest,
+        today=today,
+        last_outcome="unchanged",
+    )
+    if freshness == "stale":
+        draft.add("source", source_id, "stale", "the latest stored period is outside its cadence")
 
 
 def classify_source_freshness(

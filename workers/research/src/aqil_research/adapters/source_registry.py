@@ -131,7 +131,12 @@ class SourceRegistry:
         self._order.append(connector)
 
     def disable(self, source_id: str) -> None:
+        self.get(source_id)
         self._disabled.add(source_id)
+
+    def enable(self, source_id: str) -> None:
+        self.get(source_id)
+        self._disabled.discard(source_id)
 
     def source_ids(self, *, enabled_only: bool = False) -> tuple[str, ...]:
         ids: list[str] = []

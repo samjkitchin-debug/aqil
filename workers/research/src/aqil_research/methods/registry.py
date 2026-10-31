@@ -120,6 +120,11 @@ class MethodRegistry:
             raise MethodRegistryError(f"unknown method_id: {method_id}")
         self._enabled[method_id] = False
 
+    def enable(self, method_id: str) -> None:
+        if method_id not in self._methods:
+            raise MethodRegistryError(f"unknown method_id: {method_id}")
+        self._enabled[method_id] = True
+
     def is_enabled(self, method_id: str) -> bool:
         return self._enabled.get(method_id, False)
 

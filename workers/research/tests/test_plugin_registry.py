@@ -159,6 +159,9 @@ def test_a_simulated_source_can_be_registered_validated_and_disabled() -> None:
     assert validated.observations[0].unit == "level"
     registry.disable("test_only_source")
     assert "test_only_source" not in registry.source_ids(enabled_only=True)
+    registry.enable("test_only_source")
+    assert "test_only_source" in registry.source_ids(enabled_only=True)
+    registry.disable("test_only_source")
     assert "test_only_source" not in default_source_registry().source_ids()
     disabled = FunctionSourceConnector(
         source_id="test_only_source",
@@ -188,6 +191,8 @@ def test_a_simulated_method_is_executed_read_and_then_disabled(require_db: str) 
         registry.disable(TOY_METHOD)
         with pytest.raises(MethodExecutionRefused):
             execute_registered_method(conn, TOY_METHOD, registry=registry, executed_at=WHEN)
+        registry.enable(TOY_METHOD)
+        assert registry.is_enabled(TOY_METHOD)
         conn.rollback()
     production = {method.method_id for method in default_method_registry().registered()}
     assert TOY_METHOD not in production

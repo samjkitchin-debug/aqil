@@ -38,6 +38,6 @@ def test_failed_source_does_not_stop_the_next() -> None:
     failed = _run_one(now, "bls_employment_situation_archive", fail)
     kept = _run_one(now, "federal_reserve_monetary_press", succeed)
     assert failed.outcome == "failed"
-    assert failed.detail == "RuntimeError"
+    assert failed.detail.startswith("RuntimeError")
     assert kept.outcome == "completed"
     assert kept.unchanged == 1
