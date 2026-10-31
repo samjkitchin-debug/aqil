@@ -333,3 +333,74 @@ The execution contract and this inventory exist, so a later orchestra can design
 `npm run test:research` passed 663 tests, then Ruff check and Ruff format (423 files already formatted). Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. Methodology unit tests passed 25. Web typecheck passed. GitHub Actions has not run. This is not a publication approval.
 
 After the duplicate registration was removed, `npm run test:research` passed 658 tests. The five tests in `test_activity_cointegration.py` were deleted with that method. The remaining tests were not weakened. Ruff check passed, and Ruff format reported 431 files already formatted. Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. Catalogue tests in `present-methodology.test.ts` and `private-methodology-result.test.ts` passed 25. GitHub Actions has not run. Web typecheck was not re-run. This is not a publication approval.
+
+## N. Classification and certification, 1 November 2026
+
+This section classifies the quantitative library after the probit execution. It does not replace sections A to M and it does not delete a method that has a stored run. `publication_allowed` stays false. Nothing here is a publication approval, a forecast, a recession call, or a real-time claim. Hosted Supabase was not read or written. No `pg_dump` was created. No scheduler was added. `workers/research/src/aqil_research/workflow/refresh.py` was not changed. Database `postgres` on `127.0.0.1:55432` was not reset. Preserved runs were not replaced.
+
+Section A still says the Estrella–Mishkin probit was not estimated. That was the state on 30 October 2026. The estimate below is a separate method. It is not a silent upgrade of the spread.
+
+### Counts
+
+These four counts stay separate. They are not added into one methodology total. The two CPI autoregressions are one family. The two real-rate definitions are one family. The spread is an indicator. Cointegration non-rejection is a diagnostic. The probit is a separate model from the spread.
+
+- **8 methodology families:** business-cycle dating, dynamic factor, regime switching, mean-shift model, industrial-production autoregressive benchmark, inflation autoregression, ex-post real funds rate, recession probit.
+- **10 variants:** the Spencer-15 labelled variant; the modern Stock–Watson specification; the Hamilton monthly variant; intercept-only Bai–Perron; both CPI autoregressions; both real-rate definitions; both CUSUM specifications. Those ten are not ten extra families. The two CUSUM specifications belong to one diagnostic.
+- **3 indicators:** restricted coincident diffusion, the Sahm rule, and the 10-year minus 3-month spread.
+- **4 diagnostics:** Harding–Pagan characteristics, lead–lag cross-correlation, Engle–Granger non-rejection, and CUSUM.
+
+Static principal components, the Chicago Fed national activity index, and the Kalman filter remain supporting techniques. They are not families. Quarterly BBQ, the 1971 listing as a working dater, a nowcast, the GDP bridge, the funds-rate vector autoregression, a Phillips curve, a Taylor rule, trimmed-mean CPI, NFCI, the excess bond premium, the BIS credit gap, growth-at-risk, and vintages were not added, so they are not in these counts.
+
+### Probit result
+
+`aqil-research execute-method --method-id CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT` was run once against local `postgres`. `--refit` was not passed. Run `137d92b7-6ce1-49eb-82ad-8f5727b00f90` is `completed`, `latest_revised`, and `publication_allowed` false. Config id `constant_maturity_spread_recession_probit_v1`. Parameter policy `none`.
+
+The fit is estimated and stable. Intercept `-0.424740354915` (standard error `0.357843878008`). Spread coefficient `-1.07426638515` (standard error `0.388914248468`). Estimation uses 97 spread quarters through 2005 Q4, of which 6 outcome quarters are contractions. Evaluation uses 83 spread quarters from 2006 Q1, of which 8 outcome quarters are contractions. Evaluation AUROC `0.68`. Brier score `0.14006186313`. Calibration intercept `0.0803910340177`. Calibration slope `0.0956921901357`. One incomplete quarter was omitted and was not interpolated. The windows were not moved.
+
+This is not the New York Fed parameterisation. The short rate is `fed.h15.RIFLGFCM03_N.M`, not the three-month Treasury bill in the June 1996 article. The NBER chronology is the local attributed copy dated 14 March 2023. Automated collection of that page is prohibited. The chronology is a reference classification, not a vintage of the yields. The spread run `cbfdaf86-8446-435e-8ceb-7f43557613f1` stays the spread, not a probability.
+
+Replay from the frozen observation ids is executable but historically unmatched. `incomplete_quarters_omitted` is 1 on the stored row and 0 when recomputed from those ids, because the incomplete quarter was not linked. The intercept, spread coefficient, quarter counts, and AUROC match. The analytical payload hash differs and was not rewritten. The mismatch was not weakened into a pass. The row is not historically replayable and the method is not operational.
+
+### Registered methods with a stored run
+
+None of these is operational. None is approved for publication. Vintage class is `latest_revised` on every row. A later refresher must not treat that class as a real-time vintage, must not set `publication_allowed` true, and must not rewrite a stored run in place.
+
+| execute-method id | Series | Parameter policy | Refit rule | Run | Replay | A refresher must not assume |
+| --- | --- | --- | --- | --- | --- | --- |
+| `BRY_BOSCHAN_SPENCER15_VARIANT` | `fed.g17.IP.B50001.S` | `none` | `--refit` rejected | `8fb20325-414f-401b-8c46-bda82ed94e16` and `3955f7f4-08f8-4e7b-9ded-b3f6eea6633f` | Not in the 1 November five-row classification. Section B recorded that the older payload still replays. Not a contemporaneous recession call | That the centred Spencer smoother is a real-time date, or that the 1971 listing was executed |
+| `STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT` | `fed.g17.IP.B50001.S`, `bea.nipa.T20600.W875RX`, `bea.nipa.U002BU.KPMT`, `bls.ce.CES0000000001` | `refit_separate` | Default command calculates. `--refit` appends an unadopted run and does not replace `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` | Calculate `a7a2620a-7bd9-4cca-917b-992062ab025c`. Preserved `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`. Unadopted `940955f1-50d5-4c06-9d90-5ceebd05d352` | The two historical rows are blocked and are not historically replayable. Preserved: no `observation_ids` for the two BEA series, and `adopted_parameter_version` is still absent. Unadopted: no `observation_ids`, `adopted_parameter_version` false, likelihood gain about 0.000305 | That the unadopted refit was adopted, that the historical rows replay, or that calculate run `a7a2620a-7bd9-4cca-917b-992062ab025c` is a refit. Its likelihood is `-1590.5374990458229` |
+| `RESTRICTED_COINCIDENT_DIFFUSION` | The same four coincident series | `none` | `--refit` rejected | `1f747c9f-4851-4588-a4dc-d8fb1ff30558` | Blocked. No `observation_ids`. Not historically replayable | That the share is the Chicago Fed index, or that this historical row replays |
+| `HARDING_PAGAN_CHARACTERISTICS` | The same four coincident level series | `none` | `--refit` rejected | `0d667a12-5a9c-45e0-b04a-8aea4196bc19` | Not in the 1 November five-row classification | That these turns are NBER recessions, or that quarterly BBQ was run |
+| `HAMILTON_MONTHLY_REGIME_SWITCHING` | `fed.g17.IP.B50001.S` | `none` | `--refit` rejected | `4629b31d-b0de-4a2f-a987-9e5d3f94747e` | Replayable within `1e-8`. Lower-mean duration about 1.993 months. Extra field `minimum_duration_alternative`. Payload hash left as stored | That the lower-mean regime is a recession label, or that the extra field was written back onto the stored hash |
+| `BAI_PERRON_MEAN_SHIFTS` | `fed.g17.IP.B50001.S` | `none` | `--refit` rejected | `2f4c14eb-44f2-40dc-913f-bf7945e972cd` | Replayable within `1e-8`. Primary trim selects no break. Implementation hash differs and was not rewritten | That no break is a selected break date, or that a looser trim is the selected model |
+| `AUTOREGRESSIVE_BENCHMARK` | `fed.g17.IP.B50001.S` | `none` | `--refit` rejected | `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e` | Not in the 1 November five-row classification | That horizon 1 is a qualified forecast |
+| `LEAD_LAG_CROSS_CORRELATION` | The four coincident growth rates | `none` | `--refit` rejected | `94152391-c3a8-48d7-8f2e-8c4d1dfdb811` | Not in the 1 November five-row classification | That a contemporaneous peak is a structural lead |
+| `SAHM_UNEMPLOYMENT_GAP` | `bls.ln.LNS14000000` | `none` | `--refit` rejected | `f3db281d-9f6d-4c4c-974f-ba4b9bd68131` | Not in the 1 November five-row classification | That October 2025 was interpolated, or that the short sample is a real-time evaluation |
+| `CPI_U_INFLATION_AUTREGRESSION` | `bls.cu.CUSR0000SA0` | `none` | `--refit` rejected | `bcbf15bc-590e-4738-9bc1-bbe951b12079` | Not in the 1 November five-row classification | That the OLS sum is the Andrews–Chen median-unbiased estimator, or that this is a second family beside the holdout |
+| `INFLATION_AUTOREGRESSION` | `bls.cu.CUSR0000SA0` | `none` | `--refit` rejected | `f0adeed5-991a-4115-be21-f4cbe4c122c7` | Not a replay classification. The run remains `completed_insufficient` because October 2025 was not interpolated | That the holdout is sufficient, or that the missing month was filled |
+| `EX_POST_REAL_FEDERAL_FUNDS_RATE` | `fed.h15.RIFSPFF_N.M` and `bls.cu.CUSR0000SA0` | `none` | `--refit` rejected | `cf73c312-dc83-49d6-ba46-2ea02054d336` | Not in the 1 November five-row classification | That trailing inflation is a Taylor rule, or that this is a second family beside the subsequent definition |
+| `EX_POST_REAL_FUNDS_RATE` | `fed.h15.RIFSPFF_N.M` and `bls.cu.CUSR0000SA0` | `none` | `--refit` rejected | `e340659b-b693-480a-8e6d-a64b24b90f99` | Not in the 1 November five-row classification | That subsequent inflation is ex-ante, or a policy prescription |
+| `ENGLE_GRANGER_COINTEGRATION` | `fed.g17.IP.B50001.S` and `bls.ce.CES0000000001` | `none` | `--refit` rejected | `570e2f51-1871-4c0e-88c9-c40652093613` | Not in the 1 November five-row classification. The stored result does not reject no-cointegration | That non-rejection is causal, or that ordinary ADF critical values apply |
+| `CUSUM_RECURSIVE_RESIDUALS` | `fed.g17.IP.B50001.S` | `none` | `--refit` rejected | `4943ca23-38bb-447f-8b8a-95c75b5fcd70` | Not in the 1 November five-row classification | That February 1973 is a selected break, or that this lag-12 specification and the AR(1) CUSUM are two break dates |
+| `IP_GROWTH_CUSUM` | `fed.g17.IP.B50001.S` | `none` | `--refit` rejected | `8dd294fc-aa4c-47c5-af43-777dc75d9e3a` | Not in the 1 November five-row classification | That April 2020 is a selected break, or that this is Bai–Perron |
+| `ESTRELLA_MISHKIN_TERM_SPREAD` | `fed.h15.RIFLGFCY10_N.M` and `fed.h15.RIFLGFCM03_N.M` | `none` | `--refit` rejected | `cbfdaf86-8446-435e-8ceb-7f43557613f1` | Not in the 1 November five-row classification. The stored object remains the spread | That the spread is a probability, or that it is the probit |
+| `CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT` | `fed.h15.RIFLGFCY10_N.M` and `fed.h15.RIFLGFCM03_N.M`, with the 14 March 2023 NBER chronology as a reference classification | `none` | `--refit` rejected | `137d92b7-6ce1-49eb-82ad-8f5727b00f90` | Executable, historically unmatched on `incomplete_quarters_omitted` (stored 1, recomputed 0). Coefficients match. Not replayable | That the fit is the New York Fed model, that the omission count replays, or that the windows may be moved to manufacture a fit |
+
+### Negative results that were not implemented
+
+US real GDP `bea.nipa.T10106.A191RX` has 319 quarters, 1947 Q1 to 2026 Q3, with no gaps. A regression of GDP log-growth on industrial-production log-growth is unstable: the 1997–2007 slope is 0.330 and the 2010–2019 slope is 0.057, with a 95 percent interval that includes zero. No bridge was added.
+
+A vector autoregression of the federal funds rate and the 10-year yield was not registered. AIC selects lag 12 at the ceiling and BIC selects lag 2. The portmanteau p-value is about 2.83e-9. No VAR code was added.
+
+### Refresher
+
+`execute-method` can be the interface for methods that replay or execute cleanly. The suite cannot run unattended until a hosted backup, a hosted BEA ingest, and a scheduler exist. Those three were not built.
+
+### Track B
+
+No hosted write. No logical dump. No copy of local runs. Publication stays closed.
+
+### Test evidence for this section
+
+`npm run test:research` passed 673 tests, then Ruff check and Ruff format (434 files already formatted). Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. Methodology presentation tests in `present-methodology.test.ts` and `private-methodology-result.test.ts` passed 27. Web typecheck passed. GitHub Actions has not run. This is not a publication approval.
+

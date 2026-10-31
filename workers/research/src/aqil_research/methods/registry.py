@@ -18,6 +18,12 @@ from aqil_research.methods.census_adv_orders import (
     CENSUS_ADV_ORDERS_METHOD_ID,
     CensusAdvOrdersMethod,
 )
+from aqil_research.methods.constant_maturity_spread_recession_probit import (
+    METHOD_ID as CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT,
+)
+from aqil_research.methods.constant_maturity_spread_recession_probit import (
+    ConstantMaturitySpreadRecessionProbitMethod,
+)
 from aqil_research.methods.cpi_u_inflation_autoregression import (
     CPI_U_INFLATION_AUTREGRESSION,
     CpiUInflationAutoregressionMethod,
@@ -147,6 +153,7 @@ def default_method_registry() -> MethodRegistry:
     registry.register(LeadLagCrossCorrelationMethod())
     registry.register(EngleGrangerCointegrationMethod())
     registry.register(CusumRecursiveResidualsMethod())
+    registry.register(ConstantMaturitySpreadRecessionProbitMethod())
     return registry
 
 
@@ -178,5 +185,6 @@ __all__ = [
     "ESTRELLA_MISHKIN_TERM_SPREAD",
     "ENGLE_GRANGER_COINTEGRATION",
     "CUSUM_RECURSIVE_RESIDUALS",
+    "CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT",
     "default_method_registry",
 ]

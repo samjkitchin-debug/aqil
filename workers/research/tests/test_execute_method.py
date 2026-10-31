@@ -52,6 +52,11 @@ STORED_CONFIGS = (
         "LEAD_LAG_CROSS_CORRELATION",
         "42247425902cc9b0bf95a167f67064e13fe89c0f452ebcea350aed527dfd8f40",
     ),
+    (
+        "constant_maturity_spread_recession_probit_v1",
+        "CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT",
+        None,
+    ),
 )
 
 

@@ -76,7 +76,7 @@ export const METHODOLOGY_GROUPS: readonly { id: MethodologyGroup; heading: strin
   {
     id: "current",
     heading: "In development",
-    note: "Bry–Boschan, the Stock–Watson refit, restricted coincident diffusion, Harding–Pagan characteristics, the Sahm rule, the Hamilton monthly variant, Bai–Perron mean shifts, the autoregressive benchmark, lead–lag correlations, the CPI-U autoregression, the ex-post real federal funds rate, Engle–Granger cointegration, and the CUSUM of recursive residuals have stored runs. The inflation autoregression, the subsequent ex-post real funds rate, the industrial-production CUSUM, and the 10-year minus 3-month spread are also listed. A signed-in reader can open a stored result. That is not publication approval. The Stock–Watson refit is not operationally accepted. The Hamilton variant is not empirically qualified. The autoregression is not a qualified forecast. The real rate is not a Taylor rule. The spread is not a recession probability. Cointegration is not a causal claim. The two CUSUM cards are two stated specifications, not two selected break dates. Quarterly BBQ has not been run.",
+    note: "Bry–Boschan, the Stock–Watson refit, restricted coincident diffusion, Harding–Pagan characteristics, the Sahm rule, the Hamilton monthly variant, Bai–Perron mean shifts, the autoregressive benchmark, lead–lag correlations, the CPI-U autoregression, the ex-post real federal funds rate, Engle–Granger cointegration, and the CUSUM of recursive residuals have stored runs. The inflation autoregression, the subsequent ex-post real funds rate, the industrial-production CUSUM, the 10-year minus 3-month spread, and the constant-maturity spread probit are also listed. A signed-in reader can open a stored result. That is not publication approval. The Stock–Watson refit is not operationally accepted, and the preserved and unadopted historical rows are not replayable. Diffusion is not historically replayable. The Hamilton variant is not a recession label. Bai–Perron selecting no break is not a break call. The autoregression is not a qualified forecast. The holdout inflation autoregression stays insufficient because October 2025 was not interpolated. The real rate is not a Taylor rule. The spread is an indicator, not a recession probability. The probit is a separate model and is not the New York Fed model. Cointegration non-rejection is a diagnostic, not a causal claim. The two CUSUM cards are two stated specifications, not two selected break dates. Quarterly BBQ has not been run.",
   },
   {
     id: "activity",
@@ -86,12 +86,12 @@ export const METHODOLOGY_GROUPS: readonly { id: MethodologyGroup; heading: strin
   {
     id: "forecasting",
     heading: "Growth and forecasting",
-    note: "Planned nowcasts and the later forecasting family. US real GDP is stored as latest-revised history and no nowcast has been produced. A small vector autoregression was not opened.",
+    note: "Planned nowcasts and the later forecasting family. US real GDP is stored as latest-revised history and no nowcast has been produced. A GDP log-growth bridge on industrial production was unstable and was not registered. A funds-rate and 10-year yield vector autoregression failed its lag and residual checks and was not registered.",
   },
   {
     id: "inflation",
     heading: "Inflation and monetary conditions",
-    note: "Planned trend inflation, the Phillips curve, and the yield-curve probit. The CPI-U autoregression, the ex-post real federal funds rate, and the 10-year minus 3-month spread are listed under in development. The spread is not a recession probability. The probit stays blocked: coefficients were not estimated.",
+    note: "Planned trend inflation and the Phillips curve. The CPI-U autoregression, the ex-post real federal funds rate, and the 10-year minus 3-month spread are listed under in development. The spread is an indicator, not a recession probability. The constant-maturity spread probit is a separate model, listed under in development, and is not the New York Fed model.",
   },
   {
     id: "financial",
@@ -185,7 +185,7 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
       "A factor path would not be a recession probability and would not be a forecast skill claim unless that is the stated output.",
     ],
     uncertainty: [
-      "The modern refit estimator is registered so a replay can use the same method id. The refit is not operationally accepted.",
+      "The modern refit estimator is registered so a later calculation can use the same method id. It is not operationally accepted. The preserved run and the unadopted re-estimate are not historically replayable, and the unadopted likelihood gain stays unadopted.",
       "The 1988 payroll specification remains blocked. Employee-hours and the 1982-dollar series are not stored.",
       "A signed-in reader sees the preserved filtered factor. The unadopted re-estimate is not plotted in its place.",
       "Loadings and the likelihood are read from the stored run. They are not approved for publication.",
@@ -224,7 +224,7 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     ],
     uncertainty: [
       "This is the restricted four-series measure. It is not the Chicago Fed 85-indicator index.",
-      "A correlation with the Stock–Watson factor is not independent confirmation.",
+      "A correlation with the Stock–Watson factor is not independent confirmation. The stored run is not historically replayable.",
       "The calculated share stays unpublished until publication is allowed and a presenter exists.",
     ],
     dataInputs: [
@@ -391,7 +391,7 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     uncertainty: [
       "This is not a reproduction of the 1989 quarterly GNP model. The paper was not line-checked.",
       "Neither probability path is a real-time assessment. The input is the latest-revised index.",
-      "The stored fit is not empirically qualified and is not approved for publication.",
+      "The stored fit is replayable and is not a recession label. It is not empirically qualified and is not approved for publication.",
       "A signed-in reader can see the stored filtered probability. It is not approved for publication.",
     ],
     dataInputs: ["Federal Reserve G.17 industrial production, total index, latest revised, transformed to monthly log-growth."],
@@ -487,30 +487,42 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     validation: ["No fit exists. A near-term empirical relationship is not implied."],
     references: [],
   }),
-  planned({
+  {
     slug: "yield-curve-probit",
     registerId: "YIELD_CURVE_PROBIT",
-    name: "Yield-curve recession probability",
+    name: "Constant-maturity spread recession probit",
     measures:
-      "Estimates the probability of a future recession from the term spread, in the sense of Estrella and Mishkin. The federal funds rate is not a substitute for the three-month yield.",
+      "Estimates a four-quarter probit of the stored NBER classification on the 10-year minus 3-month constant-maturity spread. It is a separate model from the spread. It is not the New York Fed model and not the June 1996 Treasury-bill specification.",
     domain: "Monetary conditions",
-    timing: "predictive",
+    timing: "retrospective",
     functionLabel: "Probability estimation",
     outputKind: "recession-probability",
-    group: "inflation",
+    stage: "in-development",
+    group: "current",
+    queryMethodIds: ["CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT"],
     interpretation: [
-      "The intended output is a probability of a stated future recession event. It is not a dating of past turning points.",
+      "The outcome is the NBER quarterly classification published on 14 March 2023. It is a reference classification, not a vintage of the yields.",
+      "Estimation uses spread quarters through 2005 Q4. Evaluation uses spread quarters from 2006 Q1. Those windows stay fixed.",
     ],
     uncertainty: [
-      "The three-month constant-maturity yield is stored. The probit is not implemented because NBER dates are not an approved stored input.",
-      "The 1998 equation was not copied from the article. The federal funds rate is not the spread.",
+      "This is not the New York Fed parameterisation.",
+      "The short rate is the H.15 three-month constant-maturity yield, not the three-month Treasury bill in the June 1996 article.",
+      "An unstable or perfectly separated fit is stored as such. No probability is invented.",
+      "A signed-out session does not receive the calculation. Publication stays closed.",
     ],
     dataInputs: [
-      "fed.h15.RIFLGFCM03_N.M is stored. Recession dates are not an approved stored input, so the probit has no approved outcome series.",
+      "Latest revised H.15 10-year and 3-month constant-maturity yields, and the attributed NBER chronology dated 14 March 2023.",
     ],
-    validation: ["The probit is unimplemented. No probability is shown."],
-    references: [],
-  }),
+    validation: [
+      "This page reads the stored fit. It does not move the estimation or evaluation windows, and it does not re-estimate the probit.",
+    ],
+    references: [
+      {
+        label: "NBER US business cycle expansions and contractions, page dated 14 March 2023",
+        href: "https://www.nber.org/research/data/us-business-cycle-expansions-and-contractions",
+      },
+    ],
+  },
   planned({
     slug: "financial-conditions",
     registerId: "FINANCIAL_CONDITIONS",
@@ -607,8 +619,7 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     uncertainty: [
       "The 1998 and 2003 papers were not line-checked.",
       "Dates, when a break is selected, are point estimates. No confidence interval is attached.",
-      "The result uses the latest-revised file. It is not approved for publication.",
-      "The calculated selection stays unpublished until publication is allowed and a presenter exists.",
+      "The result uses the latest-revised file. Selecting no break is not a break call and is not approved for publication.",
     ],
     dataInputs: ["Federal Reserve G.17 industrial production, total index, latest revised, as monthly log-growth."],
     validation: [
@@ -752,7 +763,7 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     ],
     uncertainty: [
       "The modelled series is the monthly logarithmic change. It is not the twelve-month percent change.",
-      "Beating the historical mean at one horizon does not qualify the method as a forecast.",
+      "Beating the historical mean at one horizon does not qualify the method as a forecast. The stored holdout is insufficient because October 2025 was not interpolated.",
       "This is not a Taylor rule. A signed-in reader can see the stored fit. It is not approved for publication.",
     ],
     dataInputs: ["US CPI-U, seasonally adjusted, latest revised, as monthly logarithmic changes."],

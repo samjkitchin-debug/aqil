@@ -7,9 +7,12 @@ is not rewritten.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from uuid import uuid4
 
+import psycopg
 import pytest
 
 from aqil_research.contracts.observation import AnalysisMode
@@ -21,9 +24,9 @@ from aqil_research.methods.stock_watson_1988_fit import (
     log_difference,
     standardise,
 )
-from aqil_research.persistence.connection import research_connection
 from aqil_research.persistence.reproduce import classify_historical_replay
 from aqil_research.persistence.runs import load_research_run, save_research_run
+from aqil_research.persistence.test_database import resolve_connection_url
 from aqil_research.pipeline.models import ResearchRun
 from db_guard import open_isolated_test_database
 from test_stock_watson_lifecycle import (
@@ -46,10 +49,21 @@ def require_db() -> str:
     return open_isolated_test_database()
 
 
+@contextmanager
+def _uncommitted_connection() -> Iterator[psycopg.Connection]:
+    """Keep replay fixtures off the shared disposable database."""
+    conn = psycopg.connect(resolve_connection_url(None))
+    try:
+        yield conn
+    finally:
+        conn.rollback()
+        conn.close()
+
+
 def test_diffusion_without_observation_links_is_blocked(require_db: str) -> None:
     del require_db
     run_id = str(uuid4())
-    with research_connection() as conn:
+    with _uncommitted_connection() as conn:
         save_research_run(
             conn,
             _bare_run(
@@ -75,7 +89,7 @@ def test_stock_watson_replay_uses_frozen_links_and_keeps_the_stored_hash(require
         "payroll": columns[3],
     }
     when = datetime.now(tz=UTC)
-    with research_connection() as conn:
+    with _uncommitted_connection() as conn:
         _insert(conn, periods, values, when)
         linked = conn.execute(
             """

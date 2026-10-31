@@ -28,6 +28,9 @@ from aqil_research.methods.configs import (
     SAHM_SENSITIVITY,
     SLOOS_CIL_PUBLISHED,
 )
+from aqil_research.methods.constant_maturity_spread_recession_probit import (
+    ACCEPTED_CONFIG as CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT_PUBLISHED,
+)
 from aqil_research.methods.cpi_u_inflation_autoregression import (
     PUBLISHED_CONFIG as CPI_U_INFLATION_AUTREGRESSION_PUBLISHED,
 )
@@ -431,6 +434,7 @@ def reproduction_config(config_id: str) -> dict[str, object]:
         EX_POST_REAL_FUNDS_RATE_PUBLISHED,
         IP_GROWTH_CUSUM_PUBLISHED,
         ESTRELLA_MISHKIN_PUBLISHED,
+        CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT_PUBLISHED,
     )
     for panel in published_panels:
         if config_id == panel["config_id"]:

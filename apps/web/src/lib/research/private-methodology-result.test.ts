@@ -306,6 +306,61 @@ test("the ex-post real funds rate is subsequent inflation and not a Taylor rule"
   assert.equal(JSON.stringify(result).includes("Taylor rule recommendation"), false);
 });
 
+test("an accepted probit states it is not the New York Fed model", () => {
+  const result = extractPrivateResult(
+    stored({
+      methodId: "CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT",
+      calculation: {
+        fit_status: "estimated",
+        fit_stable: true,
+        probabilities_accepted: true,
+        intercept: "-0.4",
+        spread_coefficient: "-0.8",
+        new_york_fed_parameterisation: false,
+        input_vintage: "latest_revised",
+        probabilities: [
+          { spread_quarter: "2006-01-01", window: "evaluation", probability: "0.2", nber_contraction: 0 },
+          { spread_quarter: "2006-04-01", window: "evaluation", probability: "0.4", nber_contraction: 1 },
+          { spread_quarter: "2005-10-01", window: "estimation", probability: "0.9", nber_contraction: 0 },
+        ],
+      },
+    }),
+  );
+  assert.match(result.headline, /Intercept -0\.4/);
+  assert.match(result.headline, /Spread coefficient -0\.8/);
+  assert.match(result.standing, /Not the New York Fed model/);
+  assert.match(result.standing, /Not the June 1996 Treasury-bill specification/);
+  assert.equal(result.series?.frequency, "quarterly");
+  assert.equal(result.series?.points.length, 2);
+  assert.equal(result.series?.points.some((point) => point.period === "2005-10-01"), false);
+  assert.equal(result.publicationAllowed, false);
+});
+
+test("an unstable probit does not present an unaccepted probability", () => {
+  const result = extractPrivateResult(
+    stored({
+      methodId: "CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT",
+      calculation: {
+        fit_status: "unstable",
+        fit_stable: false,
+        fit_failure: "perfect_separation",
+        probabilities_accepted: false,
+        new_york_fed_parameterisation: false,
+        input_vintage: "latest_revised",
+        probabilities: [
+          { spread_quarter: "2006-01-01", window: "evaluation", probability: "0.99", nber_contraction: 1 },
+        ],
+      },
+    }),
+  );
+  const text = JSON.stringify(result);
+  assert.match(result.headline, /Perfect separation/);
+  assert.match(result.standing, /Not the New York Fed model/);
+  assert.equal(result.series, null);
+  assert.equal(text.includes("0.99"), false);
+  assert.equal(result.facts.find((item) => item.label === "Probabilities accepted")?.value, "No");
+});
+
 test("the term spread is a yield difference and not a recession probability", () => {
   const result = extractPrivateResult(
     stored({

@@ -232,9 +232,10 @@ def test_method_stores_the_log_level_result_and_registers_last_but_one() -> None
     assert dependency.refit_is_different_command is False
     assert method.config_hash(config)
     registered = [item.method_id for item in default_method_registry().registered()]
-    assert registered[-3] == "LEAD_LAG_CROSS_CORRELATION"
-    assert registered[-2] == ENGLE_GRANGER_COINTEGRATION
-    assert registered[-1] == "CUSUM_RECURSIVE_RESIDUALS"
+    assert registered[-4] == "LEAD_LAG_CROSS_CORRELATION"
+    assert registered[-3] == ENGLE_GRANGER_COINTEGRATION
+    assert registered[-2] == "CUSUM_RECURSIVE_RESIDUALS"
+    assert registered[-1] == "CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT"
     left, right = _cointegrated_logs(seed=7, count=150)
     result = method.run(_context(_levels(left, right)), config)
     assert result.sufficiency == "sufficient"

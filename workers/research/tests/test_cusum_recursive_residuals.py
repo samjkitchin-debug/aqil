@@ -109,7 +109,8 @@ def test_method_uses_the_benchmark_transformation_and_reports_either_outcome() -
     assert dependency.refit_is_different_command is False
     assert method.config_hash(config)
     registered = [item.method_id for item in default_method_registry().registered()]
-    assert registered[-1] == CUSUM_RECURSIVE_RESIDUALS
+    assert registered[-2] == CUSUM_RECURSIVE_RESIDUALS
+    assert registered[-1] == "CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT"
     growth = np.random.default_rng(3).normal(0.0, 0.01, size=180)
     result = method.run(_context(_levels(growth)), config)
     assert result.sufficiency == "sufficient"

@@ -1,7 +1,23 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 1 November 2026, historical replay classification
+**Last updated:** 1 November 2026, quantitative V1 certification
+
+## Quantitative V1 certification, 1 November 2026
+
+Risk class R2. Branch `research/quantitative-v1` in `C:\Users\gamer\aqil-quant-v1`. `publication_allowed` stays false. Nothing was pushed. Nothing was merged. `main` and the other worktrees were not edited. Hosted Supabase was not read or written. No `pg_dump` was created. Database `postgres` on `127.0.0.1:55432` was not reset. No scheduler was added. `workers/research/src/aqil_research/workflow/refresh.py` was not changed. Preserved runs were not replaced.
+
+`CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT` is on `default_method_registry()`. Its published config is wired for reproduction. The signed-in methodologies page can read a stored probability result and states that it is not the New York Fed model. A signed-out session still receives no calculation. The spread `ESTRELLA_MISHKIN_TERM_SPREAD`, run `cbfdaf86-8446-435e-8ceb-7f43557613f1`, stays the spread.
+
+One local `execute-method` call, without `--refit`, appended run `137d92b7-6ce1-49eb-82ad-8f5727b00f90`. The fit is estimated. Intercept `-0.424740354915`. Spread coefficient `-1.07426638515`. Estimation through 2005 Q4 and evaluation from 2006 Q1 were not moved. Replay is executable but historically unmatched because `incomplete_quarters_omitted` is 1 stored and 0 from the frozen observations. The coefficients match. That mismatch was not weakened into a pass. The method is not operational.
+
+Counts in section N of `docs/macro/METHODOLOGY_CERTIFICATION.md`: 8 methodology families, 10 variants, 3 indicators, and 4 diagnostics. The two CPI autoregressions are one family. The two real-rate definitions are one family. The spread is an indicator. Engle–Granger non-rejection is a diagnostic. The probit is a separate model from the spread. Diffusion `1f747c9f-4851-4588-a4dc-d8fb1ff30558` and the historical Stock–Watson rows `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` and `940955f1-50d5-4c06-9d90-5ceebd05d352` are not historically replayable. Hamilton and Bai–Perron are replayable and are not recession or break calls. Holdout `f0adeed5-991a-4115-be21-f4cbe4c122c7` remains insufficient because October 2025 was not interpolated. No method with a stored run was deleted.
+
+The GDP log-growth bridge on industrial production is unstable (1997–2007 slope 0.330, 2010–2019 slope 0.057, and a 95 percent interval that includes zero) and was not added. The funds-rate and 10-year yield VAR was not registered (AIC lag 12 at the ceiling, BIC lag 2, portmanteau p about 2.83e-9). `bea.nipa.T10106.A191RX` remains 319 quarters, 1947 Q1 to 2026 Q3, with no gaps.
+
+`execute-method` can be the interface for methods that replay or execute cleanly. The suite cannot run unattended until a hosted backup, a hosted BEA ingest, and a scheduler exist. Those three were not built. Track B: no hosted write.
+
+`npm run test:research` passed 673 tests, then Ruff check and Ruff format (434 files already formatted). Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. The historical-replay fixtures roll back, so they do not leave Stock–Watson rows in that disposable database. Methodology presentation tests passed 27. Web typecheck passed. GitHub Actions has not run. On this worktree at `http://127.0.0.1:3022`, the probit page, Bai–Perron, and lead–lag each returned 307 to the signed-out login at desktop width and at 390 pixels. The responses were `private, no-store` and did not include the stored figures. Sign-in is Google only, so a signed-in page was not opened. The server started for that check was stopped.
 
 ## Historical replay, 1 November 2026
 

@@ -36,7 +36,7 @@ export type PrivateSeries = {
   label: string;
   caption: string;
   unit: string;
-  frequency: "monthly";
+  frequency: "monthly" | "quarterly";
   points: PrivateSeriesPoint[];
 };
 
@@ -184,6 +184,8 @@ function extractByMethod(
       return ipGrowthCusum(calculation, run);
     case "ESTRELLA_MISHKIN_TERM_SPREAD":
       return estrellaSpread(calculation, run);
+    case "CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT":
+      return constantMaturityProbit(calculation, run);
     default:
       return {
         headline: "A stored run exists. This page has no reader for that calculation.",
@@ -836,6 +838,76 @@ function ipGrowthCusum(
       fact("Inputs", vintageFact(run, calculation)),
     ],
     limitations: ["The extreme month is not a selected break date."],
+  };
+}
+
+function constantMaturityProbit(
+  calculation: Record<string, unknown>,
+  run: StoredMethodologyRun,
+): Partial<PrivateMethodologyResult> {
+  const accepted = calculation.fit_stable === true && calculation.probabilities_accepted === true;
+  const intercept = text(calculation.intercept);
+  const slope = text(calculation.spread_coefficient);
+  const failure = fitFailureSentence(text(calculation.fit_failure));
+  const status = text(calculation.fit_status);
+  const series = accepted ? evaluationProbabilitySeries(calculation.probabilities) : null;
+  const headline = accepted
+    ? intercept && slope
+      ? `Intercept ${intercept}. Spread coefficient ${slope}.`
+      : "The stored coefficients are unavailable."
+    : failure
+      ? `The stored fit is ${status === "unstable" ? "unstable" : "not accepted"}. ${failure}`
+      : "The stored fit was not accepted.";
+  return {
+    headline,
+    standing:
+      "Not the New York Fed model. Not the June 1996 Treasury-bill specification. Latest revised. Not a real-time recession probability. Not approved for publication.",
+    facts: [
+      fact("Fit", accepted ? "Estimated" : status === "unstable" ? "Unstable" : "Not accepted"),
+      fact("Intercept", accepted && intercept ? intercept : "Not accepted"),
+      fact("Spread coefficient", accepted && slope ? slope : "Not accepted"),
+      fact("Horizon", "Four quarters"),
+      fact("Estimation through", "2005 Q4"),
+      fact("Evaluation from", "2006 Q1"),
+      fact("New York Fed model", calculation.new_york_fed_parameterisation === true ? "Marked as that model" : "No"),
+      fact("Probabilities accepted", accepted ? "Yes" : "No"),
+      fact("Inputs", vintageFact(run, calculation)),
+    ],
+    series,
+    limitations: [
+      "This is not the New York Fed parameterisation.",
+      "The short rate is the three-month constant-maturity yield, not the June 1996 Treasury bill.",
+      "The estimation and evaluation windows were not moved to manufacture a fit.",
+    ],
+  };
+}
+
+function fitFailureSentence(value: string | null): string | null {
+  if (!value) return null;
+  if (value === "perfect_separation") return "Perfect separation.";
+  if (value.endsWith(".")) return value.charAt(0).toUpperCase() + value.slice(1);
+  const sentence = value.replaceAll("_", " ");
+  return `${sentence.charAt(0).toUpperCase()}${sentence.slice(1)}.`;
+}
+
+function evaluationProbabilitySeries(value: unknown): PrivateSeries | null {
+  if (!Array.isArray(value)) return null;
+  const points: PrivateSeriesPoint[] = [];
+  for (const row of value) {
+    if (!isRecord(row) || row.window !== "evaluation") continue;
+    const period = text(row.spread_quarter);
+    const probability = num(row.probability);
+    if (!period || probability === null) continue;
+    points.push({ period, value: probability });
+  }
+  if (points.length < 2) return null;
+  return {
+    label: "Four-quarter probability",
+    caption:
+      "Evaluation-window probability from the stored fit. Not the New York Fed model. Not a real-time probability.",
+    unit: "probability",
+    frequency: "quarterly",
+    points,
   };
 }
 

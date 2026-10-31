@@ -91,6 +91,7 @@ test("the catalogue names the stored methods and every other programme row", () 
     "lead-lag",
     "sahm-rule",
     "stock-watson-1988",
+    "yield-curve-probit",
   ]);
   const bbq = methodologyBySlug("harding-pagan-bbq");
   assert.equal(bbq?.stage, "planned");
@@ -287,6 +288,7 @@ test("a missing V1 run says the result is unavailable and does not invent figure
     "ex-post-real-funds-rate",
     "ip-growth-cusum",
     "estrella-mishkin-spread",
+    "yield-curve-probit",
   ]) {
     const entry = methodologyBySlug(slug);
     assert.ok(entry);
@@ -300,6 +302,8 @@ test("a missing V1 run says the result is unavailable and does not invent figure
     assert.equal(text.includes("3.7173"), false);
     assert.equal(text.includes("-2.865"), false);
     assert.equal(text.includes("47.93"), false);
+    assert.equal(text.includes("-0.424740354915"), false);
+    assert.equal(text.includes("-1.07426638515"), false);
     assert.equal(view.privateResult, null);
   }
   const bbq = methodologyBySlug("harding-pagan-bbq");
