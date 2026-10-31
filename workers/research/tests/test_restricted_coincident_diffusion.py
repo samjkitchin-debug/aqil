@@ -200,6 +200,49 @@ def test_method_stays_unpublished_on_latest_revised_levels() -> None:
     april = next(month for month in result.calculation["months"] if month["period"] == "1997-04-01")
     assert april["denominator"] == 4
     assert april["share"] == 1.0
+    lookback = shift_month(date(1997, 1, 1), -3)
+    prior_inputs = {
+        dataset: {
+            **series,
+            lookback: EconomicObservation(
+                observation_id=f"{dataset}-{lookback.isoformat()}",
+                dataset_id=dataset,
+                provider_id="test",
+                source_id="test",
+                rights_record_id="test",
+                period_start=lookback,
+                frequency=Frequency.MONTHLY,
+                geography="US",
+                unit="level",
+                seasonal_adjustment=SeasonalAdjustment.SEASONALLY_ADJUSTED,
+                raw_value="90",
+                quality_status=QualityStatus.OBSERVED,
+                series_provenance=SeriesProvenance.LATEST_REVISED,
+                provider_vintage_date=lookback,
+                source_release_at=when,
+                availability_precision=AvailabilityPrecision.UNKNOWN,
+                retrieved_at=when,
+                first_seen_at=when,
+                source_locator="diffusion-test",
+                adapter_version="test",
+            ),
+        }
+        for dataset, series in inputs.items()
+    }
+    with_lookback = method.run(
+        MethodContext(
+            inputs_by_dataset=prior_inputs,
+            evaluation_period=periods[-1],
+            analysis_mode=AnalysisMode.LATEST_REVISED,
+            primary_dataset_id=DATASETS[0],
+        ),
+        config,
+    )
+    assert f"{DATASETS[0]}-{lookback.isoformat()}" in with_lookback.observation_ids
+    january = next(
+        month for month in with_lookback.calculation["months"] if month["period"] == "1997-01-01"
+    )
+    assert january["denominator"] == 4
     refused = method.run(
         MethodContext(
             inputs_by_dataset=inputs,

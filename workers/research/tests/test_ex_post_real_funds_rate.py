@@ -97,10 +97,13 @@ def test_real_rate_is_funds_minus_subsequent_twelve_month_inflation() -> None:
     assert calculation["twelve_month_price_rank"] is False
     assert "rank" not in calculation
     assert set(result.observation_ids) == {
+        "cpi-2018-01-01",
         "cpi-2019-01-01",
         "cpi-2020-01-01",
+        "funds-2018-01-01",
         "funds-2019-01-01",
     }
+    assert "cpi-2019-06-01" not in result.observation_ids
     earlier = method.run(_context(cpi, funds, date(2019, 1, 1)), config)
     assert earlier.calculation["funds_month"] == "2018-01-01"
     assert earlier.calculation["inflation_end_month"] == "2019-01-01"

@@ -418,7 +418,7 @@ class InflationAutoregressionMethod:
             )
         calculation = _with_sample_identity(calculation, sample)
         observation_ids = tuple(
-            series[month].observation_id for month in sample.level_months if month in series
+            sorted(series[month].observation_id for month in levels if month in series)
         )
         return MethodExecutionResult(
             sufficiency="sufficient",

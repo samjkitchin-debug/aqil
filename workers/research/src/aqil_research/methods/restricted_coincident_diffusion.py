@@ -306,11 +306,14 @@ def _levels(inputs_by_dataset: dict) -> tuple[dict[str, dict[date, float]] | Non
         if not rows:
             return None, []
         levels[dataset_id] = {}
+        lookback_start = shift_month(SAMPLE_START, -CHANGE_HORIZON_MONTHS)
         for period, observation in rows.items():
             if observation.series_provenance != SeriesProvenance.LATEST_REVISED:
                 continue
             levels[dataset_id][period] = float(observation.decimal_value())
-            if period >= SAMPLE_START:
+            # January 1997's three-month change uses October 1996. Those
+            # earlier levels are inputs, so they stay in the frozen lineage.
+            if period >= lookback_start:
                 observation_ids.append(observation.observation_id)
     return levels, observation_ids
 

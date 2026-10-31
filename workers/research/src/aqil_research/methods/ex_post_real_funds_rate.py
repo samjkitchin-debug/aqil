@@ -231,9 +231,9 @@ class ExPostRealFundsRateMethod:
         observation_ids = tuple(
             sorted(
                 {
-                    funds_row.observation_id,
-                    start_row.observation_id,
-                    end_row.observation_id,
+                    row.observation_id
+                    for window in windows
+                    for row in (window.start_row, window.end_row, window.funds_row)
                 },
             ),
         )
