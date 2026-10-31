@@ -9,7 +9,7 @@ Risk class R2 for the local cycle and the new runs. Risk class R3 for a hosted w
 
 Pull request 18 head `research/quantitative-production` at `9eac587` is an ancestor of this branch. Merging that pull request would not bring the V1 commits or this close-out. The documented plan, which needs founder approval before anyone pushes, is to open a pull request from `research/foundation-hardening` to `main` and close pull request 18 as superseded. Do not force-update the pull request 18 branch.
 
-The five other quantitative worktrees are clean and their branches are ancestors of this one. They were not removed. Local `main` stays because its icon file is still dirty.
+The five other quantitative worktrees were clean ancestors of this branch. Those checkouts were removed. The branches remain. Local `main` stays because its icon file is still dirty.
 
 `npm run research:refresh` ran twice on local `postgres`. The second run inserted nothing for the sources the first run had changed. CPI-U returned HTTP 200 on the authorised user agent and stayed `unchanged` at 956 months through September 2026. `2025-10-01` is still absent and was not interpolated. A default httpx user agent received HTTP 403. The old HTTP 406 was not reproduced. Both BEA factor refreshes failed with `VintageConflictError` for July 2026. Those steps are not operational. The recorded cycle is `partial`: 29 unchanged, 2 failed, 8 stale, 26 methods skipped. No `--refit` was implied by the cycle.
 
