@@ -382,3 +382,17 @@ test("the term spread is a yield difference and not a recession probability", ()
   assert.equal(JSON.stringify(result).toLowerCase().includes("recession probability is"), false);
   assert.equal(result.publicationAllowed, false);
 });
+
+test("an unknown method keeps the fallback sentence and invents no figure", () => {
+  const result = extractPrivateResult(
+    stored({
+      methodId: "NOT_A_REGISTERED_PRESENTER",
+      calculation: { invented: 1 },
+      statisticalInterpretation: "Stored and unread.",
+    }),
+  );
+  assert.equal(result.headline, "A stored run exists. This page has no reader for that calculation.");
+  assert.match(result.standing, /No figure is invented for NOT_A_REGISTERED_PRESENTER/);
+  assert.equal(result.series, null);
+  assert.equal(result.facts.length, 0);
+});

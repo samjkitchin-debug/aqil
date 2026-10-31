@@ -5,16 +5,7 @@ import { connection } from "next/server";
 import { resolveAccess } from "@/lib/auth/access";
 import { resolveResearchDatabaseUrl } from "@/lib/data/private-database-url";
 import type { MethodologyRunMeta } from "@/lib/research/present-methodology";
-
-type RunRow = {
-  method_id: string;
-  method_version: string;
-  executed_at: Date | string;
-  execution_status: string;
-  publication_allowed: boolean;
-  data_sufficiency: string;
-  calculation_stored: boolean;
-};
+import { readMethodologyRunMetadata } from "@/lib/research/read-contract";
 
 export type LoadMethodologyRunsResult =
   | { status: "ready"; runs: MethodologyRunMeta[] }
@@ -45,25 +36,17 @@ export async function loadMethodologyRuns(
     const client = new Client({ connectionString: database.url });
     await client.connect();
     try {
-      const result = await client.query<RunRow>(
-        `select method_id, method_version, executed_at, execution_status,
-                publication_allowed, data_sufficiency,
-                ${includeStoredFlag ? "(calculation is not null)" : "false"} as calculation_stored
-         from research.research_runs
-         where method_id = any($1::text[])
-         order by executed_at desc`,
-        [methodIds],
-      );
+      const rows = await readMethodologyRunMetadata(client, methodIds, includeStoredFlag);
       return {
         status: "ready",
-        runs: result.rows.map((row) => ({
-          methodId: row.method_id,
-          methodVersion: row.method_version,
-          executedAt: executedAt(row.executed_at),
-          executionStatus: row.execution_status,
-          publicationAllowed: row.publication_allowed === true,
-          dataSufficiency: row.data_sufficiency,
-          calculationStored: row.calculation_stored === true,
+        runs: rows.map((row) => ({
+          methodId: row.methodId,
+          methodVersion: row.methodVersion,
+          executedAt: row.executedAt,
+          executionStatus: row.executionStatus,
+          publicationAllowed: row.publicationAllowed,
+          dataSufficiency: row.dataSufficiency,
+          calculationStored: row.calculationStored === true,
         })),
       };
     } finally {
@@ -74,7 +57,3 @@ export async function loadMethodologyRuns(
   }
 }
 
-function executedAt(value: Date | string): string {
-  if (value instanceof Date) return value.toISOString();
-  return value;
-}

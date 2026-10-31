@@ -48,6 +48,11 @@ export const intelligenceNav: NavItem[] = [
     label: "Insights",
     description: "Findings that cite publication-eligible model results.",
   },
+  {
+    href: "/intelligence/health",
+    label: "Health",
+    description: "Whether today's research cycle ran, what failed, and the latest valid result.",
+  },
 ];
 
 const intelligenceContextHrefs = ["/calendar", "/research"];

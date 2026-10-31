@@ -144,55 +144,48 @@ function shell(run: StoredMethodologyRun): PrivateMethodologyResult {
   };
 }
 
+type MethodPresenter = (
+  run: StoredMethodologyRun,
+  calculation: Record<string, unknown>,
+  unadopted: StoredMethodologyRun | null,
+) => Partial<PrivateMethodologyResult>;
+
+export const methodologyPresenters: Record<string, MethodPresenter> = {
+  BRY_BOSCHAN_SPENCER15_VARIANT: (run, calculation) => bryBoschan(calculation, run),
+  [MODERN_REFIT]: (run, calculation, unadopted) => stockWatson(calculation, run, unadopted),
+  RESTRICTED_COINCIDENT_DIFFUSION: (run, calculation) => diffusion(calculation, run),
+  HARDING_PAGAN_CHARACTERISTICS: (run, calculation) => hardingPagan(calculation, run),
+  HAMILTON_MONTHLY_REGIME_SWITCHING: (run, calculation) => hamilton(calculation, run),
+  BAI_PERRON_MEAN_SHIFTS: (run, calculation) => baiPerron(calculation, run),
+  AUTOREGRESSIVE_BENCHMARK: (run, calculation) => autoregression(calculation, run),
+  LEAD_LAG_CROSS_CORRELATION: (run, calculation) => leadLag(calculation, run),
+  SAHM_UNEMPLOYMENT_GAP: (run, calculation) => sahm(calculation, run),
+  CPI_U_INFLATION_AUTREGRESSION: (run, calculation) => cpiAutoregression(calculation, run),
+  EX_POST_REAL_FEDERAL_FUNDS_RATE: (run, calculation) => exPostRealFunds(calculation, run),
+  ENGLE_GRANGER_COINTEGRATION: (run, calculation) => engleGranger(calculation, run),
+  CUSUM_RECURSIVE_RESIDUALS: (run, calculation) => cusumResiduals(calculation, run),
+  INFLATION_AUTOREGRESSION: (run, calculation) => inflationAutoregression(calculation, run),
+  EX_POST_REAL_FUNDS_RATE: (run, calculation) => exPostRealFundsRate(calculation, run),
+  IP_GROWTH_CUSUM: (run, calculation) => ipGrowthCusum(calculation, run),
+  ESTRELLA_MISHKIN_TERM_SPREAD: (run, calculation) => estrellaSpread(calculation, run),
+  CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT: (run, calculation) =>
+    constantMaturityProbit(calculation, run),
+};
+
 function extractByMethod(
   run: StoredMethodologyRun,
   calculation: Record<string, unknown>,
   unadopted: StoredMethodologyRun | null,
 ): Partial<PrivateMethodologyResult> {
-  switch (run.methodId) {
-    case "BRY_BOSCHAN_SPENCER15_VARIANT":
-      return bryBoschan(calculation, run);
-    case MODERN_REFIT:
-      return stockWatson(calculation, run, unadopted);
-    case "RESTRICTED_COINCIDENT_DIFFUSION":
-      return diffusion(calculation, run);
-    case "HARDING_PAGAN_CHARACTERISTICS":
-      return hardingPagan(calculation, run);
-    case "HAMILTON_MONTHLY_REGIME_SWITCHING":
-      return hamilton(calculation, run);
-    case "BAI_PERRON_MEAN_SHIFTS":
-      return baiPerron(calculation, run);
-    case "AUTOREGRESSIVE_BENCHMARK":
-      return autoregression(calculation, run);
-    case "LEAD_LAG_CROSS_CORRELATION":
-      return leadLag(calculation, run);
-    case "SAHM_UNEMPLOYMENT_GAP":
-      return sahm(calculation, run);
-    case "CPI_U_INFLATION_AUTREGRESSION":
-      return cpiAutoregression(calculation, run);
-    case "EX_POST_REAL_FEDERAL_FUNDS_RATE":
-      return exPostRealFunds(calculation, run);
-    case "ENGLE_GRANGER_COINTEGRATION":
-      return engleGranger(calculation, run);
-    case "CUSUM_RECURSIVE_RESIDUALS":
-      return cusumResiduals(calculation, run);
-    case "INFLATION_AUTOREGRESSION":
-      return inflationAutoregression(calculation, run);
-    case "EX_POST_REAL_FUNDS_RATE":
-      return exPostRealFundsRate(calculation, run);
-    case "IP_GROWTH_CUSUM":
-      return ipGrowthCusum(calculation, run);
-    case "ESTRELLA_MISHKIN_TERM_SPREAD":
-      return estrellaSpread(calculation, run);
-    case "CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT":
-      return constantMaturityProbit(calculation, run);
-    default:
-      return {
-        headline: "A stored run exists. This page has no reader for that calculation.",
-        standing: `${publicationStanding(run.publicationAllowed)} No figure is invented for ${run.methodId}.`,
-        diagnostic: run.statisticalInterpretation || null,
-      };
+  const present = methodologyPresenters[run.methodId];
+  if (!present) {
+    return {
+      headline: "A stored run exists. This page has no reader for that calculation.",
+      standing: `${publicationStanding(run.publicationAllowed)} No figure is invented for ${run.methodId}.`,
+      diagnostic: run.statisticalInterpretation || null,
+    };
   }
+  return present(run, calculation, unadopted);
 }
 
 function bryBoschan(
