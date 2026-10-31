@@ -91,6 +91,10 @@ def execute_registered_method(
     """Load required series from this connection, run the method, and append."""
     chosen = registry if registry is not None else default_method_registry()
     method = chosen.get(method_id)
+    if not chosen.is_enabled(method_id):
+        raise MethodExecutionRefused(
+            f"{method_id} is disabled. The implementation stays registered."
+        )
     refusal = execution_refusal(method, refit=refit)
     if refusal is not None:
         raise MethodExecutionRefused(refusal)

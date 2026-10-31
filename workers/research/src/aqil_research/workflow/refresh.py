@@ -69,6 +69,41 @@ CADENCE = {
     "bls_cps_unemployment_rate": "weekly",
 }
 
+# How often the stored series itself is published. A poll can be daily
+# while the series stays monthly or quarterly.
+_DATA_FREQUENCY = {
+    "bls_employment_situation_archive": "monthly",
+    "bls_cpi_archive": "monthly",
+    "federal_reserve_monetary_press": "daily",
+    "ecb_monetary_press": "daily",
+    "bls_ics_schedule": "daily",
+    "federal_reserve_sloos_cil": "quarterly",
+    "bls_cpi_u_all_items": "monthly",
+    "bls_ces_total_nonfarm_payrolls": "monthly",
+    "bls_jolts_total_nonfarm_job_openings": "monthly",
+    "federal_reserve_g17_total_ip": "monthly",
+    "federal_reserve_h8_bank_credit": "weekly",
+    "federal_reserve_h15_federal_funds_effective": "monthly",
+    "federal_reserve_h15_treasury_10y_constant_maturity": "monthly",
+    "ecb_sdw_hicp_sa": "monthly",
+    "ecb_hicp_core": "monthly",
+    "ecb_fm_deposit_facility": "daily",
+    "eurostat_gdp_real_ea21": "quarterly",
+    "eurostat_unemployment_ea21": "monthly",
+    "eurostat_industrial_production_ea21": "monthly",
+    "eurostat_retail_volume_ea21": "monthly",
+    "eurostat_hicp_total_ea": "monthly",
+    "stat_cpi_2025_all_items_reference": "monthly",
+    "cao_mo_private_ex_volatile_sa_monthly": "monthly",
+    "bis_gli_usd_credit_nonbanks": "quarterly",
+    "ons_mm23_cpi_d7bt": "monthly",
+    "boe_official_bank_rate": "daily",
+    "dosm_ipi_abs": "monthly",
+    "bea_real_personal_income_ex_transfers": "monthly",
+    "bea_real_manufacturing_trade_sales": "monthly",
+    "bls_cps_unemployment_rate": "monthly",
+}
+
 
 @dataclass(frozen=True, slots=True)
 class SourceRefreshResult:
@@ -111,8 +146,30 @@ def series_is_due(last_success: datetime | None, now: datetime) -> bool:
     return now - last_success >= SERIES_INTERVAL
 
 
+def default_source_registry():
+    """Production connectors. A test registry does not alter this list."""
+    from aqil_research.adapters.source_registry import FunctionSourceConnector, SourceRegistry
+
+    registry = SourceRegistry()
+    for source_id, action in _production_actions():
+        registry.register(
+            FunctionSourceConnector(
+                source_id=source_id,
+                action=action,
+                cadence=CADENCE[source_id],
+                data_frequency=_DATA_FREQUENCY.get(source_id, "monthly"),
+                rights_record_id=source_id,
+            )
+        )
+    return registry
+
+
 def default_refresh_steps() -> tuple[RefreshStep, ...]:
     """Live official feeds only. Fixture paths are not accepted."""
+    return default_source_registry().refresh_steps()
+
+
+def _production_actions() -> tuple[RefreshStep, ...]:
     return (
         ("bls_employment_situation_archive", _refresh_bls_publications),
         ("bls_cpi_archive", _refresh_bls_cpi),

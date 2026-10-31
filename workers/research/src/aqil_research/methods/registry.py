@@ -109,9 +109,24 @@ class MethodRegistryError(Exception):
 class MethodRegistry:
     def __init__(self) -> None:
         self._methods: dict[str, AnalyticalMethod] = {}
+        self._enabled: dict[str, bool] = {}
 
-    def register(self, method: AnalyticalMethod) -> None:
+    def register(self, method: AnalyticalMethod, *, enabled: bool = True) -> None:
         self._methods[method.method_id] = method
+        self._enabled[method.method_id] = enabled
+
+    def disable(self, method_id: str) -> None:
+        if method_id not in self._methods:
+            raise MethodRegistryError(f"unknown method_id: {method_id}")
+        self._enabled[method_id] = False
+
+    def is_enabled(self, method_id: str) -> bool:
+        return self._enabled.get(method_id, False)
+
+    def enabled(self) -> tuple[AnalyticalMethod, ...]:
+        return tuple(
+            method for method in self._methods.values() if self.is_enabled(method.method_id)
+        )
 
     def get(self, method_id: str) -> AnalyticalMethod:
         method = self._methods.get(method_id)
