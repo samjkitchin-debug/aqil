@@ -404,3 +404,95 @@ No hosted write. No logical dump. No copy of local runs. Publication stays close
 
 `npm run test:research` passed 673 tests, then Ruff check and Ruff format (434 files already formatted). Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. Methodology presentation tests in `present-methodology.test.ts` and `private-methodology-result.test.ts` passed 27. Web typecheck passed. GitHub Actions has not run. This is not a publication approval.
 
+## O. Foundation hardening, 1 November 2026
+
+Section N remains the scientific starting point. This section records what the hardening branch changed. `publication_allowed` stays false. No method became operational. The constant-maturity probit is not the New York Fed model. The 2005 Q4 and 2006 Q1 windows were not moved.
+
+### Why the stored probit omission does not replay
+
+`_quarter_rows` groups monthly spreads into calendar quarters. A quarter is counted in `incomplete_quarters_omitted` when one of its three months is missing or falls after the evaluation period. The ids stored on run `137d92b7-6ce1-49eb-82ad-8f5727b00f90` were only the months inside complete quarters. The omitted month was never linked. Replay therefore does not see that quarter, and the recomputed count is 0 while the stored count stays 1. The row was not rewritten. On the disposable database the outcome was `executable-but-historically-unmatched`, difference `incomplete_quarters_omitted`.
+
+The local 3-month series has 541 months and that run linked 540. New run `adff8815-8582-4c2e-befa-5faef3f9b925` links 541 months of each yield, including two omitted observation ids, and stores `incomplete_quarters_omitted` 1. The intercept and spread coefficient match the stored row (`-0.424740354915` and `-1.07426638515`). That new run replayed. It is not a claim that `137d92b7` now replays, and it is not historically identical to that row.
+
+### Other stored rows, replayed on `aqil_research_test` and rolled back
+
+| Run | Outcome |
+| --- | --- |
+| Bry–Boschan `3955f7f4-08f8-4e7b-9ded-b3f6eea6633f` | Replayable |
+| Stock–Watson calculate `a7a2620a-7bd9-4cca-917b-992062ab025c` | Replayable. Config and payload hashes differ and were not rewritten. Likelihood remains `-1590.5374990458229` |
+| Stock–Watson preserved `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` | Blocked. Frozen links omit both BEA series |
+| Stock–Watson unadopted `940955f1-50d5-4c06-9d90-5ceebd05d352` | Blocked. No observation ids. Not adopted |
+| Hamilton `4629b31d-b0de-4a2f-a987-9e5d3f94747e` | Replayable within `1e-8`. Extra field `minimum_duration_alternative`. Payload hash not rewritten |
+| Bai–Perron `2f4c14eb-44f2-40dc-913f-bf7945e972cd` | Replayable within `1e-8`. Implementation hash differs and was not rewritten |
+| Autoregressive benchmark `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e` | Replayable |
+| CPI-U autoregression `bcbf15bc-590e-4738-9bc1-bbe951b12079` | Executable, historically unmatched on `excluded_growth_months` |
+| Ex-post real funds rate `e340659b-b693-480a-8e6d-a64b24b90f99` | Executable, historically unmatched on `computable_month_count` |
+| Sahm `f3db281d-9f6d-4c4c-974f-ba4b9bd68131` | Replayable |
+| Spread `cbfdaf86-8446-435e-8ceb-7f43557613f1` | Replayable. It stays the spread |
+| Diffusion historical `1f747c9f-4851-4588-a4dc-d8fb1ff30558` | Blocked. No observation ids. Stored month shares are null |
+| Diffusion new `625e94dc-5bc5-4f4b-a01a-9c3816b9d0c6` | Executable, historically unmatched. Ids are frozen from the sample start, and the three-month change also uses earlier months that are not linked |
+
+No `--refit` was run. `3f8c7611` was not replaced.
+
+### Counts
+
+The eight families, ten variants, three indicators, and four diagnostics in section N are unchanged. No econometric method was added.
+
+On this tree, `npm run test:research` passed 688, then Ruff check and Ruff format (441 files already formatted). Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. This is not a publication approval.
+
+### Certification re-run
+
+The same uncommitted tree was executed again on 1 November 2026. `HEAD` was still `3aaa2aa`. `npm run test:research` passed 688, then Ruff check passed and 441 files were already formatted. `npm run test:db` passed 13 files and 211 tests. `scripts/replay_frozen_family.py` reproduced the table above and rolled each transaction back. Web typecheck passed. Lint passed with the existing unused `_searchParams` warning. The production build generated 55 pages, including `/intelligence/health`. No method was marked operational. `publication_allowed` stays false.
+
+### Registered source freshness, read on 1 November 2026
+
+`classify_source_freshness` was applied to local `postgres` with the calendar date 1 November 2026. The development database was not written. A quarterly series is not stale because one day was empty. The grace is 21 days for a daily series, 28 for weekly, 75 for monthly, and 200 for quarterly, measured from the latest stored period.
+
+Unchanged: SLOOS (2026-07-01), payrolls (2026-09-01), H.8 bank credit (2026-10-07), the federal funds rate (2026-09-01), the ECB deposit facility (2026-10-24), and Bank Rate (2026-10-22).
+
+Inside the cadence window: industrial production (2026-09-01), the 10-year yield (2026-09-01), Eurostat HICP (2026-09-01), the Singapore CPI reference (2026-09-01), and ONS CPI (2026-09-01). CPI-U is also inside that window at 2026-09-01, but its last refresh on 22 October 2026 was `failed_fetch` because the flat file returned HTTP 406. The classifier does not treat `failed_fetch` as technically blocked.
+
+Stale: JOLTS (2026-08-01), both ECB HICP series (2025-12-01), euro-area GDP (2026-04-01), euro-area unemployment, industrial production, and retail (2026-08-01), the Cabinet Office monthly series (2026-08-01), BIS credit (2026-01-01), Malaysia industrial production (2026-08-01), real personal income excluding transfers (2026-08-01), and real manufacturing and trade sales (2026-07-01).
+
+The five document feeds last recorded on 21 October 2026 have no economic-observation period. Their last outcomes were unchanged or completed, so they are not stale and they are not technically blocked. None of the production connectors was discontinued, not due, or rights-blocked on this read.
+
+`bls_cps_unemployment_rate` and `oecd_cli_g20` have older refresh rows and are not in the production connector list. OECD stays rights pending. `fed.h15.RIFLGFCM03_N.M` is stored as 541 months through September 2026 and is not a production refresh step. METI stays technically blocked and disabled. Census advance orders stay unwired without a key. FRED retention stays prohibited.
+
+## P. Close-out, 1 November 2026
+
+`publication_allowed` stays false. No method is operational. No family is operational. V1 is not complete. The local executions below are replayable. They are not a production deployment and they are not an unattended schedule.
+
+### Live source refresh
+
+`aqil-research refresh` ran twice against local `postgres` on `127.0.0.1:55432`. Hosted Supabase was not written. The second run inserted 0 rows for every source that the first run had inserted, so the fetch is idempotent.
+
+CPI-U `https://download.bls.gov/pub/time.series/cu/cu.data.1.AllItems` returned HTTP 200 with `User-Agent: AqilResearch/1.0 (local research retrieval)` and the flat-file header `series_id`. The same URL returned HTTP 403 from Akamai when the client used the default httpx user agent. The 22 October HTTP 406 was not reproduced. The authorised client does not send `Accept: text/plain`. The stored series is 956 months, January 1947 to September 2026. `2025-10-01` is absent from CPI-U and from unemployment. It was not interpolated. That is a gap in the publisher file, not a failed request. The refresh outcome was `unchanged`.
+
+The first refresh inserted rows for the Federal Reserve press, the ECB press, H.8 bank credit, the ECB deposit facility, euro-area GDP, euro-area unemployment, BIS credit, and Bank Rate. The second refresh left those values unchanged.
+
+Both BEA factor inputs failed with `VintageConflictError` for July 2026. The workbook was fetched. Persistence rejected a different value for the same vintage identity. The stored rows were not rewritten. Those two refresh steps are not operational.
+
+`bls_cps_unemployment_rate` was `skipped_fresh`. It is not a broken fetch.
+
+The cycle recorded after the second refresh is `partial`: 29 unchanged sources, 2 failed sources, 8 stale sources, and 26 skipped methods. No registered method's required series changed, so none was recalculated. Stale sources in that cycle: JOLTS, both ECB HICP series, euro-area industrial production, euro-area retail, the Cabinet Office series, BIS credit, and Malaysia industrial production.
+
+### New lineage-frozen runs
+
+Historical rows were not rewritten.
+
+| Run | Result |
+| --- | --- |
+| Diffusion `18f5d7bb-8227-4441-8b45-6755153d7b8f` | Replayable. 1,434 observation ids, including the three-month lookback. Historical `1f747c9f-4851-4588-a4dc-d8fb1ff30558` stays blocked. `625e94dc-5bc5-4f4b-a01a-9c3816b9d0c6` stays historically unmatched |
+| CPI-U autoregression `06ff435b-2279-4a46-99cb-6a99dd4f0a35` | Replayable. 956 observation ids. Historical `bcbf15bc-590e-4738-9bc1-bbe951b12079` stays unmatched on `excluded_growth_months` |
+| Ex-post real funds rate `e399de3f-18a6-4a72-b41f-6d14611b4338` | Replayable. 1,720 observation ids. Historical `e340659b-b693-480a-8e6d-a64b24b90f99` stays unmatched on `computable_month_count` |
+| Inflation autoregression `221f1c3a-ba9b-4b29-bb7d-4ffbd8821091` | `completed_insufficient`. October 2025 was not filled. Not replayed as a sufficient result |
+| Probit `adff8815-8582-4c2e-befa-5faef3f9b925` | Replayable. Historical `137d92b7-6ce1-49eb-82ad-8f5727b00f90` stays unmatched on `incomplete_quarters_omitted`. Not the New York Fed model |
+| Stock–Watson calculate `a7a2620a-7bd9-4cca-917b-992062ab025c` | Replayable. Preserved `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` and unadopted `940955f1-50d5-4c06-9d90-5ceebd05d352` stay blocked |
+| Stock–Watson refit `b4f95b41-cc0c-4b38-9792-d866abd6e54d` | Replayable. 1,420 observation ids. `adopted_parameter_version` is false. It does not replace `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` |
+
+The read contract returned the new diffusion run as version 1, `completed`, `sufficient`, `publication_allowed` false.
+
+### Checks on this close-out
+
+`npm run test:research` passed 688, then Ruff check passed and 441 files were already formatted. `npm run test:db` passed 13 files and 211 tests. Web typecheck passed. Lint passed with the existing unused `_searchParams` warning. The presentation and health tests passed 32. The production build generated 55 pages, including `/intelligence/health`. GitHub Actions has not run. This is not a publication approval.
+
