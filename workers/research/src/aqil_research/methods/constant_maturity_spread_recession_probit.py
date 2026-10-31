@@ -206,12 +206,13 @@ class ConstantMaturitySpreadRecessionProbitMethod:
         built = _quarter_rows(context, contraction_quarters(turns))
         if isinstance(built, str):
             return _insufficient(built)
-        quarters, omitted = built
+        quarters, omitted, omitted_ids = built
         if not quarters:
             return _insufficient("no complete spread quarter is available")
         fitted = estimate_split_probit(quarters)
         fitted["incomplete_quarters_omitted"] = omitted
-        return _result(fitted, quarters)
+        fitted["omitted_observation_ids"] = list(omitted_ids)
+        return _result(fitted, quarters, omitted_ids)
 
 
 def chronology_path() -> Path:
@@ -472,7 +473,7 @@ def _both_classes(rows: tuple[ProbitQuarter, ...]) -> bool:
 def _quarter_rows(
     context: MethodContext,
     contractions: frozenset[date],
-) -> tuple[tuple[ProbitQuarter, ...], int] | str:
+) -> tuple[tuple[ProbitQuarter, ...], int, tuple[str, ...]] | str:
     monthly = _monthly_spreads(context)
     if isinstance(monthly, str):
         return monthly
@@ -482,6 +483,7 @@ def _quarter_rows(
         by_quarter.setdefault(quarter, {})[month] = (value, observation_id)
     rows: list[ProbitQuarter] = []
     omitted = 0
+    omitted_ids: list[str] = []
     for quarter in sorted(by_quarter):
         months = (
             quarter,
@@ -489,11 +491,13 @@ def _quarter_rows(
             _add_months(quarter, 2),
         )
         present = by_quarter[quarter]
-        if any(month not in present for month in months):
+        incomplete = any(month not in present for month in months)
+        beyond_evaluation = any(month > context.evaluation_period for month in months)
+        if incomplete or beyond_evaluation:
             omitted += 1
-            continue
-        if any(month > context.evaluation_period for month in months):
-            omitted += 1
+            for month in months:
+                if month in present:
+                    omitted_ids.extend(present[month][1])
             continue
         window = _window_for(quarter)
         if window is None:
@@ -515,7 +519,7 @@ def _quarter_rows(
                 observation_ids=observation_ids,
             ),
         )
-    return tuple(rows), omitted
+    return tuple(rows), omitted, tuple(sorted(set(omitted_ids)))
 
 
 def _monthly_spreads(
@@ -572,9 +576,10 @@ def _window_for(quarter: date) -> str | None:
 def _result(
     fitted: dict[str, object],
     quarters: tuple[ProbitQuarter, ...],
+    omitted_ids: tuple[str, ...] = (),
 ) -> MethodExecutionResult:
     observation_ids = tuple(
-        sorted({item for row in quarters for item in row.observation_ids}),
+        sorted({item for row in quarters for item in row.observation_ids} | set(omitted_ids)),
     )
     status = str(fitted["fit_status"])
     if fitted["fit_stable"] is True:

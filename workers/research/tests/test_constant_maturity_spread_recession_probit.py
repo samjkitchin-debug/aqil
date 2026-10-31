@@ -40,6 +40,8 @@ from aqil_research.methods.constant_maturity_spread_recession_probit import (
     ChronologyError,
     ConstantMaturitySpreadRecessionProbitMethod,
     ProbitQuarter,
+    _quarter_rows,
+    _result,
     contraction_quarters,
     estimate_split_probit,
     load_chronology,
@@ -381,6 +383,58 @@ def _observation(
         first_seen_at=RETRIEVED,
         adapter_version="test",
     )
+
+
+def test_an_incomplete_quarter_keeps_its_observation_ids() -> None:
+    """The omitted month is linked. The 2005 Q4 and 2006 Q1 windows stay put."""
+    ten_year = {
+        date(2005, 10, 1): _observation(TEN_YEAR_DATASET_ID, "ten-oct", "4.5", date(2005, 10, 1)),
+        date(2005, 11, 1): _observation(TEN_YEAR_DATASET_ID, "ten-nov", "4.5", date(2005, 11, 1)),
+        date(2005, 12, 1): _observation(TEN_YEAR_DATASET_ID, "ten-dec", "4.5", date(2005, 12, 1)),
+        date(2006, 1, 1): _observation(TEN_YEAR_DATASET_ID, "ten-jan", "4.5", date(2006, 1, 1)),
+    }
+    three_month = {
+        date(2005, 10, 1): _observation(
+            THREE_MONTH_DATASET_ID, "short-oct", "4.0", date(2005, 10, 1)
+        ),
+        date(2005, 11, 1): _observation(
+            THREE_MONTH_DATASET_ID, "short-nov", "4.0", date(2005, 11, 1)
+        ),
+        date(2005, 12, 1): _observation(
+            THREE_MONTH_DATASET_ID, "short-dec", "4.0", date(2005, 12, 1)
+        ),
+        date(2006, 1, 1): _observation(
+            THREE_MONTH_DATASET_ID, "short-jan", "4.0", date(2006, 1, 1)
+        ),
+    }
+    context = MethodContext(
+        inputs_by_dataset={
+            TEN_YEAR_DATASET_ID: ten_year,
+            THREE_MONTH_DATASET_ID: three_month,
+        },
+        evaluation_period=date(2006, 1, 1),
+        analysis_mode=AnalysisMode.LATEST_REVISED,
+        primary_dataset_id=TEN_YEAR_DATASET_ID,
+    )
+    built = _quarter_rows(context, frozenset())
+    assert not isinstance(built, str)
+    _quarters, omitted, omitted_ids = built
+    assert omitted == 1
+    assert "ten-jan" in omitted_ids
+    assert "short-jan" in omitted_ids
+    stored = _result(
+        {
+            "fit_status": "not_estimated",
+            "fit_stable": False,
+            "fit_failure": None,
+            "metric_note": None,
+        },
+        _quarters,
+        omitted_ids,
+    )
+    assert "short-jan" in stored.observation_ids
+    assert ESTIMATION_LAST_SPREAD_QUARTER == date(2005, 10, 1)
+    assert EVALUATION_FIRST_SPREAD_QUARTER == date(2006, 1, 1)
 
 
 def _add_months(anchor: date, count: int) -> date:
