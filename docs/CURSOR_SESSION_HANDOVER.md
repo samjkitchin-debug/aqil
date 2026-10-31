@@ -1,7 +1,25 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 31 October 2026, duplicate Engle–Granger registration removed
+**Last updated:** 1 November 2026, historical replay classification
+
+## Historical replay, 1 November 2026
+
+Risk class R2. Branch `research/quantitative-v1` in `C:\Users\gamer\aqil-quant-v1`. `publication_allowed` stays false. Nothing was pushed. PR #18 was not retargeted. Nothing was merged to `main`. Hosted Supabase was not read or written. Database `postgres` on `127.0.0.1:55432` was not reset. No scheduler was added. `workers/research/src/aqil_research/workflow/refresh.py` was not changed.
+
+Replay now compares scientific figures within an absolute tolerance of `1e-8`. A stored config hash that is not the current method hash does not stop that comparison, and the stored hash is not rewritten. An extra diagnostic field or a changed implementation hash is recorded beside a numerical match. A numerical gap remains a failure.
+
+Read-only classification of the preserved rows:
+
+- Diffusion `1f747c9f-4851-4588-a4dc-d8fb1ff30558` is blocked. The missing field is `observation_ids`.
+- Stock–Watson preserved `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` is blocked. Frozen links cover industrial production and payroll only. The missing field is `observation_ids` for `bea.nipa.T20600.W875RX` and `bea.nipa.U002BU.KPMT`. `adopted_parameter_version` is still absent, so this row stays the preserved parameter version. Its config hash `1c9244eac3ac2da1` was not rewritten.
+- Stock–Watson unadopted refit `940955f1-50d5-4c06-9d90-5ceebd05d352` is blocked. The missing field is `observation_ids`. `adopted_parameter_version` remains false. The likelihood gain of about 0.000305 stays below the 0.001 margin.
+- Hamilton `4629b31d-b0de-4a2f-a987-9e5d3f94747e` is replayable. Shared figures match within `1e-8`, including a lower-mean expected duration of about 1.993 months. That is not a recession label. The recomputation adds `minimum_duration_alternative`. The analytical payload hash differs and was not rewritten.
+- Bai–Perron `2f4c14eb-44f2-40dc-913f-bf7945e972cd` is replayable. Shared figures match within `1e-8`. The primary trim still selects no break. The implementation hash differs because the module bytes changed, and it was not rewritten.
+
+`aqil-research execute-method --method-id STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT` appended run `a7a2620a-7bd9-4cca-917b-992062ab025c` on local `postgres`. The config id is `sw1988-modern-1997-2026m07`, `update_kind` is `calculate`, `adopted_parameter_version` is false, and the likelihood is `-1590.5374990458229`. `--refit` was not used on this database. A disposable test already keeps a refit unadopted. The 1988 CITIBASE panel stays blocked. These methods can still be executed, so none was relabelled in the registry. None is operational.
+
+Focused tests: `tests/test_replay_integrity.py`, `tests/test_historical_replay.py`, `test_stored_config_ids_resolve_for_reproduction`, and `test_stock_watson_refit_appends_an_unadopted_run` passed, 11 tests. Ruff check passed on the files that changed. The full research suite was not run.
 
 ## Feasible V1 registration, 31 October 2026
 

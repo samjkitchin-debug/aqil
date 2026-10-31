@@ -128,8 +128,10 @@ def test_stored_config_ids_resolve_for_reproduction() -> None:
             assert method.config_hash(parsed) == stored_hash
             assert replay_configuration(registry, stored)["config_id"] == config_id
         else:
-            with pytest.raises(ValueError, match="not sufficient to replay"):
-                replay_configuration(registry, stored)
+            resolved = replay_configuration(registry, stored)
+            assert resolved["config_id"] == config_id
+            assert stored.config_hash == "not-the-method-hash"
+            assert method.config_hash(parsed) != stored.config_hash
     with pytest.raises(ValueError, match="unknown config_id"):
         reproduction_config("not-a-stored-config")
 
