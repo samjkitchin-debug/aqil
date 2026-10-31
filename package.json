@@ -21,6 +21,6 @@
     "research:status": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-research-status.ps1"
   },
   "devDependencies": {
-    "supabase": "2.121.0"
+    "supabase": "2.122.0"
   }
 }
