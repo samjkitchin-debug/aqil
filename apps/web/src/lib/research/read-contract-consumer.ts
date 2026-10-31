@@ -27,23 +27,36 @@ export function describeOperationalState(
   }
   const startedDay = state.startedAt.slice(0, 10);
   const ranToday = startedDay === todayUtc;
-  const failures = state.events.filter((event) => event.outcome === "failed" || event.outcome === "invalid" || event.outcome === "rights_blocked");
   const lines = [
     ranToday
       ? `Today's cycle status is ${state.status ?? "unknown"}.`
       : `The latest cycle started on ${startedDay}, which is before today.`,
   ];
-  if (failures.length === 0) {
-    lines.push("Nothing in that cycle is marked failed.");
-  } else {
-    for (const failure of failures) {
-      lines.push(`${failure.subjectId} ${failure.outcome.replaceAll("_", " ")}.`);
-    }
+  if (state.status === "partial") {
+    lines.push("This cycle is a partial success.");
   }
+  lines.push(`Successful updates: ${named(state.events, "source", ["success", "inserted", "revised"])}.`);
+  lines.push(`Unchanged sources: ${named(state.events, "source", ["unchanged"])}.`);
+  lines.push(`Failed sources: ${named(state.events, "source", ["failed"])}.`);
+  lines.push(`Blocked sources: ${named(state.events, "source", ["rights_blocked", "invalid"])}.`);
+  lines.push(`Skipped methodologies: ${named(state.events, "method", ["skipped"])}.`);
+  lines.push(`Completed methodology runs: ${named(state.events, "method", ["success"])}.`);
+  lines.push(`Stale results: ${named(state.events, "source", ["stale"])}.`);
   lines.push("The latest valid result is the last completed run that this cycle did not replace.");
   return {
     version: RESEARCH_READ_CONTRACT_VERSION,
     headline: ranToday ? "Today's cycle has a record." : "Today's cycle has not run.",
     lines,
   };
+}
+
+function named(
+  events: OperationalStateRead["events"],
+  phase: string,
+  outcomes: readonly string[],
+): string {
+  const subjects = events
+    .filter((event) => event.phase === phase && outcomes.includes(event.outcome))
+    .map((event) => event.subjectId);
+  return subjects.length === 0 ? "none" : subjects.join(", ");
 }
