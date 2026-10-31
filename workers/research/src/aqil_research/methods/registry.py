@@ -4,10 +4,6 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from aqil_research.methods.activity_cointegration import (
-    ACTIVITY_LEVEL_COINTEGRATION,
-    ActivityLevelCointegrationMethod,
-)
 from aqil_research.methods.autoregressive_benchmark import (
     AUTOREGRESSIVE_BENCHMARK,
     AutoregressiveBenchmarkMethod,
@@ -146,7 +142,6 @@ def default_method_registry() -> MethodRegistry:
     registry.register(ExPostRealFederalFundsRateMethod())
     registry.register(InflationAutoregressionMethod())
     registry.register(ExPostRealFundsRateMethod())
-    registry.register(ActivityLevelCointegrationMethod())
     registry.register(IpGrowthCusumMethod())
     registry.register(EstrellaMishkinSpreadMethod())
     registry.register(LeadLagCrossCorrelationMethod())
@@ -179,7 +174,6 @@ __all__ = [
     "EX_POST_REAL_FEDERAL_FUNDS_RATE",
     "INFLATION_AUTOREGRESSION",
     "EX_POST_REAL_FUNDS_RATE",
-    "ACTIVITY_LEVEL_COINTEGRATION",
     "IP_GROWTH_CUSUM",
     "ESTRELLA_MISHKIN_TERM_SPREAD",
     "ENGLE_GRANGER_COINTEGRATION",

@@ -76,7 +76,7 @@ export const METHODOLOGY_GROUPS: readonly { id: MethodologyGroup; heading: strin
   {
     id: "current",
     heading: "In development",
-    note: "Bry–Boschan, the Stock–Watson refit, restricted coincident diffusion, Harding–Pagan characteristics, the Sahm rule, the Hamilton monthly variant, Bai–Perron mean shifts, the autoregressive benchmark, lead–lag correlations, the CPI-U autoregression, the ex-post real federal funds rate, Engle–Granger cointegration, and the CUSUM of recursive residuals have stored runs. The inflation autoregression, the subsequent ex-post real funds rate, activity-level cointegration, the industrial-production CUSUM, and the 10-year minus 3-month spread are also listed. A signed-in reader can open a stored result. That is not publication approval. The Stock–Watson refit is not operationally accepted. The Hamilton variant is not empirically qualified. The autoregression is not a qualified forecast. The real rate is not a Taylor rule. The spread is not a recession probability. Cointegration is not a causal claim. The CUSUM is not a selected break date. Quarterly BBQ has not been run.",
+    note: "Bry–Boschan, the Stock–Watson refit, restricted coincident diffusion, Harding–Pagan characteristics, the Sahm rule, the Hamilton monthly variant, Bai–Perron mean shifts, the autoregressive benchmark, lead–lag correlations, the CPI-U autoregression, the ex-post real federal funds rate, Engle–Granger cointegration, and the CUSUM of recursive residuals have stored runs. The inflation autoregression, the subsequent ex-post real funds rate, the industrial-production CUSUM, and the 10-year minus 3-month spread are also listed. A signed-in reader can open a stored result. That is not publication approval. The Stock–Watson refit is not operationally accepted. The Hamilton variant is not empirically qualified. The autoregression is not a qualified forecast. The real rate is not a Taylor rule. The spread is not a recession probability. Cointegration is not a causal claim. The two CUSUM cards are two stated specifications, not two selected break dates. Quarterly BBQ has not been run.",
   },
   {
     id: "activity",
@@ -788,35 +788,6 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     ],
     validation: [
       "This page reads the stored funds rate, subsequent inflation, and real rate. It does not recompute them.",
-    ],
-    references: [],
-  },
-  {
-    slug: "activity-level-cointegration",
-    registerId: "ACTIVITY_LEVEL_COINTEGRATION",
-    name: "Activity-level cointegration",
-    measures:
-      "Tests whether the log levels of industrial production and payroll employment share a cointegrating residual. A failure to reject no-cointegration is a result. It is not a causal claim.",
-    domain: "Economic activity",
-    timing: "retrospective",
-    functionLabel: "Structural analysis",
-    outputKind: "cointegration-test",
-    stage: "in-development",
-    group: "current",
-    queryMethodIds: ["ACTIVITY_LEVEL_COINTEGRATION"],
-    interpretation: [
-      "The null is no cointegration. The decision uses the five percent critical value returned by the test.",
-      "Log industrial production is the left-hand side. That ordering is not a cause.",
-    ],
-    uncertainty: [
-      "The inputs are latest-revised log levels. A vector autoregression is not estimated.",
-      "A signed-in reader can see the stored test. It is not approved for publication.",
-    ],
-    dataInputs: [
-      "Industrial production and total nonfarm payroll employment, latest revised, as natural log levels.",
-    ],
-    validation: [
-      "This page reads the stored statistic and critical value. It does not rerun the test.",
     ],
     references: [],
   },

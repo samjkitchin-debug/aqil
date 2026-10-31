@@ -180,8 +180,6 @@ function extractByMethod(
       return inflationAutoregression(calculation, run);
     case "EX_POST_REAL_FUNDS_RATE":
       return exPostRealFundsRate(calculation, run);
-    case "ACTIVITY_LEVEL_COINTEGRATION":
-      return activityCointegration(calculation, run);
     case "IP_GROWTH_CUSUM":
       return ipGrowthCusum(calculation, run);
     case "ESTRELLA_MISHKIN_TERM_SPREAD":
@@ -804,42 +802,6 @@ function exPostRealFundsRate(
       "No output gap is estimated.",
       "The real rate uses the CPI-U index twelve months after the funds rate.",
     ],
-  };
-}
-
-function activityCointegration(
-  calculation: Record<string, unknown>,
-  run: StoredMethodologyRun,
-): Partial<PrivateMethodologyResult> {
-  const statistic = num(calculation.statistic);
-  const critical = num(calculation.critical_value_five_percent);
-  const rejects = calculation.rejects_no_cointegration_at_five_percent;
-  const missing = statistic === null || critical === null || (rejects !== true && rejects !== false);
-  const decision =
-    rejects === true
-      ? "The test rejects no-cointegration at five percent."
-      : "The test does not reject no-cointegration at five percent.";
-  return {
-    headline: missing
-      ? "The stored result is unavailable."
-      : `${decision} Statistic ${formatFigure(statistic, 3)}. Five percent critical value ${formatFigure(critical, 3)}.`,
-    standing:
-      calculation.causal_claim === true
-        ? "A causal claim is stored on this run. Not approved for publication."
-        : "Not causal. Latest revised log levels. Not approved for publication.",
-    facts: [
-      fact(
-        "Decision",
-        missing ? "Not stored" : rejects === true ? "Rejects no-cointegration" : "Does not reject no-cointegration",
-      ),
-      fact("Statistic", statistic === null ? "Not stored" : formatFigure(statistic, 3)),
-      fact("Five percent critical value", critical === null ? "Not stored" : formatFigure(critical, 3)),
-      fact("Null", text(calculation.null_hypothesis) ?? "Not stored"),
-      fact("Sample", `${formatMaybeDay(calculation.sample_start)} to ${formatMaybeDay(calculation.sample_end)}`),
-      fact("Inputs", vintageFact(run, calculation)),
-      fact("Causal claim", calculation.causal_claim === true ? "Yes" : "No"),
-    ],
-    limitations: ["A cointegration test is not a causal claim."],
   };
 }
 

@@ -61,7 +61,6 @@ const REGISTER_ROWS = [
   "CUSUM_RECURSIVE_RESIDUALS",
   "INFLATION_AUTOREGRESSION",
   "EX_POST_REAL_FUNDS_RATE",
-  "ACTIVITY_LEVEL_COINTEGRATION",
   "IP_GROWTH_CUSUM",
   "ESTRELLA_MISHKIN_TERM_SPREAD",
 ] as const;
@@ -75,7 +74,6 @@ test("the catalogue names the stored methods and every other programme row", () 
     .map((entry) => entry.slug)
     .sort();
   assert.deepEqual(inDevelopment, [
-    "activity-level-cointegration",
     "autoregressive-benchmark",
     "bai-perron-breaks",
     "bry-boschan-spencer15",
@@ -287,7 +285,6 @@ test("a missing V1 run says the result is unavailable and does not invent figure
     "cusum-recursive-residuals",
     "inflation-autoregression",
     "ex-post-real-funds-rate",
-    "activity-level-cointegration",
     "ip-growth-cusum",
     "estrella-mishkin-spread",
   ]) {

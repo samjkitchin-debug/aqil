@@ -244,9 +244,13 @@ Production delivery is not successful. `C:\Users\gamer\aqil-release-backups\2026
 
 This section adds the methods that were ready to register. It does not replace sections A to L. Section L's four stored calculations remain. Their runs were not replaced. `publication_allowed` stays false on every run named here. Nothing in this section is a publication approval, a forecast, a recession probability, or a real-time claim.
 
-`default_method_registry()` now also includes `INFLATION_AUTOREGRESSION`, `EX_POST_REAL_FUNDS_RATE`, `ACTIVITY_LEVEL_COINTEGRATION`, `IP_GROWTH_CUSUM`, and `ESTRELLA_MISHKIN_TERM_SPREAD`. Registration does not make a method operational. `--refit` is rejected for all five because the parameter policy is `none`. `workers/research/src/aqil_research/workflow/refresh.py` was not changed. No scheduler, cron, or jobs table was added.
+`default_method_registry()` now also includes `INFLATION_AUTOREGRESSION`, `EX_POST_REAL_FUNDS_RATE`, `IP_GROWTH_CUSUM`, and `ESTRELLA_MISHKIN_TERM_SPREAD`. Registration does not make a method operational. `--refit` is rejected for all four because the parameter policy is `none`. `workers/research/src/aqil_research/workflow/refresh.py` was not changed. No scheduler, cron, or jobs table was added.
 
-Replay still requires the stored configuration hash to equal the method's own configuration hash. That match rule was not weakened. The five published config ids were added to `reproduction_config` so a later replay can resolve them.
+The V1 inventory names one Engle–Granger test: `ENGLE_GRANGER_COINTEGRATION`, run `570e2f51-1871-4c0e-88c9-c40652093613`, recorded in section L. `ACTIVITY_LEVEL_COINTEGRATION` used the same pair (`fed.g17.IP.B50001.S` and `bls.ce.CES0000000001`), natural logs, the same regression direction, residual ADF with no constant, and the MacKinnon five percent critical value. The stored conclusion was the same: the test does not reject, and the statistic is about -2.865. That duplicate registration was removed. Local run `314ef1b5-c691-4c0c-a3c4-1fb4577254a4` was left in postgres and is not a second method.
+
+`INFLATION_AUTOREGRESSION` is a 24-month holdout scored against the historical mean. It is not a replacement for `CPI_U_INFLATION_AUTREGRESSION`. `EX_POST_REAL_FUNDS_RATE` uses subsequent twelve-month inflation. It is not a replacement for `EX_POST_REAL_FEDERAL_FUNDS_RATE`, which uses trailing inflation. `IP_GROWTH_CUSUM` is an AR(1). `CUSUM_RECURSIVE_RESIDUALS` uses a predeclared lag of 12. They are two stated CUSUM specifications, not two discoveries of different break dates. `ESTRELLA_MISHKIN_TERM_SPREAD` remains a latest-revised 10-year minus 3-month spread with `probit_estimated` false.
+
+Replay still requires the stored configuration hash to equal the method's own configuration hash. That match rule was not weakened. The four remaining published config ids stay in `reproduction_config`. The activity-level config id was removed.
 
 ### Local execution
 
@@ -256,37 +260,36 @@ Commands were `aqil-research execute-method --method-id ID` against local `postg
 | --- | --- | --- | --- |
 | `INFLATION_AUTOREGRESSION` | `f0adeed5-991a-4115-be21-f4cbe4c122c7` | `completed_insufficient` | The latest contiguous monthly logarithmic-change sample is shorter than 144 months. October 2025 CPI is missing and was not interpolated. Not empirically qualified as a forecast. Not a Taylor rule. |
 | `EX_POST_REAL_FUNDS_RATE` | `e340659b-b693-480a-8e6d-a64b24b90f99` | `completed` | Funds month September 2025. Federal funds rate 4.22 percent. Subsequent twelve-month CPI inflation 3.7173 percent. Ex-post real rate 0.5027 percentage points. Not a Taylor rule. Not empirically qualified as a forecast. |
-| `ACTIVITY_LEVEL_COINTEGRATION` | `314ef1b5-c691-4c0c-a3c4-1fb4577254a4` | `completed` | Does not reject no-cointegration at five percent. Statistic about -2.865. Five percent critical value about -3.342. Sample January 1939 to September 2026. Not causal. |
-| `IP_GROWTH_CUSUM` | `8dd294fc-aa4c-47c5-af43-777dc75d9e3a` | `completed` | Stays inside the five percent boundary. Largest absolute CUSUM about 41.71 in April 2020, where the boundary is about 97.99. Not a selected break date. Not Bai–Perron. |
+| `IP_GROWTH_CUSUM` | `8dd294fc-aa4c-47c5-af43-777dc75d9e3a` | `completed` | Stays inside the five percent boundary. Largest absolute CUSUM about 41.71 in April 2020, where the boundary is about 97.99. Not a selected break date. Not Bai–Perron. This AR(1) specification and the lag-12 CUSUM in section L are two stated specifications, not two discoveries of different break dates. |
 | `ESTRELLA_MISHKIN_TERM_SPREAD` | `cbfdaf86-8446-435e-8ceb-7f43557613f1` | `completed` | September 2026 spread 0.90 percentage points. 10-year yield 4.99. 3-month yield 4.09. Not a recession probability. No probit was estimated. |
 
 The 3-month yield `fed.h15.RIFLGFCM03_N.M` was already stored: 541 distinct months, 1 September 1981 to 1 September 2026. No second ingest was run. Discount-basis `fed.h15.RIFSGFSM03_N.M` has 0 rows. Federal funds is not the short rate.
 
 ### Method record
 
-| Field | Inflation autoregression | Ex-post real funds rate | Activity-level cointegration | Industrial-production CUSUM | 10-year minus 3-month spread |
-| --- | --- | --- | --- | --- | --- |
-| Name | CPI-U inflation autoregression | Ex-post real federal funds rate | Activity-level cointegration | Industrial-production CUSUM | 10-year minus 3-month spread |
-| Origin | Autoregressive benchmark rule on CPI-U log changes | Funds rate minus subsequent twelve-month CPI inflation | Augmented Engle–Granger, `statsmodels.tsa.stattools.coint` | `recursive_olsresiduals` CUSUM on an AR(1) | Estrella and Mishkin, Current Issues, June 1996. The article does not print probit coefficients |
-| Variant | Held-out comparison with the historical mean. Not a product forecast. Not a Taylor rule | Subsequent inflation, endpoints only. Not a Taylor rule | Log industrial production on log payroll employment. Not causal | Predeclared lag 1. Not Bai–Perron. Not a selected break date | Latest-revised investment-basis spread only. Not a recession probability |
-| Code path | `workers/research/src/aqil_research/methods/inflation_autoregression.py` | `workers/research/src/aqil_research/methods/ex_post_real_funds_rate.py` | `workers/research/src/aqil_research/methods/activity_cointegration.py` | `workers/research/src/aqil_research/methods/ip_growth_cusum.py` | `workers/research/src/aqil_research/methods/estrella_mishkin.py` |
-| Series | `bls.cu.CUSR0000SA0` | `fed.h15.RIFSPFF_N.M` and `bls.cu.CUSR0000SA0` | `fed.g17.IP.B50001.S` and `bls.ce.CES0000000001` | `fed.g17.IP.B50001.S` | `fed.h15.RIFLGFCY10_N.M` and `fed.h15.RIFLGFCM03_N.M` |
-| Frequency | Monthly | Monthly | Monthly | Monthly | Monthly |
-| Transformations | Monthly logarithmic change. Gaps not filled | Twelve-month percent change from t to t+12 | Natural log levels | Monthly log-growth | Difference of the two yields. No probit |
-| Parameter policy | `none`. Version 0.1.0 | `none`. Version 0.1.0 | `none`. Version 0.1.0 | `none`. Version 0.1.0 | `none`. Version 1.0.0 |
-| execute-method id | `INFLATION_AUTOREGRESSION` | `EX_POST_REAL_FUNDS_RATE` | `ACTIVITY_LEVEL_COINTEGRATION` | `IP_GROWTH_CUSUM` | `ESTRELLA_MISHKIN_TERM_SPREAD` |
-| Refit rule | `--refit` rejected | `--refit` rejected | `--refit` rejected | `--refit` rejected | `--refit` rejected |
-| Run | `f0adeed5-991a-4115-be21-f4cbe4c122c7` | `e340659b-b693-480a-8e6d-a64b24b90f99` | `314ef1b5-c691-4c0c-a3c4-1fb4577254a4` | `8dd294fc-aa4c-47c5-af43-777dc75d9e3a` | `cbfdaf86-8446-435e-8ceb-7f43557613f1` |
-| Validation label | Implemented. Executed. Insufficient on the latest contiguous sample. Not empirically qualified. Not operational. Not approved for publication | Implemented. Historically evaluated on latest-revised data. Not empirically qualified as a forecast. Not a Taylor rule. Not operational. Not approved for publication | Implemented. Historically evaluated. Does not reject no-cointegration. Not causal. Not operational. Not approved for publication | Implemented. Historically evaluated. Stays inside the boundary. Not a break date. Not operational. Not approved for publication | Implemented. Historically evaluated as a spread. Not a recession probability. Probit coefficients were not estimated. Not operational. Not approved for publication |
-| Vintage class | `latest_revised` | `latest_revised` | `latest_revised` | `latest_revised` | `latest_revised` |
-| Publication flag | false | false | false | false | false |
-| A refresher must not assume | That October 2025 was interpolated, that an insufficient run is a forecast, or that the run is rewritten in place | An output gap, a Taylor rule, trailing inflation, or a policy prescription | Causality, a vector autoregression, or that failure to reject was replaced by a rejection | That April 2020 is a selected break, that the lag was chosen by an information criterion, or that this is Bai–Perron | That the spread is a recession probability, that probit coefficients exist in the June 1996 article, or that federal funds is the short rate |
+| Field | Inflation autoregression | Ex-post real funds rate | Industrial-production CUSUM | 10-year minus 3-month spread |
+| --- | --- | --- | --- | --- |
+| Name | CPI-U inflation autoregression | Ex-post real federal funds rate | Industrial-production CUSUM | 10-year minus 3-month spread |
+| Origin | Autoregressive benchmark rule on CPI-U log changes | Funds rate minus subsequent twelve-month CPI inflation | `recursive_olsresiduals` CUSUM on an AR(1) | Estrella and Mishkin, Current Issues, June 1996. The article does not print probit coefficients |
+| Variant | Held-out comparison with the historical mean. Not a product forecast. Not a Taylor rule | Subsequent inflation, endpoints only. Not a Taylor rule | Predeclared lag 1. Not Bai–Perron. Not a selected break date. A second stated CUSUM specification, not a second break date | Latest-revised investment-basis spread only. Not a recession probability |
+| Code path | `workers/research/src/aqil_research/methods/inflation_autoregression.py` | `workers/research/src/aqil_research/methods/ex_post_real_funds_rate.py` | `workers/research/src/aqil_research/methods/ip_growth_cusum.py` | `workers/research/src/aqil_research/methods/estrella_mishkin.py` |
+| Series | `bls.cu.CUSR0000SA0` | `fed.h15.RIFSPFF_N.M` and `bls.cu.CUSR0000SA0` | `fed.g17.IP.B50001.S` | `fed.h15.RIFLGFCY10_N.M` and `fed.h15.RIFLGFCM03_N.M` |
+| Frequency | Monthly | Monthly | Monthly | Monthly |
+| Transformations | Monthly logarithmic change. Gaps not filled | Twelve-month percent change from t to t+12 | Monthly log-growth | Difference of the two yields. No probit |
+| Parameter policy | `none`. Version 0.1.0 | `none`. Version 0.1.0 | `none`. Version 0.1.0 | `none`. Version 1.0.0 |
+| execute-method id | `INFLATION_AUTOREGRESSION` | `EX_POST_REAL_FUNDS_RATE` | `IP_GROWTH_CUSUM` | `ESTRELLA_MISHKIN_TERM_SPREAD` |
+| Refit rule | `--refit` rejected | `--refit` rejected | `--refit` rejected | `--refit` rejected |
+| Run | `f0adeed5-991a-4115-be21-f4cbe4c122c7` | `e340659b-b693-480a-8e6d-a64b24b90f99` | `8dd294fc-aa4c-47c5-af43-777dc75d9e3a` | `cbfdaf86-8446-435e-8ceb-7f43557613f1` |
+| Validation label | Implemented. Executed. Insufficient on the latest contiguous sample. Not empirically qualified. Not operational. Not approved for publication | Implemented. Historically evaluated on latest-revised data. Not empirically qualified as a forecast. Not a Taylor rule. Not operational. Not approved for publication | Implemented. Historically evaluated. Stays inside the boundary. Not a break date. Not operational. Not approved for publication | Implemented. Historically evaluated as a spread. Not a recession probability. Probit coefficients were not estimated. Not operational. Not approved for publication |
+| Vintage class | `latest_revised` | `latest_revised` | `latest_revised` | `latest_revised` |
+| Publication flag | false | false | false | false |
+| A refresher must not assume | That October 2025 was interpolated, that an insufficient run is a forecast, or that the run is rewritten in place | An output gap, a Taylor rule, trailing inflation, or a policy prescription | That April 2020 is a selected break, that the lag was chosen by an information criterion, or that this is Bai–Perron | That the spread is a recession probability, that probit coefficients exist in the June 1996 article, or that federal funds is the short rate |
 
-These five methods are implemented. None is empirically qualified. The inflation autoregression did not produce a sufficient calculation on the stored file.
+These four methods are implemented. None is empirically qualified. The inflation autoregression did not produce a sufficient calculation on the stored file. The only Engle–Granger test in this inventory is section L's `ENGLE_GRANGER_COINTEGRATION`.
 
 ### Preserved runs
 
-These rows were read again after the five appends. Each still has `publication_allowed` false and `analysis_mode` `latest_revised`. None was replaced.
+These rows were read again after the appends. Each still has `publication_allowed` false and `analysis_mode` `latest_revised`. None was replaced. Local run `314ef1b5-c691-4c0c-a3c4-1fb4577254a4` was not deleted. It is the duplicate registration's stored row, not a second Engle–Granger method.
 
 `8fb20325-414f-401b-8c46-bda82ed94e16`, `3955f7f4-08f8-4e7b-9ded-b3f6eea6633f`, `0d667a12-5a9c-45e0-b04a-8aea4196bc19`, `1f747c9f-4851-4588-a4dc-d8fb1ff30558`, `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` (preserved Stock–Watson; the refit was not adopted), `940955f1-50d5-4c06-9d90-5ceebd05d352` (stays unadopted), `f3db281d-9f6d-4c4c-974f-ba4b9bd68131`, `4629b31d-b0de-4a2f-a987-9e5d3f94747e`, `2f4c14eb-44f2-40dc-913f-bf7945e972cd`, `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e`, `94152391-c3a8-48d7-8f2e-8c4d1dfdb811`.
 
@@ -328,3 +331,5 @@ The execution contract and this inventory exist, so a later orchestra can design
 ### Test evidence for this section
 
 `npm run test:research` passed 663 tests, then Ruff check and Ruff format (423 files already formatted). Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. Methodology unit tests passed 25. Web typecheck passed. GitHub Actions has not run. This is not a publication approval.
+
+After the duplicate registration was removed, `npm run test:research` passed 658 tests. The five tests in `test_activity_cointegration.py` were deleted with that method. The remaining tests were not weakened. Ruff check passed, and Ruff format reported 431 files already formatted. Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. Catalogue tests in `present-methodology.test.ts` and `private-methodology-result.test.ts` passed 25. GitHub Actions has not run. Web typecheck was not re-run. This is not a publication approval.

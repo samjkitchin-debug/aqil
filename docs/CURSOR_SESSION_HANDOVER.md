@@ -1,19 +1,18 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 31 October 2026, feasible V1 method registration
+**Last updated:** 31 October 2026, duplicate Engle–Granger registration removed
 
 ## Feasible V1 registration, 31 October 2026
 
 Risk class R2. Branch `research/quantitative-v1` in `C:\Users\gamer\aqil-quant-v1`. `publication_allowed` stays false. Nothing was pushed. PR #18 was not retargeted. Nothing was merged to `main`. Hosted Supabase was not read or written. Database `postgres` on `127.0.0.1:55432` was not reset. No `pg_dump` was created. `workers/research/src/aqil_research/workflow/refresh.py` was not changed. No scheduler, cron, or jobs table was added.
 
-`default_method_registry()` now includes `INFLATION_AUTOREGRESSION`, `EX_POST_REAL_FUNDS_RATE`, `ACTIVITY_LEVEL_COINTEGRATION`, `IP_GROWTH_CUSUM`, and `ESTRELLA_MISHKIN_TERM_SPREAD`. The older CPI-U and trailing-funds modules remain registered. Their stored runs were not replaced. `--refit` was not passed. Replay match rules were not weakened.
+`default_method_registry()` includes `INFLATION_AUTOREGRESSION`, `EX_POST_REAL_FUNDS_RATE`, `IP_GROWTH_CUSUM`, and `ESTRELLA_MISHKIN_TERM_SPREAD`. `ACTIVITY_LEVEL_COINTEGRATION` was removed because it duplicated `ENGLE_GRANGER_COINTEGRATION` (run `570e2f51-1871-4c0e-88c9-c40652093613`). Local run `314ef1b5-c691-4c0c-a3c4-1fb4577254a4` was left in postgres and is not a second method. The older CPI-U and trailing-funds modules remain registered. Their stored runs were not replaced. `--refit` was not passed. Replay match rules were not weakened. `IP_GROWTH_CUSUM` and `CUSUM_RECURSIVE_RESIDUALS` are two stated CUSUM specifications, not two discoveries of different break dates.
 
 Local append-only runs, all `latest_revised` and `publication_allowed` false:
 
 - `INFLATION_AUTOREGRESSION` `f0adeed5-991a-4115-be21-f4cbe4c122c7` is `completed_insufficient`. The latest contiguous logarithmic-change sample is shorter than 144 months. October 2025 CPI was not interpolated. Not empirically qualified. Not a Taylor rule.
 - `EX_POST_REAL_FUNDS_RATE` `e340659b-b693-480a-8e6d-a64b24b90f99`. September 2025 funds rate 4.22 percent, subsequent twelve-month CPI inflation 3.7173 percent, ex-post real rate 0.5027 percentage points. Not a Taylor rule.
-- `ACTIVITY_LEVEL_COINTEGRATION` `314ef1b5-c691-4c0c-a3c4-1fb4577254a4`. Does not reject no-cointegration. Not causal.
 - `IP_GROWTH_CUSUM` `8dd294fc-aa4c-47c5-af43-777dc75d9e3a`. Stays inside the five percent boundary. Not a selected break date. Not Bai–Perron.
 - `ESTRELLA_MISHKIN_TERM_SPREAD` `cbfdaf86-8446-435e-8ceb-7f43557613f1`. September 2026 spread 0.90 percentage points (4.99 minus 4.09). Not a recession probability. No probit coefficients were estimated.
 
@@ -23,7 +22,7 @@ Preserved runs still have `publication_allowed` false, including Stock–Watson 
 
 The execution contract and the inventory in section M of `docs/macro/METHODOLOGY_CERTIFICATION.md` exist, so a later orchestra can design one refresher. It is not ready to run unattended. The three prerequisites still missing are a hosted backup, a hosted BEA ingest, and the scheduler. This session did not build them. Track B stops here: no hosted write and no `pg_dump`.
 
-Signed-in pages can read the new stored calculations. Planned cards with empty query lists stay empty. `harding-pagan-bbq` stays planned. Signed-out sessions still receive no calculation. Test counts for this commit are in section M. GitHub Actions has not run.
+Signed-in pages can read the stored calculations that remain registered. The activity-level card was removed, so that stored row is not shown as a second method. Planned cards with empty query lists stay empty. `harding-pagan-bbq` stays planned. Signed-out sessions still receive no calculation. After the removal, `npm run test:research` passed 658 tests and the catalogue tests passed 25. GitHub Actions has not run.
 
 ## Quantitative V1 views, 31 October 2026
 

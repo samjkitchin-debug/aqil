@@ -7,9 +7,6 @@ from dataclasses import dataclass
 
 import psycopg
 
-from aqil_research.methods.activity_cointegration import (
-    PUBLISHED_CONFIG as ACTIVITY_LEVEL_COINTEGRATION_PUBLISHED,
-)
 from aqil_research.methods.autoregressive_benchmark import (
     PUBLISHED_CONFIG as AUTOREGRESSIVE_BENCHMARK_PUBLISHED,
 )
@@ -215,7 +212,6 @@ def reproduction_config(config_id: str) -> dict[str, object]:
         EX_POST_REAL_FEDERAL_FUNDS_PUBLISHED,
         INFLATION_AUTOREGRESSION_PUBLISHED,
         EX_POST_REAL_FUNDS_RATE_PUBLISHED,
-        ACTIVITY_LEVEL_COINTEGRATION_PUBLISHED,
         IP_GROWTH_CUSUM_PUBLISHED,
         ESTRELLA_MISHKIN_PUBLISHED,
     )
