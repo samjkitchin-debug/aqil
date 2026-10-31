@@ -69,6 +69,15 @@ if ($instrumentsOnDevelopment -eq "t") {
   throw "The instruments schema must stay off preserved database postgres."
 }
 
+$cyclesOnTest = (Invoke-Psql $testDatabase "select to_regclass('research.research_cycles')").Trim()
+if ($cyclesOnTest -eq "") {
+  $cycleMigration = Join-Path (Split-Path -Parent $PSScriptRoot) "supabase\migrations\20261101120000_research_cycles.sql"
+  docker cp $cycleMigration "${container}:/tmp/aqil_research_cycles.sql"
+  if ($LASTEXITCODE -ne 0) { throw "Could not copy the research cycle migration." }
+  docker exec $container psql -U postgres -d $testDatabase -v ON_ERROR_STOP=1 -f /tmp/aqil_research_cycles.sql
+  if ($LASTEXITCODE -ne 0) { throw "Could not apply the research cycle migration on $testDatabase." }
+}
+
 $after = (Invoke-Psql "postgres" $liveCountSql).Trim()
 if ($before -ne $after) {
   throw "Development live observation count changed from $before to $after."
