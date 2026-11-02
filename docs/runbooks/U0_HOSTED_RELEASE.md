@@ -87,6 +87,21 @@ Restore the dump into a disposable database and check schemas, roles, and the re
 
 Restore is a new project or a reviewed restore. Do not use `supabase db reset --linked`.
 
+## Logical backup, 2 November 2026
+
+The direct host name does not resolve from this machine. The supported owner connection is the session-pooler URL on port 5432 for `postgres.ojvswermsbbaltjohqph`, stored only in `C:\Users\gamer\aqil-release-backups\hosted-owner.connection`. That file is outside Git. Do not print it. The owner role is for backup and restore. `research_worker` is not a dump role.
+
+Repeatable procedure:
+
+1. Read the owner file in a process that does not echo it. Set `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, and `PGSSLMODE=require`.
+2. Confirm `current_user`, `has_schema_privilege` on `research`, `count(*)` from `research.research_runs`, and `count(*)` from `research.economic_observations`.
+3. `pg_dump --format=custom` of schemas `research`, `public`, `forward`, `instruments`, `auth`, and `storage` to `C:\Users\gamer\aqil-release-backups\2026-11-02\aqil-hosted.dump`.
+4. Start a disposable Postgres 17 container that is not the local Supabase stack. Create an empty database. Create `research_reader` and `research_writer` as `NOLOGIN` with no password.
+5. `pg_restore --schema=research` does not emit `CREATE SCHEMA`. Create the schema, restore `--schema=research`, then restore the dump's `ACL - SCHEMA research` entry. Ignore the single "schema already exists" error from that ACL pass. Restore `--schema=forward` and `--schema=instruments` the same way.
+6. Compare observation counts, the five run ids, and grants with the host. A zero exit code is not the proof.
+
+Executed on 2 November 2026. The privileges check returned the pooler owner role, research usage, 5 runs, and 34,859 observations. The custom dump is 1,563,838 bytes and recorded no dump errors. The disposable database `aqil_restore` on `127.0.0.1:55499` restored 34,859 observations. The five runs, all `publication_allowed=false` and `completed`, were `5894b7a4-98e1-40c2-a503-b8e19cb77281` (`CREDIT_STANDARDS_AND_VOLUMES`), `2b1d1c28-56e3-47ab-920a-b0aa175d9a1d` (`INDUSTRIAL_PRODUCTION_ACTIVITY`), `f0f41b6f-9d18-4e7b-84fb-30e53df2e157` (`LABOUR_MARKET_CONDITIONS`), `d8ec09f0-719e-4b9f-ab88-772ea1c9ae8d` (`MACRO_READING_SYNTHESIS`), and `e6602b5b-f34a-445a-b7d8-13aab77e5726` (`PRICES_AND_POLICY`). Series counts matched the host, including CPI-U 956, payrolls 1,053, unemployment 44, industrial production 1,293, the 10-year yield 882, and federal funds 867. The absent BEA, 3-month yield, and Census series were absent in the restore. `research_reader` has select on `economic_observations` and on 17 `research_runs` columns. `research_writer` has select and insert on the research tables in the dump. Replaying the schema ACL sets `research_reader` usage. The dump does not recreate role passwords or `LOGIN`. `auth` and `storage` need Supabase-specific owners and were not required for the research proof. The container was removed after the checks. The dump file remains outside Git.
+
 ## What SQL cannot undo
 
 The ten applied files create tables, constraints, policies, and grants. Replacing the two forward check constraints widened the allowed evidence classes. Dropping those new tables would delete any rows written after the apply. There were none at apply time. A site rollback does not remove them.

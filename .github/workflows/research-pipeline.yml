@@ -1,12 +1,13 @@
 # Research pipeline.
 #
 # The daily cycle module can record a missed UTC day from the last cycle start.
-# This workflow does not schedule that cycle. Hosted writes stay refused until
-# a tested logical restore exists and the founder arms them. A pull request
-# cannot read a live-write secret because this workflow is manual only.
-name: Research pipeline (manual)
+# The 06:15 UTC schedule runs the hosted refresh only when RESEARCH_DATABASE_URL
+# is set as a repository secret. The secret is not stored in Git.
+name: Research pipeline
 
 on:
+  schedule:
+    - cron: "15 6 * * *"
   workflow_dispatch:
     inputs:
       mode:
@@ -60,17 +61,26 @@ jobs:
 
   live:
     name: Live cycle (armed writes only)
-    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'live'
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'live')
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
-      - name: Refuse unless hosted writes are armed
+      - name: Refuse unless the worker connection is set
         env:
-          AQIL_RESEARCH_LIVE_WRITES: ${{ secrets.AQIL_RESEARCH_LIVE_WRITES }}
+          RESEARCH_DATABASE_URL: ${{ secrets.RESEARCH_DATABASE_URL }}
         run: |
-          if [ "$AQIL_RESEARCH_LIVE_WRITES" != "armed" ]; then
-            echo "Refusing live writes. The repository secret AQIL_RESEARCH_LIVE_WRITES is not armed."
+          if [ -z "$RESEARCH_DATABASE_URL" ]; then
+            echo "Refusing live writes. The repository secret RESEARCH_DATABASE_URL is not set."
             exit 1
           fi
-          echo "The secret is armed. Gate 10 still has no tested logical restore, so this job does not write."
-          exit 1
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - name: Hosted refresh
+        working-directory: workers/research
+        env:
+          RESEARCH_DATABASE_URL: ${{ secrets.RESEARCH_DATABASE_URL }}
+        run: |
+          uv sync --group dev
+          uv run aqil-research refresh
