@@ -24,8 +24,10 @@ import {
   identityCopy,
   listingsCopy,
   priceCopy,
+  adjustedCloseCopy,
   type EtfShareExplore,
 } from "./present-explore.ts";
+import { LICENSED_PRICE_WITHHELD } from "./licensed-price-access.ts";
 
 function unverifiedAnchor(): EtfShareExplore {
   return {
@@ -86,9 +88,35 @@ test("an unverified anchor hides uncited fields and holdings", () => {
   assert.doesNotMatch(assessmentCopy(share), /CORE/);
   assert.match(priceCopy(share), /not zero/);
   assert.equal(share.prices.reason, PRICE_ABSENT);
+  assert.equal(adjustedCloseCopy(share), "");
   assert.match(PERFORMANCE_SEPARATE, /none is a recommendation/);
   assert.doesNotMatch(PERFORMANCE_SEPARATE, /buy|allocate|order/i);
   assert.equal(share.exposures.length, 0);
+});
+
+test("an adjusted close series stays distinct from a raw close", () => {
+  const share = unverifiedAnchor();
+  share.prices = {
+    ...absentPrices(),
+    adjustedCloseCount: 1838,
+    adjustedFirstDate: "2019-07-25",
+    adjustedLastDate: "2026-11-02",
+    adjustedCurrency: "USD",
+  };
+  const adjusted = adjustedCloseCopy(share);
+  assert.match(adjusted, /Adjusted close in USD from 2019-07-25 to 2026-11-02/);
+  assert.match(adjusted, /The stored count is 1838/);
+  assert.match(adjusted, /not a raw close/);
+  assert.match(priceCopy(share), /No licensed close is stored/);
+  assert.doesNotMatch(priceCopy(share), /1838/);
+});
+
+test("a session without the founder claim does not reveal adjusted prices", () => {
+  const share = unverifiedAnchor();
+  share.prices = absentPrices(LICENSED_PRICE_WITHHELD);
+  assert.equal(adjustedCloseCopy(share), "");
+  assert.match(priceCopy(share), /founder session/);
+  assert.doesNotMatch(priceCopy(share), /2019-07-25|1838/);
 });
 
 test("an exact ISIN can open a dossier and a ticker cannot", () => {

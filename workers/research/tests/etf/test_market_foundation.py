@@ -445,6 +445,44 @@ def test_approval_history_is_separate_from_eligibility_and_not_autonomous() -> N
     assert model.latest_close.price_type == "close"
 
 
+def test_adjusted_close_is_not_reported_as_a_raw_close() -> None:
+    earlier = _close(
+        session_date=date(2019, 7, 25),
+        price_type="adjusted_close",
+        adjustment_status="adjusted",
+        adjustment_definition="splits",
+        value=Decimal("100"),
+    )
+    later = _close(
+        session_date=date(2026, 11, 2),
+        price_type="adjusted_close",
+        adjustment_status="adjusted",
+        adjustment_definition="splits",
+        value=Decimal("140"),
+    )
+    raw = _close()
+    model = build_read_model(
+        isin="IE00BK5BQT80",
+        cited=False,
+        listings=(),
+        eligibility=(),
+        approvals=(),
+        prices=(later, earlier, raw),
+        fx_reason="No FX rate is stored.",
+        holdings_completeness="partial",
+    )
+    assert model.latest_close is not None
+    assert model.latest_close.price_type == "close"
+    assert model.historical_closes == (raw,)
+    series = model.adjusted_close_series
+    assert series.count == 2
+    assert series.currency == "USD"
+    assert series.first_date == date(2019, 7, 25)
+    assert series.last_date == date(2026, 11, 2)
+    assert model.latest_adjusted_close is not None
+    assert model.latest_adjusted_close.price_type == "adjusted_close"
+
+
 def test_explicit_approval_requires_actor_and_is_not_called_here_as_founder() -> None:
     with pytest.raises(GovernanceError):
         draft_approval(

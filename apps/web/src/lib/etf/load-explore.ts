@@ -333,12 +333,21 @@ async function loadPrices(client: Client, shareClassId: string): Promise<EtfShar
     );
     const rows = prices.rows;
     const closeRows = rows.filter((row) => row.priceType === "close");
+    const adjustedRows = rows.filter((row) => row.priceType === "adjusted_close");
     const quote = rows.find((row) => row.priceType === "bid" || row.priceType === "ask" || row.priceType === "last") ?? null;
+    const currencies = new Set(adjustedRows.map((row) => row.currency));
+    const earliest = adjustedRows.at(-1) ?? null;
+    const latest = adjustedRows[0] ?? null;
     return {
       close: closeRows[0] ?? null,
       nav: nav.rows[0] ?? null,
       quote,
       closeCount: closeRows.length,
+      adjustedClose: latest,
+      adjustedCloseCount: adjustedRows.length,
+      adjustedFirstDate: earliest?.sessionDate ?? null,
+      adjustedLastDate: latest?.sessionDate ?? null,
+      adjustedCurrency: currencies.size === 1 ? latest?.currency ?? null : null,
       reason: closeRows[0] ? "" : PRICE_ABSENT,
     };
   } catch {

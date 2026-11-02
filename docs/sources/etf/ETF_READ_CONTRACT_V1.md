@@ -17,7 +17,7 @@ Missing stays missing. A missing price is not zero. A missing approval is not el
 | Eligibility | `instruments.eligibility_decisions`, and the existing `instruments.assessments` row | `eligible`, `insufficient`, or `rejected` are conditions. `CORE` is not founder approval and is not a score. |
 | Approval | `instruments.approval_decisions` | Append-only. This programme inserts none. An approval needs an actor and a rationale. |
 | Latest close | `instruments.market_price_observations` where `price_type` is `close` and `adjustment_status` is `raw` | No licensed close is stored. |
-| Adjusted close | A different row, `price_type` `adjusted_close` | It is never written over the raw close. |
+| Adjusted close | A different row, `price_type` `adjusted_close`, shown with currency, first date, last date, and count | It is never rewritten as a raw close. A session without the founder claim does not receive it. |
 | NAV | `instruments.nav_observations` | NAV is not the listing close. |
 | Bid, ask, last | Separate market-price rows | A quote is not the close. Delay class stays on the row. |
 | Quote unit | `quote_unit` | `GBX` stays `GBX`. It is not divided into `GBP` in the raw row. |

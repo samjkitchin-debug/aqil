@@ -78,6 +78,11 @@ export type PriceFreshnessView = {
   nav: PricePointView | null;
   quote: PricePointView | null;
   closeCount: number;
+  adjustedClose: PricePointView | null;
+  adjustedCloseCount: number;
+  adjustedFirstDate: string | null;
+  adjustedLastDate: string | null;
+  adjustedCurrency: string | null;
   reason: string;
 };
 
@@ -174,7 +179,18 @@ export const PRICE_ABSENT =
   "No licensed close is stored. A missing price is not zero.";
 
 export function absentPrices(reason = PRICE_ABSENT): PriceFreshnessView {
-  return { close: null, nav: null, quote: null, closeCount: 0, reason };
+  return {
+    close: null,
+    nav: null,
+    quote: null,
+    closeCount: 0,
+    adjustedClose: null,
+    adjustedCloseCount: 0,
+    adjustedFirstDate: null,
+    adjustedLastDate: null,
+    adjustedCurrency: null,
+    reason,
+  };
 }
 
 export const APPROVAL_ABSENT =
@@ -194,6 +210,18 @@ export function priceCopy(share: EtfShareExplore): string {
   if (!close) return share.prices.reason || PRICE_ABSENT;
   const stale = close.quality === "stale" ? " This close is stale." : "";
   return `Close ${close.valueText} ${close.quoteUnit} on ${close.sessionDate}. Adjustment ${close.adjustmentStatus}. Delay ${close.delayClass}. Source ${close.sourceId}. Retrieved ${close.retrievedAt}.${stale} Stored closes: ${share.prices.closeCount}.`;
+}
+
+export function adjustedCloseCopy(share: EtfShareExplore): string {
+  const prices = share.prices;
+  if (prices.adjustedCloseCount === 0) return "";
+  const currency = prices.adjustedCurrency;
+  const first = prices.adjustedFirstDate;
+  const last = prices.adjustedLastDate;
+  if (!currency || !first || !last) {
+    return `The adjusted close count is ${prices.adjustedCloseCount}. Currency or dates are incomplete. This is not a raw close.`;
+  }
+  return `Adjusted close in ${currency} from ${first} to ${last}. The stored count is ${prices.adjustedCloseCount}. This is not a raw close.`;
 }
 
 export function navCopy(share: EtfShareExplore): string {

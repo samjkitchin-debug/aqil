@@ -34,6 +34,17 @@ class HoldingLine(BaseModel):
     weight: Decimal | None = None
 
 
+class AdjustedCloseSeries(BaseModel):
+    """A split-adjusted series. It is not a raw close and not a total return."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    currency: str | None = None
+    first_date: date | None = None
+    last_date: date | None = None
+    count: int = 0
+
+
 class EtfReadModel(BaseModel):
     """One share class as the web loader may show it. No recommendation is included."""
 
@@ -46,6 +57,9 @@ class EtfReadModel(BaseModel):
     approvals: tuple[ApprovalRow, ...] = ()
     latest_close: PriceObservation | None = None
     historical_closes: tuple[PriceObservation, ...] = ()
+    latest_adjusted_close: PriceObservation | None = None
+    historical_adjusted_closes: tuple[PriceObservation, ...] = ()
+    adjusted_close_series: AdjustedCloseSeries = Field(default_factory=AdjustedCloseSeries)
     latest_nav: PriceObservation | None = None
     fx_lineage: str
     holdings_completeness: str
@@ -73,6 +87,7 @@ def build_read_model(
     """Assemble stored facts. Eligibility is not copied into approvals."""
 
     closes = _typed(prices, "close", as_of)
+    adjusted = _typed(prices, "adjusted_close", as_of)
     navs = _typed(prices, "nav", as_of)
     overlap_count, overlap_reason = _overlap(
         holdings_completeness,
@@ -88,6 +103,9 @@ def build_read_model(
         approvals=approvals,
         latest_close=closes[-1] if closes else None,
         historical_closes=closes,
+        latest_adjusted_close=adjusted[-1] if adjusted else None,
+        historical_adjusted_closes=adjusted,
+        adjusted_close_series=_adjusted_series(adjusted),
         latest_nav=navs[-1] if navs else None,
         fx_lineage=fx_reason,
         holdings_completeness=holdings_completeness,
@@ -96,6 +114,18 @@ def build_read_model(
         overlap_reason=overlap_reason,
         shared_holding_count=overlap_count,
         sources=source_ids,
+    )
+
+
+def _adjusted_series(rows: tuple[PriceObservation, ...]) -> AdjustedCloseSeries:
+    if not rows:
+        return AdjustedCloseSeries()
+    currencies = {row.currency for row in rows}
+    return AdjustedCloseSeries(
+        currency=rows[-1].currency if len(currencies) == 1 else None,
+        first_date=rows[0].session_date,
+        last_date=rows[-1].session_date,
+        count=len(rows),
     )
 
 

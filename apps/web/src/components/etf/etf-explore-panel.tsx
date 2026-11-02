@@ -5,6 +5,7 @@ import { mapCitedExposure } from "@/lib/etf/exposure-context";
 import {
   ETF_RESEARCH_BOUNDARY,
   EXPOSURES_ABSENT,
+  adjustedCloseCopy,
   approvalCopy,
   assessmentCopy,
   benchmarkCopy,
@@ -71,6 +72,11 @@ export function EtfExplorePanel({ share }: Props) {
       <p className="research-body" data-testid="etf-price">
         {priceCopy(share)}
       </p>
+      {adjustedCloseCopy(share) ? (
+        <p className="research-body" data-testid="etf-adjusted-close">
+          {adjustedCloseCopy(share)}
+        </p>
+      ) : null}
       <p className="research-body">{navCopy(share)}</p>
       <p className="research-body">{quoteCopy(share)}</p>
       <h3 className="research-section-title">Cited costs</h3>
