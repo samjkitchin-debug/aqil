@@ -1,6 +1,6 @@
 # Macro-to-ETF readiness
 
-**Status:** Gate 0 record, written before any correlation  
+**Status:** Gate 0 was written before any correlation. The later-gates section records the run.  
 **Branch:** `research/macro-etf-discovery`, cut from `5ef2913`  
 **Catalogue hash:** `b7b9c2aa85eb9c343b0582f93b05fa57e26f46be57d4e3b8b25a831a20059491`
 
@@ -50,3 +50,17 @@ Later gates run only on `retrospective_only` cells, and only on the four first-p
 ## What this is not
 
 `publication_allowed` stays false. No allocation, investment-policy, Saxo, or refresh file was edited. No production table was added. scikit-learn was not added. The forward-validated class is empty because nothing here was frozen before the outcomes.
+
+## Later gates
+
+The catalogue hash did not change after Gate 0. The trial ledger is `trials.jsonl`.
+
+The pilot was estimated. Pearson r is 0.6976183057660493, Spearman r is 0.6036422349612018, and the Newey-West slope is 0.03587019471662332. It has 73 decision points and 7 non-overlapping windows, so it stays below the exploratory floor and is not an exploratory finding.
+
+Seven training-window cells on EIMI meet the statistical rule, at the 1-month and 3-month horizons. The features are the unemployment level, the 12-month unemployment change, the 12-month CPI-U change, and the 12-month industrial-production change. They are not seven independent findings. The holdout slope kept the same sign. The predeclared cash rule did not beat immediate investment on the holdout under either the zero or the 10 basis-point assumption. The economically useful class is empty. The forward-validated class is empty.
+
+Gate 2 recorded 45 rows and did not promote a combination. Gate 3 recorded 72 rows. No incremental test both met the training statistical floor and survived Benjamini-Hochberg, so Gate 4 did not combine methodology outputs. Gate 6 ran the holdout once.
+
+`uv run pytest tests/discovery` passed 16. `uv run pytest tests/test_asof_selection.py` passed 7. `uv run pytest tests/etf/test_performance.py` passed 13. The same three paths together passed 36. `npm run test:research` was not re-run. The known failures were not re-run and were not weakened: the TradingView rights fragment in `test_restricted_sources_block_collection_holdings_and_ter`, `test_every_etf_fragment_blocks_cost_collection`, and `test_rights_fragments_refuse_automated_collection`, and the live H.15 count in `test_live_board_file_is_counted_in_memory`. This is not a GitHub Actions result and it is not Verified.
+
+`publication_allowed` stayed false. The refresh, as-of, return, allocation, and investment-policy files were not edited.

@@ -15,6 +15,12 @@ from aqil_research.discovery.association import (
     claim_class,
 )
 from aqil_research.discovery.coverage import materialise_feature
+from aqil_research.discovery.economic import (
+    adverse_flags,
+    beats_immediate,
+    invest_at_once_flags,
+    terminal_wealth,
+)
 from aqil_research.discovery.eligibility import SampleFloors, meets_exploratory, meets_statistical
 from aqil_research.discovery.load import StudyData
 from aqil_research.discovery.pairs import (
@@ -394,31 +400,8 @@ class _Context:
             if record["evidence_class"] == "statistically_supported"
         ]
         records: list[dict[str, Any]] = []
-        if any(record["gate"] == "6" for record in inferential):
-            holdout_already = True
-        else:
-            holdout_already = False
         if not supported:
-            if not holdout_already:
-                records.append(
-                    self._record(
-                        gate="6",
-                        cell_id="holdout",
-                        status="blocked",
-                        evidence="not_claimed",
-                        payload={
-                            "reason": (
-                                "no inferential cell survived false-discovery control "
-                                "and the holdout"
-                            ),
-                            "holdout_run": any(
-                                record["payload"].get("holdout_confirms") is False
-                                and record["payload"].get("holdout")
-                                for record in inferential
-                            ),
-                        },
-                    )
-                )
+            records.append(self._holdout_record(ran=False, cells=[]))
             records.append(
                 self._record(
                     gate="5",
@@ -435,15 +418,96 @@ class _Context:
             )
             return records
         records.append(
-            self._record(
-                gate="5",
-                cell_id="economic",
-                status="blocked",
-                evidence="not_claimed",
-                payload={"reason": "supported cells are compared individually"},
+            self._holdout_record(
+                ran=True,
+                cells=[record["cell_id"] for record in supported],
             )
         )
+        for record in supported:
+            records.append(self._economic_cell(record))
         return records
+
+    def _holdout_record(self, *, ran: bool, cells: list[str]) -> dict[str, Any]:
+        if ran:
+            reason = "The holdout was run once on each cell that survived the training test."
+        else:
+            reason = "No inferential cell survived false-discovery control and the holdout."
+        return self._record(
+            gate="6",
+            cell_id="holdout",
+            status="retrospective_only" if ran else "blocked",
+            evidence="not_claimed",
+            payload={"holdout_run": ran, "cells": cells, "reason": reason},
+        )
+
+    def _economic_cell(self, record: dict[str, Any]) -> dict[str, Any]:
+        _prefix, feature_id, etf, horizon_text = record["cell_id"].split(":")
+        horizon = int(horizon_text)
+        rule = str(self.features[feature_id]["adverse"])
+        listing = self.study.listings[etf]
+        training, holdout = split_holdout(
+            self._pairs(feature_id, etf, horizon),
+            self.holdout,
+        )
+        train_end = max(session for session in listing.sessions if session < self.holdout)
+        final = listing.sessions[-1]
+        training = tuple(pair for pair in training if pair.entry <= train_end)
+        holdout = tuple(pair for pair in holdout if pair.entry <= final)
+        cell = f"gate5:{feature_id}:{etf}:{horizon}"
+        if not training or not holdout:
+            return self._record(
+                gate="5",
+                cell_id=cell,
+                status="blocked",
+                evidence="not_claimed",
+                payload={"reason": "a contribution window was empty"},
+            )
+        ordered = training + holdout
+        flags = adverse_flags([float(pair.signal) for pair in ordered], rule)
+        invested = [not flag for flag in flags]
+        train_invested = invested[: len(training)]
+        hold_invested = invested[len(training) :]
+        costs = tuple(float(cost) for cost in self.catalogue["costs_bps"])
+        train_beats = beats_immediate(
+            list(training),
+            train_invested,
+            listing.prices,
+            train_end,
+            costs,
+        )
+        hold_beats = beats_immediate(
+            list(holdout),
+            hold_invested,
+            listing.prices,
+            final,
+            costs,
+        )
+        useful = train_beats and hold_beats
+        wealth = {
+            "training": _wealth(training, train_invested, listing.prices, train_end, costs),
+            "holdout": _wealth(holdout, hold_invested, listing.prices, final, costs),
+        }
+        return self._record(
+            gate="5",
+            cell_id=cell,
+            status="retrospective_only" if useful else "blocked",
+            evidence="economically_useful" if useful else "not_claimed",
+            payload={
+                "training_advantage": train_beats,
+                "holdout_advantage": hold_beats,
+                "adverse": rule,
+                "costs_bps": list(costs),
+                "wealth": wealth,
+                "reason": (
+                    None
+                    if useful
+                    else (
+                        "the predeclared rule did not beat immediate investment "
+                        "under both cost assumptions"
+                    )
+                ),
+            },
+        )
 
     def _gate4(self, distinct: dict[str, dict[str, Any]]) -> dict[str, Any]:
         if len(distinct) < 2:
@@ -753,4 +817,20 @@ def _diffusion(series: dict[str, dict[date, Decimal]]) -> dict[date, Decimal]:
         month.period: Decimal(str(month.share))
         for month in result.months
         if month.share is not None
+    }
+
+
+def _wealth(pairs, invested, prices, end, costs):
+    return {
+        str(cost): {
+            "signal": terminal_wealth(pairs, invested, prices, end, cost),
+            "immediate": terminal_wealth(
+                pairs,
+                invest_at_once_flags(len(pairs)),
+                prices,
+                end,
+                cost,
+            ),
+        }
+        for cost in costs
     }

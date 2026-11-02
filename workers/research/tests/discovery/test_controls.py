@@ -184,3 +184,26 @@ def test_a_long_price_gap_is_not_filled() -> None:
     )
     assert paired.pairs == ()
     assert paired.missing_windows == 1
+
+
+def test_cash_beats_immediate_investment_when_prices_fall() -> None:
+    from aqil_research.discovery.economic import adverse_flags, beats_immediate
+    from aqil_research.discovery.pairs import AlignedPair
+
+    first = date(2020, 1, 2)
+    second = date(2020, 2, 3)
+    pairs = [
+        AlignedPair(date(2019, 12, 1), first, first, second, Decimal("1"), Decimal("-0.5")),
+        AlignedPair(
+            date(2020, 1, 1), second, second, date(2020, 3, 2), Decimal("2"), Decimal("-0.2")
+        ),
+    ]
+    prices = {
+        first: Decimal("10"),
+        second: Decimal("5"),
+        date(2020, 3, 2): Decimal("4"),
+    }
+    flags = adverse_flags([1.0, 2.0], "positive")
+    invested = [not flag for flag in flags]
+    assert invested == [False, False]
+    assert beats_immediate(pairs, invested, prices, date(2020, 3, 2), (0, 10))

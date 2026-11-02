@@ -56,7 +56,10 @@ def results_markdown(records: list[dict[str, Any]], state: dict[str, Any]) -> st
         "not an issuer total-return index and not NAV. "
         "No foreign-exchange series was used. EUNA stays in euros. "
         "Costs of zero and 10 basis points were assumptions "
-        "and were applied only if a cell reached Gate 5. "
+        "and were applied to the cells that reached Gate 5. "
+        "Gate 3 did not store a block bootstrap of the added coefficient. "
+        "No incremental test both met the training statistical floor "
+        "and survived Benjamini-Hochberg, so Gate 4 had nothing to combine. "
         "Nothing in this run was frozen before the outcome, "
         "so the forward-validated class is empty. "
         f"The input hash is `{state.get('input_hash', '')}`.",
@@ -82,7 +85,8 @@ def negative_markdown(records: list[dict[str, Any]]) -> str:
         "",
     ]
     for reason, count in reasons.most_common(12):
-        lines.append(f"- {count} rows: {reason}")
+        noun = "row" if count == 1 else "rows"
+        lines.append(f"- {count} {noun}: {reason}")
     lines.extend(["", "## Cells that were estimated and not supported", ""])
     for record in records:
         if record["evidence_class"] in {"statistically_supported", "economically_useful"}:
@@ -112,16 +116,34 @@ def _lead(supported: list[dict[str, Any]], useful: list[dict[str, Any]]) -> str:
             f"The economically useful class contains {names}. "
             "That claim is retrospective and is not forward-validated."
         )
-    if supported:
-        names = ", ".join(record["cell_id"] for record in supported)
+    if not supported:
         return (
-            f"The statistically supported class contains {names}. "
-            "No cell cleared the economic comparison. The forward-validated class is empty."
+            "No cell is statistically supported or economically useful on this evidence. "
+            "The forward-validated class is empty."
         )
+    etfs = sorted({record["cell_id"].split(":")[2] for record in supported})
+    horizons = sorted({record["cell_id"].split(":")[3] for record in supported}, key=int)
+    features = sorted({record["cell_id"].split(":")[1] for record in supported})
+    feature_text = ", ".join(_feature_name(item) for item in features)
+    horizon_text = " and ".join(f"{item}-month" for item in horizons)
     return (
-        "No cell is statistically supported or economically useful on this evidence. "
-        "The forward-validated class is empty."
+        f"{len(supported)} training-window cells meet the statistical rule. "
+        f"They use {feature_text} on {', '.join(etfs)} at the {horizon_text} horizons. "
+        "They are not independent findings. The features overlap, the horizons overlap, "
+        "and they share one listing. "
+        "None of the predeclared cash rules beat immediate investment on the holdout. "
+        "The economically useful class is empty. The forward-validated class is empty."
     )
+
+
+def _feature_name(feature_id: str) -> str:
+    names = {
+        "unemployment_level": "the unemployment level",
+        "unemployment_12m_change": "the 12-month unemployment change",
+        "cpi_u_12m_change": "the 12-month CPI-U change",
+        "ip_12m_change": "the 12-month industrial-production change",
+    }
+    return names.get(feature_id, feature_id)
 
 
 def _pilot_paragraph(record: dict[str, Any] | None) -> str:
@@ -152,10 +174,18 @@ def _gate_sentence(records: list[dict[str, Any]], gate: str, label: str) -> str:
     if not rows:
         return f"{label} has no row."
     blocked = sum(1 for record in rows if record["status"] == "blocked")
+    if gate == "5" and blocked == len(rows):
+        return (
+            f"{label} ran on {len(rows)} cells. None beat immediate investment "
+            "on the holdout under both cost assumptions."
+        )
+    if gate == "6" and rows[0]["payload"].get("holdout_run"):
+        return f"{label} ran the holdout once."
     if blocked == len(rows):
         reason = rows[0]["payload"].get("reason", "every row is blocked")
         return f"{label} stopped: {reason}."
-    return f"{label} recorded {len(rows)} rows, of which {blocked} are blocked."
+    noun = "row" if len(rows) == 1 else "rows"
+    return f"{label} recorded {len(rows)} {noun}, of which {blocked} are blocked."
 
 
 def _class_table(records: list[dict[str, Any]]) -> str:

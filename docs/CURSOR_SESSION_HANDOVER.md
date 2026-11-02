@@ -1,7 +1,17 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 3 November 2026, preservation closeout stopped before merge
+**Last updated:** 3 November 2026, macro-to-ETF discovery recorded on a research branch
+
+## Macro-to-ETF discovery, 3 November 2026
+
+Branch `research/macro-etf-discovery` was cut from `5ef2913` on `work/etf-foundation-v1`. `72cfe7d` is the parent of that commit and is not on `origin/main` (`f52a888`). Nothing was pushed and nothing was merged. `apps/web/public/icons/icon.svg` stayed unstaged.
+
+Local `postgres` live `latest_revised` observations are 38,653. Fixture rows are 87, including 15 provider-vintage rows. There is no live vintage panel. `publication_allowed` is false on all 54 research runs. `aqil_etf` still has 42,931 adjusted closes, 0 raw closes, 0 foreign-exchange rows, and no INRG listing. The backup SHA-256 is `B7598DC08AEE375B4E29F66A0423075EAED2A6527B0DDBCBE1F1FE3C6BB96BEB`.
+
+Gate 0 has 960 cells: 568 `retrospective_only` and 392 blocked. The 26 registrations classify as 10 executable historical methodologies, 10 supporting indicators, 5 diagnostics, and 1 unavailable. The programme register has 31 method rows, which is a different list. The pilot, 12-month unemployment change against 12-month VWRA, has 73 decision points and 7 non-overlapping windows. It was estimated and is not an exploratory finding. Seven overlapping EIMI cells meet the statistical rule and none meet the economic rule. The forward-validated class is empty. Detail is in `docs/research/macro-etf/RESULTS.md`.
+
+Checks on this tree, not GitHub Actions and not Verified: `uv run pytest tests/discovery` passed 16; `uv run pytest tests/test_asof_selection.py` passed 7; `uv run pytest tests/etf/test_performance.py` passed 13. The full research suite was not re-run. The known TradingView rights-fragment failures and the live H.15 count failure were not weakened.
 
 ## Preservation closeout, 3 November 2026
 
