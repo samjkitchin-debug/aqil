@@ -2,7 +2,7 @@ import { Suspense } from "react";
 
 import { AppShell } from "@/components/app-shell";
 import { PrivatePage } from "@/components/auth/private-page";
-import { EtfExplorePanel } from "@/components/etf/etf-explore-panel";
+import { EtfExplorePanel, EtfUniverseFilter } from "@/components/etf/etf-explore-panel";
 import { StatusLine } from "@/components/ui/status-line";
 import { loadEtfExplore } from "@/lib/etf/load-explore";
 import {
@@ -38,6 +38,7 @@ async function EtfExplore({ isin }: { isin?: string }) {
   if (loaded.status === "empty") {
     return (
       <div className="research-banner" data-testid="explore-empty">
+        <EtfUniverseFilter isin={isin} />
         <h2 className="research-section-title">ETF research</h2>
         <p className="research-body">{ETF_EMPTY_COPY}</p>
         <p className="research-body mt-[var(--space-4)]">{ETF_CITED_DOCUMENT_REQUIREMENT}</p>
@@ -48,6 +49,7 @@ async function EtfExplore({ isin }: { isin?: string }) {
 
   return (
     <div data-testid="etf-explore">
+      <EtfUniverseFilter isin={isin} />
       {loaded.shares.map((share) => (
         <EtfExplorePanel key={share.isin} share={share} />
       ))}

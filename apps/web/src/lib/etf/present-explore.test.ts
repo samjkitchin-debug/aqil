@@ -10,7 +10,11 @@ import {
   ETF_RESEARCH_BOUNDARY,
   EXPOSURES_ABSENT,
   HOLDINGS_BLOCKED_REASON,
+  OVERLAP_UNAVAILABLE,
+  PERFORMANCE_SEPARATE,
+  PRICE_ABSENT,
   SHARE_CLASS_ABSENT,
+  absentPrices,
   assessmentCopy,
   benchmarkCopy,
   citedShareClassHref,
@@ -19,6 +23,7 @@ import {
   holdingsCopy,
   identityCopy,
   listingsCopy,
+  priceCopy,
   type EtfShareExplore,
 } from "./present-explore.ts";
 
@@ -43,6 +48,11 @@ function unverifiedAnchor(): EtfShareExplore {
     fundReturnCount: 0,
     benchmarkReturnCount: 0,
     exposures: [],
+    prices: absentPrices(),
+    approvals: [],
+    eligibilityDecisions: [],
+    fxSentence: "No rights-cleared SGD reference rate is stored.",
+    overlapReason: OVERLAP_UNAVAILABLE,
   };
 }
 
@@ -72,7 +82,12 @@ test("an unverified anchor hides uncited fields and holdings", () => {
   assert.equal(holdingsCopy(share), HOLDINGS_BLOCKED_REASON);
   assert.match(benchmarkCopy(share), /separate series/);
   assert.match(assessmentCopy(share), /^UNKNOWN/);
+  assert.match(assessmentCopy(share), /not founder approval/);
   assert.doesNotMatch(assessmentCopy(share), /CORE/);
+  assert.match(priceCopy(share), /not zero/);
+  assert.equal(share.prices.reason, PRICE_ABSENT);
+  assert.match(PERFORMANCE_SEPARATE, /none is a recommendation/);
+  assert.doesNotMatch(PERFORMANCE_SEPARATE, /buy|allocate|order/i);
   assert.equal(share.exposures.length, 0);
 });
 

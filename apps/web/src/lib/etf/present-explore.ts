@@ -60,6 +60,40 @@ export function citedShareClassHref(isin: string | null | undefined): string | n
   return `/explore?isin=${encodeURIComponent(value)}`;
 }
 
+export type PricePointView = {
+  priceType: string;
+  valueText: string;
+  quoteUnit: string;
+  currency: string;
+  sessionDate: string;
+  sourceId: string;
+  adjustmentStatus: string;
+  retrievedAt: string;
+  delayClass: string;
+  quality: string;
+};
+
+export type PriceFreshnessView = {
+  close: PricePointView | null;
+  nav: PricePointView | null;
+  quote: PricePointView | null;
+  closeCount: number;
+  reason: string;
+};
+
+export type ApprovalHistoryView = {
+  decision: string;
+  actor: string;
+  rationale: string;
+  recordedAt: string;
+};
+
+export type EligibilityDecisionView = {
+  decision: string;
+  conditions: string;
+  recordedAt: string;
+};
+
 export type EtfShareExplore = {
   isin: string;
   evidenceStatus: "unverified" | "cited" | "unavailable" | "insufficient";
@@ -75,6 +109,11 @@ export type EtfShareExplore = {
   fundReturnCount: number;
   benchmarkReturnCount: number;
   exposures: CitedExposureView[];
+  prices: PriceFreshnessView;
+  approvals: ApprovalHistoryView[];
+  eligibilityDecisions: EligibilityDecisionView[];
+  fxSentence: string;
+  overlapReason: string;
 };
 
 export function identityCopy(share: EtfShareExplore): string {
@@ -126,9 +165,63 @@ export function returnsCopy(share: EtfShareExplore): string {
 
 export function assessmentCopy(share: EtfShareExplore): string {
   if (!share.assessment) {
-    return "No eligibility assessment is stored. Missing hard evidence stays unknown. There is no rank.";
+    return "No eligibility assessment is stored. Missing hard evidence stays unknown. There is no rank. Eligibility is not founder approval.";
   }
-  return `${share.assessment.eligibility}. Evidence ${share.assessment.evidenceStatus}. ${share.assessment.statement}`;
+  return `${share.assessment.eligibility}. Evidence ${share.assessment.evidenceStatus}. ${share.assessment.statement} Eligibility is not founder approval.`;
+}
+
+export const PRICE_ABSENT =
+  "No licensed close is stored. A missing price is not zero.";
+
+export function absentPrices(reason = PRICE_ABSENT): PriceFreshnessView {
+  return { close: null, nav: null, quote: null, closeCount: 0, reason };
+}
+
+export const APPROVAL_ABSENT =
+  "No founder approval is stored. Eligibility is a separate decision.";
+
+export const FX_GAP =
+  "No rights-cleared SGD reference rate is stored. Broker FX is a different series.";
+
+export const OVERLAP_UNAVAILABLE =
+  "Overlap is unavailable. Top-ten holdings stay partial, and missing holdings are not an empty portfolio.";
+
+export const PERFORMANCE_SEPARATE =
+  "Market-price return, NAV return, and total return stay separate. None is calculated on this page, and none is a recommendation.";
+
+export function priceCopy(share: EtfShareExplore): string {
+  const close = share.prices.close;
+  if (!close) return share.prices.reason || PRICE_ABSENT;
+  const stale = close.quality === "stale" ? " This close is stale." : "";
+  return `Close ${close.valueText} ${close.quoteUnit} on ${close.sessionDate}. Adjustment ${close.adjustmentStatus}. Delay ${close.delayClass}. Source ${close.sourceId}. Retrieved ${close.retrievedAt}.${stale} Stored closes: ${share.prices.closeCount}.`;
+}
+
+export function navCopy(share: EtfShareExplore): string {
+  const nav = share.prices.nav;
+  if (!nav) return "No NAV is stored. NAV is not the listing close.";
+  return `NAV ${nav.valueText} ${nav.quoteUnit} on ${nav.sessionDate}. Source ${nav.sourceId}.`;
+}
+
+export function quoteCopy(share: EtfShareExplore): string {
+  const quote = share.prices.quote;
+  if (!quote) return "No bid, ask, or last trade is stored. A quote is not the close.";
+  return `${quote.priceType} ${quote.valueText} ${quote.quoteUnit}. Delay ${quote.delayClass}. Retrieved ${quote.retrievedAt}. Quality ${quote.quality}.`;
+}
+
+export function approvalCopy(share: EtfShareExplore): string {
+  if (share.approvals.length === 0) return APPROVAL_ABSENT;
+  return share.approvals
+    .map((row) => `${row.decision} by ${row.actor} at ${row.recordedAt}. ${row.rationale}`)
+    .join(" ");
+}
+
+export function eligibilityDecisionCopy(share: EtfShareExplore): string {
+  if (share.eligibilityDecisions.length === 0) {
+    return "No separate eligibility decision is stored. Missing evidence stays insufficient.";
+  }
+  return share.eligibilityDecisions
+    .map((row) => `${row.decision}. ${row.conditions} Recorded ${row.recordedAt}.`)
+    .join(" ");
 }
 
 export function freshnessCopy(share: EtfShareExplore): string {

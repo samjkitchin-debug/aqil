@@ -6,6 +6,8 @@
 
 Exposures has no cited share class. Deploy Capital is not an order screen. Vanguard and iShares holdings rows stay `automated_access=prohibited` and `redistribution=prohibited`. Do not set `publication_allowed=true` for Bry–Boschan or Stock–Watson.
 
+`supabase/migrations/20261102160000_etf_market_data.sql` is additive and was not applied to the hosted project in the 2 November 2026 ETF foundation pass. Do not apply it until a current backup is confirmed, the disposable rehearsal has passed, and the founder has approved a price display licence. `ETF_DATABASE_URL` stays unset until `etf_reader` has a password outside Git. Do not run `vercel deploy`.
+
 ## Deploy
 
 One fast-forward push of `main` deploys the existing GitHub integration. Do not run `vercel deploy` and do not create a second project. Root directory is `apps/web`. Production branch is `main`.

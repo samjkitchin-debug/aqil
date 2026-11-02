@@ -64,6 +64,14 @@ if ($instrumentsOnTest -ne "t") {
   docker exec $container psql -U postgres -d $testDatabase -v ON_ERROR_STOP=1 -f /tmp/aqil_pgtap_etf_instruments.sql
   if ($LASTEXITCODE -ne 0) { throw "Could not apply the instruments migration on $testDatabase." }
 }
+$marketOnTest = (Invoke-Psql $testDatabase "select to_regclass('instruments.market_price_observations')").Trim()
+if ($marketOnTest -eq "") {
+  $marketMigration = Join-Path (Split-Path -Parent $PSScriptRoot) "supabase\migrations\20261102160000_etf_market_data.sql"
+  docker cp $marketMigration "${container}:/tmp/aqil_pgtap_etf_market_data.sql"
+  if ($LASTEXITCODE -ne 0) { throw "Could not copy the ETF market-data migration." }
+  docker exec $container psql -U postgres -d $testDatabase -v ON_ERROR_STOP=1 -f /tmp/aqil_pgtap_etf_market_data.sql
+  if ($LASTEXITCODE -ne 0) { throw "Could not apply the ETF market-data migration on $testDatabase." }
+}
 $instrumentsOnDevelopment = (Invoke-Psql "postgres" "select exists(select 1 from information_schema.schemata where schema_name = 'instruments')").Trim()
 if ($instrumentsOnDevelopment -eq "t") {
   throw "The instruments schema must stay off preserved database postgres."

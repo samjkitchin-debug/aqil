@@ -135,6 +135,10 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "bea.nipa.U002BU.KPMT",
         "bea.nipa.T10106.A191RX",
         "nber.bcdc.us_business_cycle_chronology",
+        "market.eodhd.etf_eod",
+        "market.twelvedata.etf_eod",
+        "fx.mas.sgd_reference",
+        "broker.saxo.sim_infoprices",
     }
     for record in records:
         assert record.terms_url in record.evidence_urls
@@ -201,6 +205,13 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
             assert record.assessed_on.isoformat() == "2026-10-31"
         elif record.dataset_id == "nber.bcdc.us_business_cycle_chronology":
             assert record.assessed_on.isoformat() == "2026-11-01"
+        elif record.dataset_id in {
+            "market.eodhd.etf_eod",
+            "market.twelvedata.etf_eod",
+            "fx.mas.sgd_reference",
+            "broker.saxo.sim_infoprices",
+        }:
+            assert record.assessed_on.isoformat() == "2026-11-02"
         elif record.dataset_id == "govinfo.federal_register.notices":
             assert record.assessed_on.isoformat() == "2026-10-24"
         else:

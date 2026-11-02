@@ -98,10 +98,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Recompute Sahm from frozen observation evidence and print comparison",
     )
     from aqil_research.etf.documents.command import register_cite_etf_parser
+    from aqil_research.etf.refresh.command import register_etf_refresh_parsers
     from aqil_research.manual.command import register_macro_parser
 
     register_macro_parser(sub)
     register_cite_etf_parser(sub)
+    register_etf_refresh_parsers(sub)
     return parser
 
 
@@ -151,6 +153,14 @@ def main(argv: list[str] | None = None) -> int:
         from aqil_research.etf.documents.command import run_cite_etf
 
         return run_cite_etf(args)
+    if args.command == "etf-refresh":
+        from aqil_research.etf.refresh.command import run_etf_refresh
+
+        return run_etf_refresh(args)
+    if args.command == "etf-refresh-status":
+        from aqil_research.etf.refresh.command import run_etf_refresh_status
+
+        return run_etf_refresh_status(args)
     return 1
 
 

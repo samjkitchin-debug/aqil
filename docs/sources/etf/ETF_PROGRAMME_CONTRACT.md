@@ -71,6 +71,12 @@ No TER, AUM, holding, spread, NAV, or return is invented in this phase. A field 
 
 The fields macro may later query, and the fields it must not write or read, are in `docs/sources/etf/MACRO_ETF_READ_CONTRACT.md`. That note is still a proposal. It does not change macro code.
 
+## Market data foundation, 2 November 2026
+
+Additive migration `supabase/migrations/20261102160000_etf_market_data.sql` adds broker mappings, NAV, market prices, FX, converted amounts, eligibility decisions, approval decisions, and ETF refresh runs. It does not edit `20261024120000_etf_instruments.sql`. It is not applied to preserved database `postgres`.
+
+The read shape is `docs/sources/etf/ETF_READ_CONTRACT_V1.md`. No ISIN was cited. The two prohibited holdings rows were not changed. Price, NAV, and FX rights rows are disabled and unknown. They are not permission to store a number. The primary price-source slot is unresolved. No vendor was selected.
+
 ## Blockers
 
-Issuer and index pages assessed on 23 October 2026 do not clear automated collection. Vanguard and iShares holdings collectors stay unbuilt. The instruments migration is local to this branch. It is not a hosted migration. AQ-009 and AQ-040 stay in progress until identities are cited from a permitted source and the database checks have actually passed.
+Issuer and index pages assessed on 23 October 2026 do not clear automated collection. Vanguard and iShares holdings collectors stay unbuilt. No permitted issuer citation is stored. A registered free price key has not returned a London bar. The founder has not approved a display licence. AQ-009 and AQ-040 stay in progress until identities are cited from a permitted source.

@@ -13,6 +13,11 @@ import {
   type EtfHoldingsView,
   type EtfListingView,
   type EtfShareExplore,
+  type PricePointView,
+  PRICE_ABSENT,
+  FX_GAP,
+  OVERLAP_UNAVAILABLE,
+  absentPrices,
 } from "@/lib/etf/present-explore";
 
 const SHARE_CLASS_ISIN = /^[A-Z]{2}[A-Z0-9]{9}[0-9]$/;
@@ -261,5 +266,126 @@ async function loadShare(client: Client, share: ShareRow): Promise<EtfShareExplo
         },
       ];
     }),
+    prices: await loadPrices(client, share.share_class_id),
+    approvals: await loadApprovals(client, share.share_class_id),
+    eligibilityDecisions: await loadEligibility(client, share.share_class_id),
+    fxSentence: await loadFxSentence(client),
+    overlapReason: holdingsView.shown && holdingsView.completeness === "full"
+      ? "Overlap counts only names in two stored full snapshots. One snapshot is not an overlap."
+      : OVERLAP_UNAVAILABLE,
   };
+}
+
+type PriceRow = PricePointView;
+
+async function loadPrices(client: Client, shareClassId: string): Promise<EtfShareExplore["prices"]> {
+  try {
+    const prices = await client.query<PriceRow>(
+      `select price_type as "priceType",
+              value::text as "valueText",
+              quote_unit as "quoteUnit",
+              currency,
+              to_char(session_date, 'YYYY-MM-DD') as "sessionDate",
+              source_id as "sourceId",
+              adjustment_status as "adjustmentStatus",
+              to_char(retrieved_at at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as "retrievedAt",
+              delay_class as "delayClass",
+              quality
+       from instruments.market_price_observations p
+       join instruments.listings l on l.listing_id = p.listing_id
+       where l.share_class_id = $1
+         and p.quality <> 'rejected'
+       order by p.session_date desc, p.revision desc`,
+      [shareClassId],
+    );
+    const nav = await client.query<PriceRow>(
+      `select price_type as "priceType",
+              value::text as "valueText",
+              quote_unit as "quoteUnit",
+              currency,
+              to_char(session_date, 'YYYY-MM-DD') as "sessionDate",
+              source_id as "sourceId",
+              adjustment_status as "adjustmentStatus",
+              to_char(retrieved_at at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as "retrievedAt",
+              delay_class as "delayClass",
+              quality
+       from instruments.nav_observations
+       where share_class_id = $1
+         and quality <> 'rejected'
+       order by session_date desc, revision desc
+       limit 1`,
+      [shareClassId],
+    );
+    const rows = prices.rows;
+    const closeRows = rows.filter((row) => row.priceType === "close");
+    const quote = rows.find((row) => row.priceType === "bid" || row.priceType === "ask" || row.priceType === "last") ?? null;
+    return {
+      close: closeRows[0] ?? null,
+      nav: nav.rows[0] ?? null,
+      quote,
+      closeCount: closeRows.length,
+      reason: closeRows[0] ? "" : PRICE_ABSENT,
+    };
+  } catch {
+    return absentPrices("Market prices could not be read. A missing price is not zero.");
+  }
+}
+
+async function loadApprovals(client: Client, shareClassId: string): Promise<EtfShareExplore["approvals"]> {
+  try {
+    const result = await client.query<EtfShareExplore["approvals"][number]>(
+      `select decision,
+              actor,
+              rationale,
+              to_char(recorded_at at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as "recordedAt"
+       from instruments.approval_decisions
+       where share_class_id = $1
+       order by recorded_at`,
+      [shareClassId],
+    );
+    return result.rows;
+  } catch {
+    return [];
+  }
+}
+
+async function loadEligibility(
+  client: Client,
+  shareClassId: string,
+): Promise<EtfShareExplore["eligibilityDecisions"]> {
+  try {
+    const result = await client.query<EtfShareExplore["eligibilityDecisions"][number]>(
+      `select decision,
+              conditions,
+              to_char(recorded_at at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as "recordedAt"
+       from instruments.eligibility_decisions
+       where share_class_id = $1
+       order by recorded_at`,
+      [shareClassId],
+    );
+    return result.rows;
+  } catch {
+    return [];
+  }
+}
+
+async function loadFxSentence(client: Client): Promise<string> {
+  try {
+    const result = await client.query<{
+      base_currency: string;
+      quote_currency: string;
+      rate_semantics: string;
+      source_id: string;
+    }>(
+      `select base_currency, quote_currency, rate_semantics, source_id
+       from instruments.fx_observations
+       order by retrieved_at desc
+       limit 1`,
+    );
+    const row = result.rows[0];
+    if (!row) return FX_GAP;
+    return `${row.base_currency}/${row.quote_currency} ${row.rate_semantics} FX from ${row.source_id}. The raw price row is not rewritten.`;
+  } catch {
+    return FX_GAP;
+  }
 }

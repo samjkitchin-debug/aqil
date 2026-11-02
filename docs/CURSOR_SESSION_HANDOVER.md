@@ -1,7 +1,19 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 2 November 2026, scheduled-run check
+**Last updated:** 2 November 2026, ETF foundation V1
+
+## ETF universe and market data foundation, 2 November 2026
+
+Risk class R3 for schema, grants, and prices, and R2 for eligibility. Branch `work/etf-foundation-v1` from `origin/main` `f52a888`. Documented production commit `2c285eb` is an ancestor. `apps/web/public/icons/icon.svg` stayed unstaged. Macro methods, `publication_allowed`, and `workers/research/src/aqil_research/workflow/refresh.py` were not edited. The two prohibited holdings rows were not edited.
+
+Local only. Nothing was pushed. The hosted project was not migrated. `ETF_DATABASE_URL` was not set. No price plan was purchased. No bar, ISIN, NAV, holding, or founder approval was inserted. Preserved database `postgres` was not reset and was not given the new migration. `aqil_etf` was not given the new migration.
+
+The new file is `supabase/migrations/20261102160000_etf_market_data.sql`. The read contract is `docs/sources/etf/ETF_READ_CONTRACT_V1.md`. Price persistence stays blocked: the 2 November probe found no registered key and no London or Xetra bar. Gate E and Gate F are BLOCKED. Gate O is BLOCKED: this pass did not confirm a backup taken after the latest hosted writes, and it did not apply the migration.
+
+No vendor is selected. The price-source slot is unresolved because `docs/sources/etf/SAXO_MARKET_DATA_PROOF_2026-11-02.md` is absent. Saxo may occupy that slot only if the proof records entitled InfoPrices, entitled daily charts, and permitted retention. EODHD and Twelve Data are replaceable adapters and are not the primary. Do not buy a feed. The founder approval still required is not a purchase.
+
+Local checks on this branch, not CI and not Verified: `npm run test:db` passed 14 files and 229 tests, including `etf_market_data.test.sql`. Development live observations remained 38653. `instruments` stayed off `postgres`. `aqil_etf.instruments.share_classes` was 0. `uv run pytest tests/etf tests/test_etf_share_class_contract.py tests/test_source_rights.py` passed 110. Ruff check on the ETF package passed. `npm run typecheck` in `apps/web` passed. The ETF web test passed 11. Eslint on the ETF page and loader passed. `npm run check:tokens` passed. A signed-in browser was not opened. The pulled production env file has empty database URLs, so the hosted share-class count was not read.
 
 ## Verification, 2 November 2026, 06:37 UTC
 
