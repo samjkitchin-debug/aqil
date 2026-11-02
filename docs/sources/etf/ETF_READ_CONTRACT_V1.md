@@ -35,17 +35,17 @@ Production today lets any signed-in Google account open the app. A price row is 
 
 ## Price licence, still required
 
-No vendor is the primary price source. The adapter registry slot is `unresolved` because `docs/sources/etf/SAXO_MARKET_DATA_PROOF_2026-11-02.md` is absent. EODHD and Twelve Data remain replaceable adapters. They are not selected. Nothing was purchased. No Saxo price was invented. Gate E is not passed.
+No vendor is the primary price source. The adapter registry slot is `unresolved` because Saxo is not suitable as the primary daily-close source. The source is `docs/sources/etf/SAXO_MARKET_DATA_PROOF_2026-11-02.md`. The founder-supplied 24-hour token is simulation. LIVE `GET /port/v1/users/me` returned HTTP 401. Simulation returned HTTP 200, and no further LIVE call was made with that token. On simulation the five London ETFs returned delayed indicative bid and ask (OldIndicative, 15-minute delay, no last) and 1,200 daily bars from 2022-02-01 to 2026-11-02. No HTTP 403 occurred on that token. Those figures were not stored and must not be stored as LIVE market history. The earlier LIVE vault session, with a valid LIVE token, resolved the same ETFs as Etf, but InfoPrices was NoAccess with no bid, ask, or last, and daily charts were HTTP 403 Access denied. MarketDataViaOpenApiTermsAccepted was false. Simulation success is not LIVE entitlement. The adapter stays replaceable. Nothing was purchased. No price was invented. Gate E and Gate F are not passed.
 
 The 2 November 2026 price-provider probe retrieved no London or Xetra bar. That note is evidence of those calls. It is not a vendor choice.
 
 Rights rows `eodhd_global_etf_eod`, `twelve_data_global_etf_eod`, `mas_sgd_reference_fx`, and `saxo_sim_infoprices` are disabled and unknown. They are not permission. `vanguard_uk_vwra_holdings` and `ishares_ucits_holdings` stay prohibited.
 
-The founder approval still required is not a purchase. Do not approve a subscription to EODHD, Twelve Data, or any other feed as the primary source. The primary slot stays unresolved until the Saxo proof file records all three of these facts: InfoPrices entitled, daily charts entitled, and retention permitted. If that file records them, Saxo may occupy the slot. A later licensed vendor can replace Saxo without changing share-class identity, this read contract, or the React pages. Close, NAV, bid, ask, last, and adjusted close stay distinct. Production display to any signed-in Google account still needs a retention and display right that matches that audience. That right is not recorded.
+Before any price is stored, the founder must approve a source whose retention and display rights match who can open Explore. That approval is not a purchase made here, and it is not the simulation token. Simulation bid, ask, and daily bars must not be written as LIVE history. Saxo can be reconsidered only after the founder personally accepts OpenAPI market-data terms on the LIVE account and a new LIVE proof shows InfoPrices and daily charts rather than NoAccess and HTTP 403, and a rights decision then allows those prices to be stored. A later licensed vendor can take the slot without changing share-class identity, this read contract, or the React pages. Close, NAV, bid, ask, last, and adjusted close stay distinct. Gate E and Gate F stay open.
 
 ## Saxo
 
-Saxo can be the primary price source only when the proof file records the three facts above. Production OAuth stays off. This build does not enable trading. HTTP 403 does not store a quote, does not invent a bar, and does not by itself select another vendor. A chart close is not the current quote.
+Saxo was tested on 2 November 2026 and is not the primary daily-close source. The 24-hour token is simulation. Its quotes and bars were not stored. The earlier LIVE session returned NoAccess and an HTTP 403 entitlement refusal. Production OAuth stays off. This build does not enable trading. A chart close is not the current quote. The adapter can take a later licensed vendor, or Saxo again only after a new LIVE proof.
 
 ## Refresh
 

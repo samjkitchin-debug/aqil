@@ -75,7 +75,7 @@ The fields macro may later query, and the fields it must not write or read, are 
 
 Additive migration `supabase/migrations/20261102160000_etf_market_data.sql` adds broker mappings, NAV, market prices, FX, converted amounts, eligibility decisions, approval decisions, and ETF refresh runs. It does not edit `20261024120000_etf_instruments.sql`. It is not applied to preserved database `postgres`.
 
-The read shape is `docs/sources/etf/ETF_READ_CONTRACT_V1.md`. No ISIN was cited. The two prohibited holdings rows were not changed. Price, NAV, and FX rights rows are disabled and unknown. They are not permission to store a number. The primary price-source slot is unresolved. No vendor was selected.
+The read shape is `docs/sources/etf/ETF_READ_CONTRACT_V1.md`. No ISIN was cited. The two prohibited holdings rows were not changed. Price, NAV, and FX rights rows are disabled and unknown. They are not permission to store a number. The primary price-source slot is unresolved because Saxo is not suitable as the primary daily-close source. Simulation success is not LIVE entitlement. No other vendor was selected.
 
 ## Blockers
 

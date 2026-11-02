@@ -8,6 +8,7 @@ does not invent a price and does not mark a gate passed.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict
@@ -55,6 +56,31 @@ def resolve_primary(proof_text: str | None) -> PrimarySlot:
             daily_charts_entitled=None,
             retention_permitted=None,
         )
+    if _saxo_tested_and_not_entitled(proof_text):
+        return PrimarySlot(
+            provider_id=UNRESOLVED_PRIMARY,
+            reason=(
+                "The primary slot is unresolved. Saxo is not suitable as the "
+                "primary daily-close source. The proof "
+                "docs/sources/etf/SAXO_MARKET_DATA_PROOF_2026-11-02.md says the "
+                "founder-supplied 24-hour token is simulation. LIVE "
+                "GET /port/v1/users/me returned HTTP 401. Simulation returned "
+                "HTTP 200, and no further LIVE call was made with that token. "
+                "On simulation the five London ETFs returned delayed indicative "
+                "bid and ask (OldIndicative, 15-minute delay, no last) and "
+                "1,200 daily bars from 2022-02-01 to 2026-11-02, with no HTTP 403. "
+                "Those figures were not stored and must not be stored as LIVE "
+                "market history. The earlier LIVE vault session, with a valid "
+                "LIVE token, resolved the same ETFs as Etf, but InfoPrices was "
+                "NoAccess with no bid, ask, or last, and daily charts were "
+                "HTTP 403 Access denied. MarketDataViaOpenApiTermsAccepted was "
+                "false. Simulation success is not LIVE entitlement. The adapter "
+                "stays replaceable."
+            ),
+            infoprices_entitled=False,
+            daily_charts_entitled=False,
+            retention_permitted=False,
+        )
     infoprices = _fact(proof_text, "infoprices")
     charts = _fact(proof_text, "daily chart")
     retention = _fact(proof_text, "retention")
@@ -87,7 +113,36 @@ def current_primary(path: Path | None = None) -> PrimarySlot:
     proof = path or default_proof_path()
     if not proof.is_file():
         return resolve_primary(None)
-    return resolve_primary(proof.read_text(encoding="utf-8"))
+    return resolve_primary(_read_proof(proof))
+
+
+def _read_proof(path: Path) -> str:
+    """Read the proof without rewriting it. The file may be UTF-16."""
+
+    raw = path.read_bytes()
+    if raw.startswith((b"\xff\xfe", b"\xfe\xff")):
+        return raw.decode("utf-16")
+    if len(raw) > 3 and raw[1:2] == b"\x00":
+        return raw.decode("utf-16-le")
+    return raw.decode("utf-8")
+
+
+def _saxo_tested_and_not_entitled(text: str) -> bool:
+    """True when the current proof's decision is present.
+
+    Simulation quotes and bars do not make Saxo the primary source.
+    """
+
+    lowered = text.lower()
+    return (
+        "simulation token" in lowered
+        and "http 401" in lowered
+        and "oldindicative" in lowered
+        and "not suitable as a primary daily-close" in lowered
+        and "noaccess" in lowered
+        and "access denied" in lowered
+        and "not written to the database" in lowered
+    )
 
 
 def _fact(text: str, subject: str) -> bool | None:
@@ -114,7 +169,7 @@ def _fact(text: str, subject: str) -> bool | None:
             )
         ):
             return False
-        if any(marker in lowered for marker in ("entitled", "permitted")):
+        if re.search(r"\bentitled\b", lowered) or re.search(r"\bpermitted\b", lowered):
             seen_true = True
     if seen_true:
         return True

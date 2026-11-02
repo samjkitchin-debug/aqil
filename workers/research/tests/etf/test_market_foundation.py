@@ -538,7 +538,17 @@ def test_primary_is_unresolved_until_the_saxo_proof_records_entitlement(tmp_path
 
     missing = current_primary(tmp_path / "missing.md")
     assert missing.provider_id == UNRESOLVED_PRIMARY
-    assert current_primary().provider_id == UNRESOLVED_PRIMARY
+    assert missing.infoprices_entitled is None
+    tested = current_primary()
+    assert tested.provider_id == UNRESOLVED_PRIMARY
+    assert tested.infoprices_entitled is False
+    assert tested.daily_charts_entitled is False
+    assert tested.retention_permitted is False
+    assert "simulation" in tested.reason
+    assert "HTTP 401" in tested.reason
+    assert "not suitable" in tested.reason
+    assert "not be stored as LIVE" in tested.reason
+    assert "SAXO_MARKET_DATA_PROOF_2026-11-02.md" in tested.reason
     denied = resolve_primary(
         "InfoPrices HTTP 403\nDaily charts HTTP 403\nRetention is not permitted\n"
     )
