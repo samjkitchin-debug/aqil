@@ -1,6 +1,15 @@
 # AQIL — Execution Roadmap and Stage Gates
 
-**Last reconciled:** 25 October 2026 · **Application version:** 0.2.0. The release commit is the commit tagged `v0.2.0`. The deployment id is recorded after the GitHub-triggered production deployment.
+**Last reconciled:** 2 November 2026 · **Application version:** 0.2.0.
+
+## Hosted research state (2 November 2026)
+
+This section supersedes the 24–25 October sentences below that say the host has no observations, no research runs, no refresh, and an unset `RESEARCH_DATABASE_URL`.
+
+- Production is `https://aqil-tau.vercel.app`, deployment `dpl_3kSdbfFy4L3hoLVeNtwiEN1XJsjB`, commit `2c285eb79e98a168d098a363b8fc0afd6af29039`. Google sign-in remains ADR 020: any signed-in Google user may read unpublished research. Signed-out users are redirected to login.
+- Hosted project `ojvswermsbbaltjohqph` includes migration `20261101120000`. The 2 November owner dump restored 34,859 observations and the five 23 October 2026 macro-reading runs. BEA income is 813 months, BEA sales 356 months, and the 3-month yield is 541 months. Unemployment on the host is 44 months from January 2023. The local 944-month unemployment file was not copied. Census stays unwired.
+- Vercel `RESEARCH_DATABASE_URL` is `research_reader`. The GitHub Actions secret of the same name is `research_worker` and is used only by the 06:15 UTC refresh. `publication_allowed` stays false. Hosted quantitative runs are not scientifically operational. Stock–Watson calculate was refused because the accepted parameter version is not on the host.
+- One hosted refresh at 2026-11-02 04:11:25 UTC is `partial`. Unemployment fetch failed and left the 44 months unchanged. The Stock–Watson filter was absent. Cited funds and production Saxo remain out of this release. G0 remains open.
 
 ## Operating baseline (24 October 2026)
 
@@ -73,7 +82,7 @@ These sit beside G0–G8. They are cumulative. U1 includes U0. U2 includes U1. T
 | U1 | Cited funds, portfolio mapping, a saved policy in `public.wealth_allocation_targets`, and an implementation-ready playbook library | Issuer scraping, a second policy file as a permanent store, predictive models |
 | U2 | A read-only, policy-based deployment assessment | Orders, and any requirement for a return-forecast model |
 
-The hosted schema apply is done. U0 still lacks hosted observations, a refresh, cited funds, and production Saxo. The fail-closed database URL is the production behaviour while `RESEARCH_DATABASE_URL` is unset.
+The 25 October sentence that U0 lacks hosted observations is history. On 2 November 2026 the host has observations, unpublished runs, and a 06:15 UTC refresh. U0 still lacks cited funds and production Saxo. Vercel `RESEARCH_DATABASE_URL` is set for `research_reader`.
 
 ## M1 — Next active milestone (macro intelligence engine slice)
 

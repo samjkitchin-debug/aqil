@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "fixture (offline dry run) or live (refuses unless the arming secret is set)"
+        description: "fixture (offline dry run) or live (runs when RESEARCH_DATABASE_URL is set)"
         required: true
         default: fixture
         type: choice
