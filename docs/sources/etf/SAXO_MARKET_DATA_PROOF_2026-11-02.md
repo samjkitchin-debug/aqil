@@ -32,6 +32,20 @@ No FxSpot UIC was on the allow-listed positions read. No FX UIC was guessed. Ref
 
 The published Saxo terms still separate private retention from redistribution. Accepting market-data terms is not permission to display prices to other users. `/explore` can be opened by any signed-in Google account, so these rows were not written to `instruments`. Gate E and Gate F are not passed. No schedule was run.
 
+
+
+## Chart pagination, 2 November 2026, 09:12 UTC
+
+The access token was still valid, so it was not refreshed. No price was stored. Each call was GET /chart/v3/charts on https://gateway.saxobank.com/openapi with AssetType=Etf, Horizon=1440, Count=1200, and FieldGroups=ChartInfo,Data. The older page used Mode=UpTo and Time equal to the earliest sample of the previous page. No page returned HTTP 403 or an empty refusal. Each series stopped when its earliest sample equalled ChartInfo.FirstSampleTime. That timestamp is Saxo's first chart sample. It is not a cited share-class inception. The sample dated 2026-11-02 is the current session and is not treated as a completed close. DataVersion matched the earlier retest.
+
+| Symbol | UIC | FirstSampleTime | Pages | Counts | Older page refused |
+| --- | --- | --- | --- | --- | --- |
+| VWRA:xlon | 14464978 | 2019-07-29 | 2 | 1200 then 637 | no |
+| EIMI:xlon | 969856 | 2014-06-11 | 3 | 1200, 1200, 707 | no |
+| CNDX:xlon | 4937893 | 2010-09-15 | 3 | 1200, 1200, 1065 | no |
+| IUIT:xlon | 4925949 | 2016-06-23 | 3 | 1200, 1200, 189 | no |
+| IWMO:xlon | 4532733 | 2014-10-20 | 3 | 1200, 1200, 293 | no |
+
 ## Earlier notes
 
 The sections below were written before this retest. They include the simulation token and the earlier LIVE NoAccess session. They are history.

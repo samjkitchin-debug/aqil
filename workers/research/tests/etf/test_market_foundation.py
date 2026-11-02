@@ -545,6 +545,7 @@ def test_primary_is_unresolved_until_the_saxo_proof_records_entitlement(tmp_path
     assert tested.daily_charts_entitled is True
     assert tested.retention_permitted is False
     assert tested.provider_id == UNRESOLVED_PRIMARY
+    assert "Technical availability is verified" in tested.reason
     assert "OldIndicative" in tested.reason
     assert "not stored" in tested.reason
     assert "Gate E and Gate F are not passed" in tested.reason
@@ -578,3 +579,40 @@ def test_live_quote_does_not_invent_a_last() -> None:
     refused = live_quote_kinds({"Quote": {"PriceTypeBid": "NoAccess", "PriceTypeAsk": "NoAccess"}})
     assert refused == ("refused",)
     assert live_chart_kind({"Data": [{"Close": 3}]}) == "close"
+
+
+def test_chart_page_stops_at_the_first_sample_and_does_not_invent_history() -> None:
+    from aqil_research.etf.saxo.chart_pages import ChartWindow, plan_older_page
+
+    partial = plan_older_page(
+        ChartWindow(
+            status=200,
+            count=1200,
+            earliest="2022-02-01T00:00:00Z",
+            latest="2026-11-02T00:00:00Z",
+            first_sample_time="2019-07-29T00:00:00Z",
+        ),
+        today="2026-11-02",
+    )
+    assert partial.mode == "UpTo"
+    assert partial.time == "2022-02-01T00:00:00Z"
+    assert partial.latest_may_be_open is True
+    assert partial.reached_first_sample is False
+    done = plan_older_page(
+        ChartWindow(
+            status=200,
+            count=637,
+            earliest="2019-07-29T00:00:00Z",
+            latest="2022-02-01T00:00:00Z",
+            first_sample_time="2019-07-29T00:00:00Z",
+        ),
+        today="2026-11-02",
+    )
+    assert done.mode is None
+    assert done.reached_first_sample is True
+    assert done.older_page_refused is False
+    refused = plan_older_page(
+        ChartWindow(status=403, count=0, earliest=None, latest=None, first_sample_time=None),
+        today="2026-11-02",
+    )
+    assert refused.older_page_refused is True

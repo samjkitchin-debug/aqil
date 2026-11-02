@@ -43,6 +43,20 @@ Rights rows `eodhd_global_etf_eod`, `twelve_data_global_etf_eod`, `mas_sgd_refer
 
 The terms flag is now true. That consent does not allow these prices to be shown to every signed-in Google account. Before any price is stored, the founder must decide that private research storage in instruments is permitted for the people who can open Explore, or keep the rows unread by anyone else. A later licensed vendor can still take the slot. Close, NAV, bid, ask, last, and adjusted close stay distinct. Gate E and Gate F stay open. Gate O is blocked because nothing was stored and production was not deployed.
 
+## Saxo market-data terms, read 2 November 2026
+
+Accepting OpenAPI access is not storage consent and not redistribution consent. The pages below were read on 2 November 2026. A permission that is not written on those pages is not claimed.
+
+Personal use of the API by a direct retail client is described in [Can I use OpenAPI for personal use?](https://openapi.help.saxo/hc/en-us/articles/4416505486481-Can-I-use-OpenAPI-for-personal-use), updated 15 October 2026. The retrieved text allows a personal portfolio tool, export of balances and positions, a personal view of market rates and account performance, and a personal trading interface. It does not grant multi-user display.
+
+Private persistent storage and derived research are described in [Can I store and use OpenAPI market data for my own algo or AI/backtesting?](https://openapi.help.saxo/hc/en-us/articles/39663625431581-Can-I-store-and-use-OpenAPI-market-data-for-my-own-algo-or-AI-backtesting), updated 5 October 2026. The retrieved text says the client may store OpenAPI market data for private purposes, including backtesting, strategy validation, and the client's own AI or algo development, with no fixed retention limit, provided the data are not redistributed. The example is a private store of Level 1 quotes from `trade/v1/prices`. It does not name Explore or a database shared with other signed-in users.
+
+Redistribution is prohibited by that same article. Displaying the data to other end users through a product or application requires a separate market-data agreement. A retail market-data subscription covers delivery to the client and private storage. It does not cover delivery to other users or professional or non-personal use. The party that must grant that agreement is Saxo Bank.
+
+[Enabling Market Data](https://developer.saxobank.com/excel/user-guide/enabling-market-data) says market data is disabled by default for non-FX instruments outside Saxo's own platforms, and that the client enables it in SaxoTraderGO and accepts a disclaimer. The retrieved disclaimer lists copying, reproduction, downloading, and distributing market data as misuse. The retrieved page did not add a separate sentence that names a written-permission form beyond that disclaimer and the separate market-data agreement above. Temporary caching is not given its own permission. Personal display inside the account holder's own tool is the personal-use article. Persistent historical storage is the private-storage article and stops at redistribution. Multi-user commercial display is not permitted on these pages.
+
+Because any signed-in Google account can open Explore, Saxo prices stay out of `instruments`. Technical availability is verified. The primary slot stays unresolved for storage.
+
 ## Saxo
 
 Saxo was retested on LIVE after the founder accepted market-data terms. The terms flag was true. Quotes were delayed and indicative, with no last. Chart pages returned closes and were not stored. Production OAuth stays off. This build does not enable trading. A chart close is not a last trade. The adapter can take a later licensed vendor.
