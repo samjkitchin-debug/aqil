@@ -1,7 +1,33 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 3 November 2026, ETF history import
+**Last updated:** 3 November 2026, preservation closeout stopped before merge
+
+## Preservation closeout, 3 November 2026
+
+Stopped before merge and before push. The research suite failed, and one ETF rights test in the narrower pytest run failed with it. `main` was not updated. The feature branch was not pushed. Nothing was deployed.
+
+`HEAD` is `72cfe7dc56089e70a40b958bda61d7789023f857` on `work/etf-foundation-v1`. That branch has no upstream. `origin` at `https://github.com/samjkitchin-debug/aqil.git` answered `git ls-remote`: `refs/heads/main` is `f52a888f6bbedf96e528ca3bccf6df751e3c8896`. `refs/heads/work/etf-foundation-v1` is absent on the remote. The only pre-existing uncommitted file was `apps/web/public/icons/icon.svg`. It stayed unstaged and was not reverted. No price payload, `.env`, or API key was committed.
+
+Local versus hosted: the 42931 adjusted closes are on local database `aqil_etf` at `127.0.0.1:55432`. The hosted project was not migrated and was not given this history. There was no production deploy and no Vercel deploy. Browser acceptance was not run.
+
+The Docker container was already running. `instruments.market_price_observations` is 42931 rows, all `adjusted_close`, `adjustment_status` `adjusted`, `source_id` `tradingview_data_api`, definition `tradingview adjustment=splits; split-adjusted close; not a raw close`. Raw `close` rows are 0. Nineteen symbols have data. INRG has no listing and zero rows. RBOT has 2524 rows from 2016-11-03 to 2026-11-02 and is missing session 2025-12-19. The other eighteen symbols have that session. VWRA is 1838, from 2019-07-25 to 2026-11-02. USD rows are 40682. EUR rows are 2249, all EUNA. `fx_observations` is 0. No total-return index is stored. This list was selected in 2026, so funds that closed before selection are absent. A backtest of these names is not an unbiased historical ETF selection.
+
+TradingView Data API is a third-party API. It is not TradingView Inc. Forty-one HTTP calls were used. Nineteen remain inside the 60-call cap. Reads stay founder-only. Saxo rows were preserved on their own proof and were not copied into `aqil_etf`.
+
+Backup directory: `C:\Users\gamer\aqil-release-backups\2026-11-03-etf-history\`. File `aqil_etf.dump` is 1629423 bytes, SHA-256 `B7598DC08AEE375B4E29F66A0423075EAED2A6527B0DDBCBE1F1FE3C6BB96BEB`. `aqil_etf` has no `supabase_migrations.schema_migrations` table. The objects match `20261024120000_etf_instruments.sql` and `20261102160000_etf_market_data.sql`. Restore into disposable database `aqil_etf_restore_20261103` returned 42931 observations and 1838 VWRA rows. That disposable database was dropped. `postgres` and `aqil_etf` remain. After the disposable test preparation, live economic observations on `postgres` were still 38653.
+
+Commands on this tree, not GitHub Actions and not Verified:
+
+- `npm run test:etf` in `apps/web` passed 15.
+- `npm run typecheck` in `apps/web` passed.
+- `npx eslint` on `src/lib/etf`, `src/components/etf/etf-explore-panel.tsx`, `src/components/forward/forward-etf-explore.tsx`, `src/app/explore/page.tsx`, and `src/lib/data/private-database-url.test.ts` passed.
+- `npm run build` in `apps/web` passed and generated 55 pages.
+- `npm run test:db` passed 14 files and 229 tests on disposable `aqil_pgtap_test`. The script does not reset `postgres`.
+- `uv run pytest tests/etf/test_tradingview_import.py tests/etf/test_universe_v1.py tests/etf/test_market_foundation.py tests/test_etf_share_class_contract.py tests/test_source_rights.py` passed 50 and failed 1. The tradingview, universe, and market-foundation files passed. `test_rights_fragments_refuse_automated_collection` failed because `docs/sources/etf/fragments/tradingview_data_api.csv` has `automated_access` `permitted`.
+- `npm run test:research` recreated disposable `aqil_research_test` from the `postgres` schema and did not reset `postgres`. Pytest passed 731 and failed 4. Ruff did not run because pytest exited 1. Failures: `tests/etf/test_adversarial.py::test_restricted_sources_block_collection_holdings_and_ter`, `tests/etf/test_fundamentals.py::test_every_etf_fragment_blocks_cost_collection`, `tests/test_etf_share_class_contract.py::test_rights_fragments_refuse_automated_collection`, and `tests/test_fed_h15.py::test_live_board_file_is_counted_in_memory`. The three ETF failures are the same TradingView Data API fragment, which permits automated access, internal computation, raw retention, and historical archiving. The H.15 test downloaded the live board file and counted 868 federal-funds rows where the test expects 867. That test used the network. No repair was invented.
+
+Next task: P1 resolve the INRG listing currency. That is not a new sprint. Do not rescale the London GBX row. Do not start FX, distributions, forecasting, a new provider, or a hosted upload.
 
 ## TradingView history import, 3 November 2026
 
