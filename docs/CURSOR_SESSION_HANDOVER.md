@@ -1,7 +1,11 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 2 November 2026, V1 foundation close-out
+**Last updated:** 2 November 2026, scheduled-run check
+
+## Verification, 2 November 2026, 06:37 UTC
+
+The founder claim was already present on the pre-existing authorised account. It was not changed. `AQIL_AUTHORISED_USER_IDS` is empty, so no second account was selected. The 06:15 UTC research workflow had not started by 06:37 UTC. Gate C scheduled execution stays pending. No manual dispatch was used.
 
 ## V1 foundation close-out, 2 November 2026
 
