@@ -5,7 +5,7 @@
 
 ## Verification, 2 November 2026, 06:37 UTC
 
-The founder claim was already present on the pre-existing authorised account. It was not changed. `AQIL_AUTHORISED_USER_IDS` is empty, so no second account was selected. The 06:15 UTC research workflow had not started by 06:37 UTC. Gate C scheduled execution stays pending. No manual dispatch was used.
+The founder claim was already present on the pre-existing authorised account. It was not changed. `AQIL_AUTHORISED_USER_IDS` is empty, so no second account was selected. The 06:15 UTC research workflow had not started by 06:37 UTC. Gate C scheduled execution stays pending. No manual dispatch was used. At 06:39 UTC the workflow was still enabled, cron `15 6 * * *` was on `main`, and GitHub had created no run; the schedule was not changed.
 
 ## V1 foundation close-out, 2 November 2026
 
