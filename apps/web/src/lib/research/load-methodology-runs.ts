@@ -9,7 +9,8 @@ import { readMethodologyRunMetadata } from "@/lib/research/read-contract";
 
 export type LoadMethodologyRunsResult =
   | { status: "ready"; runs: MethodologyRunMeta[] }
-  | { status: "unavailable"; reason: string };
+  | { status: "unavailable"; reason: string }
+  | { status: "withheld" };
 
 function researchDatabaseUrl() {
   return resolveResearchDatabaseUrl({
