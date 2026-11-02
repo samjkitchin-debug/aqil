@@ -541,13 +541,13 @@ def test_primary_is_unresolved_until_the_saxo_proof_records_entitlement(tmp_path
     assert missing.infoprices_entitled is None
     tested = current_primary()
     assert tested.provider_id == UNRESOLVED_PRIMARY
-    assert tested.infoprices_entitled is False
-    assert tested.daily_charts_entitled is False
+    assert tested.infoprices_entitled is True
+    assert tested.daily_charts_entitled is True
     assert tested.retention_permitted is False
-    assert "simulation" in tested.reason
-    assert "HTTP 401" in tested.reason
-    assert "not suitable" in tested.reason
-    assert "not be stored as LIVE" in tested.reason
+    assert tested.provider_id == UNRESOLVED_PRIMARY
+    assert "OldIndicative" in tested.reason
+    assert "not stored" in tested.reason
+    assert "Gate E and Gate F are not passed" in tested.reason
     assert "SAXO_MARKET_DATA_PROOF_2026-11-02.md" in tested.reason
     denied = resolve_primary(
         "InfoPrices HTTP 403\nDaily charts HTTP 403\nRetention is not permitted\n"
@@ -559,3 +559,22 @@ def test_primary_is_unresolved_until_the_saxo_proof_records_entitlement(tmp_path
     assert silent.infoprices_entitled is None
     entitled = resolve_primary("InfoPrices entitled\nDaily charts entitled\nRetention permitted\n")
     assert entitled.provider_id == SAXO_SOURCE_ID
+
+
+def test_live_quote_does_not_invent_a_last() -> None:
+    from aqil_research.etf.saxo.normalise import live_chart_kind, live_quote_kinds
+
+    indicative = live_quote_kinds(
+        {
+            "Quote": {
+                "PriceTypeBid": "OldIndicative",
+                "PriceTypeAsk": "OldIndicative",
+                "Bid": 1,
+                "Ask": 2,
+            }
+        }
+    )
+    assert indicative == ("bid", "ask")
+    refused = live_quote_kinds({"Quote": {"PriceTypeBid": "NoAccess", "PriceTypeAsk": "NoAccess"}})
+    assert refused == ("refused",)
+    assert live_chart_kind({"Data": [{"Close": 3}]}) == "close"

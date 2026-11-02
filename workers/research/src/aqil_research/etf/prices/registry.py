@@ -56,6 +56,24 @@ def resolve_primary(proof_text: str | None) -> PrimarySlot:
             daily_charts_entitled=None,
             retention_permitted=None,
         )
+    if _live_terms_retest(proof_text):
+        return PrimarySlot(
+            provider_id=UNRESOLVED_PRIMARY,
+            reason=(
+                "The primary slot is unresolved. A LIVE retest after the founder "
+                "accepted OpenAPI market-data terms is in "
+                "docs/sources/etf/SAXO_MARKET_DATA_PROOF_2026-11-02.md. "
+                "MarketDataViaOpenApiTermsAccepted was true. London VWRA, EIMI, "
+                "CNDX, IUIT, and IWMO returned delayed OldIndicative bid and ask "
+                "with no last, and 1,200 daily chart closes from 2022-02-01 to "
+                "2026-11-02. No HTTP 403 occurred. The rows were not stored. "
+                "Accepting terms is not permission to display prices to other "
+                "users. The adapter stays replaceable. Gate E and Gate F are not passed."
+            ),
+            infoprices_entitled=True,
+            daily_charts_entitled=True,
+            retention_permitted=False,
+        )
     if _saxo_tested_and_not_entitled(proof_text):
         return PrimarySlot(
             provider_id=UNRESOLVED_PRIMARY,
@@ -114,6 +132,17 @@ def current_primary(path: Path | None = None) -> PrimarySlot:
     if not proof.is_file():
         return resolve_primary(None)
     return resolve_primary(_read_proof(proof))
+
+
+
+def _live_terms_retest(text: str) -> bool:
+    """True when the proof records the post-acceptance LIVE retest."""
+
+    lowered = text.lower()
+    return (
+        "live retest after terms acceptance" in lowered
+        and "not written to `instruments`" in lowered
+    )
 
 
 def _read_proof(path: Path) -> str:
