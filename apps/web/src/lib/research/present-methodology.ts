@@ -1,4 +1,5 @@
 import type { MethodologyCatalogueEntry } from "./methodology-catalogue.ts";
+import { storedResultMethodIds } from "./methodology-manifest.ts";
 import type { PrivateMethodologyResult } from "./private-methodology-result.ts";
 
 /** Run metadata. A calculation reaches the page only through the private result. */
@@ -70,17 +71,7 @@ const OUTPUT_LABEL: Record<MethodologyCatalogueEntry["outputKind"], string> = {
   unavailable: "No output type is defined",
 };
 
-const STORED_RESULT_METHOD_IDS = new Set([
-  "CPI_U_INFLATION_AUTREGRESSION",
-  "EX_POST_REAL_FEDERAL_FUNDS_RATE",
-  "ENGLE_GRANGER_COINTEGRATION",
-  "CUSUM_RECURSIVE_RESIDUALS",
-  "INFLATION_AUTOREGRESSION",
-  "EX_POST_REAL_FUNDS_RATE",
-  "IP_GROWTH_CUSUM",
-  "ESTRELLA_MISHKIN_TERM_SPREAD",
-  "CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT",
-]);
+const STORED_RESULT_METHOD_IDS = storedResultMethodIds();
 
 export function presentMethodology(
   entry: MethodologyCatalogueEntry,

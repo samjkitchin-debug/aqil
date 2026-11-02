@@ -50,7 +50,7 @@ function MethodologyCard({ item, planned }: { item: MethodologyPresentation; pla
           {item.name}
         </Link>
       </h3>
-      <p className="research-body">{item.measures}</p>
+      <p className="research-body">{item.statusLine}</p>
       <dl className="intel-method-facts">
         <div>
           <dt>Domain</dt>
@@ -66,9 +66,8 @@ function MethodologyCard({ item, planned }: { item: MethodologyPresentation; pla
         </div>
       </dl>
       <p className="research-meta" data-testid={`methodology-status-${item.slug}`}>
-        {item.statusLine}
+        {item.latestLine ?? item.functionLabel}
       </p>
-      {item.latestLine ? <p className="research-meta">{item.latestLine}</p> : null}
       <p className="intel-method-open">
         <Link href={`/intelligence/methodologies/${item.slug}`} prefetch={false}>
           Open methodology

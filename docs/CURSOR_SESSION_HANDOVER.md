@@ -1,7 +1,40 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 2 November 2026, code release without a hosted write
+**Last updated:** 2 November 2026, hosted research foundation activated
+
+## Research-foundation activation, 2 November 2026
+
+Stage 2 restore passed and migration `20261101120000` is applied on project `ojvswermsbbaltjohqph`. The custom dump is `C:\Users\gamer\aqil-release-backups\2026-11-02\aqil-hosted.dump` (1,563,838 bytes). The disposable restore matched 34,859 observations and the five 23 October 2026 macro-reading run ids. `publication_allowed` stays false. Local runs were not copied.
+
+Hosted ingestion inserted BEA income 813 months, BEA sales 356 months, and the 3-month yield 541 months. The following refresh left those rows unchanged. Census was not wired. Unemployment remains 44 months. CPI-U stayed unchanged at 956.
+
+New hosted runs, all unpublished, include Estrella–Mishkin `b550f7f4-1e20-45f3-90e7-dbf2552d8b6c` (1 September 2026 spread 0.90 percentage points; 10-year 4.99, 3-month 4.09) and ex-post real funds `0da7d406-a3ad-44de-822a-a04036a1b4fd` (September 2025 funds 4.22 percent, real rate 0.5027). Bai–Perron `2f094f84-34d6-430b-9323-80fe1780ea61` selected 0 breaks. Engle–Granger `542abfbc-4d74-4e00-ae43-a54104abaa00` statistic -2.8648234. Sahm `c53dd21e-52d2-49f8-bc80-f556952f31e5` and inflation autoregression `713e8ce2-2a5c-44a5-ad3c-8a62a0f932ae` are `completed_insufficient` and are not replayable from frozen observations. Stock–Watson calculate was refused because the accepted parameter version is not on the host. These hosted runs are not local runs and are not operational acceptance.
+
+One hosted refresh recorded cycle status `partial` at 2026-11-02 04:11:25 UTC. Unemployment fetch failed. The Stock–Watson filter was absent. Other sources completed or stayed unchanged. Disposable fault-isolation tests passed 17. `supabase test db` on `aqil_pgtap_test` passed 13 files and 211 tests, including `research_cycles.test.sql`.
+
+Production before the catalogue commit still showed the hosted spread and "Today's cycle has a record." Signed-out requests return 307 to login. Conditions still shows unemployment 4.2% for September 2026 and states that Census advance orders were not collected.
+
+## Earlier activation notes, 2 November 2026
+
+Stage 1 was read against production and hosted project `ojvswermsbbaltjohqph`. Stage 2 did not start. No hosted write, no migration apply, no `pg_dump`, no method execution, and no copy of local runs.
+
+Production deployment `dpl_795bdXWF54KJe9uyTRMnmWMWdYvz` is Ready, target production, branch `main`, commit `9b728d590b803c642be8c286818f1fd62fb4ef2d`, and aliased to `https://aqil-tau.vercel.app`. `RESEARCH_DATABASE_URL` is present as a sensitive production variable. Its value was not read. A signed-in methodologies page queried `research.research_runs` successfully. Health then failed because `research.research_cycles` does not exist.
+
+Exact signed-in copy:
+
+- `/intelligence/health`: "Research health could not be read." "The cycle record is unavailable. No figure is invented."
+- `/intelligence/methodologies/bry-boschan-spencer15`: "No stored run matches this methodology." "No matching run row."
+- `/intelligence/methodologies/financial-conditions`: "Planned." "Aqil has not calculated this methodology."
+- `/conditions`: "23 of 23 tracked series have a stored observation." United States unemployment for September 2026 is 4.2%, matching hosted `bls.ln.LNS14000000`. The page states that Census advance orders were not collected.
+
+Hosted `research.research_runs` still has only the five 23 October 2026 macro-reading rows, all `publication_allowed=false`. No quantitative methodology has a hosted run. Those local runs named in the older sections below are not hosted runs. Latest applied migration is `20261029212358`. Unemployment remains 44 months from January 2023. Absent series: `bea.nipa.T20600.W875RX`, `bea.nipa.U002BU.KPMT`, `bea.nipa.T10106.A191RX`, `fed.h15.RIFLGFCM03_N.M`, `census.m3.adv.MDM.NO`.
+
+A later search the same day still found no hosted owner connection. Stores checked, with no secret values recorded: the exact files `hosted-owner.connection` and `research-worker.connection`; `C:\Users\gamer\aqil-release-backups\2026-10-25` and `2026-10-30` (`reader.url` is `research_reader`, and `worker.password` is a password without a worker URL); `supabase/.temp/pooler-url` (owner user, no password); the local Docker database URL in `supabase/.temp` (local container, not the host); process, user, and machine environment names `SUPABASE_DB_URL`, `DATABASE_URL`, `RESEARCH_DATABASE_URL`, `PGHOST`, `PGUSER`, `PGPASSWORD`, `SUPABASE_DB_PASSWORD`, `POSTGRES_PASSWORD`, `POSTGRES_URL`, and `SUPABASE_ACCESS_TOKEN` (all unset); Vercel production `POSTGRES_PASSWORD` and `POSTGRES_URL` (sensitive, values not readable); Windows Credential Manager target `Supabase CLI:supabase` (CLI binary is not installed, and no owner URL is stored); `apps/web/.env.local` (no database URL). No hosted write was made.
+
+A later attempt on 2 November 2026 still found no usable owner URL. This CLI has no `vercel env get`. `vercel env run` for production, `/v3/env/pull`, and the decrypted project env API all returned empty sensitive values for `POSTGRES_PASSWORD`, `POSTGRES_URL`, and `POSTGRES_URL_NON_POOLING`. The Supabase management API, using the existing access token, returns the direct host and a pooler connection string whose password is a placeholder. Direct host lookup failed. Pooler authentication with that placeholder failed on ports 5432 and 6543. The database password was not reset. No interactive login was opened. `hosted-owner.connection` was removed because it was not usable. `research-worker.connection` remains and was not used. No hosted write was made.
+
+Founder action, exact: place one line, the database-owner URL, in `C:\Users\gamer\aqil-release-backups\hosted-owner.connection`. Do not paste it into chat. The worker file must not be used as a substitute for that owner dump. `apps/web/public/icons/icon.svg` was not edited.
 
 ## Code release, 2 November 2026
 
