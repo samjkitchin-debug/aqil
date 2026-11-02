@@ -43,7 +43,7 @@ Values are not recorded here. Production target only.
 | `POSTGRES_HOST` | Set. `db.ojvswermsbbaltjohqph.supabase.co`. |
 | `POSTGRES_PASSWORD` | Set, sensitive. Not readable through the API. Not reused. |
 | `POSTGRES_DATABASE` | Set. `postgres`. |
-| `RESEARCH_DATABASE_URL` | Set, sensitive, production only. Role `research_reader` on the session pooler, port 5432, `uselibpqcompat=true&sslmode=require`. Not the `postgres` user. |
+| `RESEARCH_DATABASE_URL` | Set, sensitive, production only. Role `research_reader` on the session pooler, port 5432. Not the `postgres` user. The GitHub Actions secret of the same name is a different value: the `research_worker` URL for the 06:15 UTC refresh. Do not copy either value into the other system. |
 | `ETF_DATABASE_URL` | Unset. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Removed from the project on 25 October 2026. |
 | `SUPABASE_SECRET_KEY` | Removed from the project on 25 October 2026. |

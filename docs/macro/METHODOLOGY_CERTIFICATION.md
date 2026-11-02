@@ -492,6 +492,24 @@ Historical rows were not rewritten.
 
 The read contract returned the new diffusion run as version 1, `completed`, `sufficient`, `publication_allowed` false.
 
+## Q. Hosted runs, 2 November 2026
+
+Sections A to P name local runs unless a sentence says otherwise. Those local run ids were not copied to the host. This section is the hosted inventory. `publication_allowed` stays false. No row here is scientifically operational, a forecast, or a publication approval.
+
+The owner dump restored the five 23 October 2026 macro-reading runs and 34,859 observations. Migration `20261101120000` is applied. Hosted inputs added after the dump: BEA income 813 months, BEA sales 356 months, and the 3-month yield 541 months. Hosted unemployment remains 44 months from January 2023. A fetch failure on 2 November did not extend it. Census stays unwired. AQ-103 was not built.
+
+| Hosted run | Result |
+| --- | --- |
+| Estrella–Mishkin `b550f7f4-1e20-45f3-90e7-dbf2552d8b6c` | Completed. Spread 0.90 percentage points on 2026-09-01. 10-year yield 4.99. 3-month yield 4.09. Not a recession probability. Shown to a signed-in reader. |
+| Ex-post real funds `0da7d406-a3ad-44de-822a-a04036a1b4fd` | Completed. September 2025 funds rate 4.22 percent. Real rate 0.5027. Not a Taylor rule. |
+| Bai–Perron `2f094f84-34d6-430b-9323-80fe1780ea61` | Completed. Selected 0 breaks. |
+| Engle–Granger `542abfbc-4d74-4e00-ae43-a54104abaa00` | Completed. Statistic -2.8648234. Not a causal claim. |
+| Inflation autoregression `713e8ce2-2a5c-44a5-ad3c-8a62a0f932ae` | `completed_insufficient`. No frozen observations to replay. |
+| Sahm `c53dd21e-52d2-49f8-bc80-f556952f31e5` | `completed_insufficient` on the 44-month sample. No frozen observations to replay. |
+| Stock–Watson modern refit | Not executed. The accepted parameter version is not on the host. No factor was invented. |
+
+The other hosted quantitative runs from the same execution are completed, unpublished, and replay-matched. They are listed in `docs/CURSOR_SESSION_HANDOVER.md`. One hosted refresh at 2026-11-02 04:11:25 UTC is `partial`. The 06:15 UTC schedule is on `main`. A hosted execution is not operational acceptance.
+
 ### Checks on this close-out
 
 `npm run test:research` passed 688, then Ruff check passed and 441 files were already formatted. `npm run test:db` passed 13 files and 211 tests. Web typecheck passed. Lint passed with the existing unused `_searchParams` warning. The presentation and health tests passed 32. The production build generated 55 pages, including `/intelligence/health`. GitHub Actions has not run. This is not a publication approval.

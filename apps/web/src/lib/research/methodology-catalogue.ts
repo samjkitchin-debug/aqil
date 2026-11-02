@@ -187,7 +187,7 @@ export const METHODOLOGY_CATALOGUE: readonly MethodologyCatalogueEntry[] = [
     uncertainty: [
       "The modern refit estimator is registered so a later calculation can use the same method id. It is not operationally accepted. The preserved run and the unadopted re-estimate are not historically replayable, and the unadopted likelihood gain stays unadopted.",
       "The 1988 payroll specification remains blocked. Employee-hours and the 1982-dollar series are not stored.",
-      "A signed-in reader sees the preserved filtered factor. The unadopted re-estimate is not plotted in its place.",
+      "A signed-in reader sees the preserved filtered factor only when that run is stored. It is not stored on the host. The unadopted re-estimate is not plotted in its place.",
       "Loadings and the likelihood are read from the stored run. They are not approved for publication.",
       "Static principal components, the Chicago Fed National Activity Index and the Kalman filter are supporting techniques for this family. They are not separate methodologies and do not have their own cards.",
     ],

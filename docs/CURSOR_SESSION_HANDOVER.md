@@ -1,7 +1,11 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 2 November 2026, hosted research foundation activated
+**Last updated:** 2 November 2026, review and hosted-doc reconciliation
+
+## Review close-out, 2 November 2026
+
+A separate security review and a separate read-only review looked at the activation diff from `9b728d5`. Neither found a P0. Signed-out readers are redirected before a calculation. `publication_allowed` stays false. The web uses `research_reader`. The GitHub secret of the same name is `research_worker` and is not copied onto Vercel. The Stock–Watson page no longer says a preserved factor is shown when that run is absent. No method was marked scientifically operational. P2 items are on AQ-107.
 
 ## Research-foundation activation, 2 November 2026
 
