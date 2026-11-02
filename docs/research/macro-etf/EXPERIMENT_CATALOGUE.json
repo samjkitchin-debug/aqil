@@ -1,0 +1,153 @@
+{
+  "catalogue_id": "macro-etf-discovery-2026-11-03",
+  "frozen_before_fit": true,
+  "publication_allowed": false,
+  "point_in_time_rule": "A latest-revised series is retrospective. It is never labelled point_in_time.",
+  "assumed_lag_months": 1,
+  "maximum_decision_to_entry_days": 10,
+  "assumed_lag_statement": "The one-month lag is an assumption. It is not a stored release timestamp.",
+  "horizons_months": [1, 3, 6, 12, 24, 36],
+  "first_pass_horizons_months": [6, 12],
+  "first_pass_etfs": ["VWRA", "CSPX", "EIMI", "EUNA"],
+  "floors": {
+    "exploratory_decision_points": 36,
+    "exploratory_non_overlapping": 8,
+    "statistical_decision_points": 60,
+    "statistical_non_overlapping": 15
+  },
+  "holdout": {
+    "decision_period_on_or_after": "2023-01-01",
+    "minimum_decision_points": 8,
+    "rule": "Training decisions are strictly before this date. The holdout is run once and is not used to choose a cell."
+  },
+  "primary_test": {
+    "statistic": "ols_hac_slope",
+    "null": "The slope is zero.",
+    "maxlags_rule": "horizon_months minus 1, and 0 when the horizon is one month",
+    "alpha": 0.05,
+    "multiple_testing": "Benjamini-Hochberg on training-window primary p-values inside the registered family. Full-sample p-values are descriptive and are not the selection statistic."
+  },
+  "bootstrap": {
+    "method": "circular_block",
+    "block_length_rule": "horizon_months",
+    "replicates": 400,
+    "seed": 20261103,
+    "interval": [0.025, 0.975],
+    "cell_seed_rule": "The frozen seed plus the Adler-32 of the cell id modulo 100000.",
+    "audit_rule": "A claim is withdrawn to inconclusive when the block-bootstrap interval for the slope contains zero."
+  },
+  "collinearity_abs_pearson": 0.95,
+  "ridge": "Ridge is not estimated. A penalty would be a second unregistered search. Collinear cousins are one group.",
+  "pilot": {
+    "feature_id": "unemployment_12m_change",
+    "dataset_id": "bls.ln.LNS14000000",
+    "transform": "difference over 12 calendar months, in percentage points",
+    "etf": "VWRA",
+    "horizon_months": 12,
+    "excluded_from_search_family": true
+  },
+  "features": [
+    {
+      "feature_id": "unemployment_level",
+      "kind": "level",
+      "dataset_id": "bls.ln.LNS14000000",
+      "group": "unemployment",
+      "adverse": "above_past_median",
+      "reason": "The unemployment rate is the level named in the first-pass family."
+    },
+    {
+      "feature_id": "unemployment_12m_change",
+      "kind": "difference",
+      "months": 12,
+      "dataset_id": "bls.ln.LNS14000000",
+      "group": "unemployment",
+      "adverse": "positive",
+      "reason": "A 12-month change in a rate is the difference, in percentage points. A missing month is not bridged."
+    },
+    {
+      "feature_id": "cpi_u_12m_change",
+      "kind": "ratio_change",
+      "months": 12,
+      "dataset_id": "bls.cu.CUSR0000SA0",
+      "group": "cpi",
+      "adverse": "above_past_median",
+      "reason": "CPI-U enters as a 12-month ratio change. No surprise term is used."
+    },
+    {
+      "feature_id": "ip_12m_change",
+      "kind": "ratio_change",
+      "months": 12,
+      "dataset_id": "fed.g17.IP.B50001.S",
+      "group": "industrial_production",
+      "adverse": "negative",
+      "reason": "Industrial production enters as a 12-month ratio change."
+    },
+    {
+      "feature_id": "funds_level",
+      "kind": "level",
+      "dataset_id": "fed.h15.RIFSPFF_N.M",
+      "group": "funds",
+      "adverse": "above_past_median",
+      "reason": "The federal funds rate enters as a level."
+    },
+    {
+      "feature_id": "funds_12m_change",
+      "kind": "difference",
+      "months": 12,
+      "dataset_id": "fed.h15.RIFSPFF_N.M",
+      "group": "funds",
+      "adverse": "positive",
+      "reason": "A 12-month change in the funds rate is the difference, in percentage points."
+    },
+    {
+      "feature_id": "spread_level",
+      "kind": "spread",
+      "long_dataset_id": "fed.h15.RIFLGFCY10_N.M",
+      "short_dataset_id": "fed.h15.RIFLGFCM03_N.M",
+      "group": "spread",
+      "adverse": "negative",
+      "reason": "The spread is the 10-year yield minus the 3-month yield in the same month."
+    },
+    {
+      "feature_id": "spread_12m_change",
+      "kind": "spread_difference",
+      "months": 12,
+      "long_dataset_id": "fed.h15.RIFLGFCY10_N.M",
+      "short_dataset_id": "fed.h15.RIFLGFCM03_N.M",
+      "group": "spread",
+      "adverse": "negative",
+      "reason": "The 12-month change in the spread is the difference of that spread. A missing yield month is not bridged."
+    }
+  ],
+  "gate3": [
+    {
+      "indicator_id": "sahm_gap",
+      "baseline_feature_id": "unemployment_level",
+      "reason": "The Sahm gap is compared with the unemployment level it is built from."
+    },
+    {
+      "indicator_id": "diffusion_share",
+      "baseline_feature_id": "ip_12m_change",
+      "reason": "Restricted diffusion is compared with industrial-production growth, one of its inputs."
+    },
+    {
+      "indicator_id": "spread_level",
+      "baseline_dataset_id": "fed.h15.RIFLGFCY10_N.M",
+      "reason": "The spread is compared with the 10-year yield, one of the two inputs. It is not compared with itself."
+    }
+  ],
+  "costs_bps": [0, 10],
+  "cash_return": 0,
+  "cash_return_statement": "Cash earns zero because no cash rate is stored. This is an assumption.",
+  "concentration": "One listing, fully invested or fully in cash. No leverage and no second listing.",
+  "economic_comparators": ["invest each contribution at its own entry", "invest only in March, June, September and December", "12-month price momentum using only sessions before the entry"],
+  "economic_rule": "A contribution is retained as cash when the predeclared adverse state is true. Otherwise it is invested at that entry and held to the window end.",
+  "forward_validated": "This class stays empty. Nothing in this catalogue was frozen before the outcomes existed.",
+  "unchanged_sha256": {
+    "workers/research/src/aqil_research/workflow/refresh.py": "70f2da27c5af29c1f2a71c3a470bcf4d0ff9afc909c2eb4bd959bc719afa7639",
+    "workers/research/src/aqil_research/vintages/asof.py": "ffeb859840168b7a6215e300716a0635301f2f99395d0fe6a82ec5b71e5b2b24",
+    "workers/research/src/aqil_research/etf/performance/returns.py": "c2a125715874da1c8930ea051f9ecf8c83b8f8bed1560799c2cffbd001e32b80",
+    "apps/web/src/lib/wealth/allocation.ts": "6b90e21994851802cb4c8dc728d1bad0a476ce4da46fa3e90ba609709fbaeaf7",
+    "apps/web/src/lib/capital/policy.ts": "7671a525cd1a93ce358d72f6882f74eed1ab150a3e02cc3846be0f64629d5441"
+  }
+}
