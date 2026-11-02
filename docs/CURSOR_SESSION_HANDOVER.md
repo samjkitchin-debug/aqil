@@ -1,7 +1,15 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 1 November 2026, foundation close-out
+**Last updated:** 2 November 2026, code release without a hosted write
+
+## Code release, 2 November 2026
+
+Risk class R2 for the Git merge. Risk class R3 for a hosted write, which was not done. `research/foundation-hardening` at `fba0613` already contained `research/quantitative-production` (`9eac587`), `research/quantitative-v1` (`3aaa2aa`), and the source, inflation, and multivariate branches. The hardening worktree was clean. `npm run test:research` on 2 November 2026 passed 688 tests, then Ruff. Docker Desktop had been stopped and was started for that disposable-database preparation. Preserved `postgres` on port 55432 was not reset.
+
+`publication_allowed` stays false. No hosted migration was applied. No local research run was copied. `SUPABASE_DB_PASSWORD`, `POSTGRES_PASSWORD`, `SUPABASE_ACCESS_TOKEN`, and `RESEARCH_DATABASE_URL` were unset. The Supabase CLI is not installed. Gate 8 and gate 10 stay blocked until the founder supplies the database-owner password for project `ojvswermsbbaltjohqph` out of band, or approves a paid backup, and a logical dump is restored into a disposable database. See `docs/runbooks/U0_HOSTED_RELEASE.md`. Production can serve the new web build while `RESEARCH_DATABASE_URL` is unset, because the health page then says the research database is not configured and does not query `research.research_cycles`.
+
+The dirty `apps/web/public/icons/icon.svg` on `C:\Users\gamer\aqil` was not part of this merge.
 
 ## Foundation close-out, 1 November 2026
 
