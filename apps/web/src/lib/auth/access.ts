@@ -3,7 +3,12 @@ import "server-only";
 import { connection } from "next/server";
 import { cache } from "react";
 
-import { classifyAuthFailure, type AccessStatus } from "@/lib/auth/session-policy";
+import {
+  classifyAuthFailure,
+  researchAuthorisationFromMetadata,
+  type AccessStatus,
+  type ResearchAuthorisation,
+} from "@/lib/auth/session-policy";
 import { isSupabaseConfigured } from "@/lib/env/public";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -11,7 +16,11 @@ export type AccessResolution =
   | { status: "signed_out" }
   | { status: "temporarily_unavailable" }
   | { status: "terminal_invalid_session" }
-  | { status: "authenticated_authorised"; userId: string };
+  | {
+      status: "authenticated_authorised";
+      userId: string;
+      researchAuthorisation: ResearchAuthorisation;
+    };
 
 function rethrowRedirect(error: unknown): void {
   if (
@@ -39,7 +48,11 @@ async function resolveAccessOnce(): Promise<AccessResolution> {
       return { status: "signed_out" };
     }
 
-    return { status: "authenticated_authorised", userId: data.user.id };
+    return {
+      status: "authenticated_authorised",
+      userId: data.user.id,
+      researchAuthorisation: researchAuthorisationFromMetadata(data.user.app_metadata),
+    };
   } catch (error) {
     rethrowRedirect(error);
     return { status: "temporarily_unavailable" };

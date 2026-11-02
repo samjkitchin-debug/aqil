@@ -52,21 +52,16 @@ def record_filter_update(conn: psycopg.Connection, *, decision_at: datetime) -> 
 
 
 def _filter_update_locked(conn: psycopg.Connection) -> FilterUpdate:
-    row = conn.execute(
-        """
-        select calculation from research.research_runs
-        where method_id = %s
-          and execution_status = 'completed'
-          and calculation ? 'loadings_ip_income_sales_payroll'
-          and coalesce(calculation->>'adopted_parameter_version', 'true') = 'true'
-        order by executed_at desc
-        limit 1
-        """,
-        (METHOD_ID,),
-    ).fetchone()
-    if row is None or row[0] is None:
+    from aqil_research.workflow.parameter_versions import (
+        latest_filtered_calculation,
+        load_accepted_factor_parameters,
+    )
+
+    parameters = load_accepted_factor_parameters(conn)
+    if parameters is None:
         return FilterUpdate("absent", "no stored 1988 refit")
-    calculation = row[0]
+    calculation = dict(parameters)
+    stored_run = latest_filtered_calculation(conn)
     try:
         panel = _panel(conn, calculation.get("moments"))
     except (ValueError, ZeroDivisionError) as exc:
@@ -98,12 +93,15 @@ def _filter_update_locked(conn: psycopg.Connection) -> FilterUpdate:
     if not math.isfinite(likelihood) or any(not math.isfinite(value) for value in path):
         _store_failure(conn, "non-finite likelihood or filtered state")
         return FilterUpdate("failed", "non-finite likelihood or filtered state")
-    stored = calculation["filtered_factor"]
+    stored = None if stored_run is None else stored_run.get("filtered_factor")
     gap = None
-    if len(path) == len(stored):
+    if isinstance(stored, list) and len(path) == len(stored):
         gap = max(abs(left - right) for left, right in zip(path, stored, strict=True))
-    likelihood_gap = abs(likelihood - float(calculation["log_likelihood"]))
-    if gap is not None and gap <= 1e-6 and likelihood_gap <= 1e-4:
+    stored_likelihood = None if stored_run is None else stored_run.get("log_likelihood")
+    likelihood_gap = None
+    if isinstance(stored_likelihood, int | float):
+        likelihood_gap = abs(likelihood - float(stored_likelihood))
+    if gap is not None and gap <= 1e-6 and (likelihood_gap is None or likelihood_gap <= 1e-4):
         return FilterUpdate("unchanged", "filtered path matches the stored run")
     _store_filter_update(conn, calculation, path, likelihood)
     return FilterUpdate(
@@ -119,6 +117,7 @@ def _store_filter_update(conn, calculation, path, likelihood) -> None:
     payload["filtered_factor"] = list(path)
     payload["log_likelihood"] = likelihood
     payload["update_kind"] = "filter_update"
+    payload["adopted_parameter_version"] = False
     payload["real_time"] = False
     payload["publication_allowed"] = False
     run = ResearchRun(

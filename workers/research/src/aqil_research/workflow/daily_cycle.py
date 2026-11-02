@@ -276,7 +276,7 @@ def record_refresh_cycle(
     source_failed = False
     for source in sources:
         outcome, detail, datasets = _refresh_event(source, source_dataset_ids)
-        if outcome in {"failed", "rights_blocked", "invalid"}:
+        if outcome in {"failed", "invalid"}:
             source_failed = True
         if outcome == "success":
             changed.update(datasets)
@@ -318,6 +318,10 @@ def _refresh_event(
         return "rights_blocked", detail, set()
     if outcome == "failed_validation":
         return "invalid", detail, set()
+    if outcome in {"absent", "locked", "insufficient"}:
+        return "blocked", detail, set()
+    if outcome == "filter_update":
+        return "success", detail, set(dataset_ids(source.source_id))
     if inserted > 0:
         return "success", detail, set(dataset_ids(source.source_id))
     if outcome in {"unchanged", "completed", "success", "skipped_fresh", "not_requested"}:

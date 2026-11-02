@@ -4,6 +4,15 @@ export type AccessStatus =
   | "temporarily_unavailable"
   | "terminal_invalid_session";
 
+export type ResearchAuthorisation = "founder" | "none";
+
+/** One account claim. Ordinary sign-in does not grant unpublished research. */
+export function researchAuthorisationFromMetadata(metadata: unknown): ResearchAuthorisation {
+  if (typeof metadata !== "object" || metadata === null) return "none";
+  const claim = (metadata as { aqil_research?: unknown }).aqil_research;
+  return claim === "founder" ? "founder" : "none";
+}
+
 export type AuthFailure = {
   name?: string;
   code?: string;

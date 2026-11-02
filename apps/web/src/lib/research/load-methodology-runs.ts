@@ -28,7 +28,10 @@ export async function loadMethodologyRuns(
   await connection();
   if (methodIds.length === 0) return { status: "ready", runs: [] };
   const access = await resolveAccess();
-  const includeStoredFlag = access.status === "authenticated_authorised";
+  if (access.status !== "authenticated_authorised" || access.researchAuthorisation !== "founder") {
+    return { status: "withheld" };
+  }
+  const includeStoredFlag = true;
   const database = researchDatabaseUrl();
   if (database.status === "unavailable") return database;
   try {

@@ -831,6 +831,7 @@ def _refresh_dosm_ipi(now: datetime) -> SourceRefreshResult:
 
 
 def _refresh_series(now: datetime) -> SourceRefreshResult:
+    """Official LN flat file. The Public Data API year window is not this series."""
     last_success = _latest_live_retrieval("bls_cps_unemployment_rate")
     if not series_is_due(last_success, now):
         return SourceRefreshResult(
@@ -838,16 +839,24 @@ def _refresh_series(now: datetime) -> SourceRefreshResult:
             "skipped_fresh",
             detail="last live retrieval is inside the weekly interval",
         )
-    from aqil_research.collection.service import collect_bls_unemployment
+    from aqil_research.adapters.bls_ln_history.adapter import (
+        BlsLnHistoryAdapter,
+        BlsLnHistoryConfig,
+    )
+    from aqil_research.adapters.bls_ln_history.constants import DATASET_ID, SOURCE_ID
+    from aqil_research.adapters.bls_ln_history.parse import StoredLnPoint
 
-    with research_connection() as conn:
-        result, _store = collect_bls_unemployment(
-            store_backend="postgres",
-            collected_at=now,
-            live=True,
-            conn=conn,
-        )
-    return SourceRefreshResult("bls_cps_unemployment_rate", str(result.outcome))
+    return _refresh_registered(
+        now,
+        SOURCE_ID,
+        DATASET_ID,
+        StoredLnPoint,
+        lambda retrieved, priors: BlsLnHistoryAdapter(
+            config=BlsLnHistoryConfig(live=True),
+            retrieved_at=retrieved,
+            prior_points=priors,  # type: ignore[arg-type]
+        ),
+    )
 
 
 def _latest_live_retrieval(source_id: str) -> datetime | None:

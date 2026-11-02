@@ -176,42 +176,15 @@ def _accepted_stock_watson_parameters(
     conn: psycopg.Connection,
     method_id: str,
 ) -> dict[str, object] | None:
-    """Latest completed vector whose adopted flag is absent or true.
+    """Accepted parameter artifact, or the preserved run when that artifact is absent.
 
     An explicit false, including the unadopted re-estimate, is not selected.
     """
     if method_id != SPECIFICATION_ID:
         return None
-    row = conn.execute(
-        """
-        select calculation
-        from research.research_runs
-        where method_id = %s
-          and execution_status = 'completed'
-          and calculation ? 'loadings_ip_income_sales_payroll'
-          and coalesce(calculation->>'adopted_parameter_version', 'true') = 'true'
-          and run_id <> %s
-        order by executed_at desc
-        limit 1
-        """,
-        (method_id, UNADOPTED_REESTIMATE_RUN_ID),
-    ).fetchone()
-    if row is None or not isinstance(row[0], dict):
-        return None
-    calculation = row[0]
-    required = (
-        "loadings_ip_income_sales_payroll",
-        "factor_ar",
-        "idiosyncratic_ar",
-        "idiosyncratic_scale",
-    )
-    if any(key not in calculation for key in required):
-        return None
-    parameters: dict[str, object] = {key: calculation[key] for key in required}
-    moments = calculation.get("moments")
-    if isinstance(moments, dict):
-        parameters["moments"] = moments
-    return parameters
+    from aqil_research.workflow.parameter_versions import load_accepted_factor_parameters
+
+    return load_accepted_factor_parameters(conn)
 
 
 def _within_cutoff(

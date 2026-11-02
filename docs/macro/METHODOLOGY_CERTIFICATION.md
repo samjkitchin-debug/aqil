@@ -514,3 +514,35 @@ The other hosted quantitative runs from the same execution are completed, unpubl
 
 `npm run test:research` passed 688, then Ruff check passed and 441 files were already formatted. `npm run test:db` passed 13 files and 211 tests. Web typecheck passed. Lint passed with the existing unused `_searchParams` warning. The presentation and health tests passed 32. The production build generated 55 pages, including `/intelligence/health`. GitHub Actions has not run. This is not a publication approval.
 
+## R. V1 certification matrix, 2 November 2026
+
+This is the certification for the implemented registry. A completed hosted run is not operational acceptance. `publication_allowed` stays false on every row. No method is a qualified forecast. Read-contract version 2 names the same consumer use. Local runs in sections A to P were not copied.
+
+| Method | Purpose | Implementation | Numerical check | Reproducibility | Data validity | Historical evaluation | Operational execution | Forecast | Publication | Consumer use |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Bry–Boschan Spencer-15 | Retrospective turning points | Registered | Stored peaks and troughs | Hosted run completed | Latest revised industrial production | Retrospective, not real time | Hosted run stored | Not claimed | False | Retrospective diagnostic |
+| Harding–Pagan characteristics | Phase and concordance | Registered | Stored concordance | Hosted run completed | Latest revised | Retrospective | Hosted run stored | Not claimed | False | Retrospective diagnostic |
+| Bai–Perron mean shifts | Predeclared mean shifts | Registered | Primary trim selected 0 breaks | Hosted run completed | Latest revised | Retrospective | Hosted run stored | Not claimed | False | Retrospective diagnostic |
+| CUSUM recursive residuals | Stability diagnostic | Registered | Stored extreme | Hosted run completed | Latest revised | Retrospective | Hosted run stored | Not claimed | False | Retrospective diagnostic |
+| Industrial-production CUSUM | Growth stability | Registered | Stored extreme | Hosted run completed | Latest revised | Retrospective | Hosted run stored | Not claimed | False | Retrospective diagnostic |
+| Engle–Granger | Cointegration diagnostic | Registered | Statistic -2.8648234 | Hosted run completed | Latest revised log levels | Retrospective | Hosted run stored | Not claimed | False | Retrospective diagnostic |
+| Autoregressive benchmark | Comparison with the historical mean | Registered | Not qualified as a forecast | Hosted run completed | Latest revised | Retrospective | Hosted run stored | Not qualified | False | Retrospective diagnostic |
+| Stock–Watson modern refit | Coincident factor from the accepted parameters | Registered | Loadings match the preserved vector | Hosted calculate `d7761adb-db43-48ef-bdbb-a57e31fc753e` replayed with no scientific difference | Latest revised panel, frozen training moments | Not a real-time vintage | One hosted calculate. Not operationally accepted | Not claimed | False | Retrospective diagnostic |
+| Term spread | 10-year minus 3-month yield | Registered | Spread stored | Hosted run completed | Latest revised | Not a probability | Hosted run stored | Not claimed | False | Descriptive measurement |
+| Ex-post real federal funds rate | Funds rate minus trailing CPI | Registered | Stored identity | Hosted run completed | Latest revised | Not a Taylor rule | Hosted run stored | Not claimed | False | Descriptive measurement |
+| Subsequent ex-post real funds rate | Funds rate minus the next twelve CPI months | Registered | Stored identity | Hosted run completed | Latest revised | Not a Taylor rule | Hosted run stored | Not claimed | False | Descriptive measurement |
+| CPI-U autoregression | Persistence of monthly log changes | Registered | Not a forecast and not Andrews–Chen | Hosted run completed | October 2025 gap not interpolated | Latest revised | Hosted run stored | Not qualified | False | Descriptive measurement |
+| Lead–lag correlation | Cross-correlation | Registered | Stored pairs | Hosted run completed | Latest revised | Descriptive | Hosted run stored | Not claimed | False | Descriptive measurement |
+| Labour, prices, production, and credit family readings | Stored family descriptions | Registered | Stored readings | Hosted runs completed | Latest revised | Not a score | Hosted runs stored | Not claimed | False | Descriptive measurement |
+| SLOOS standards | Survey description | Registered | Stored share | Hosted run completed | Latest revised | Descriptive | Hosted run stored | Not claimed | False | Descriptive measurement |
+| Constant-maturity probit | Predeclared spread probability | Registered | Fit accepted on the stored row | Hosted run completed | Latest revised, not the New York Fed model | Not real time | Hosted run stored | Not a qualified forecast | False | Probability estimate |
+| Hamilton monthly regime | Experimental regime probability | Registered | Lower-mean regime not a recession label | Hosted run completed | Latest revised | Not empirically qualified | Hosted run stored | Not claimed | False | Experimental only |
+| Restricted diffusion | Experimental breadth | Registered | Stored share | Hosted run completed | Latest revised | Experimental | Hosted run stored | Not claimed | False | Experimental only |
+| Sahm gap | Latest unemployment window | Registered | Formula tested | `c53dd21e` and `7847922a` have no frozen sufficient window | Official October 2025 month is absent and was not interpolated | Not real time | Both runs `completed_insufficient` | Not claimed | False | Blocked |
+| Inflation autoregression | Holdout persistence and forecast test | Registered | Minimum 144 contiguous growth months | `713e8ce2` cannot be replayed | The contiguous sample ending at the latest month is shorter than 144 because October 2025 is absent | Window was not moved | Stays insufficient | Not qualified | False | Blocked |
+| Census advance orders | Advance durable goods | Registered | Not run | No hosted series | `census.m3.adv.MDM.NO` has no rows | Not evaluated | Not executed | Not claimed | False | Blocked |
+| Macro conditions panel | Panel including Census orders | Registered | Not run | Missing Census input | Census series absent | Not evaluated | Skipped | Not claimed | False | Blocked |
+| Period level change | Unemployment period change | Registered | Registered | No hosted completed run | Not executed on the host in this close-out | Not evaluated | Skipped when inputs were unchanged | Not claimed | False | Blocked |
+
+The rejected Stock–Watson re-estimate was not promoted. The parameter artifact `sw1988-modern-1997-2026m07` has checksum `2fb8f5b3689125d5c25b49e69cff05e8efad55ff2ca67fe11e6d45743581ae1b` and contains no filtered path. A second promotion did not insert another row. The hosted calculation likelihood is -1593.0930472758703 on 355 growth months. That is a longer panel than the July 2026 estimation sample. It is not a refit.
+

@@ -26,7 +26,7 @@ from aqil_research.methods.stock_watson_1988_fit import (
 )
 from aqil_research.workflow.stock_watson_reading import (
     PRESERVED_ESTIMATION_RUN_ID,
-    _filter_update_locked,
+    _store_filter_update,
     adopt_parameter_version,
     parameter_row_is_adopted,
 )
@@ -150,7 +150,7 @@ def test_preserved_run_is_not_replaced_by_an_unverified_gradient() -> None:
     )
     import inspect
 
-    assert "adopted_parameter_version" in inspect.getsource(_filter_update_locked)
+    assert "adopted_parameter_version" in inspect.getsource(_store_filter_update)
 
 
 def test_filtered_factor_is_not_the_smoother() -> None:

@@ -16,7 +16,8 @@ export type MethodologyRunMeta = {
 
 export type MethodologyRunLoad =
   | { status: "ready"; runs: readonly MethodologyRunMeta[] }
-  | { status: "unavailable"; reason: string };
+  | { status: "unavailable"; reason: string }
+  | { status: "withheld" };
 
 export type MethodologySection = {
   id: string;
@@ -189,6 +190,7 @@ function statusLineFor(
     return "No method identifier is registered for this page.";
   }
   if (load.status === "unavailable") return load.reason;
+  if (load.status === "withheld") return "Stored result withheld.";
   if (!latest) {
     if (entry.queryMethodIds.some((id) => STORED_RESULT_METHOD_IDS.has(id))) {
       return "The stored result is unavailable.";
@@ -216,6 +218,9 @@ function currentResult(
 ): string {
   if (load.status === "unavailable") {
     return "The current result cannot be described because run metadata could not be read. No output is invented in its place.";
+  }
+  if (load.status === "withheld") {
+    return "Unpublished research is limited to an authorised account. No figure is loaded.";
   }
   if (!latest) {
     if (entry.queryMethodIds.some((id) => STORED_RESULT_METHOD_IDS.has(id))) {
@@ -260,6 +265,9 @@ function operationalStatus(
   if (load.status === "unavailable") {
     return `${load.reason} Hosted scheduling is not read by this page.`;
   }
+  if (load.status === "withheld") {
+    return "Unpublished research is limited to an authorised account. No execution time is loaded.";
+  }
   if (!latest) {
     return "No execution time is stored for the identifiers this page queries. This page does not report a schedule it cannot read.";
   }
@@ -281,6 +289,10 @@ function technicalEvidence(
   ];
   if (load.status === "unavailable") {
     lines.push(load.reason);
+    return lines;
+  }
+  if (load.status === "withheld") {
+    lines.push("Unpublished research is limited to an authorised account.");
     return lines;
   }
   if (!latest) {

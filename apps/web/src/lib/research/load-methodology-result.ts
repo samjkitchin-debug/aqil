@@ -27,7 +27,7 @@ export async function loadPrivateMethodologyResult(
   methodIds: readonly string[],
 ): Promise<LoadPrivateMethodologyResult> {
   const access = await resolveAccess();
-  if (access.status !== "authenticated_authorised") {
+  if (access.status !== "authenticated_authorised" || access.researchAuthorisation !== "founder") {
     return { status: "ready", result: null };
   }
   await connection();

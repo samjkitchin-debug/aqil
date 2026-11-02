@@ -1,8 +1,13 @@
 # Research pipeline.
 #
 # The daily cycle module can record a missed UTC day from the last cycle start.
-# The 06:15 UTC schedule runs the hosted refresh only when RESEARCH_DATABASE_URL
-# is set as a repository secret. The secret is not stored in Git.
+# The 06:15 UTC schedule runs the hosted refresh when the worker secret is set.
+# The worker secret is RESEARCH_WORKER_DATABASE_URL. The legacy name
+# RESEARCH_DATABASE_URL remains a fallback for this workflow only.
+# Vercel keeps the reader role under RESEARCH_DATABASE_URL. Neither value is
+# copied into the other system, and neither is stored in Git.
+# This workflow has no pull_request trigger, so a fork pull request cannot
+# receive the worker secret. The live job does not pass --refit.
 name: Research pipeline
 
 on:
@@ -67,12 +72,17 @@ jobs:
     steps:
       - name: Refuse unless the worker connection is set
         env:
+          RESEARCH_WORKER_DATABASE_URL: ${{ secrets.RESEARCH_WORKER_DATABASE_URL }}
           RESEARCH_DATABASE_URL: ${{ secrets.RESEARCH_DATABASE_URL }}
         run: |
+          if [ -n "$RESEARCH_WORKER_DATABASE_URL" ]; then
+            export RESEARCH_DATABASE_URL="$RESEARCH_WORKER_DATABASE_URL"
+          fi
           if [ -z "$RESEARCH_DATABASE_URL" ]; then
-            echo "Refusing live writes. The repository secret RESEARCH_DATABASE_URL is not set."
+            echo "Refusing live writes. The worker database secret is not set."
             exit 1
           fi
+          echo "Worker connection is set. The value is not printed."
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
         with:
@@ -80,7 +90,11 @@ jobs:
       - name: Hosted refresh
         working-directory: workers/research
         env:
+          RESEARCH_WORKER_DATABASE_URL: ${{ secrets.RESEARCH_WORKER_DATABASE_URL }}
           RESEARCH_DATABASE_URL: ${{ secrets.RESEARCH_DATABASE_URL }}
         run: |
+          if [ -n "$RESEARCH_WORKER_DATABASE_URL" ]; then
+            export RESEARCH_DATABASE_URL="$RESEARCH_WORKER_DATABASE_URL"
+          fi
           uv sync --group dev
           uv run aqil-research refresh
