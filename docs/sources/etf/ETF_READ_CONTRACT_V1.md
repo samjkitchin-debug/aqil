@@ -43,6 +43,18 @@ Rights rows `eodhd_global_etf_eod`, `twelve_data_global_etf_eod`, `mas_sgd_refer
 
 The terms flag is now true. That consent does not allow these prices to be shown to every signed-in Google account. Before any price is stored, the founder must decide that private research storage in instruments is permitted for the people who can open Explore, or keep the rows unread by anyone else. A later licensed vendor can still take the slot. Close, NAV, bid, ask, last, and adjusted close stay distinct. Gate E and Gate F stay open. Gate O is blocked because nothing was stored and production was not deployed.
 
+## Personal research and EODHD, 2 November 2026
+
+Aqil is a private founder-only research application today. Market-data rules are not designed around commercial redistribution to a large audience. A later commercial licence can still replace the adapter.
+
+`docs/sources/etf/PRICE_VENDOR_FALLBACK_2026-11-02.md` is a fallback note. It does not approve a purchase. Its statement that Saxo requires express written permission before copying or downloading is stronger than the pages retrieved for the Saxo terms section above. Those pages list copying and downloading as misuse and require a separate Saxo agreement before display to other users. They do not close a separate written-permission question. OpenAPI access remains not unrestricted storage.
+
+EODHD personal terms were read at [Terms and conditions](https://eodhd.com/financial-apis/terms-conditions). A Non-Professional User is an individual who views or uses the information solely for their own personal investment activities. The same section says Non-Professional Users are permitted to store, manipulate, and analyse the data for private, non-commercial purposes, and are prohibited from displaying or granting access to the information, in original or repackaged form. The page does not expressly permit showing the series inside an application, even to the account holder alone. The US$19.99 a month EOD Historical All-World plan on [https://eodhd.com/pricing](https://eodhd.com/pricing) names worldwide end-of-day history. It is not recommended for purchase. No registered free key has returned a London bar. The public demo token is not that test.
+
+No `EODHD_API_TOKEN` was present in the process environment or in the gitignored env files that were checked. The founder step, with no payment, is to open [https://eodhd.com/pricing](https://eodhd.com/pricing), choose Start free, complete EODHD's own account form, and place the issued key only in a gitignored server environment as `EODHD_API_TOKEN`.
+
+Licensed ETF prices are read only when `app_metadata.aqil_research` is `founder`, the same claim as unpublished research in ADR 028. Ordinary Google sign-in is not enough. The server does not send a provider key to the browser.
+
 ## Saxo market-data terms, read 2 November 2026
 
 Accepting OpenAPI access is not storage consent and not redistribution consent. The pages below were read on 2 November 2026. A permission that is not written on those pages is not claimed.

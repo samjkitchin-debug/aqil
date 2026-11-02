@@ -3,7 +3,12 @@ import "server-only";
 import type { Client } from "pg";
 import { connection } from "next/server";
 
+import { resolveAccess } from "@/lib/auth/access";
 import { resolveEtfDatabaseUrl } from "@/lib/data/private-database-url";
+import {
+  LICENSED_PRICE_WITHHELD,
+  licensedEtfPricesAllowed,
+} from "@/lib/etf/licensed-price-access";
 import {
   HOLDINGS_BLOCKED_REASON,
   type CitedExposureView,
@@ -47,6 +52,10 @@ function etfDatabaseUrl() {
 
 export async function loadEtfExplore(isin?: string): Promise<LoadEtfExploreResult> {
   await connection();
+  const access = await resolveAccess();
+  const pricesAllowed =
+    access.status === "authenticated_authorised" &&
+    licensedEtfPricesAllowed(access.researchAuthorisation);
   const requested = isin?.trim() ?? "";
   if (requested && !SHARE_CLASS_ISIN.test(requested)) return { status: "absent" };
   const databaseUrl = etfDatabaseUrl();
@@ -74,7 +83,7 @@ export async function loadEtfExplore(isin?: string): Promise<LoadEtfExploreResul
 
       const views: EtfShareExplore[] = [];
       for (const share of shares.rows) {
-        views.push(await loadShare(client, share));
+        views.push(await loadShare(client, share, pricesAllowed));
       }
       return { status: "ready", shares: views };
     } finally {
@@ -88,7 +97,11 @@ export async function loadEtfExplore(isin?: string): Promise<LoadEtfExploreResul
   }
 }
 
-async function loadShare(client: Client, share: ShareRow): Promise<EtfShareExplore> {
+async function loadShare(
+  client: Client,
+  share: ShareRow,
+  pricesAllowed: boolean,
+): Promise<EtfShareExplore> {
   const listings = await client.query<EtfListingView & { trading_currency: string }>(
     `select mic, trading_currency, ticker
      from instruments.listings
@@ -266,7 +279,9 @@ async function loadShare(client: Client, share: ShareRow): Promise<EtfShareExplo
         },
       ];
     }),
-    prices: await loadPrices(client, share.share_class_id),
+    prices: pricesAllowed
+      ? await loadPrices(client, share.share_class_id)
+      : absentPrices(LICENSED_PRICE_WITHHELD),
     approvals: await loadApprovals(client, share.share_class_id),
     eligibilityDecisions: await loadEligibility(client, share.share_class_id),
     fxSentence: await loadFxSentence(client),
