@@ -66,7 +66,7 @@ The 1971 footnote 7 does not cite a work. There is no bibliography entry for the
 
 The twelve-month placement is printed by Takeshi Otsu, "Robust Statistics and Business Cycle Dating", Seijo University Economic Papers, no. 228, March 2020, in the section on the Bry-Boschan procedure (`https://www.seijo.ac.jp/education/faeco/academic-journals/jtmo420000001iji-att/228-3otsu.pdf`). The filter dated at month t uses six lags and five leads, so the window is t-6 through t+5. Otsu says this follows the FORTRAN rather than the 1971 prose. Harding-Pagan quarterly BBQ is not used.
 
-Months for cyclical dominance compare mean absolute differences, which is the difference option Otsu names, and are then confined to three through six months as chapter 2 prints. Even spans use the same one-extra-lag split. `publication_allowed` stays false. One local run on stored G.17 is `8fb20325-414f-401b-8c46-bda82ed94e16`: 18 peaks and 19 troughs, MCD 3. A six-month NBER window contained 30 of those 37 dates. That overlap did not change any window.
+Months for cyclical dominance compare mean absolute differences, which is the difference option Otsu names, and are then confined to three through six months as chapter 2 prints. Even spans use the same one-extra-lag split. `publication_allowed` stays false. One local run on stored G.17 is `8fb20325-414f-401b-8c46-bda82ed94e16`: 18 peaks and 19 troughs, MCD 3. A six-month NBER window contained 30 of those 37 dates. That overlap did not change any window. Runs stored from 30 October 2026 are labelled retrospective_full_sample. The Spencer smoother is centred, so the dates are not a contemporaneous recession call. Revision sensitivity is blocked because the stored file is latest_revised. Section 17 records the comparison with run 8fb20325-414f-401b-8c46-bda82ed94e16.
 
 ## 4. Input data
 
@@ -141,3 +141,15 @@ AQ-094 keeps the 1971 refusal and records the labelled variant. The 1971 volume 
 ### Full research suite, 25 October 2026
 
 `npm run test:research` passed 528 tests in 12.33 seconds, including Ruff. The development database was not reset. This does not change the six-month NBER window and does not make the variant a 1971 replica. Unattended hosted scheduling is still off. The hook runs only when refresh is invoked.
+
+## 17. Spencer-15 validation on 30 October 2026
+
+The production bounds are unchanged: a full cycle of at least fifteen months, a phase of at least five months, and a six-month ban at each end. `date_specific_cycles` still refuses to date. The Spencer-15 weights were not replaced.
+
+The stored chronology class is `retrospective_full_sample`. The Spencer smoother is centred, so these dates are not a contemporaneous recession call. Revision sensitivity is blocked because `fed.g17.IP.B50001.S` is `latest_revised`. No vintage panel was invented.
+
+Local run `8fb20325-414f-401b-8c46-bda82ed94e16` was left in place. It still has 18 peaks, 19 troughs, and MCD 3, with `publication_allowed` false. A new run was appended: `3955f7f4-08f8-4e7b-9ded-b3f6eea6633f`. It has the same 18 peaks, the same 19 troughs, and the same MCD. `publication_allowed` is false. Recomputing the new run matched its stored calculation. Recomputing the earlier run does not match its stored calculation, because the new calculation adds the chronology label, the length-bound diagnostic, the revision block, and the NBER diagnostic. The peak list and the trough list are the same.
+
+The length-bound diagnostic is a separate result. It does not replace the production dates. Not applying the five-month phase rule adds a peak on 1 May 1934 and a trough on 1 September 1934, so that case has 19 peaks and 20 troughs. Not applying the six-month endpoint ban leaves the production dates unchanged on this sample. A six-month NBER window contains 30 of the 37 production dates. That overlap does not gate the method and is not an acceptance test.
+
+This section does not claim operational acceptance or publication. Targeted pytest on 30 October 2026, from `workers/research`, was 29 passed and 1 failed. The failure is `test_refresh_hook_is_idempotent_until_a_month_changes`: the first collect on disposable database `aqil_research_test` returned unchanged because that G.17 package was already stored. The assertion was not changed. `npm run test:research` was not run. Database `postgres` was not reset.

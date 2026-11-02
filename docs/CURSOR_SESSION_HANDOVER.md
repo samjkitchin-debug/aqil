@@ -1,7 +1,181 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 30 October 2026, hosted research read
+**Last updated:** 2 November 2026, code release without a hosted write
+
+## Code release, 2 November 2026
+
+Risk class R2 for the Git merge. Risk class R3 for a hosted write, which was not done. `research/foundation-hardening` at `fba0613` already contained `research/quantitative-production` (`9eac587`), `research/quantitative-v1` (`3aaa2aa`), and the source, inflation, and multivariate branches. The hardening worktree was clean. `npm run test:research` on 2 November 2026 passed 688 tests, then Ruff. Docker Desktop had been stopped and was started for that disposable-database preparation. Preserved `postgres` on port 55432 was not reset.
+
+`publication_allowed` stays false. No hosted migration was applied. No local research run was copied. `SUPABASE_DB_PASSWORD`, `POSTGRES_PASSWORD`, `SUPABASE_ACCESS_TOKEN`, and `RESEARCH_DATABASE_URL` were unset. The Supabase CLI is not installed. Gate 8 and gate 10 stay blocked until the founder supplies the database-owner password for project `ojvswermsbbaltjohqph` out of band, or approves a paid backup, and a logical dump is restored into a disposable database. See `docs/runbooks/U0_HOSTED_RELEASE.md`. Production can serve the new web build while `RESEARCH_DATABASE_URL` is unset, because the health page then says the research database is not configured and does not query `research.research_cycles`.
+
+The dirty `apps/web/public/icons/icon.svg` on `C:\Users\gamer\aqil` was not part of this merge.
+
+## Foundation close-out, 1 November 2026
+
+Risk class R2 for the local cycle and the new runs. Risk class R3 for a hosted write, which was not done. Branch `research/foundation-hardening` in `C:\Users\gamer\aqil-quant-v1`. `publication_allowed` stays false. Nothing was pushed. Nothing was merged. Pull request 18 stays open. No branch was deleted. `main` at `c038426` matches `origin/main`. The dirty `apps/web/public/icons/icon.svg` on `C:\Users\gamer\aqil` was not edited. Hosted Supabase was not written. Database `postgres` on `127.0.0.1:55432` was not reset.
+
+Pull request 18 head `research/quantitative-production` at `9eac587` is an ancestor of this branch. Merging that pull request would not bring the V1 commits or this close-out. The documented plan, which needs founder approval before anyone pushes, is to open a pull request from `research/foundation-hardening` to `main` and close pull request 18 as superseded. Do not force-update the pull request 18 branch.
+
+The five other quantitative worktrees were clean ancestors of this branch. Those checkouts were removed. The branches remain. Local `main` stays because its icon file is still dirty.
+
+`npm run research:refresh` ran twice on local `postgres`. The second run inserted nothing for the sources the first run had changed. CPI-U returned HTTP 200 on the authorised user agent and stayed `unchanged` at 956 months through September 2026. `2025-10-01` is still absent and was not interpolated. A default httpx user agent received HTTP 403. The old HTTP 406 was not reproduced. Both BEA factor refreshes failed with `VintageConflictError` for July 2026. Those steps are not operational. The recorded cycle is `partial`: 29 unchanged, 2 failed, 8 stale, 26 methods skipped. No `--refit` was implied by the cycle.
+
+New replayable runs, appended and not substituted for the old rows: diffusion `18f5d7bb-8227-4441-8b45-6755153d7b8f`, CPI-U autoregression `06ff435b-2279-4a46-99cb-6a99dd4f0a35`, ex-post real funds `e399de3f-18a6-4a72-b41f-6d14611b4338`, probit `adff8815-8582-4c2e-befa-5faef3f9b925`, Stock–Watson calculate `a7a2620a-7bd9-4cca-917b-992062ab025c`, and unadopted refit `b4f95b41-cc0c-4b38-9792-d866abd6e54d`. Historical probit `137d92b7`, diffusion `1f747c9f` and `625e94dc`, CPI-U `bcbf15bc`, ex-post `e340659b`, and Stock–Watson `3f8c7611` and `940955f1` stay non-replayable. Inflation autoregression `221f1c3a-ba9b-4b29-bb7d-4ffbd8821091` is `completed_insufficient`. No method is operational. Section P of `docs/macro/METHODOLOGY_CERTIFICATION.md` is the inventory.
+
+The GitHub research workflow is manual only. It is ready for activation and is not operational. Gate 10 stays blocked. No database-owner password was found. The Supabase CLI is not installed. `research_reader` was not used for a dump. `pg_dump` was not run. The founder action is in `docs/runbooks/U0_HOSTED_RELEASE.md`.
+
+Checks on this tree, not GitHub Actions: `npm run test:research` passed 688, then Ruff check passed and 441 files were already formatted. `npm run test:db` passed 13 files and 211 tests. Web typecheck passed. Lint passed with the existing unused `_searchParams` warning. The presentation and health tests passed 32. The production build generated 55 pages, including `/intelligence/health`. A signed-out request to `http://127.0.0.1:3025/intelligence/health` returned 307 to the login page with `Cache-Control: private, no-store, max-age=0`. At desktop width and at 390 pixels the page said "Sign in to continue." and did not show a cycle figure. Google sign-in was not completed. A signed-in health view was not opened.
+
+## Certification re-run, 1 November 2026
+
+## Certification re-run, 1 November 2026
+
+The hardening work is still uncommitted on `research/foundation-hardening`. `HEAD` remains `3aaa2aa`. Nothing was pushed, merged, or committed. Database `postgres` on `127.0.0.1:55432` was not reset. Development live observations remained 38,598 through the disposable pgTAP preparation. Total observations read before that preparation were 38,685. Hosted Supabase was not written. `pg_dump` was not run.
+
+Commands executed on this tree:
+
+- `npm run test:research` passed 688 tests, then Ruff check passed and Ruff format reported 441 files already formatted. That run includes `test_daily_cycle.py` (12), `test_plugin_registry.py` (2), `test_historical_replay.py` (2), and `test_replay_integrity.py` (7).
+- `uv run python scripts/replay_frozen_family.py` read local `postgres` and rolled back each replay on `aqil_research_test`. Outcomes match section O of `docs/macro/METHODOLOGY_CERTIFICATION.md`.
+- `npm run test:db` passed 13 files and 211 tests, including `research_cycles.test.sql`. Disposable preparation printed the usual ignored `pg_restore` privilege errors.
+- Web typecheck passed. Web lint passed with the existing unused `_searchParams` warning. `npm run build` generated 55 pages, including `/intelligence/health`.
+- `node --experimental-strip-types --test` on the navigation, methodology presentation, private result, and read-contract consumer files passed 31. The two methodology files are 28 of those. The health copy tests are 2.
+- GitHub Actions has not run.
+
+A signed-out request to `http://127.0.0.1:3024/intelligence/health` returned 307 to `/login?error=signed_out&next=%2Fintelligence%2Fhealth` with `Cache-Control: private, no-store, max-age=0`. At 1280 pixels and at 390 pixels the sign-in page said "Sign in to continue." The page text did not contain a cycle figure. A signed-in health view was not opened. Google sign-in was not available in this session.
+
+Gate 10 stays blocked. No `SUPABASE_DB_PASSWORD`, `POSTGRES_PASSWORD`, or `RESEARCH_DATABASE_URL` is set in the process, user, or machine environment. `C:\Users\gamer\aqil-release-backups\2026-10-30` holds a `research_reader` pooler file and password files for the reader and worker roles. Those roles are not the database owner. They were not used. The smallest remedy is a database-owner password the founder supplies, or a paid backup add-on the founder approves, then a logical dump stored outside Git and restored into a disposable database.
+
+## Foundation hardening, 1 November 2026
+
+Risk class R2 for the local migration and the cycle. Risk class R3 for any hosted write, which was not done. Branch `research/foundation-hardening` in `C:\Users\gamer\aqil-quant-v1`, cut from `3aaa2aa`. `publication_allowed` stays false. Nothing was pushed. Nothing was merged. Pull request 18 stays open. No branch or worktree was deleted. `main` at `c038426` and `apps/web/public/icons/icon.svg` were not edited. Hosted Supabase was read and not written. Database `postgres` on `127.0.0.1:55432` was not reset. Migration `20261101120000_research_cycles.sql` was applied only to that local database and rehearsed on disposable databases. It was not applied to the host.
+
+Ancestry from this tip's parent `3aaa2aa`, re-checked before the branch was cut: `da05562`, `9eac587`, `108f53e`, `81c5119`, and `4e12f18` are ancestors. The branch was 21 commits ahead of `main` and 0 behind. Those five branches have no commit that is absent from V1. V1 is not on `origin`.
+
+Before behaviour changed, on `3aaa2aa`: `npm run test:research` passed 673, then Ruff check and Ruff format (434 files already formatted). Methodology presentation tests passed 27. Web typecheck passed. Only `aqil_research_test` was rebuilt. `postgres` was not reset.
+
+The probit omission is explained in section O of `docs/macro/METHODOLOGY_CERTIFICATION.md`. Run `137d92b7-6ce1-49eb-82ad-8f5727b00f90` was not rewritten. New run `adff8815-8582-4c2e-befa-5faef3f9b925` freezes the omitted month and replayed. It is not the same historical row and it is not the New York Fed model. Diffusion `1f747c9f-4851-4588-a4dc-d8fb1ff30558` and Stock–Watson `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` and `940955f1-50d5-4c06-9d90-5ceebd05d352` stay non-replayable. New diffusion `625e94dc-5bc5-4f4b-a01a-9c3816b9d0c6` has frozen ids and does not replay, because months before the sample start are used and not linked. No method was marked operational.
+
+`npm run test:research` on this tree passed 688, then Ruff check and Ruff format (441 files already formatted). `npm run test:db` passed 13 files and 211 tests, including `research_cycles.test.sql`. Disposable preparation printed the usual ignored `pg_restore` privilege errors and left the live observation count unchanged. Web typecheck passed. Web lint passed with the existing unused `_searchParams` warning. `npm run build` passed, including `/intelligence/health`, 55 routes. The two methodology presentation files passed 28. The health copy tests passed 2. GitHub Actions has not run.
+
+Gate 10 stays blocked. No dump password was found. The health page and the version 1 read contract were still built. A signed-in health view was not opened: this worktree has no `.env.local`, and `http://127.0.0.1:3023/intelligence/health` returned 307 to `/login?error=unavailable&next=%2Fintelligence%2Fhealth` with `Cache-Control: private, no-store, max-age=0`. At 390 pixels the sign-in page showed that private data had not been shown. It did not show a cycle figure.
+
+## Quantitative V1 certification, 1 November 2026
+
+Risk class R2. Branch `research/quantitative-v1` in `C:\Users\gamer\aqil-quant-v1`. `publication_allowed` stays false. Nothing was pushed. Nothing was merged. `main` and the other worktrees were not edited. Hosted Supabase was not read or written. No `pg_dump` was created. Database `postgres` on `127.0.0.1:55432` was not reset. No scheduler was added. `workers/research/src/aqil_research/workflow/refresh.py` was not changed. Preserved runs were not replaced.
+
+`CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT` is on `default_method_registry()`. Its published config is wired for reproduction. The signed-in methodologies page can read a stored probability result and states that it is not the New York Fed model. A signed-out session still receives no calculation. The spread `ESTRELLA_MISHKIN_TERM_SPREAD`, run `cbfdaf86-8446-435e-8ceb-7f43557613f1`, stays the spread.
+
+One local `execute-method` call, without `--refit`, appended run `137d92b7-6ce1-49eb-82ad-8f5727b00f90`. The fit is estimated. Intercept `-0.424740354915`. Spread coefficient `-1.07426638515`. Estimation through 2005 Q4 and evaluation from 2006 Q1 were not moved. Replay is executable but historically unmatched because `incomplete_quarters_omitted` is 1 stored and 0 from the frozen observations. The coefficients match. That mismatch was not weakened into a pass. The method is not operational.
+
+Counts in section N of `docs/macro/METHODOLOGY_CERTIFICATION.md`: 8 methodology families, 10 variants, 3 indicators, and 4 diagnostics. The two CPI autoregressions are one family. The two real-rate definitions are one family. The spread is an indicator. Engle–Granger non-rejection is a diagnostic. The probit is a separate model from the spread. Diffusion `1f747c9f-4851-4588-a4dc-d8fb1ff30558` and the historical Stock–Watson rows `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` and `940955f1-50d5-4c06-9d90-5ceebd05d352` are not historically replayable. Hamilton and Bai–Perron are replayable and are not recession or break calls. Holdout `f0adeed5-991a-4115-be21-f4cbe4c122c7` remains insufficient because October 2025 was not interpolated. No method with a stored run was deleted.
+
+The GDP log-growth bridge on industrial production is unstable (1997–2007 slope 0.330, 2010–2019 slope 0.057, and a 95 percent interval that includes zero) and was not added. The funds-rate and 10-year yield VAR was not registered (AIC lag 12 at the ceiling, BIC lag 2, portmanteau p about 2.83e-9). `bea.nipa.T10106.A191RX` remains 319 quarters, 1947 Q1 to 2026 Q3, with no gaps.
+
+`execute-method` can be the interface for methods that replay or execute cleanly. The suite cannot run unattended until a hosted backup, a hosted BEA ingest, and a scheduler exist. Those three were not built. Track B: no hosted write.
+
+`npm run test:research` passed 673 tests, then Ruff check and Ruff format (434 files already formatted). Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. The historical-replay fixtures roll back, so they do not leave Stock–Watson rows in that disposable database. Methodology presentation tests passed 27. Web typecheck passed. GitHub Actions has not run. On this worktree at `http://127.0.0.1:3022`, the probit page, Bai–Perron, and lead–lag each returned 307 to the signed-out login at desktop width and at 390 pixels. The responses were `private, no-store` and did not include the stored figures. Sign-in is Google only, so a signed-in page was not opened. The server started for that check was stopped.
+
+## Historical replay, 1 November 2026
+
+Risk class R2. Branch `research/quantitative-v1` in `C:\Users\gamer\aqil-quant-v1`. `publication_allowed` stays false. Nothing was pushed. PR #18 was not retargeted. Nothing was merged to `main`. Hosted Supabase was not read or written. Database `postgres` on `127.0.0.1:55432` was not reset. No scheduler was added. `workers/research/src/aqil_research/workflow/refresh.py` was not changed.
+
+Replay now compares scientific figures within an absolute tolerance of `1e-8`. A stored config hash that is not the current method hash does not stop that comparison, and the stored hash is not rewritten. An extra diagnostic field or a changed implementation hash is recorded beside a numerical match. A numerical gap remains a failure.
+
+Read-only classification of the preserved rows:
+
+- Diffusion `1f747c9f-4851-4588-a4dc-d8fb1ff30558` is blocked. The missing field is `observation_ids`.
+- Stock–Watson preserved `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` is blocked. Frozen links cover industrial production and payroll only. The missing field is `observation_ids` for `bea.nipa.T20600.W875RX` and `bea.nipa.U002BU.KPMT`. `adopted_parameter_version` is still absent, so this row stays the preserved parameter version. Its config hash `1c9244eac3ac2da1` was not rewritten.
+- Stock–Watson unadopted refit `940955f1-50d5-4c06-9d90-5ceebd05d352` is blocked. The missing field is `observation_ids`. `adopted_parameter_version` remains false. The likelihood gain of about 0.000305 stays below the 0.001 margin.
+- Hamilton `4629b31d-b0de-4a2f-a987-9e5d3f94747e` is replayable. Shared figures match within `1e-8`, including a lower-mean expected duration of about 1.993 months. That is not a recession label. The recomputation adds `minimum_duration_alternative`. The analytical payload hash differs and was not rewritten.
+- Bai–Perron `2f4c14eb-44f2-40dc-913f-bf7945e972cd` is replayable. Shared figures match within `1e-8`. The primary trim still selects no break. The implementation hash differs because the module bytes changed, and it was not rewritten.
+
+`aqil-research execute-method --method-id STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT` appended run `a7a2620a-7bd9-4cca-917b-992062ab025c` on local `postgres`. The config id is `sw1988-modern-1997-2026m07`, `update_kind` is `calculate`, `adopted_parameter_version` is false, and the likelihood is `-1590.5374990458229`. `--refit` was not used on this database. A disposable test already keeps a refit unadopted. The 1988 CITIBASE panel stays blocked. These methods can still be executed, so none was relabelled in the registry. None is operational.
+
+Focused tests: `tests/test_replay_integrity.py`, `tests/test_historical_replay.py`, `test_stored_config_ids_resolve_for_reproduction`, and `test_stock_watson_refit_appends_an_unadopted_run` passed, 11 tests. Ruff check passed on the files that changed. The full research suite was not run.
+
+## Feasible V1 registration, 31 October 2026
+
+Risk class R2. Branch `research/quantitative-v1` in `C:\Users\gamer\aqil-quant-v1`. `publication_allowed` stays false. Nothing was pushed. PR #18 was not retargeted. Nothing was merged to `main`. Hosted Supabase was not read or written. Database `postgres` on `127.0.0.1:55432` was not reset. No `pg_dump` was created. `workers/research/src/aqil_research/workflow/refresh.py` was not changed. No scheduler, cron, or jobs table was added.
+
+`default_method_registry()` includes `INFLATION_AUTOREGRESSION`, `EX_POST_REAL_FUNDS_RATE`, `IP_GROWTH_CUSUM`, and `ESTRELLA_MISHKIN_TERM_SPREAD`. `ACTIVITY_LEVEL_COINTEGRATION` was removed because it duplicated `ENGLE_GRANGER_COINTEGRATION` (run `570e2f51-1871-4c0e-88c9-c40652093613`). Local run `314ef1b5-c691-4c0c-a3c4-1fb4577254a4` was left in postgres and is not a second method. The older CPI-U and trailing-funds modules remain registered. Their stored runs were not replaced. `--refit` was not passed. Replay match rules were not weakened. `IP_GROWTH_CUSUM` and `CUSUM_RECURSIVE_RESIDUALS` are two stated CUSUM specifications, not two discoveries of different break dates.
+
+Local append-only runs, all `latest_revised` and `publication_allowed` false:
+
+- `INFLATION_AUTOREGRESSION` `f0adeed5-991a-4115-be21-f4cbe4c122c7` is `completed_insufficient`. The latest contiguous logarithmic-change sample is shorter than 144 months. October 2025 CPI was not interpolated. Not empirically qualified. Not a Taylor rule.
+- `EX_POST_REAL_FUNDS_RATE` `e340659b-b693-480a-8e6d-a64b24b90f99`. September 2025 funds rate 4.22 percent, subsequent twelve-month CPI inflation 3.7173 percent, ex-post real rate 0.5027 percentage points. Not a Taylor rule.
+- `IP_GROWTH_CUSUM` `8dd294fc-aa4c-47c5-af43-777dc75d9e3a`. Stays inside the five percent boundary. Not a selected break date. Not Bai–Perron.
+- `ESTRELLA_MISHKIN_TERM_SPREAD` `cbfdaf86-8446-435e-8ceb-7f43557613f1`. September 2026 spread 0.90 percentage points (4.99 minus 4.09). Not a recession probability. No probit coefficients were estimated.
+
+`fed.h15.RIFLGFCM03_N.M` is stored: 541 distinct months, 1 September 1981 to 1 September 2026. No extra ingest was required. Discount-basis `RIFSGFSM03_N.M` has 0 rows. Unemployment `bls.ln.LNS14000000` has 1,054 stored rows and 944 distinct months, 1 January 1948 to 1 September 2026. October 2025 is absent. The coverage row's 944 distinct periods match the distinct months, so that row was not rewritten. AQ-103 is not done. US real GDP remains 319 quarters and was not turned into a nowcast.
+
+Preserved runs still have `publication_allowed` false, including Stock–Watson `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` and unadopted `940955f1-50d5-4c06-9d90-5ceebd05d352`.
+
+The execution contract and the inventory in section M of `docs/macro/METHODOLOGY_CERTIFICATION.md` exist, so a later orchestra can design one refresher. It is not ready to run unattended. The three prerequisites still missing are a hosted backup, a hosted BEA ingest, and the scheduler. This session did not build them. Track B stops here: no hosted write and no `pg_dump`.
+
+Signed-in pages can read the stored calculations that remain registered. The activity-level card was removed, so that stored row is not shown as a second method. Planned cards with empty query lists stay empty. `harding-pagan-bbq` stays planned. Signed-out sessions still receive no calculation. After the removal, `npm run test:research` passed 658 tests and the catalogue tests passed 25. GitHub Actions has not run.
+
+## Quantitative V1 views, 31 October 2026
+
+Risk class R2. Branch `research/quantitative-v1` in `C:\Users\gamer\aqil-quant-v1`. `publication_allowed` stays false. Nothing was pushed. Nothing was merged to `main`. Hosted Supabase was not written. Local research runs were not copied. Database `postgres` on `127.0.0.1:55432` was not reset. No scheduler, nowcast, Estrella–Mishkin probit, Taylor rule, or LLM interpretation was added.
+
+Signed-in methodology cards now query `CPI_U_INFLATION_AUTREGRESSION`, `EX_POST_REAL_FEDERAL_FUNDS_RATE`, `ENGLE_GRANGER_COINTEGRATION`, and `CUSUM_RECURSIVE_RESIDUALS`. The page reads the stored calculation. If that run is absent, it says the result is unavailable. Signed-out sessions still receive no calculation JSON. `harding-pagan-bbq` stays planned with an empty query list. The earlier cards remain: Spencer-15, Stock–Watson, Harding–Pagan characteristics, diffusion, Hamilton, Bai–Perron, the autoregressive benchmark, lead–lag, and Sahm. Sahm run `f3db281d-9f6d-4c4c-974f-ba4b9bd68131` was not replaced.
+
+Stored local runs, read and not rewritten: CPI-U `bcbf15bc-590e-4738-9bc1-bbe951b12079` (AIC lag 12, OLS persistence about 0.803, October 2025 CPI missing); ex-post real funds `cf73c312-dc83-49d6-ba46-2ea02054d336` (September 2026 funds 3.75, inflation about 3.7173, real rate about 0.0327 percentage points); Engle–Granger `570e2f51-1871-4c0e-88c9-c40652093613` (does not reject no-cointegration, statistic about -2.865, MacKinnon five percent about -3.342); CUSUM `4943ca23-38bb-447f-8b8a-95c75b5fcd70` (does not cross, largest absolute CUSUM about 47.93 in February 1973, boundary about 66.98). Stock–Watson preserved run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` was not replaced. `--refit` stays rejected unless the method declares a separate refit command. Only Stock–Watson does, and that command does not replace the preserved run.
+
+The inventory for those four calculations is section L of `docs/macro/METHODOLOGY_CERTIFICATION.md`. The later spread method is section M. It is not a probit. `fed.h15.RIFLGFCM03_N.M` is stored (541 months, September 1981–September 2026) and NBER dates are not an approved stored input. US real GDP `bea.nipa.T10106.A191RX` is stored (319 quarters, 1947 Q1–2026 Q3) and no nowcast was implemented. Unemployment `bls.ln.LNS14000000` is revised history from January 1948 with October 2025 still missing. That is not a real-time Sahm evaluation.
+
+The daily refresher is not built. The execute-method contract is stable enough to design one later. It is not stable enough to run one. Still missing: a verified hosted logical dump and point-in-time recovery, a hosted BEA ingest, and no copying of local runs.
+
+Track B blocker: production delivery is not successful. `C:\Users\gamer\aqil-release-backups\2026-10-25` is migration files, not a `pg_dump`. `C:\Users\gamer\aqil-release-backups\2026-10-30` is pre-import counts, not a logical dump. The free-plan backup list was empty and point-in-time recovery was off. The hosted database password was not readable, so no dump was taken. No hosted migration was applied and no local run was copied.
+
+Untracked method drafts were moved out of the package tree into `C:\Users\gamer\aqil-quant-v1-strays` and were not committed. The docstring-only edit in `workers/research/src/aqil_research/adapters/fed_h15/__init__.py` was left unstaged.
+
+Checks before this commit, not GitHub Actions: `npm run test:research` collected 636 tests and passed them, then Ruff saw an uncommitted registry edit that imported drafts which are not part of this commit. That edit was restored and was not committed. On the restored tree, Ruff check passed and Ruff format reported 423 files already formatted. Only `aqil_research_test` was rebuilt. Database `postgres` was not reset. Methodology unit tests in `present-methodology.test.ts` and `private-methodology-result.test.ts` passed 23. `npm run typecheck` passed. `npm run lint` in `apps/web` passed with the existing unused `_searchParams` warning. `npm run check:tokens` passed. `npm run build` passed, 50 routes. A signed-in browser session was not available. On this worktree at `http://127.0.0.1:3021`, lead–lag and the CPI-U card both returned 307 to `/login?error=signed_out` at desktop width and at 390 pixels. The responses were `private, no-store` and did not include the stored figures. The signed-in stored numbers were not opened.
+
+## Source binding, 31 October 2026
+
+Risk class R2. Branch `research/quantitative-v1-sources` in `C:\Users\gamer\aqil-quant-sources`, started at `d9821cb87dde0e5811ea4cd724ff9804b9c09dd8`. `publication_allowed` stays false. Nothing was pushed. Hosted Supabase was not written. Local `postgres` on `127.0.0.1:55432` was not reset and research runs were not deleted.
+
+That binding is now merged into `research/quantitative-v1` in `C:\Users\gamer\aqil-quant-v1`. The methods already on this branch stay registered, including Stock–Watson calculate-versus-refit separation, which does not overwrite run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`. No Estrella–Mishkin method, nowcast, or scheduler was added by the merge. On this worktree the targeted source tests passed 32. The development database `postgres` was not reset. Nothing was pushed.
+
+The Board H.15 zip names `RIFLGFCM03_N.M`, market yield on U.S. Treasury securities at 3-month constant maturity, quoted on an investment basis. 541 months, 1981-09-01 to 2026-09-01, were stored as `fed.h15.RIFLGFCM03_N.M`. The same file also names discount-basis bill `RIFSGFSM03_N.M`. That bill was not stored. Federal funds was not used. FRED was not downloaded or stored.
+
+Estrella–Mishkin was not implemented. NBER dates are not an approved stored input. They exist only as a hardcoded diagnostic chronology in the Spencer-15 method, cited from the NBER page dated 14 March 2023. No new chronology was scraped. The 1998 equation was not copied from the article, so no probit was written.
+
+The official LN flat file `ln.data.1.AllData` contains monthly `LNS14000000`, titled `(Seas) Unemployment Rate`, from 1948-01-01 to 2026-09-01. 944 values were read. 2025-10-01 is absent and was not interpolated. 923 rows were inserted and 21 unchanged values kept their first identity. Existing fixture rows were not deleted. This is revised history, not a real-time Sahm evaluation. AQ-103 is not done.
+
+BEA workbook `Section1All_xls.xlsx`, sheet `T10106-Q`, line 1, account `A191RX`, is real gross domestic product, millions of chained 2017 dollars, seasonally adjusted at annual rates. 319 quarters, 1947-01-01 to 2026-07-01, were stored as `bea.nipa.T10106.A191RX`. The sheet says data published 29 October 2026. Euro-area GDP was not copied onto this id. No nowcast was written.
+
+ALFRED was not ingested. Philadelphia Fed real-time data was not ingested. Real-time claims remain blocked. `refresh.py`, `protocol.py`, `cli.py`, and `execute_method.py` were not edited. No `--refit`.
+
+Targeted tests passed: `test_bls_ln_history`, `test_bea_real_gdp`, `test_fed_h15`, `test_source_rights`, `test_source_lifecycle` (32). The full suite, production build, and browser tests were not run.
+
+## Execution contract, 31 October 2026
+
+Risk class R2. Branch `research/quantitative-v1` in `C:\Users\gamer\aqil-quant-v1`, parent `9eac587355cab5203c4e64477c789e0558950762`. `publication_allowed` stays false. Nothing was pushed. PR #18 was not retargeted. The development database `postgres` was not reset and its preserved runs were not replaced. Hosted Supabase was not written. `scripts/prepare-research-test-db.ps1` rebuilt only `aqil_research_test`. `workers/research/src/aqil_research/workflow/refresh.py` was not changed. No scheduler, cron, or jobs table was added.
+
+`aqil-research execute-method --method-id ID` looks the method up in `default_method_registry()`, loads that method's required series, and appends a run through `execute_research_run` and `save_research_run`. Optional `--cutoff YYYY-MM-DD`. `--refit` is rejected unless the method's parameter policy is `refit_separate`. Stock–Watson is the only current method with that policy. Its default command calculates with the accepted parameter version and does not write `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` or adopt `940955f1-50d5-4c06-9d90-5ceebd05d352`. A refit appends a new run with `adopted_parameter_version` false. Methods with no estimated parameters use parameter policy `none`. The macro panel depends on Sahm, SLOOS, and Census orders. The Sahm-only `run` command is unchanged.
+
+Read-only replay, match rule unchanged: lead–lag `94152391-c3a8-48d7-8f2e-8c4d1dfdb811` and the autoregressive benchmark `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e` fully matched. Bai–Perron `2f4c14eb-44f2-40dc-913f-bf7945e972cd` matched the calculation, snapshot, and observation ids; the payload hash did not, because the stored implementation hash is not the hash of the current module bytes. Hamilton `4629b31d-b0de-4a2f-a987-9e5d3f94747e` matched the snapshot and observation ids; the current calculation includes `minimum_duration_alternative`, which the stored row does not. Diffusion `1f747c9f-4851-4588-a4dc-d8fb1ff30558`, Stock–Watson preserved `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`, and the unadopted re-estimate `940955f1-50d5-4c06-9d90-5ceebd05d352` stay unsupported because their stored config hashes are not the method configuration hashes. Diffusion and the unadopted re-estimate also have no frozen observation ids. Those rows were not rewritten.
+
+`npm run test:research` passed 605 tests, then Ruff check and Ruff format (408 files already formatted). GitHub Actions has not run. This is not a publication approval.
+
+Later method work should add `dependency()` and `accepted_config_payload()` on any new registered method. A separate refit belongs only on a method whose parameter policy is `refit_separate`. Do not loosen the replay match rule.
+
+## Signed-in methodology results, 31 October 2026
+
+Risk class R2. Branch `research/quantitative-production` in `C:\Users\gamer\aqil-quant-prod`, based on `da055629e01d910b8e1a6069d7992ee4e1acf7cf`. `publication_allowed` stays false. Nothing in this note is a publication approval.
+
+A signed-in detail page reads `research.research_runs.calculation` on the server and shows the stored figures. A signed-out session does not. The list page does not select the JSON. The hosted `research_reader` already had select on `calculation`, so no migration was added. The named runs are on local postgres (`127.0.0.1:55432`, database `postgres`) and are absent from hosted project `ojvswermsbbaltjohqph`. They were not copied. Hosted Supabase was not changed. Nothing was deployed. Local postgres was not reset.
+
+Displayed runs, unchanged as stored rows: Spencer-15 `3955f7f4-08f8-4e7b-9ded-b3f6eea6633f` and `8fb20325-414f-401b-8c46-bda82ed94e16` (18 peaks, 19 troughs); Stock–Watson parameter version `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` (re-estimate `940955f1-50d5-4c06-9d90-5ceebd05d352` not adopted); Harding–Pagan `0d667a12-5a9c-45e0-b04a-8aea4196bc19`; Sahm `f3db281d-9f6d-4c4c-974f-ba4b9bd68131` (September 2025 gap 0.23, not triggered, October 2025 not interpolated); diffusion `1f747c9f-4851-4588-a4dc-d8fb1ff30558`; Hamilton `4629b31d-b0de-4a2f-a987-9e5d3f94747e` (filtered probability, lower-mean duration about 2 months, not a recession label); Bai–Perron `2f4c14eb-44f2-40dc-913f-bf7945e972cd` (no break); autoregression `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e` (twelve-month horizon loses to the historical mean); lead–lag `94152391-c3a8-48d7-8f2e-8c4d1dfdb811` (contemporaneous and unstable).
+
+The main checkout at `C:\Users\gamer\aqil` was not edited. Its uncommitted `apps/web/public/icons/icon.svg` change was left in place.
+
+Checks on this worktree: methodology unit tests passed 14. `npm run test:research` passed 598 tests, then Ruff check and Ruff format (405 files already formatted). The disposable database `aqil_research_test` was rebuilt. The development database `postgres` was not reset. Web typecheck passed with `tsc --noEmit`. ESLint passed on the methodology files that changed. GitHub Actions has not run.
+
+This browser, opened at `http://127.0.0.1:3011/intelligence/methodologies/stock-watson-1988`, was redirected to `/login?error=signed_out`. The page offered Continue with Google. The stored calculation was not shown. A 390-pixel signed-in layout was not opened in this browser. Production was not deployed.
 
 ## Hosted research read, 30 October 2026
 
@@ -1060,3 +1234,62 @@ Not stored: bank-lending survey `BLS.Q.U2.ALL.O.E.Z.B3.ST.S.WFNET` and BSI loans
 Signed-in `/conditions` showed 16 stored series. Europe showed the euro-area series and listed credit, currencies, energy and property as missing. China showed no indicator reading and listed the missing families. At 390px the page did not overflow horizontally. The economic reading above the filter still restates the stored United States synthesis. It is not a China or Europe reading.
 
 Wave 2 must not overwrite these adapter packages, the appended rights rows, the govinfo rights row, the coverage register, or the uncommitted events and presentation work.
+
+## Quantitative methods batch 1, 30 October 2026
+
+Risk class R2. Local only. Branch `research/quantitative-methods` in `C:\Users\gamer\aqil-quant-methods`. Nothing was pushed, deployed, or applied to hosted Supabase. `publication_allowed` stays false. The preserved database `postgres` on `127.0.0.1` port 55432 was not reset. Batch 2 was not started. `docs/macro/METHODOLOGY_CERTIFICATION.md` was not written.
+
+Integration commit: `3c5c138c692d19bea37220b15fd52be912c768c7`
+
+Stored runs, left in place:
+
+- Spencer-15 retrospective run `3955f7f4-08f8-4e7b-9ded-b3f6eea6633f`. Kept run `8fb20325-414f-401b-8c46-bda82ed94e16`. Both have 18 peaks and 19 troughs. Chronology class `retrospective_full_sample`. `date_specific_cycles()` still refuses. A read-only replay of the kept run on `postgres` matched the full payload through the legacy implementation hash.
+- Harding–Pagan characteristics run `0d667a12-5a9c-45e0-b04a-8aea4196bc19`. Method id `HARDING_PAGAN_CHARACTERISTICS`. This is not quarterly BBQ.
+- Sahm short sample run `f3db281d-9f6d-4c4c-974f-ba4b9bd68131`. September 2025 gap 0.23 and not triggered. October 2025 was not interpolated. Sahm was not reimplemented. The AQ-103 unemployment backfill was not done.
+- Stock–Watson re-estimate `940955f1-50d5-4c06-9d90-5ceebd05d352`. Gradient norms about 0.000629 and 0.000623. Likelihood gain about 0.000305, so `adopted_parameter_version` is false. Preserved parameter version `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`. The refit is not operationally accepted. The 1988 panel block stays.
+- Restricted coincident diffusion run `1f747c9f-4851-4588-a4dc-d8fb1ff30558`. Correlation with the preserved filtered factor about 0.336 on 352 months. That is not independent confirmation and not the Chicago Fed 85-indicator index.
+
+`default_method_registry` now includes `STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT`, `RESTRICTED_COINCIDENT_DIFFUSION`, and `HARDING_PAGAN_CHARACTERISTICS`. Registration does not set `publication_allowed` true. `refresh.py` was not changed. The diffusion recorder appends a run on every call, so it was not hooked. Characteristics are idempotent, but they depend on four series and the existing refresh hook does not rerun that kind of method when any one input changes. The Stock–Watson path already replays the frozen filter. It was not turned into a re-estimate.
+
+Catalogue: `diffusion-index` is in development for the restricted measure. `harding-pagan-characteristics` was added. `harding-pagan-bbq` stays planned. Calculation JSON stays withheld.
+
+AQ-094 to AQ-102 notes were extended. No new backlog id. Diffusion and Harding–Pagan characteristics are in the quantitative register only. That backlog gap remains.
+
+`npm run test:research` passed 561 tests, Ruff check, and Ruff format. `scripts/prepare-research-test-db.ps1` rebuilt only `aqil_research_test`. Two earlier failures were that dirty disposable database. `test_refresh_hook_is_idempotent_until_a_month_changes` returned unchanged because G.17 was already stored. `test_stock_watson_lifecycle.py` saw a leftover negative level, so the filter update said log differences require positive levels. Assertions were not weakened. Both passed after the disposable database was prepared. `apps/web` present-methodology tests passed 7. GitHub Actions has not run.
+
+Nothing in these results should stop batch 2, provided publication stays closed, the refit is not marked operationally accepted, diffusion is not treated as confirmation of the factor, and characteristics are not described as BBQ.
+
+## Quantitative methods certification, 30 October 2026
+
+Risk class R2. Local only. Branch `research/quantitative-methods` in `C:\Users\gamer\aqil-quant-methods`. Nothing was pushed, deployed, or applied to hosted Supabase. `publication_allowed` stays false. The preserved database `postgres` on `127.0.0.1` port 55432 was not reset. No VAR code was written.
+
+The certification is `docs/macro/METHODOLOGY_CERTIFICATION.md`.
+
+Registration commit: `2a52262e08f1860e0eac7ecf9fe8722a5fd89526`. This handover section is committed with the certification. Its parent is that registration commit.
+
+`default_method_registry` now also includes `HAMILTON_MONTHLY_REGIME_SWITCHING`, `BAI_PERRON_MEAN_SHIFTS`, `AUTOREGRESSIVE_BENCHMARK`, and `LEAD_LAG_CROSS_CORRELATION`. `refresh.py` was not changed. These are full-sample estimates, not idempotent single-series refresh hooks.
+
+Stored runs, left in place:
+
+- Hamilton monthly variant run `4629b31d-b0de-4a2f-a987-9e5d3f94747e`. BIC lag 2. Seeded recovery maximum absolute error about 0.016. Lower-mean expected duration about 2 months. Not a persistent recession regime and not empirically qualified. Not a reproduction of Hamilton 1989 quarterly US GNP. Filtered and smoothed probabilities are separate. Neither is real-time.
+- Bai–Perron intercept-only mean shifts run `2f4c14eb-44f2-40dc-913f-bf7945e972cd`. Primary trimming selects no break on G.17 log-growth. That is a valid result. Looser trims are sensitivity, not a second selected model. `point_estimates_only`. The 1998 and 2003 papers were not line-checked. Not the general regressor model.
+- Autoregressive benchmark run `7c33c9b1-3759-4fa6-86ea-c0bcbc86257e`. AIC lag 12. Horizon 1 beat the historical mean. Horizon 12 did not. Not empirically qualified as a forecast.
+- Lead–lag run `94152391-c3a8-48d7-8f2e-8c4d1dfdb811`. Strongest correlations are contemporaneous. None of those peaks is stable across 1997-2007 and 2010-2019. Not a structural lead. This blocks a small VAR.
+
+Batch 3 stays blocked. Estrella–Mishkin still needs the 10-year minus 3-month Treasury spread. AQ-104 stays the dependency. The stored 10-year yield and the federal funds rate are not that spread. US GDP is not stored, and there is no vintage panel. Euro-area GDP does not remove the nowcast block. Financial conditions, the excess bond premium, the BIS credit gap, and yield-spread substitutes were not estimated and were not proxied.
+
+Catalogue slugs with stored runs: `hamilton-markov-switching`, `bai-perron-breaks`, `autoregressive-benchmark`, and `lead-lag`, alongside the batch 1 cards. `harding-pagan-bbq` stays planned. Payloads stay withheld.
+
+Hamilton, Bai–Perron mean shifts, the autoregressive benchmark, and lead–lag have no backlog ids. That gap remains, as it does for diffusion and Harding-Pagan characteristics.
+
+`npm run test:research` passed 597 tests, then Ruff check and Ruff format. Targeted batch 2 modules passed 36. Catalogue unit tests passed 8. GitHub Actions has not run.
+
+Certification commit: `b2f6096d9f9b47d8c3a35be67679b4d2816f0691`. At that commit, local `main` was `c03842692c0a18b41ed63fb527cbb9534f44c0ab` and the reader-role commits were not yet on this branch. The next section records the merge.
+
+## Main merged into quantitative methods, 30 October 2026
+
+Risk class R2. Local only. Branch `research/quantitative-methods` in `C:\Users\gamer\aqil-quant-methods`. Nothing was pushed. `main` itself was not updated. This branch was not merged into `main`. Hosted Supabase was not migrated by this merge. `publication_allowed` was not set true. The preserved database `postgres` on `127.0.0.1` port 55432 was not reset.
+
+Local `main` remains `c03842692c0a18b41ed63fb527cbb9534f44c0ab`. Merge commit: `790b5fd91fe7f8c361fa68f75768a24767b9bc33`. It merged `main` into `research/quantitative-methods`. Parents are `b2f6096d9f9b47d8c3a35be67679b4d2816f0691` and `c03842692c0a18b41ed63fb527cbb9534f44c0ab`. The merge was clean. It includes `8fd00ac` (hosted research reader role) and `c038426` (reader migration stored as UTF-8). The uncommitted `apps/web/public/icons/icon.svg` in `C:\Users\gamer\aqil` was left untouched and was not part of the merge.
+
+No Python, catalogue, or web test file changed. `npm run test:research` was not run for this merge.

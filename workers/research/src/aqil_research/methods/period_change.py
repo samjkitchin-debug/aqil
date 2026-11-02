@@ -9,9 +9,20 @@ from decimal import ROUND_HALF_UP, Decimal
 from pydantic import BaseModel, ConfigDict, Field
 
 from aqil_research.contracts.observation import EconomicObservation, Frequency
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 from aqil_research.methods.sahm import SahmMethodError
 from aqil_research.vintages.asof import monthly_decimal_series
+
+PERIOD_CHANGE_ACCEPTED = {
+    "config_id": "pchange_demo_v1",
+    "months_back": 3,
+    "label": "Three-month level change demo",
+}
 
 PERIOD_CHANGE_METHOD_ID = "PERIOD_LEVEL_CHANGE"
 PERIOD_CHANGE_METHOD_VERSION = "1.0.0"
@@ -35,6 +46,19 @@ class PeriodChangeMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return ("bls.ln.LNS14000000",)
+
+    def dependency(self) -> MethodDependency:
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("monthly",),
+            minimum_history="two monthly endpoints; months_back is at least 1",
+            parameter_policy="none",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(PERIOD_CHANGE_ACCEPTED)
 
     def parse_config(self, payload: dict[str, object]) -> PeriodChangeConfig:
         return PeriodChangeConfig.model_validate(payload)

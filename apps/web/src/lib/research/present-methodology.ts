@@ -1,6 +1,7 @@
 import type { MethodologyCatalogueEntry } from "./methodology-catalogue.ts";
+import type { PrivateMethodologyResult } from "./private-methodology-result.ts";
 
-/** Run metadata. Calculation payloads are intentionally absent. */
+/** Run metadata. A calculation reaches the page only through the private result. */
 export type MethodologyRunMeta = {
   methodId: string;
   methodVersion: string;
@@ -8,6 +9,8 @@ export type MethodologyRunMeta = {
   executionStatus: string;
   publicationAllowed: boolean;
   dataSufficiency: string;
+  /** True when a calculation column is stored. The JSON itself is not on this object. */
+  calculationStored: boolean;
 };
 
 export type MethodologyRunLoad =
@@ -32,6 +35,8 @@ export type MethodologyPresentation = {
   latestLine: string | null;
   sections: readonly MethodologySection[];
   references: MethodologyCatalogueEntry["references"];
+  /** Stored figures for a signed-in reader. Absent when the page did not load a calculation. */
+  privateResult: PrivateMethodologyResult | null;
 };
 
 const EXECUTED = new Intl.DateTimeFormat("en-GB", {
@@ -57,17 +62,36 @@ const OUTPUT_LABEL: Record<MethodologyCatalogueEntry["outputKind"], string> = {
   "recession-probability": "Recession probability",
   "forecast-distribution": "Forecast distribution",
   "structural-breaks": "Structural-break chronology",
+  "benchmark-comparison": "Benchmark comparison",
+  "cross-correlation": "Cross-correlation",
+  "persistence-summary": "Persistence summary",
+  "cointegration-test": "Cointegration test",
+  "stability-diagnostic": "Stability diagnostic",
   unavailable: "No output type is defined",
 };
+
+const STORED_RESULT_METHOD_IDS = new Set([
+  "CPI_U_INFLATION_AUTREGRESSION",
+  "EX_POST_REAL_FEDERAL_FUNDS_RATE",
+  "ENGLE_GRANGER_COINTEGRATION",
+  "CUSUM_RECURSIVE_RESIDUALS",
+  "INFLATION_AUTOREGRESSION",
+  "EX_POST_REAL_FUNDS_RATE",
+  "IP_GROWTH_CUSUM",
+  "ESTRELLA_MISHKIN_TERM_SPREAD",
+  "CONSTANT_MATURITY_SPREAD_RECESSION_PROBIT",
+]);
 
 export function presentMethodology(
   entry: MethodologyCatalogueEntry,
   load: MethodologyRunLoad,
+  privateResult: PrivateMethodologyResult | null = null,
 ): MethodologyPresentation {
   if (entry.stage === "planned") return presentPlanned(entry);
   const matched = load.status === "ready" ? runsFor(entry, load.runs) : [];
   const latest = matched[0] ?? null;
-  const statusLine = statusLineFor(entry, load, latest, matched.length);
+  const shown = privateResult && matched.some((run) => run.methodId === privateResult.methodId) ? privateResult : null;
+  const statusLine = statusLineFor(entry, load, latest, matched.length, shown);
   return {
     slug: entry.slug,
     name: entry.name,
@@ -79,17 +103,18 @@ export function presentMethodology(
     statusLine,
     latestLine: latest ? latestLine(latest) : null,
     references: entry.references,
+    privateResult: shown,
     sections: [
       { id: "overview", heading: "Overview", paragraphs: [entry.measures] },
       {
         id: "current-result",
         heading: "Current result",
-        paragraphs: [currentResult(entry, load, latest)],
+        paragraphs: [currentResult(entry, load, latest, shown)],
       },
       {
         id: "historical-output",
         heading: "Historical output",
-        paragraphs: [historicalOutput(entry, latest)],
+        paragraphs: [historicalOutput(entry, latest, shown)],
       },
       { id: "interpretation", heading: "Interpretation", paragraphs: entry.interpretation },
       { id: "uncertainty", heading: "Confidence and uncertainty", paragraphs: entry.uncertainty },
@@ -103,7 +128,7 @@ export function presentMethodology(
       {
         id: "technical",
         heading: "Technical evidence",
-        paragraphs: technicalEvidence(entry, load, latest),
+        paragraphs: technicalEvidence(entry, load, latest, shown),
       },
     ],
   };
@@ -122,6 +147,7 @@ function presentPlanned(entry: MethodologyCatalogueEntry): MethodologyPresentati
     statusLine: "Planned.",
     latestLine: null,
     references: entry.references,
+    privateResult: null,
     sections: [
       { id: "overview", heading: "Overview", paragraphs: [entry.measures] },
       {
@@ -166,17 +192,28 @@ function statusLineFor(
   load: MethodologyRunLoad,
   latest: MethodologyRunMeta | null,
   count: number,
+  privateResult: PrivateMethodologyResult | null,
 ): string {
   if (entry.queryMethodIds.length === 0) {
     return "No method identifier is registered for this page.";
   }
   if (load.status === "unavailable") return load.reason;
-  if (!latest) return "No stored run matches this methodology.";
-  if (!latest.publicationAllowed) {
-    return count === 1
-      ? "One stored run. The calculated output is not eligible for publication."
-      : `${count} stored runs. The calculated output is not eligible for publication.`;
+  if (!latest) {
+    if (entry.queryMethodIds.some((id) => STORED_RESULT_METHOD_IDS.has(id))) {
+      return "The stored result is unavailable.";
+    }
+    return "No stored run matches this methodology.";
   }
+  if (!latest.publicationAllowed) {
+    const base =
+      count === 1
+        ? "One stored run. The calculated output is not eligible for publication."
+        : `${count} stored runs. The calculated output is not eligible for publication.`;
+    if (privateResult) return `${base} The stored private result is shown on this page.`;
+    if (latest.calculationStored) return `${base} Open the methodology to read the private result.`;
+    return base;
+  }
+  if (privateResult) return "A publication-eligible run is stored and its private result is shown.";
   return "A publication-eligible run is stored. This page has no presenter for its output.";
 }
 
@@ -184,20 +221,34 @@ function currentResult(
   entry: MethodologyCatalogueEntry,
   load: MethodologyRunLoad,
   latest: MethodologyRunMeta | null,
+  privateResult: PrivateMethodologyResult | null,
 ): string {
   if (load.status === "unavailable") {
     return "The current result cannot be described because run metadata could not be read. No output is invented in its place.";
   }
   if (!latest) {
+    if (entry.queryMethodIds.some((id) => STORED_RESULT_METHOD_IDS.has(id))) {
+      return "The stored result is unavailable. No figure is invented.";
+    }
     return `No stored run is available for ${entry.name}. Nothing is plotted.`;
   }
+  if (privateResult) return privateResult.headline;
   if (!latest.publicationAllowed) {
-    return "The latest run is stored and its calculated output is withheld. Publication is closed, so this page does not show dates, factor values, probabilities or scores from that run.";
+    return "The latest run is stored and its calculated output is withheld on this view. Publication is closed. Dates, factor values, probabilities and scores stay off this summary.";
   }
   return "Publication is open for the latest run, but no typed presenter is wired for this output. The figures stay hidden until that presenter exists.";
 }
 
-function historicalOutput(entry: MethodologyCatalogueEntry, latest: MethodologyRunMeta | null): string {
+function historicalOutput(
+  entry: MethodologyCatalogueEntry,
+  latest: MethodologyRunMeta | null,
+  privateResult: PrivateMethodologyResult | null,
+): string {
+  if (privateResult?.series) return privateResult.series.caption;
+  if (privateResult && privateResult.dates.length > 0) {
+    return "The stored peaks and troughs are listed with the current result. They are retrospective dates, not a real-time call.";
+  }
+  if (privateResult) return privateResult.standing;
   if (!latest || !latest.publicationAllowed) {
     if (entry.outputKind === "turning-points") {
       return "A published result would be a chronology of peaks and troughs. That chronology is not shown.";
@@ -229,10 +280,13 @@ function technicalEvidence(
   entry: MethodologyCatalogueEntry,
   load: MethodologyRunLoad,
   latest: MethodologyRunMeta | null,
+  privateResult: PrivateMethodologyResult | null,
 ): string[] {
   const lines = [
     `Query identifiers: ${entry.queryMethodIds.join(", ")}.`,
-    "Calculation JSON, payload hashes and model coefficients are not loaded.",
+    privateResult
+      ? "The stored calculation was read for this signed-in page."
+      : "Calculation JSON is not loaded on this view.",
   ];
   if (load.status === "unavailable") {
     lines.push(load.reason);
@@ -244,7 +298,10 @@ function technicalEvidence(
   }
   lines.push(`Latest method ${latest.methodId} ${latest.methodVersion}.`);
   lines.push(`Publication allowed: ${latest.publicationAllowed ? "yes" : "no"}.`);
-  lines.push(`Executed ${formatExecuted(latest.executedAt)}.`);
+  lines.push(`Latest execution ${formatExecuted(latest.executedAt)}.`);
+  if (privateResult) {
+    lines.push(`Displayed run ${privateResult.runId}, executed ${formatExecuted(privateResult.executedAt)}.`);
+  }
   return lines;
 }
 

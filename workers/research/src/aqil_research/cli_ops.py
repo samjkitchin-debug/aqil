@@ -5,12 +5,14 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import date
 from pathlib import Path
 
 from aqil_research.cli import DEFAULT_FIXTURE
 from aqil_research.collection.service import collect_bls_unemployment
 from aqil_research.insight.build_sahm import build_sahm_insight
 from aqil_research.insight.io import DEFAULT_WEB_INSIGHT_PATH, write_insight
+from aqil_research.methods.registry import MethodRegistryError, default_method_registry
 from aqil_research.persistence.connection import research_connection
 from aqil_research.persistence.runs import load_research_run
 from aqil_research.workflow.collect_and_run import collect_and_run_sahm
@@ -92,6 +94,76 @@ def register_collect_parsers(sub: argparse._SubParsersAction) -> None:
         help="Show the latest recorded refresh for each source. Does not poll.",
     )
     status.add_argument("--format", choices=["text", "json"], default="text")
+
+
+def register_execute_method_parser(sub: argparse._SubParsersAction) -> None:
+    command = sub.add_parser(
+        "execute-method",
+        help="Calculate one registered method and append a run",
+    )
+    command.add_argument("--method-id", required=True)
+    command.add_argument(
+        "--cutoff",
+        type=_parse_cutoff,
+        default=None,
+        help="Last period included, as YYYY-MM-DD",
+    )
+    command.add_argument(
+        "--refit",
+        action="store_true",
+        help="Estimate a new parameter version. Rejected unless the method declares a refit",
+    )
+
+
+def _parse_cutoff(value: str) -> date:
+    try:
+        return date.fromisoformat(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("Cutoff must be YYYY-MM-DD.") from exc
+
+
+def run_execute_method(args: argparse.Namespace) -> int:
+    """Dispatch through the default method registry and append one run."""
+    from aqil_research.pipeline.execute_method import (
+        MethodExecutionRefused,
+        execute_registered_method,
+        execution_refusal,
+    )
+
+    registry = default_method_registry()
+    try:
+        method = registry.get(args.method_id)
+    except MethodRegistryError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    refusal = execution_refusal(method, refit=bool(args.refit))
+    if refusal is not None:
+        print(refusal, file=sys.stderr)
+        return 2
+    from aqil_research.persistence.connection import research_connection
+
+    try:
+        with research_connection() as conn:
+            run = execute_registered_method(
+                conn,
+                args.method_id,
+                cutoff=args.cutoff,
+                refit=bool(args.refit),
+                registry=registry,
+            )
+    except MethodExecutionRefused as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    except OSError as exc:
+        print(f"database error: {exc}", file=sys.stderr)
+        return 10
+    print(f"run_id={run.run_id}")
+    print(f"method_id={run.method_id}")
+    print(f"execution_status={run.execution_status}")
+    print(f"publication_allowed={'true' if run.publication_allowed else 'false'}")
+    if run.execution_status in {"completed", "completed_insufficient"}:
+        return 0
+    return 8
 
 
 def run_refresh_status(args: argparse.Namespace) -> int:

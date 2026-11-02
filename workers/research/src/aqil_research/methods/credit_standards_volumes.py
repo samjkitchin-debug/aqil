@@ -22,7 +22,13 @@ from aqil_research.contracts.observation import (
     SeasonalAdjustment,
     SeriesProvenance,
 )
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.configs import CREDIT_STANDARDS_AND_VOLUMES_PUBLISHED
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
 
 CREDIT_STANDARDS_AND_VOLUMES_METHOD_ID = "CREDIT_STANDARDS_AND_VOLUMES"
 CREDIT_STANDARDS_AND_VOLUMES_METHOD_VERSION = "1.0.0"
@@ -66,6 +72,19 @@ class CreditStandardsVolumesMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return (SLOOS_DATASET_ID, H8_DATASET_ID)
+
+    def dependency(self) -> MethodDependency:
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("quarterly", "weekly"),
+            minimum_history=("two quarterly SLOOS observations and one weekly H.8 observation"),
+            parameter_policy="none",
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(CREDIT_STANDARDS_AND_VOLUMES_PUBLISHED)
 
     def parse_config(self, payload: dict[str, object]) -> CreditStandardsVolumesConfig:
         return CreditStandardsVolumesConfig.model_validate(payload)

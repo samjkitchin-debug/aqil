@@ -75,7 +75,14 @@ GEO_LABEL = (
 def test_refresh_list_matches_operational_coverage_and_excludes_oecd() -> None:
     operational = {row["source_id"] for row in _coverage_rows() if row["status"] == "operational"}
     steps = {name for name, _action in default_refresh_steps()}
-    assert operational == (steps - PUBLICATION_STEPS) | {"bls_cps_unemployment_rate"}
+    stored_outside_refresh = {
+        "federal_reserve_h15_treasury_3m_constant_maturity",
+        "bea_real_gross_domestic_product",
+    }
+    assert operational == (
+        (steps - PUBLICATION_STEPS) | {"bls_cps_unemployment_rate"} | stored_outside_refresh
+    )
+    assert stored_outside_refresh.isdisjoint(steps)
     assert SOURCE_ID in operational
     assert "oecd_cli_g20" not in steps
     assert "oecd_cli_g20" not in operational

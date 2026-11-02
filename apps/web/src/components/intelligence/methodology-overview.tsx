@@ -17,7 +17,7 @@ export async function MethodologyOverviewSection() {
   return (
     <div data-testid="methodology-overview">
       <p className="research-body intel-lead">
-        Each card is one quantitative method. A stored run is described only as far as its publication state allows. A planned method has no calculation.
+        Each card is one quantitative method. A signed-in reader can open a stored result. That result is not approved for publication. A planned method has no calculation.
       </p>
       {METHODOLOGY_GROUPS.map((group) => {
         const groupItems = items.filter((item) => item.entry.group === group.id);

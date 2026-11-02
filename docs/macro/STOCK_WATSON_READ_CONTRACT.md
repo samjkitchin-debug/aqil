@@ -16,7 +16,9 @@
 
 **Input-data vintage:** `latest_revised` live retrievals. Not a real-time vintage.
 
-**Current health:** the stored run is completed. A failed filter update is a `failed_method` row and is not the factor a reader should display. Read the latest `completed` row whose calculation contains `loadings_ip_income_sales_payroll`.
+**Current health:** the stored run is completed. A failed filter update is a `failed_method` row and is not the factor a reader should display. Read the latest `completed` row whose calculation contains `loadings_ip_income_sales_payroll` and whose `adopted_parameter_version` is not false. A re-estimate with `adopted_parameter_version` false is an estimation record. It does not replace run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`.
+
+**Estimation status, 30 October 2026:** run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a` was not overwritten. Its executed time is still 2026-10-25 00:31:12 UTC and `publication_allowed` is false. A multi-start re-estimate is stored as run `940955f1-50d5-4c06-9d90-5ceebd05d352`. The central finite-difference gradient of the negative log likelihood has norm 0.000629 at step 1e-5 and 0.000623 at step 1e-4, so the gradient condition was met. The log likelihood is −1590.537194, against −1590.537499 on the preserved run. That improvement is below 0.001, so `adopted_parameter_version` is false and the preserved run remains the parameter version. The filtered factor is not the smoother. The refit is not operationally accepted.
 
 **Method:** `STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT`
 

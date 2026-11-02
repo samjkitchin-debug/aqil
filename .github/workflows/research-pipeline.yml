@@ -1,10 +1,16 @@
+# Research pipeline.
+#
+# The daily cycle module can record a missed UTC day from the last cycle start.
+# This workflow does not schedule that cycle. Hosted writes stay refused until
+# a tested logical restore exists and the founder arms them. A pull request
+# cannot read a live-write secret because this workflow is manual only.
 name: Research pipeline (manual)
 
 on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "fixture (offline dry run) or live (requires secrets; not enabled by default)"
+        description: "fixture (offline dry run) or live (refuses unless the arming secret is set)"
         required: true
         default: fixture
         type: choice
@@ -21,7 +27,8 @@ concurrency:
 
 jobs:
   collect-and-run:
-    name: Collect and run (dry run)
+    name: Collect and run (fixture)
+    if: inputs.mode == 'fixture'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -39,7 +46,6 @@ jobs:
         with:
           python-version: "3.13"
       - name: Fixture collect-and-run
-        if: inputs.mode == 'fixture'
         working-directory: workers/research
         env:
           RESEARCH_DATABASE_URL: postgresql://research_worker:research_worker@127.0.0.1:55432/postgres
@@ -51,8 +57,20 @@ jobs:
             --start-year 2022 --end-year 2025 \
             --run-id "gha-${{ github.run_id }}" \
             --allow-evaluation-fallback
-      - name: Live collect-and-run (disabled until hosted secrets approved)
-        if: inputs.mode == 'live'
+
+  live:
+    name: Live cycle (armed writes only)
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'live'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Refuse unless hosted writes are armed
+        env:
+          AQIL_RESEARCH_LIVE_WRITES: ${{ secrets.AQIL_RESEARCH_LIVE_WRITES }}
         run: |
-          echo "Live mode requires hosted RESEARCH_DATABASE_URL and BLS_API_KEY secrets — not activated in this sprint."
+          if [ "$AQIL_RESEARCH_LIVE_WRITES" != "armed" ]; then
+            echo "Refusing live writes. The repository secret AQIL_RESEARCH_LIVE_WRITES is not armed."
+            exit 1
+          fi
+          echo "The secret is armed. Gate 10 still has no tested logical restore, so this job does not write."
           exit 1

@@ -13,8 +13,14 @@ from aqil_research.methods.census_adv_orders import (
     CensusAdvOrdersConfig,
     CensusAdvOrdersMethod,
 )
-from aqil_research.methods.configs import SAHM_PUBLISHED
-from aqil_research.methods.protocol import MethodContext, MethodExecutionResult
+from aqil_research.methods.configs import MACRO_CONDITIONS_PUBLISHED, SAHM_PUBLISHED
+from aqil_research.methods.protocol import (
+    MethodContext,
+    MethodDependency,
+    MethodExecutionResult,
+    bind_dependency,
+)
+from aqil_research.methods.sahm import AVERAGE_WINDOW_MONTHS, LOOKBACK_MONTHS
 from aqil_research.methods.sahm_registered import SahmAnalyticalMethod
 from aqil_research.methods.sloos_cil import (
     SLOOS_CIL_METHOD_ID,
@@ -49,6 +55,28 @@ class MacroConditionsMethod:
 
     def required_dataset_ids(self) -> tuple[str, ...]:
         return (LABOUR_DATASET_ID, SLOOS_DATASET_ID, CENSUS_DATASET_ID)
+
+    def dependency(self) -> MethodDependency:
+        return bind_dependency(
+            self.required_dataset_ids(),
+            frequency=("monthly", "quarterly"),
+            minimum_history=(
+                f"{LOOKBACK_MONTHS + AVERAGE_WINDOW_MONTHS} monthly unemployment observations, "
+                "one quarterly SLOOS observation, "
+                "and two Census months with two vintages of the prior month"
+            ),
+            parameter_policy="none",
+            depends_on_method_ids=(
+                SahmAnalyticalMethod.method_id,
+                SLOOS_CIL_METHOD_ID,
+                CENSUS_ADV_ORDERS_METHOD_ID,
+            ),
+            new_observation_requires_recalculation=True,
+            refit_is_different_command=False,
+        )
+
+    def accepted_config_payload(self) -> dict[str, object]:
+        return dict(MACRO_CONDITIONS_PUBLISHED)
 
     def vintage_history_dataset_ids(self) -> tuple[str, ...]:
         return (CENSUS_DATASET_ID,)

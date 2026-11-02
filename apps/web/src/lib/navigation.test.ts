@@ -18,7 +18,7 @@ test("Intelligence opens the dashboard and keeps three sections", () => {
   assert.equal(intelligenceHome, "/conditions");
   assert.deepEqual(
     intelligenceNav.map((item) => item.label),
-    ["Dashboard", "Methodologies", "Insights"],
+    ["Dashboard", "Methodologies", "Insights", "Health"],
   );
   assert.equal(intelligenceNav[0]?.href, "/conditions");
   assert.equal(intelligenceNav[1]?.href, "/intelligence/methodologies");

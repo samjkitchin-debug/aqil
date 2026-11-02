@@ -1,4 +1,4 @@
-"""The two H.15 monthly series this package is allowed to bind."""
+"""The monthly H.15 series this package is allowed to bind."""
 
 from __future__ import annotations
 
@@ -59,7 +59,21 @@ TREASURY_10Y = H15Series(
     ),
 )
 
+TREASURY_3M = H15Series(
+    series_name="RIFLGFCM03_N.M",
+    preview_code="H15/H15/RIFLGFCM03_N.M",
+    dataset_id="fed.h15.RIFLGFCM03_N.M",
+    source_id="federal_reserve_h15_treasury_3m_constant_maturity",
+    adapter_id="fed_h15_riflgfcm03_n_m",
+    id_token="cm03",
+    long_description=(
+        "Market yield on U.S. Treasury securities at 3-month constant maturity, "
+        "quoted on investment basis"
+    ),
+)
+
 SERIES_BY_SOURCE = {
     FEDERAL_FUNDS.source_id: FEDERAL_FUNDS,
     TREASURY_10Y.source_id: TREASURY_10Y,
+    TREASURY_3M.source_id: TREASURY_3M,
 }

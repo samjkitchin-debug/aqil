@@ -83,6 +83,8 @@ export function unitLabel(unit: string): string {
   switch (unit) {
     case "percent":
       return "Percent";
+    case "probability":
+      return "Probability";
     case "percent_per_year":
       return "Percent per year";
     case "percent_net_tightening":

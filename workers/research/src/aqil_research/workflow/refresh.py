@@ -69,6 +69,41 @@ CADENCE = {
     "bls_cps_unemployment_rate": "weekly",
 }
 
+# How often the stored series itself is published. A poll can be daily
+# while the series stays monthly or quarterly.
+_DATA_FREQUENCY = {
+    "bls_employment_situation_archive": "monthly",
+    "bls_cpi_archive": "monthly",
+    "federal_reserve_monetary_press": "daily",
+    "ecb_monetary_press": "daily",
+    "bls_ics_schedule": "daily",
+    "federal_reserve_sloos_cil": "quarterly",
+    "bls_cpi_u_all_items": "monthly",
+    "bls_ces_total_nonfarm_payrolls": "monthly",
+    "bls_jolts_total_nonfarm_job_openings": "monthly",
+    "federal_reserve_g17_total_ip": "monthly",
+    "federal_reserve_h8_bank_credit": "weekly",
+    "federal_reserve_h15_federal_funds_effective": "monthly",
+    "federal_reserve_h15_treasury_10y_constant_maturity": "monthly",
+    "ecb_sdw_hicp_sa": "monthly",
+    "ecb_hicp_core": "monthly",
+    "ecb_fm_deposit_facility": "daily",
+    "eurostat_gdp_real_ea21": "quarterly",
+    "eurostat_unemployment_ea21": "monthly",
+    "eurostat_industrial_production_ea21": "monthly",
+    "eurostat_retail_volume_ea21": "monthly",
+    "eurostat_hicp_total_ea": "monthly",
+    "stat_cpi_2025_all_items_reference": "monthly",
+    "cao_mo_private_ex_volatile_sa_monthly": "monthly",
+    "bis_gli_usd_credit_nonbanks": "quarterly",
+    "ons_mm23_cpi_d7bt": "monthly",
+    "boe_official_bank_rate": "daily",
+    "dosm_ipi_abs": "monthly",
+    "bea_real_personal_income_ex_transfers": "monthly",
+    "bea_real_manufacturing_trade_sales": "monthly",
+    "bls_cps_unemployment_rate": "monthly",
+}
+
 
 @dataclass(frozen=True, slots=True)
 class SourceRefreshResult:
@@ -111,8 +146,68 @@ def series_is_due(last_success: datetime | None, now: datetime) -> bool:
     return now - last_success >= SERIES_INTERVAL
 
 
+def source_dataset_ids(source_id: str) -> tuple[str, ...]:
+    """Datasets a successful insert can mark as changed. Documents have none."""
+    return _SOURCE_DATASETS.get(source_id, ())
+
+
+_SOURCE_DATASETS = {
+    "bls_cpi_u_all_items": ("bls.cu.CUSR0000SA0",),
+    "bls_ces_total_nonfarm_payrolls": ("bls.ce.CES0000000001",),
+    "bls_jolts_total_nonfarm_job_openings": ("bls.jt.JTS000000000000000JOL",),
+    "federal_reserve_g17_total_ip": ("fed.g17.IP.B50001.S",),
+    "federal_reserve_h8_bank_credit": ("fed.h8.B1001NCBA",),
+    "federal_reserve_h15_federal_funds_effective": ("fed.h15.RIFSPFF_N.M",),
+    "federal_reserve_h15_treasury_10y_constant_maturity": ("fed.h15.RIFLGFCY10_N.M",),
+    "federal_reserve_sloos_cil": ("fed.sloos.SUBLPDCILS_N.Q",),
+    "ecb_sdw_hicp_sa": ("ecb.icp.M.U2.Y.000000.3.INX",),
+    "ecb_hicp_core": ("ecb.icp.M.U2.Y.XEF000.3.INX",),
+    "ecb_fm_deposit_facility": ("ecb.fm.D.U2.EUR.4F.KR.DFR.LEV",),
+    "eurostat_gdp_real_ea21": ("eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21",),
+    "eurostat_unemployment_ea21": ("eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21",),
+    "eurostat_industrial_production_ea21": ("eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21",),
+    "eurostat_retail_volume_ea21": ("eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21",),
+    "eurostat_hicp_total_ea": ("eurostat.prc_hicp_minr.M.I25.TOTAL.EA",),
+    "stat_cpi_2025_all_items_reference": (
+        "stat.cpi.2025base.JP.0001.all_items.monthly.calendar.nsa.reference_3dp",
+    ),
+    "cao_mo_private_ex_volatile_sa_monthly": (
+        "cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar",
+    ),
+    "bis_gli_usd_credit_nonbanks": ("bis.ws_gli.Q.USD.3P.N.A.I.B.USD",),
+    "ons_mm23_cpi_d7bt": ("ons.mm23.D7BT",),
+    "boe_official_bank_rate": ("boe.iudbedr",),
+    "dosm_ipi_abs": ("dosm.ipi.abs",),
+    "bea_real_personal_income_ex_transfers": ("bea.nipa.T20600.W875RX",),
+    "bea_real_manufacturing_trade_sales": ("bea.nipa.U002BU.KPMT",),
+    "bls_cps_unemployment_rate": ("bls.ln.LNS14000000",),
+}
+
+
+def default_source_registry():
+    """Production connectors. A test registry does not alter this list."""
+    from aqil_research.adapters.source_registry import FunctionSourceConnector, SourceRegistry
+
+    registry = SourceRegistry()
+    for source_id, action in _production_actions():
+        registry.register(
+            FunctionSourceConnector(
+                source_id=source_id,
+                action=action,
+                cadence=CADENCE[source_id],
+                data_frequency=_DATA_FREQUENCY.get(source_id, "monthly"),
+                rights_record_id=source_id,
+            )
+        )
+    return registry
+
+
 def default_refresh_steps() -> tuple[RefreshStep, ...]:
     """Live official feeds only. Fixture paths are not accepted."""
+    return default_source_registry().refresh_steps()
+
+
+def _production_actions() -> tuple[RefreshStep, ...]:
     return (
         ("bls_employment_situation_archive", _refresh_bls_publications),
         ("bls_cpi_archive", _refresh_bls_cpi),
@@ -171,19 +266,15 @@ def run_registered_refresh(
 
             with research_connection() as conn:
                 update = record_filter_update(conn, decision_at=now)
-            _record(
-                RefreshReport(
-                    now,
-                    False,
-                    (
-                        SourceRefreshResult(
-                            "stock_watson_coincident_1988_filter",
-                            update.status,
-                            detail=update.detail,
-                        ),
-                    ),
-                )
+            filter_result = SourceRefreshResult(
+                "stock_watson_coincident_1988_filter",
+                update.status,
+                detail=update.detail,
             )
+            _record(RefreshReport(now, False, (filter_result,)))
+            from aqil_research.workflow.daily_cycle import record_refresh_cycle
+
+            record_refresh_cycle(lock_conn, now, (*report.sources, filter_result))
             return report
         finally:
             _unlock(lock_conn)
@@ -197,7 +288,7 @@ def _run_one(
     try:
         return action(now)
     except Exception as exc:
-        return SourceRefreshResult(source_id, "failed", detail=type(exc).__name__)
+        return SourceRefreshResult(source_id, "failed", detail=f"{type(exc).__name__}: {exc}"[:500])
 
 
 def _refresh_bls_publications(now: datetime) -> SourceRefreshResult:

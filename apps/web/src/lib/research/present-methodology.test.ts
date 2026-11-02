@@ -6,6 +6,7 @@ import {
   METHODOLOGY_CATALOGUE,
   methodologyBySlug,
 } from "./methodology-catalogue.ts";
+import { extractPrivateResult, type StoredMethodologyRun } from "./private-methodology-result.ts";
 import { presentMethodology, type MethodologyRunMeta } from "./present-methodology.ts";
 
 const bry = methodologyBySlug("bry-boschan-spencer15");
@@ -19,6 +20,7 @@ function run(overrides: Partial<MethodologyRunMeta> = {}): MethodologyRunMeta {
     executionStatus: "completed",
     publicationAllowed: false,
     dataSufficiency: "sufficient",
+    calculationStored: false,
     ...overrides,
   };
 }
@@ -37,6 +39,7 @@ const REGISTER_ROWS = [
   "KALMAN_FILTER",
   "DIFFUSION_INDEX",
   "HARDING_PAGAN_BBQ",
+  "HARDING_PAGAN_CHARACTERISTICS",
   "MIXED_FREQUENCY_NOWCAST",
   "HAMILTON_MARKOV_SWITCHING",
   "YIELD_CURVE_PROBIT",
@@ -49,13 +52,51 @@ const REGISTER_ROWS = [
   "BAI_PERRON_BREAKS",
   "ADVANCED_FORECASTING",
   "PORTFOLIO_RESEARCH",
+  "AUTOREGRESSIVE_BENCHMARK",
+  "LEAD_LAG_CROSS_CORRELATION",
+  "SAHM_UNEMPLOYMENT_GAP",
+  "CPI_U_INFLATION_AUTREGRESSION",
+  "EX_POST_REAL_FEDERAL_FUNDS_RATE",
+  "ENGLE_GRANGER_COINTEGRATION",
+  "CUSUM_RECURSIVE_RESIDUALS",
+  "INFLATION_AUTOREGRESSION",
+  "EX_POST_REAL_FUNDS_RATE",
+  "IP_GROWTH_CUSUM",
+  "ESTRELLA_MISHKIN_TERM_SPREAD",
 ] as const;
 
-test("the catalogue keeps the two in-development methods and names every other programme row", () => {
+test("the catalogue names the stored methods and every other programme row", () => {
   assert.equal(bry?.queryMethodIds.includes("BRY_BOSCHAN_SPENCER15_VARIANT"), true);
   assert.equal(factor?.outputKind, "time-series");
   assert.equal(bry?.stage, "in-development");
   assert.equal(factor?.stage, "in-development");
+  const inDevelopment = METHODOLOGY_CATALOGUE.filter((entry) => entry.stage === "in-development")
+    .map((entry) => entry.slug)
+    .sort();
+  assert.deepEqual(inDevelopment, [
+    "autoregressive-benchmark",
+    "bai-perron-breaks",
+    "bry-boschan-spencer15",
+    "cpi-u-inflation-autoregression",
+    "cusum-recursive-residuals",
+    "diffusion-index",
+    "engle-granger-cointegration",
+    "estrella-mishkin-spread",
+    "ex-post-real-federal-funds-rate",
+    "ex-post-real-funds-rate",
+    "hamilton-markov-switching",
+    "harding-pagan-characteristics",
+    "inflation-autoregression",
+    "ip-growth-cusum",
+    "lead-lag",
+    "sahm-rule",
+    "stock-watson-1988",
+    "yield-curve-probit",
+  ]);
+  const bbq = methodologyBySlug("harding-pagan-bbq");
+  assert.equal(bbq?.stage, "planned");
+  assert.deepEqual(bbq?.queryMethodIds, []);
+  assert.equal(bbq?.registerId, "HARDING_PAGAN_BBQ");
   const shown = new Set(METHODOLOGY_CATALOGUE.map((entry) => entry.registerId));
   const excluded = new Set(EXCLUDED_REGISTER_ROWS.map((row) => row.id));
   assert.deepEqual(
@@ -99,6 +140,35 @@ test("a closed publication withholds calculated output", () => {
   assert.equal("output" in view, false);
 });
 
+test("unpublished diffusion and characteristics stay withheld", () => {
+  const diffusion = methodologyBySlug("diffusion-index");
+  const characteristics = methodologyBySlug("harding-pagan-characteristics");
+  assert.ok(diffusion);
+  assert.ok(characteristics);
+  assert.deepEqual(diffusion.queryMethodIds, ["RESTRICTED_COINCIDENT_DIFFUSION"]);
+  assert.deepEqual(characteristics.queryMethodIds, ["HARDING_PAGAN_CHARACTERISTICS"]);
+  for (const entry of [diffusion, characteristics]) {
+    const view = presentMethodology(entry, {
+      status: "ready",
+      runs: [run({ methodId: entry.queryMethodIds[0], publicationAllowed: false })],
+    });
+    const text = JSON.stringify(view);
+    assert.match(view.statusLine, /not eligible for publication/);
+    assert.match(text, /withheld/);
+    assert.equal(text.includes("0.336"), false);
+    assert.equal(text.includes("0.000629"), false);
+    assert.equal("output" in view, false);
+  }
+  const bbq = methodologyBySlug("harding-pagan-bbq");
+  assert.ok(bbq);
+  const bbqView = presentMethodology(bbq, {
+    status: "ready",
+    runs: [run({ methodId: "HARDING_PAGAN_BBQ", publicationAllowed: true })],
+  });
+  assert.equal(bbqView.statusLine, "Planned.");
+  assert.equal(JSON.stringify(bbqView).includes("HARDING_PAGAN_BBQ"), false);
+});
+
 test("an eligible run still has no presenter", () => {
   assert.ok(bry);
   const view = presentMethodology(bry, {
@@ -110,11 +180,178 @@ test("an eligible run still has no presenter", () => {
   assert.match(current?.paragraphs.join(" ") ?? "", /stay hidden/);
 });
 
+test("unpublished batch 2 methods stay withheld", () => {
+  const cases = [
+    ["hamilton-markov-switching", "HAMILTON_MONTHLY_REGIME_SWITCHING"],
+    ["bai-perron-breaks", "BAI_PERRON_MEAN_SHIFTS"],
+    ["autoregressive-benchmark", "AUTOREGRESSIVE_BENCHMARK"],
+    ["lead-lag", "LEAD_LAG_CROSS_CORRELATION"],
+  ] as const;
+  for (const [slug, methodId] of cases) {
+    const entry = methodologyBySlug(slug);
+    assert.ok(entry);
+    assert.equal(entry.stage, "in-development");
+    assert.deepEqual(entry.queryMethodIds, [methodId]);
+    const view = presentMethodology(entry, {
+      status: "ready",
+      runs: [run({ methodId, publicationAllowed: false })],
+    });
+    const text = JSON.stringify(view);
+    assert.match(view.statusLine, /not eligible for publication/);
+    assert.match(text, /withheld/);
+    assert.equal(text.includes("0.016"), false);
+    assert.equal(text.includes("4629b31d"), false);
+    assert.equal(text.includes("is a leading indicator"), false);
+    assert.equal("output" in view, false);
+  }
+  const hamilton = methodologyBySlug("hamilton-markov-switching");
+  const bai = methodologyBySlug("bai-perron-breaks");
+  const benchmark = methodologyBySlug("autoregressive-benchmark");
+  const leadLag = methodologyBySlug("lead-lag");
+  assert.match(hamilton?.measures ?? "", /not a reproduction/);
+  assert.match(bai?.measures ?? "", /not the general Bai–Perron regressor model/);
+  assert.match(benchmark?.measures ?? "", /not a qualified forecast/);
+  assert.match(leadLag?.measures ?? "", /no series receives leading-indicator status/);
+  const bbq = methodologyBySlug("harding-pagan-bbq");
+  assert.equal(bbq?.stage, "planned");
+});
+
 test("Stock–Watson without a run does not invent a factor", () => {
   const text = prose("stock-watson-1988", []);
   assert.match(text, /No stored run matches this methodology/);
   assert.equal(text.includes("converged"), false);
-  assert.match(text, /not selected/);
+  assert.match(text, /not operationally accepted/);
+});
+
+test("a signed-in private result shows stored dates and stays unpublished", () => {
+  assert.ok(bry);
+  const stored = storedRun({
+    methodId: "BRY_BOSCHAN_SPENCER15_VARIANT",
+    calculation: {
+      variant_id: "BRY_BOSCHAN_SPENCER15_VARIANT",
+      chronology_class: "retrospective_full_sample",
+      peaks: ["2008-01-01", "2020-02-01"],
+      troughs: ["2009-06-01"],
+      mcd_months: 3,
+      input_vintage: "latest_revised",
+    },
+  });
+  const result = extractPrivateResult(stored);
+  const view = presentMethodology(bry, { status: "ready", runs: [run({ calculationStored: true })] }, result);
+  const text = JSON.stringify(view);
+  assert.equal(result.publicationAllowed, false);
+  assert.match(view.statusLine, /not eligible for publication/);
+  assert.match(text, /2 peaks and 1 trough are stored/);
+  assert.match(text, /Not approved for publication/);
+  assert.equal(text.includes("publication_allowed\":true"), false);
+});
+
+test("the list withholds figures when only metadata is loaded", () => {
+  assert.ok(bry);
+  const view = presentMethodology(bry, {
+    status: "ready",
+    runs: [run({ calculationStored: true })],
+  });
+  const text = JSON.stringify(view);
+  assert.match(view.statusLine, /private result/);
+  assert.match(text, /withheld/);
+  assert.equal(text.includes("2008-01-01"), false);
+  assert.equal(view.privateResult, null);
+});
+
+function storedRun(overrides: Partial<StoredMethodologyRun> & { calculation?: Record<string, unknown> | null }): StoredMethodologyRun {
+  return {
+    runId: "run-1",
+    methodId: "BRY_BOSCHAN_SPENCER15_VARIANT",
+    methodVersion: "1.0.0",
+    executedAt: "2026-10-30T08:00:00.000Z",
+    executionStatus: "completed",
+    publicationAllowed: false,
+    dataSufficiency: "sufficient",
+    analysisMode: "latest_revised",
+    primaryDatasetId: "fed.g17.IP.B50001.S",
+    missingDataReason: null,
+    statisticalInterpretation: "Stored.",
+    limitations: ["publication_allowed stays false."],
+    calculation: null,
+    ...overrides,
+  };
+}
+
+test("a missing V1 run says the result is unavailable and does not invent figures", () => {
+  for (const slug of [
+    "cpi-u-inflation-autoregression",
+    "ex-post-real-federal-funds-rate",
+    "engle-granger-cointegration",
+    "cusum-recursive-residuals",
+    "inflation-autoregression",
+    "ex-post-real-funds-rate",
+    "ip-growth-cusum",
+    "estrella-mishkin-spread",
+    "yield-curve-probit",
+  ]) {
+    const entry = methodologyBySlug(slug);
+    assert.ok(entry);
+    assert.equal(entry.stage, "in-development");
+    assert.equal(entry.queryMethodIds.length, 1);
+    const view = presentMethodology(entry, { status: "ready", runs: [] });
+    const text = JSON.stringify(view);
+    assert.equal(view.statusLine, "The stored result is unavailable.");
+    assert.match(text, /The stored result is unavailable/);
+    assert.equal(text.includes("0.803"), false);
+    assert.equal(text.includes("3.7173"), false);
+    assert.equal(text.includes("-2.865"), false);
+    assert.equal(text.includes("47.93"), false);
+    assert.equal(text.includes("-0.424740354915"), false);
+    assert.equal(text.includes("-1.07426638515"), false);
+    assert.equal(view.privateResult, null);
+  }
+  const bbq = methodologyBySlug("harding-pagan-bbq");
+  assert.deepEqual(bbq?.queryMethodIds, []);
+});
+
+test("a closed V1 publication still shows a signed-in private result", () => {
+  const entry = methodologyBySlug("engle-granger-cointegration");
+  assert.ok(entry);
+  const stored = storedRun({
+    methodId: "ENGLE_GRANGER_COINTEGRATION",
+    calculation: {
+      statistic: -1.5,
+      critical_value_five_percent: -3.1,
+      rejects_no_cointegration_at_five_percent: false,
+      null_hypothesis: "no_cointegration",
+      causal_claim: false,
+      input_vintage: "latest_revised",
+      sample_start: "1950-01-01",
+      sample_end: "1951-01-01",
+    },
+  });
+  const result = extractPrivateResult(stored);
+  const view = presentMethodology(
+    entry,
+    { status: "ready", runs: [run({ methodId: "ENGLE_GRANGER_COINTEGRATION", calculationStored: true })] },
+    result,
+  );
+  const text = JSON.stringify(view);
+  assert.equal(result.publicationAllowed, false);
+  assert.match(view.statusLine, /not eligible for publication/);
+  assert.match(text, /does not reject no-cointegration/);
+  assert.match(text, /-1\.5/);
+  assert.equal(text.includes("-2.865"), false);
+  assert.equal(text.includes("publication_allowed\":true"), false);
+});
+
+test("the list withholds V1 figures when only metadata is loaded", () => {
+  const entry = methodologyBySlug("cpi-u-inflation-autoregression");
+  assert.ok(entry);
+  const view = presentMethodology(entry, {
+    status: "ready",
+    runs: [run({ methodId: "CPI_U_INFLATION_AUTREGRESSION", calculationStored: true })],
+  });
+  const text = JSON.stringify(view);
+  assert.match(text, /withheld/);
+  assert.equal(view.privateResult, null);
+  assert.equal(text.includes("0.803"), false);
 });
 
 test("run metadata failure is stated and not replaced with a result", () => {

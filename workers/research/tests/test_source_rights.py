@@ -101,6 +101,7 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "fed.h8.B1001NCBA",
         "fed.h15.RIFSPFF_N.M",
         "fed.h15.RIFLGFCY10_N.M",
+        "fed.h15.RIFLGFCM03_N.M",
         "ecb.icp.M.U2.Y.000000.3.INX",
         "govinfo.federal_register.notices",
         "ecb.icp.M.U2.Y.XEF000.3.INX",
@@ -132,6 +133,8 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "eurostat.prc_hicp_minr.M.I25.TOTAL.EA",
         "bea.nipa.T20600.W875RX",
         "bea.nipa.U002BU.KPMT",
+        "bea.nipa.T10106.A191RX",
+        "nber.bcdc.us_business_cycle_chronology",
     }
     for record in records:
         assert record.terms_url in record.evidence_urls
@@ -191,6 +194,13 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
             "bea.nipa.U002BU.KPMT",
         }:
             assert record.assessed_on.isoformat() == "2026-10-25"
+        elif record.dataset_id in {
+            "fed.h15.RIFLGFCM03_N.M",
+            "bea.nipa.T10106.A191RX",
+        }:
+            assert record.assessed_on.isoformat() == "2026-10-31"
+        elif record.dataset_id == "nber.bcdc.us_business_cycle_chronology":
+            assert record.assessed_on.isoformat() == "2026-11-01"
         elif record.dataset_id == "govinfo.federal_register.notices":
             assert record.assessed_on.isoformat() == "2026-10-24"
         else:
@@ -241,6 +251,7 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "fed.h8.B1001NCBA",
         "fed.h15.RIFSPFF_N.M",
         "fed.h15.RIFLGFCY10_N.M",
+        "fed.h15.RIFLGFCM03_N.M",
         "ecb.icp.M.U2.Y.000000.3.INX",
         "ecb.icp.M.U2.Y.XEF000.3.INX",
         "ecb.fm.D.U2.EUR.4F.KR.DFR.LEV",
@@ -258,6 +269,7 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "eurostat.prc_hicp_minr.M.I25.TOTAL.EA",
         "bea.nipa.T20600.W875RX",
         "bea.nipa.U002BU.KPMT",
+        "bea.nipa.T10106.A191RX",
     }
     assert all(operation_allowed(unemployment, operation) for operation in FIRST_LIVE_OPERATIONS)
     assert unemployment.attribution == AttributionRequirement.REQUIRED

@@ -51,6 +51,63 @@ class MethodExecutionResult:
     narrative: str
 
 
+ParameterPolicy = Literal["none", "fixed_accepted", "refit_separate"]
+VintageClass = Literal["latest_revised"]
+_KNOWN_FREQUENCIES = frozenset({"weekly", "monthly", "quarterly"})
+
+
+@dataclass(frozen=True, slots=True)
+class MethodDependency:
+    """What a method reads, and whether a refit is a different command.
+
+    ``new_observation_requires_recalculation`` is metadata. It does not install
+    a trigger. ``vintage_class`` stays ``latest_revised`` until a lawful
+    vintage panel exists.
+    """
+
+    source_series: tuple[str, ...]
+    frequency: tuple[str, ...]
+    minimum_history: str
+    vintage_class: VintageClass
+    parameter_policy: ParameterPolicy
+    depends_on_method_ids: tuple[str, ...]
+    new_observation_requires_recalculation: bool
+    refit_is_different_command: bool
+
+
+def bind_dependency(
+    source_series: tuple[str, ...],
+    *,
+    frequency: tuple[str, ...],
+    minimum_history: str,
+    parameter_policy: ParameterPolicy,
+    new_observation_requires_recalculation: bool,
+    refit_is_different_command: bool,
+    depends_on_method_ids: tuple[str, ...] = (),
+) -> MethodDependency:
+    """Build the one dependency record every registered method exposes."""
+    if not source_series:
+        raise ValueError("a method dependency needs at least one source series")
+    if not frequency or any(item not in _KNOWN_FREQUENCIES for item in frequency):
+        raise ValueError("frequency must be weekly, monthly, or quarterly")
+    if not minimum_history.strip():
+        raise ValueError("minimum history must state the gate the method already enforces")
+    if parameter_policy == "refit_separate" and not refit_is_different_command:
+        raise ValueError("refit_separate requires a separate refit command")
+    if refit_is_different_command and parameter_policy != "refit_separate":
+        raise ValueError("a separate refit command requires parameter policy refit_separate")
+    return MethodDependency(
+        source_series=source_series,
+        frequency=frequency,
+        minimum_history=minimum_history,
+        vintage_class="latest_revised",
+        parameter_policy=parameter_policy,
+        depends_on_method_ids=depends_on_method_ids,
+        new_observation_requires_recalculation=new_observation_requires_recalculation,
+        refit_is_different_command=refit_is_different_command,
+    )
+
+
 class AnalyticalMethod(Protocol):
     method_id: str
     method_version: str
@@ -58,6 +115,10 @@ class AnalyticalMethod(Protocol):
     def implementation_hash(self) -> str: ...
 
     def required_dataset_ids(self) -> tuple[str, ...]: ...
+
+    def dependency(self) -> MethodDependency: ...
+
+    def accepted_config_payload(self) -> dict[str, object]: ...
 
     def parse_config(self, payload: dict[str, object]) -> BaseModel: ...
 

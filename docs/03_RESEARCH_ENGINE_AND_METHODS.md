@@ -170,3 +170,31 @@ Research can later update its beliefs **as a new forecast version**. The initial
 
 ## 12. What success and failure look like
 Success may be 'Aqil showed convincingly that another 12-month allocation would have been needless; continuing a global ETF was sensible.' Success can also be 'It identified a genuine repeatable measurable strategy'. Failure is 'It produced a persuasive narrative without provenance or selectively celebrated paper winners'. No research decision is rewarded for being exciting.
+
+## 13. Operating the research foundation
+
+These steps use the code on `research/foundation-hardening`. `publication_allowed` stays false. None of them is a publication approval.
+
+**Add a source.** Register a connector on a `SourceRegistry` with its identity, fetch, parse, validation, rights record, cadence, and enable flag. The production list is `default_source_registry()` in `workers/research/src/aqil_research/workflow/refresh.py`. A connector returns economic observations. It does not contain a method or a page.
+
+**Disable a source or a method.** Call `disable` on the registry, and `enable` to put that same implementation back. The implementation stays in the repository. A disabled id is omitted from refresh steps or from `enabled()` methods. Deleting the module is not the switch. The web pages read `research.research_runs` through the version 1 read contract. They do not contain an execution switch.
+
+**Run a method.** `aqil-research execute-method --method-id <id>` appends one run through `execute_registered_method`. `--refit` is refused unless the method declares `refit_separate`. Stock–Watson is the only current method that does. A refit does not replace run `3f8c7611-c2a1-44a0-8c7e-01bebbfe9a8a`.
+
+**Refresh.** `npm run research:refresh` polls enabled production connectors under the existing advisory lock. Each source has its own transaction. One failure does not stop the others.
+
+**Daily cycle.** `npm run research:refresh` is the one orchestration entry. After the source poll it records `research.research_cycles` and one event per source and method. A method runs only when a new observation requires recalculation, its required series changed, and its inputs are present. `--refit` is never implied. The GitHub workflow stays `workflow_dispatch` only. It is ready for activation and is not an operational schedule. The live job still exits before any hosted write. A missed UTC day is the last cycle start, not a GitHub receipt.
+
+**Replay.** `workers/research/scripts/replay_frozen_family.py` reads local `postgres` and replays on `aqil_research_test` inside a transaction that rolls back. Hamilton and Bai–Perron keep a `1e-8` comparison of shared figures. A differing hash is recorded and is not rewritten.
+
+**Inspect a failure.** Read `research.research_cycle_events` for that cycle. The signed-in page `/intelligence/health` names successful updates, unchanged sources, failed sources, blocked sources, skipped methodologies, completed methodology runs, stale results, and a partial cycle. It does not show a secret.
+
+**Restore a backup.** A hosted write waits on a logical `pg_dump` taken with an authorised database password, stored outside Git, and restored into a disposable database. The folder `C:\Users\gamer\aqil-release-backups` is not that dump. A Vercel rollback is not that dump. On 1 November 2026 no dump password was readable. See `docs/runbooks/U0_HOSTED_RELEASE.md`.
+
+**Add a presenter.** Add one function to `methodologyPresenters` in `apps/web/src/lib/research/private-methodology-result.ts`. An unknown method id keeps the sentence that no figure is invented.
+
+**Read a lifecycle.** Method cards keep `evidence_stage`. Runs keep `execution_status` and `publication_allowed`. The read contract version is `1` (`apps/web/src/lib/research/read-contract.ts` and `aqil_research.reads.v1`). No second status enum was added.
+
+`docs/sources/SOURCE_RIGHTS.csv` was re-read on 1 November 2026, including the certification pass. No row was changed. FRED retention stays prohibited. The METI industrial-production workbook stays technically blocked after HTTP 403 and its rights row stays disabled. Census advance orders stay unwired without a key. The three-month constant-maturity yield stays stored outside the production refresh list.
+
+**Inspect freshness.** `classify_source_freshness` uses the series cadence. A quarterly series is not stale because one day had no new row. The 1 November 2026 read of local `postgres` is in section O of `docs/macro/METHODOLOGY_CERTIFICATION.md`. The certification re-run on the uncommitted tree passed 688 research tests, 13 database files and 211 database tests, and the production build of 55 pages. GitHub Actions has not run. Gate 10 stays blocked until a database-owner dump is restored.

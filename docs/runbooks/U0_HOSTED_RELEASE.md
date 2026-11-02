@@ -74,7 +74,16 @@ After apply, `anon`, `authenticated`, and `service_role` have no usage on `resea
 
 Organisation plan: free. The backup list was empty. Point-in-time recovery was off. Free projects are told to export with `supabase db dump`. That dump needs the database password. Vercel stores `POSTGRES_PASSWORD` as a sensitive variable and did not return it. No other readable copy was found.
 
-The pre-apply record outside Git is `C:\Users\gamer\aqil-release-backups\2026-10-25\`. It has the five already-applied migration files and the row counts. It is not a `pg_dump`. Auth rows were not exported.
+The pre-apply record outside Git is `C:\Users\gamer\aqil-release-backups\2026-10-25\`. It has the five already-applied migration files and the row counts. It is not a `pg_dump`. A later folder, `2026-10-30`, holds `PRE_IMPORT_COUNTS.txt`, import scripts, and password files for `research_reader` and the worker role, plus a pooler URL whose user is `research_reader`. Auth rows were not exported. Those files are not a logical dump and they are not the database owner.
+
+On 1 November 2026 no `SUPABASE_DB_PASSWORD`, `POSTGRES_PASSWORD`, `SUPABASE_ACCESS_TOKEN`, or `RESEARCH_DATABASE_URL` was set in the user, machine, or process environment. `apps/web/.env.local` on the main worktree names the anon key and Saxo keys, not a database password. The Supabase CLI is not installed. The reader and worker files in `2026-10-30` were not used. `pg_dump` was not run. Gate 10 stays blocked.
+
+The exact founder action is one of these, and then a restore check:
+
+1. Supply the database-owner password for role `postgres` on project `ojvswermsbbaltjohqph`, out of band, not in Git and not in chat. The dump command is `supabase db dump --db-url` to a file under `C:\Users\gamer\aqil-release-backups`, using that direct owner URL. Do not use the `research_reader` or `research_worker` pooler URL.
+2. Or approve a paid backup add-on and download that backup.
+
+Restore the dump into a disposable database and check schemas, roles, and the research row counts. A Vercel rollback is not that backup. No hosted migration or research write happens before that restore.
 
 Restore is a new project or a reviewed restore. Do not use `supabase db reset --linked`.
 
@@ -84,7 +93,7 @@ The ten applied files create tables, constraints, policies, and grants. Replacin
 
 ## Data
 
-Do not copy local `postgres`, local research runs, fixtures, or Saxo tokens into the host. `research_worker` is `NOLOGIN`. One manual `npm run research:refresh` waits on a real research-worker URL. OECD and other non-operational series stay out of that refresh. Leave `publication_allowed=false`.
+Do not copy local `postgres`, local research runs, fixtures, or Saxo tokens into the host. A worker password file is stored in `C:\Users\gamer\aqil-release-backups\2026-10-30`. It was not used on 1 November 2026. That role is not the database owner, so it is not a dump credential. One manual `npm run research:refresh` waits on a real research-worker URL. OECD and other non-operational series stay out of that refresh. Leave `publication_allowed=false`. Hosted BEA series `bea.nipa.T20600.W875RX` and `bea.nipa.U002BU.KPMT` were still absent, as was `fed.h15.RIFLGFCM03_N.M`. Those series are not copied from local `postgres`.
 
 ## Local rehearsal
 

@@ -48,3 +48,40 @@ def test_december_2026_still_includes_the_absence() -> None:
     finding = classify_sahm_window(set(), date(2026, 12, 1))
     assert finding.status == "permanently_invalid"
     assert finding.next_possible_evaluation == date(2027, 1, 1)
+
+
+def _next_month(cursor: date) -> date:
+    year = cursor.year + (cursor.month // 12)
+    month = cursor.month % 12 + 1
+    return date(year, month, 1)
+
+
+def test_gap_month_invalidates_windows_that_include_it() -> None:
+    """Calendar dates only. No unemployment rates are invented."""
+    present = _months(date(2023, 1, 1), 45)
+    present.discard(date(2025, 10, 1))
+    unchanged = set(present)
+    assert len(present) == 44
+    assert date(2025, 10, 1) not in present
+
+    first_complete = classify_sahm_window(present, date(2024, 3, 1))
+    last_complete = classify_sahm_window(present, date(2025, 9, 1))
+    assert first_complete.status == "eligible"
+    assert last_complete.status == "eligible"
+    assert date(2025, 10, 1) not in required_sahm_months(date(2025, 9, 1))
+
+    short_history = classify_sahm_window(present, date(2024, 2, 1))
+    assert short_history.status == "awaiting_observations"
+    assert date(2025, 10, 1) not in short_history.missing_months
+
+    cursor = date(2025, 10, 1)
+    while cursor <= date(2026, 12, 1):
+        finding = classify_sahm_window(present, cursor)
+        assert date(2025, 10, 1) in required_sahm_months(cursor)
+        assert finding.status == "permanently_invalid"
+        assert finding.permanent_months == (date(2025, 10, 1),)
+        assert finding.next_possible_evaluation == date(2027, 1, 1)
+        assert date(2025, 10, 1) not in present
+        cursor = _next_month(cursor)
+
+    assert present == unchanged

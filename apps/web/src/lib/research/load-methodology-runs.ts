@@ -2,17 +2,10 @@ import "server-only";
 
 import { connection } from "next/server";
 
+import { resolveAccess } from "@/lib/auth/access";
 import { resolveResearchDatabaseUrl } from "@/lib/data/private-database-url";
 import type { MethodologyRunMeta } from "@/lib/research/present-methodology";
-
-type RunRow = {
-  method_id: string;
-  method_version: string;
-  executed_at: Date | string;
-  execution_status: string;
-  publication_allowed: boolean;
-  data_sufficiency: string;
-};
+import { readMethodologyRunMetadata } from "@/lib/research/read-contract";
 
 export type LoadMethodologyRunsResult =
   | { status: "ready"; runs: MethodologyRunMeta[] }
@@ -26,14 +19,16 @@ function researchDatabaseUrl() {
 }
 
 /**
- * Read run metadata only. The calculation column is not selected, so an
- * unpublished factor path or turning-point list cannot reach the page.
+ * Read run metadata for the methodologies list.
+ * The calculation JSON is not selected. A signed-in detail page loads it separately.
  */
 export async function loadMethodologyRuns(
   methodIds: readonly string[],
 ): Promise<LoadMethodologyRunsResult> {
   await connection();
   if (methodIds.length === 0) return { status: "ready", runs: [] };
+  const access = await resolveAccess();
+  const includeStoredFlag = access.status === "authenticated_authorised";
   const database = researchDatabaseUrl();
   if (database.status === "unavailable") return database;
   try {
@@ -41,23 +36,17 @@ export async function loadMethodologyRuns(
     const client = new Client({ connectionString: database.url });
     await client.connect();
     try {
-      const result = await client.query<RunRow>(
-        `select method_id, method_version, executed_at, execution_status,
-                publication_allowed, data_sufficiency
-         from research.research_runs
-         where method_id = any($1::text[])
-         order by executed_at desc`,
-        [methodIds],
-      );
+      const rows = await readMethodologyRunMetadata(client, methodIds, includeStoredFlag);
       return {
         status: "ready",
-        runs: result.rows.map((row) => ({
-          methodId: row.method_id,
-          methodVersion: row.method_version,
-          executedAt: executedAt(row.executed_at),
-          executionStatus: row.execution_status,
-          publicationAllowed: row.publication_allowed === true,
-          dataSufficiency: row.data_sufficiency,
+        runs: rows.map((row) => ({
+          methodId: row.methodId,
+          methodVersion: row.methodVersion,
+          executedAt: row.executedAt,
+          executionStatus: row.executionStatus,
+          publicationAllowed: row.publicationAllowed,
+          dataSufficiency: row.dataSufficiency,
+          calculationStored: row.calculationStored === true,
         })),
       };
     } finally {
@@ -68,7 +57,3 @@ export async function loadMethodologyRuns(
   }
 }
 
-function executedAt(value: Date | string): string {
-  if (value instanceof Date) return value.toISOString();
-  return value;
-}
