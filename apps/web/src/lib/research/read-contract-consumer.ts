@@ -38,7 +38,9 @@ export function describeOperationalState(
   lines.push(`Successful updates: ${named(state.events, "source", ["success", "inserted", "revised"])}.`);
   lines.push(`Unchanged sources: ${named(state.events, "source", ["unchanged"])}.`);
   lines.push(`Failed sources: ${named(state.events, "source", ["failed"])}.`);
-  lines.push(`Blocked sources: ${named(state.events, "source", ["rights_blocked", "invalid"])}.`);
+  lines.push(
+    `Blocked sources: ${named(state.events, "source", ["rights_blocked", "invalid", "blocked"])}.`,
+  );
   lines.push(`Skipped methodologies: ${named(state.events, "method", ["skipped"])}.`);
   lines.push(`Completed methodology runs: ${named(state.events, "method", ["success"])}.`);
   lines.push(`Stale results: ${named(state.events, "source", ["stale"])}.`);

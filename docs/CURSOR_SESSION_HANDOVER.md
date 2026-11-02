@@ -1,7 +1,21 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 2 November 2026, review and hosted-doc reconciliation
+**Last updated:** 2 November 2026, V1 foundation close-out
+
+## V1 foundation close-out, 2 November 2026
+
+Branch `research/v1-closeout` from `origin/main` `0384e81`. `publication_allowed` stays false. Local runs were not copied. `apps/web/public/icons/icon.svg` was not edited. The baseline dump `C:\Users\gamer\aqil-release-backups\2026-11-02\aqil-hosted.dump` remains 1,563,838 bytes.
+
+Hosted project `ojvswermsbbaltjohqph`. Before the parameter migration, a new custom dump `aqil-hosted-pre-closeout.dump` (2,211,950 bytes) restored 36,624 observations, 24 runs, and 1 cycle into a disposable Postgres 17 container. Supabase role grants in that restore were ignored. The container was removed.
+
+The accepted Stock–Watson vector is parameter version `sw1988-modern-1997-2026m07`, checksum `2fb8f5b3689125d5c25b49e69cff05e8efad55ff2ca67fe11e6d45743581ae1b`. It is not run `3f8c7611`. Promotion was idempotent. Hosted calculate `d7761adb-db43-48ef-bdbb-a57e31fc753e` is `completed`, unpublished, `adopted_parameter_version` false, loadings matched, 1,424 observation ids, replayable with no scientific difference. Likelihood -1593.0930472758703 on 355 growth months. No refit.
+
+Unemployment `bls.ln.LNS14000000` is 944 distinct months, January 1948 to September 2026, from live adapter `bls_ln_flat_lns14000000` at 2026-11-02 05:20:54 UTC. October 2025 is absent. Sahm `c53dd21e` is unchanged. New Sahm `7847922a` is `completed_insufficient` for the same missing month. Inflation `713e8ce2` stays insufficient. The contiguous sample was not shortened or interpolated.
+
+Cycle `43899b55-bc12-4ad1-ada8-d61d5e9bcecc` at 2026-11-02 05:22:37 UTC is `completed`: 31 unchanged sources, 9 stale, 26 methods skipped, no failure. The 04:11 UTC cycle stays `partial`. The 06:15 UTC GitHub schedule had not run at 05:24 UTC. `RESEARCH_WORKER_DATABASE_URL` is set beside the existing worker secret. Vercel still uses the reader URL.
+
+Unpublished research reads require `app_metadata.aqil_research = founder` (ADR 028). Conditions stays on ordinary sign-in. `authenticated` cannot select `research.parameter_versions`.
 
 ## Review close-out, 2 November 2026
 

@@ -5,7 +5,16 @@
  * interpretation is added here.
  */
 
-export const RESEARCH_READ_CONTRACT_VERSION = "1" as const;
+export const RESEARCH_READ_CONTRACT_VERSION = "2" as const;
+
+export type ResearchConsumerUse =
+  | "descriptive_measurement"
+  | "retrospective_diagnostic"
+  | "historical_association"
+  | "probability_estimate"
+  | "qualified_forecast"
+  | "experimental_only"
+  | "blocked";
 
 export type ObservationRead = {
   observationId: string;

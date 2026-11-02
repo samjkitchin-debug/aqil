@@ -11,10 +11,10 @@ test("an unknown cycle says today's cycle has not run", () => {
   assert.match(copy.lines.join(" "), /last valid result/i);
 });
 
-test("a failed source is named and the contract version stays 1", () => {
+test("a failed source is named and the contract version is current", () => {
   const copy = describeOperationalState(
     {
-      version: "1",
+      version: RESEARCH_READ_CONTRACT_VERSION,
       startedAt: "2026-11-01T06:00:00.000Z",
       status: "partial",
       events: [
@@ -31,7 +31,7 @@ test("a failed source is named and the contract version stays 1", () => {
 test("the health sentences keep each cycle outcome distinct", () => {
   const copy = describeOperationalState(
     {
-      version: "1",
+      version: RESEARCH_READ_CONTRACT_VERSION,
       startedAt: "2026-11-01T06:00:00.000Z",
       status: "partial",
       events: [

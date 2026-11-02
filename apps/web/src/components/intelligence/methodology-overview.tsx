@@ -17,8 +17,13 @@ export async function MethodologyOverviewSection() {
   return (
     <div data-testid="methodology-overview">
       <p className="research-body intel-lead">
-        Each card is one quantitative method. A signed-in reader can open a stored result. That result is not approved for publication. A planned method has no calculation.
+        Each card is one quantitative method. An authorised account can open a stored result. That result is not approved for publication. A planned method has no calculation.
       </p>
+      {load.status === "withheld" ? (
+        <p className="research-body" data-testid="research-withheld">
+          Unpublished research is limited to an authorised account. Method descriptions stay visible. Stored results are not loaded.
+        </p>
+      ) : null}
       {METHODOLOGY_GROUPS.map((group) => {
         const groupItems = items.filter((item) => item.entry.group === group.id);
         if (groupItems.length === 0) return null;

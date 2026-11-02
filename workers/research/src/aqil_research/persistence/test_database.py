@@ -93,12 +93,14 @@ def assert_connected_test_database(conn: psycopg.Connection) -> None:
 
 def resolve_connection_url(explicit: str | None) -> str:
     """During pytest, never fall back to the development database."""
+    from aqil_research.persistence.config import normalize_database_url
+
     if running_under_pytest():
         if explicit is not None:
-            return assert_test_database_url(explicit)
-        return require_test_database_url()
+            return normalize_database_url(assert_test_database_url(explicit))
+        return normalize_database_url(require_test_database_url())
     if explicit is not None:
-        return explicit
+        return normalize_database_url(explicit)
     from aqil_research.persistence.config import research_database_url_or_local_default
 
-    return research_database_url_or_local_default()
+    return normalize_database_url(research_database_url_or_local_default())
