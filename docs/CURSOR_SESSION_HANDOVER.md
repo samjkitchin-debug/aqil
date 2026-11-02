@@ -1,7 +1,14 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 2 November 2026, ETF foundation V1
+**Last updated:** 3 November 2026, ETF history import
+
+## TradingView history import, 3 November 2026
+
+Branch `work/etf-foundation-v1`. Nothing was pushed. Hosted migrations were not applied. Preserved database `postgres` was not reset. Macro methods, publication flags, and the macro refresh workflow were not edited. `apps/web/public/icons/icon.svg` stayed unstaged.
+
+The Basic key was written only to gitignored `workers/research/.env` and sent only to `https://api.tradingviewapi.com`. Forty-one HTTP calls were used. Nineteen remain inside the 60-call cap. Nineteen listings have a cached split-adjusted daily series. INRG has no London USD row; the London row is GBX and was not rescaled. The local database on port 55432 timed out, so `stored_price_observations` is 0 and the frozen dataset is not complete. Saxo rows were not inserted. This is not CI and not Verified.
+
 
 ## ETF universe and market data foundation, 2 November 2026
 

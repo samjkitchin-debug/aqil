@@ -1,0 +1,220 @@
+{
+  "dataset_id": "aqil-etf-history-v1-2026-11",
+  "register_version": "ETF_UNIVERSE_V1_2026-11-03",
+  "register_sha256": "149d43373c05590b3375db5f76808cbcaef0415a0668400c03d8d18019e6a03a",
+  "target_start": "2016-11-03",
+  "target_end": "2026-11-02",
+  "instrument_count": 20,
+  "approved_count": 18,
+  "stored_price_observations": 0,
+  "licensed_storage": "not established",
+  "saxo_persistence": "refused",
+  "fx_coverage": "absent",
+  "distribution_treatment": {
+    "accumulating": "do not add a dividend on top of an adjusted close",
+    "distributing": "INRG total return stays insufficient until a distribution series exists"
+  },
+  "survivorship": "This is a founder-selected November 2026 universe. Funds that closed before selection are absent. A backtest of these instruments is not an unbiased historical ETF selection strategy.",
+  "instruments": [
+    {
+      "symbol": "VWRA",
+      "isin": "IE00BK5BQT80",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2019",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "IWDA",
+      "isin": "IE00B4L5Y983",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2009",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "CSPX",
+      "isin": "IE00B5BMR087",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2010",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "EIMI",
+      "isin": "IE00BKM4GZ66",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2014",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "WSML",
+      "isin": "IE00BF4RFH31",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2018",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "IJPA",
+      "isin": "IE00B4L5YX21",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2009",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "CNDX",
+      "isin": "IE00B53SZB19",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2010",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "IUIT",
+      "isin": "IE00B3WJKG14",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2015",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "IWMO",
+      "isin": "IE00BP3QZ825",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2014",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "IWQU",
+      "isin": "IE00BP3QZ601",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2014",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "IWVL",
+      "isin": "IE00BP3QZB59",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2014",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "SPEQ",
+      "isin": "IE00BNGJJT35",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2021",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "NDIA",
+      "isin": "IE00BZCQB185",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2018",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "ICHN",
+      "isin": "IE00BJ5JPG56",
+      "mic": "XAMS",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2019",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "SMH",
+      "isin": "IE00BMC38736",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2020",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "RBOT",
+      "isin": "IE00BYZK4552",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2016",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "LOCK",
+      "isin": "IE00BG0J4C88",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2018",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "HEAL",
+      "isin": "IE00BYZK4776",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Approved",
+      "inception_year": "2016",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "INRG",
+      "isin": "IE00B1XNHC34",
+      "mic": "XLON",
+      "currency": "USD",
+      "research_status": "Conditional",
+      "inception_year": "2007",
+      "history": "not ingested",
+      "issuer_verified_at_import": false
+    },
+    {
+      "symbol": "EUNA",
+      "isin": "IE00BDBRDM35",
+      "mic": "XETR",
+      "currency": "EUR",
+      "research_status": "Comparator",
+      "inception_year": "2017",
+      "history": "cached",
+      "issuer_verified_at_import": false
+    }
+  ]
+}
