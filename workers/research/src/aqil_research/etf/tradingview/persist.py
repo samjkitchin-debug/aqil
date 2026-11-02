@@ -27,9 +27,56 @@ class StoreResult:
     issue: str | None = None
 
 
+REFUSED_ISIN = "IE00B1XNHC34"
+
+
 def assert_database_name(name: str) -> None:
     if name in PRESERVED_DATABASES:
         raise PriceStoreError(f"refusing to write the preserved database {name}")
+
+
+def assert_series_allowed(*, isin: str, currency: str) -> None:
+    """INRG's London row is GBX. It is not the approved USD listing."""
+
+    if isin == REFUSED_ISIN or currency == "GBX":
+        raise PriceStoreError("INRG is not stored; the London row is GBX, not USD")
+
+
+def ensure_listing(
+    conn: psycopg.Connection,
+    *,
+    isin: str,
+    mic: str,
+    ticker: str,
+    currency: str,
+    umbrella_name: str,
+    domicile_iso2: str,
+    sub_fund_name: str,
+    distribution_policy: str,
+) -> str:
+    """Resolve one listing. A second call does not insert another share class."""
+
+    name = conn.execute("select current_database()").fetchone()
+    assert_database_name("" if name is None else str(name[0]))
+    assert_series_allowed(isin=isin, currency=currency)
+    existing = _listing_id(conn, isin, mic, ticker, currency)
+    if existing is not None:
+        return existing
+    umbrella_id = _umbrella_id(conn, umbrella_name, domicile_iso2)
+    sub_fund_id = _sub_fund_id(conn, umbrella_id, sub_fund_name, currency)
+    share_class_id = _share_class_id(conn, sub_fund_id, isin, distribution_policy)
+    conn.execute(
+        """
+        insert into instruments.listings (share_class_id, mic, trading_currency, ticker)
+        values (%s, %s, %s, %s)
+        on conflict (share_class_id, mic, trading_currency, ticker) do nothing
+        """,
+        (share_class_id, mic, currency, ticker),
+    )
+    listing_id = _listing_id(conn, isin, mic, ticker, currency)
+    if listing_id is None:
+        raise PriceStoreError("listing insert did not resolve")
+    return listing_id
 
 
 def store_observations(
@@ -45,6 +92,7 @@ def store_observations(
 
     name = conn.execute("select current_database()").fetchone()
     assert_database_name("" if name is None else str(name[0]))
+    assert_series_allowed(isin=isin, currency=currency)
     listing = conn.execute(
         """
         select listings.listing_id::text
@@ -146,3 +194,110 @@ def _existing(
                 )
             )
     return tuple(stored)
+
+
+def _listing_id(
+    conn: psycopg.Connection,
+    isin: str,
+    mic: str,
+    ticker: str,
+    currency: str,
+) -> str | None:
+    row = conn.execute(
+        """
+        select listings.listing_id::text
+        from instruments.listings as listings
+        join instruments.share_classes as share_classes
+          on share_classes.share_class_id = listings.share_class_id
+        where share_classes.isin = %s
+          and listings.mic = %s
+          and listings.ticker = %s
+          and listings.trading_currency = %s
+        """,
+        (isin, mic, ticker, currency),
+    ).fetchone()
+    return None if row is None else str(row[0])
+
+
+def _umbrella_id(conn: psycopg.Connection, legal_name: str, domicile_iso2: str) -> str:
+    found = conn.execute(
+        """
+        select umbrella_id::text
+        from instruments.umbrellas
+        where legal_name = %s and domicile_iso2 = %s
+        order by recorded_at
+        limit 1
+        """,
+        (legal_name, domicile_iso2),
+    ).fetchone()
+    if found is not None:
+        return str(found[0])
+    created = conn.execute(
+        """
+        insert into instruments.umbrellas (legal_name, domicile_iso2)
+        values (%s, %s)
+        returning umbrella_id::text
+        """,
+        (legal_name, domicile_iso2),
+    ).fetchone()
+    if created is None:
+        raise PriceStoreError("umbrella insert did not resolve")
+    return str(created[0])
+
+
+def _sub_fund_id(
+    conn: psycopg.Connection,
+    umbrella_id: str,
+    legal_name: str,
+    currency: str,
+) -> str:
+    found = conn.execute(
+        """
+        select sub_fund_id::text
+        from instruments.sub_funds
+        where umbrella_id = %s and legal_name = %s and base_currency = %s
+        order by recorded_at
+        limit 1
+        """,
+        (umbrella_id, legal_name, currency),
+    ).fetchone()
+    if found is not None:
+        return str(found[0])
+    created = conn.execute(
+        """
+        insert into instruments.sub_funds (umbrella_id, legal_name, base_currency)
+        values (%s, %s, %s)
+        returning sub_fund_id::text
+        """,
+        (umbrella_id, legal_name, currency),
+    ).fetchone()
+    if created is None:
+        raise PriceStoreError("sub-fund insert did not resolve")
+    return str(created[0])
+
+
+def _share_class_id(
+    conn: psycopg.Connection,
+    sub_fund_id: str,
+    isin: str,
+    distribution_policy: str,
+) -> str:
+    found = conn.execute(
+        "select share_class_id::text from instruments.share_classes where isin = %s",
+        (isin,),
+    ).fetchone()
+    if found is not None:
+        return str(found[0])
+    created = conn.execute(
+        """
+        insert into instruments.share_classes (
+          sub_fund_id, isin, distribution_policy, hedge_status, evidence_status
+        )
+        values (%s, %s, %s, 'unknown', 'unverified')
+        returning share_class_id::text
+        """,
+        (sub_fund_id, isin, distribution_policy),
+    ).fetchone()
+    if created is None:
+        raise PriceStoreError("share class insert did not resolve")
+    return str(created[0])

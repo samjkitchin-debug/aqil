@@ -6,8 +6,8 @@
   "target_end": "2026-11-02",
   "instrument_count": 20,
   "approved_count": 18,
-  "stored_price_observations": 0,
-  "licensed_storage": "not established",
+  "stored_price_observations": 42931,
+  "licensed_storage": "founder retention stored",
   "saxo_persistence": "refused",
   "fx_coverage": "absent",
   "distribution_treatment": {
@@ -23,7 +23,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2019",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -33,7 +33,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2009",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -43,7 +43,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2010",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -53,7 +53,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2014",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -63,7 +63,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2018",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -73,7 +73,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2009",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -83,7 +83,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2010",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -93,7 +93,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2015",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -103,7 +103,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2014",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -113,7 +113,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2014",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -123,7 +123,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2014",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -133,7 +133,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2021",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -143,7 +143,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2018",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -153,7 +153,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2019",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -163,7 +163,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2020",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -173,7 +173,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2016",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -183,7 +183,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2018",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -193,7 +193,7 @@
       "currency": "USD",
       "research_status": "Approved",
       "inception_year": "2016",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     },
     {
@@ -213,7 +213,7 @@
       "currency": "EUR",
       "research_status": "Comparator",
       "inception_year": "2017",
-      "history": "cached",
+      "history": "stored",
       "issuer_verified_at_import": false
     }
   ]

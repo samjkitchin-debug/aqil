@@ -169,6 +169,15 @@ def test_manifest_stays_at_zero_until_a_count_is_supplied() -> None:
     assert manifest["licensed_storage"] == "not established"
 
 
+def test_inrg_gbx_is_not_stored() -> None:
+    from aqil_research.etf.tradingview.persist import PriceStoreError, assert_series_allowed
+
+    with pytest.raises(PriceStoreError):
+        assert_series_allowed(isin="IE00B1XNHC34", currency="USD")
+    with pytest.raises(PriceStoreError):
+        assert_series_allowed(isin="IE00BK5BQT80", currency="GBX")
+
+
 def test_postgres_is_refused_and_founder_storage_is_private() -> None:
     with pytest.raises(PriceStoreError):
         assert_database_name("postgres")
