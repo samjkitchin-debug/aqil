@@ -1,7 +1,18 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 3 November 2026, macro-to-ETF discovery recorded on a research branch
+**Last updated:** 3 November 2026, one BEA real GDP growth vintage stored
+
+## Point-in-time vintage, 3 November 2026
+
+Branch `research/macro-etf-discovery`. Local `postgres` and `aqil_etf` were not reset. No hosted migration was applied. No run was copied to the host. `apps/web/public/icons/icon.svg` stayed unstaged.
+
+A rights-cleared BEA workbook, `gdp-gdi-vintage-history.xlsx`, was stored as `bea.vintage.real_gdp.pct_preceding`: 1,077 provider-vintage rows, 99 quarters from 2002 Q1 to 2026 Q3, 293 printed release dates. File SHA-256 `127ef3a7e7c9923e7962dd43693139d44865acbb4e3a6db9b8c52b6de87b4a58`. Series checksum `f3f4a4242d32007fedf34d751f1675e6be80270d76f44f073d894e8016a64be1`. A second import inserted nothing. Live `latest_revised` observations remain 38,653. Fixture rows remain 87, including 15 fixture vintages. `A191RX` remains 319 latest-revised quarters. `publication_allowed` is false on all 54 runs. `aqil_etf` was not written.
+
+FRED and ALFRED were not stored. The rights row still prohibits retention. The BLS flat file has no vintage column. The Employment Situation archive page says archived releases may have been revised. The Board G.17 download is a current series. No registered method requires the new series, so none was labelled point-in-time and none was replayed. The 960-cell matrix was not rewritten and still has zero point-in-time cells. Detail is in `docs/research/macro-etf/VINTAGE_AVAILABILITY.md`.
+
+`npm run test:research` passed 755 and failed 4. The failures are the known TradingView rights-fragment tests and the live H.15 count, which saw 868 federal-funds rows where the test expects 867. `uv run ruff check .` passed. `uv run ruff format --check .` still reports 13 pre-existing files. Typecheck, web lint, production build, browser tests, and `npm run test:db` were not re-run. This is not Verified.
+
 
 ## Macro-to-ETF discovery, 3 November 2026
 

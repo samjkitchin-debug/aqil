@@ -144,6 +144,8 @@ Required patterns:
 
 On 25 October 2026 a read-only query of local `postgres` found 35,735 observation rows: 35,648 from live retrievals and 87 from fixture retrievals. 35,720 rows are `latest_revised` and 15 are `provider_vintage`. The 15 vintage rows are the known unemployment fixtures, not an operational panel. FRED/ALFRED remains technically blocked in `docs/sources/SOURCE_RIGHTS.csv`. The as-of selector in `workers/research/src/aqil_research/vintages/asof.py` is implemented and tested on synthetic rows. Live macro methods refuse point-in-time mode when their inputs are latest-revised files.
 
+On 3 November 2026 a separate series, `bea.vintage.real_gdp.pct_preceding`, was stored from the BEA vintage-history workbook. It is the printed real GDP percent change by release date. It is not the A191RX level and it is not an ALFRED panel. No registered method requires it, so no method was labelled point-in-time. The record is `docs/research/macro-etf/VINTAGE_AVAILABILITY.md`.
+
 Phased validation:
 
 1. Mathematical correctness on revised history and fixtures.
