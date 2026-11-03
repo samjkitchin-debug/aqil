@@ -34,3 +34,7 @@ The migration is applied to the local development database only. It is not appli
 The Python package `aqil_research.long_horizon` holds the simulator, the frozen category C specification, the catalogue reader, and the registry writer. Methodology mathematics, `refresh.py`, allocation, the investment-policy statement, and Saxo behaviour are not edited.
 
 The certification pass adds `aqil_research.certification` beside that package. The stored code hash on `LH-X-001` covers only the `long_horizon` modules, so the audit can import the simulator without replacing the execution. Reproduction remains `uv run python -m aqil_research.long_horizon.reproduce` from `workers/research`.
+
+## Outcome-first event layer
+
+The price-event catalogue is a linked layer in `aqil_research.long_horizon.events`. It does not replace `LH-H-001`, `LH-E-001`, or `LH-X-001`. It does not rewrite the 960-cell matrix or the version 1 catalogue. Migration `20261103190000_outcome_event_registry.sql` adds append-only event definitions, market events, family counts, feature-availability rows, and comparison periods on the same local research schema. Total-return events stay blocked because the stored series are split-adjusted closes. The specification is frozen in Git before any price scan. The rules are in `docs/research/events/EVENT_IDENTIFICATION.md` and `docs/research/events/PILOT_SPECIFICATION.md`.

@@ -1,7 +1,12 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 3 November 2026, research engine certification
+**Last updated:** 3 November 2026, outcome-first specification freeze
+
+
+## Outcome-first specification, 3 November 2026
+
+Branch `research/macro-etf-discovery`. Local HEAD and `origin/research/macro-etf-discovery` were `69d600cfc00438144d55543cb3f9ef8ab0aa228a` before this commit. `origin/main` remains `f52a888f6bbedf96e528ca3bccf6df751e3c8896`. This commit freezes event definition `EVT-DEF-001` version 1 and the category C intersection `LH-H-002` / `LH-E-002` before any price scan. The retrospective macro example `LH-H-003` / `LH-E-003` is specified and is not estimated. No inventory count is in this commit. `apps/web/public/icons/icon.svg` stayed unstaged. Nothing was pushed, merged, or deployed. Local `postgres` and `aqil_etf` were not reset. Migration `20261103190000` is in Git and is not yet applied. `publication_allowed` stays false. This is not Verified.
 
 
 ## Research engine certification, 3 November 2026
