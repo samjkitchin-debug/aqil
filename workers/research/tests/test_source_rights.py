@@ -134,6 +134,7 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
         "bea.nipa.T20600.W875RX",
         "bea.nipa.U002BU.KPMT",
         "bea.nipa.T10106.A191RX",
+        "bea.vintage.real_gdp.pct_preceding",
         "nber.bcdc.us_business_cycle_chronology",
         "market.eodhd.etf_eod",
         "market.twelvedata.etf_eod",
@@ -214,6 +215,8 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
             assert record.assessed_on.isoformat() == "2026-11-02"
         elif record.dataset_id == "govinfo.federal_register.notices":
             assert record.assessed_on.isoformat() == "2026-10-24"
+        elif record.dataset_id == "bea.vintage.real_gdp.pct_preceding":
+            assert record.assessed_on.isoformat() == "2026-11-03"
         else:
             assert record.assessed_on.isoformat() == "2026-10-17"
 
@@ -233,6 +236,13 @@ def test_canonical_register_links_evidence_and_separates_datasets() -> None:
     assert not source_usable(fred, RightsOperation.AI_PROCESSING)
     assert not source_usable(fred, RightsOperation.AI_MODEL_TRAINING)
     assert not operation_allowed(fred, RightsOperation.COMMERCIAL_PUBLICATION)
+
+    vintage = by_dataset["bea.vintage.real_gdp.pct_preceding"]
+    assert vintage.source_id == "bea_gdp_gdi_vintage_history"
+    assert vintage.m1_role == M1Role.UNRESOLVED
+    assert source_usable(vintage, RightsOperation.RAW_DATA_RETENTION)
+    assert source_usable(vintage, RightsOperation.HISTORICAL_ARCHIVING)
+    assert not source_usable(vintage, RightsOperation.AI_MODEL_TRAINING)
 
     treasury = by_dataset["treasury.xml.daily_treasury_yield_curve"]
     fiscal = by_dataset["fiscal.avg_interest_rates"]
