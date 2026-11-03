@@ -11,6 +11,8 @@ A rights-cleared BEA workbook, `gdp-gdi-vintage-history.xlsx`, was stored as `be
 
 FRED and ALFRED were not stored. The rights row still prohibits retention. The BLS flat file has no vintage column. The Employment Situation archive page says archived releases may have been revised. The Board G.17 download is a current series. No registered method requires the new series, so none was labelled point-in-time and none was replayed. The 960-cell matrix was not rewritten and still has zero point-in-time cells. Detail is in `docs/research/macro-etf/VINTAGE_AVAILABILITY.md`.
 
+The branch was pushed to `origin/research/macro-etf-discovery`. It was not merged to `main`. `icon.svg` was not pushed.
+
 `npm run test:research` passed 755 and failed 4. The failures are the known TradingView rights-fragment tests and the live H.15 count, which saw 868 federal-funds rows where the test expects 867. `uv run ruff check .` passed. `uv run ruff format --check .` still reports 13 pre-existing files. Typecheck, web lint, production build, browser tests, and `npm run test:db` were not re-run. This is not Verified.
 
 
