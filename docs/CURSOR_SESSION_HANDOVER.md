@@ -1,12 +1,16 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 3 November 2026, outcome-first specification freeze
+**Last updated:** 3 November 2026, outcome-first inventory
 
 
-## Outcome-first specification, 3 November 2026
+## Outcome-first inventory, 3 November 2026
 
-Branch `research/macro-etf-discovery`. Local HEAD and `origin/research/macro-etf-discovery` were `69d600cfc00438144d55543cb3f9ef8ab0aa228a` before this commit. `origin/main` remains `f52a888f6bbedf96e528ca3bccf6df751e3c8896`. This commit freezes event definition `EVT-DEF-001` version 1 and the category C intersection `LH-H-002` / `LH-E-002` before any price scan. The retrospective macro example `LH-H-003` / `LH-E-003` is specified and is not estimated. No inventory count is in this commit. `apps/web/public/icons/icon.svg` stayed unstaged. Nothing was pushed, merged, or deployed. Local `postgres` and `aqil_etf` were not reset. Migration `20261103190000` is in Git and is not yet applied. `publication_allowed` stays false. This is not Verified.
+Branch `research/macro-etf-discovery`. The specification commit is `9bb057a4f81a0b1c8be4a2f4e2c16d4b11121096`. It precedes this inventory. Local HEAD before the specification commit, and `origin/research/macro-etf-discovery`, were `69d600cfc00438144d55543cb3f9ef8ab0aa228a`. `origin/main` remains `f52a888f6bbedf96e528ca3bccf6df751e3c8896`. This commit was not pushed, not merged, and not deployed. `apps/web/public/icons/icon.svg` stayed unstaged. Local `postgres` and `aqil_etf` were not reset. Migration `20261103190000` was applied only to local `postgres`. `publication_allowed` stays false. This is not Verified.
+
+Event definition `EVT-DEF-001` version 1 is frozen. Stored series are split-adjusted closes, so total-return events are blocked. The category C pilot is `LH-H-002`, `LH-E-002`, `LH-X-002`, evidence `LH-V-002`, claim `LH-C-002`. The predetermined status is `inconclusive`. Catalogued price events: 1,749. Eligible month-ends: 1,700. Condition-false controls: 1,553. Condition true: 147. Labelled advances: 631. Both: 62. False positives: 85. Qualifying listings: 18. Median lift is positive and small, the condition is not common, and it does not accompany most labelled advances. That is why the frozen rule does not reject it, and also why it is not an investment claim. There is no untouched holdout. The portfolio comparison was not run. The retrospective macro example `LH-H-003`, `LH-E-003`, `LH-X-003`, evidence `LH-V-003`, claim `LH-C-003` is blocked and was not estimated. `LH-X-001` remains `inconclusive`. Detail is in `docs/research/events/`.
+
+`npm run test:research` prepared disposable `aqil_research_test` and did not reset `postgres` or `aqil_etf`. It collected 828 tests: 824 passed and 4 failed. The four failures are `test_restricted_sources_block_collection_holdings_and_ter`, `test_every_etf_fragment_blocks_cost_collection`, `test_rights_fragments_refuse_automated_collection`, and `test_live_board_file_is_counted_in_memory` (868 federal-funds rows where the test expects 867). Those tests were not weakened. Pytest exited before the script's Ruff steps. A separate `uv run ruff check .` passed. `uv run ruff format --check .` would reformat 13 pre-existing files, which were left unchanged. Typecheck, `npm run test:db`, production build, and browser tests were not run.
 
 
 ## Research engine certification, 3 November 2026

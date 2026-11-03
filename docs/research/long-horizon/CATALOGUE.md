@@ -31,4 +31,4 @@ Workbook sheet row counts, including the header row:
 | Nonnegotiable Checks | 19 |
 | Research Dashboard | 30 |
 
-Import writes one candidate row per source file. The same scenario identifier therefore exists once for each file that contains it. `empirical_result` is false. The 309 signals are not registered as hypotheses, because that would require inventing an economic rationale for each one. The only registered hypothesis is `LH-H-001`, and it is not one of the 618 catalogue scenarios.
+Import writes one candidate row per source file. The same scenario identifier therefore exists once for each file that contains it. `empirical_result` is false. The 309 signals are not registered as hypotheses, because that would require inventing an economic rationale for each one. `LH-H-001` is the hypothesis registered for this catalogue, and it is not one of the 618 catalogue scenarios. The outcome-first layer registers `LH-H-002` and `LH-H-003` separately. They are not catalogue scenarios and they do not change these counts.
