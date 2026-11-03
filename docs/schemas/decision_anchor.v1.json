@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/decision_anchor.v1.json",
+  "title": "Decision anchor v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "anchor_id",
+    "specification_id",
+    "specification_version",
+    "specification_hash",
+    "symbol",
+    "anchor_kind",
+    "session_date",
+    "lookback_sufficient",
+    "publication_allowed"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "anchor_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "specification_id": {
+      "const": "ATLAS-DEF-001"
+    },
+    "specification_version": {
+      "const": 1
+    },
+    "specification_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "symbol": {
+      "type": "string",
+      "minLength": 1
+    },
+    "anchor_kind": {
+      "enum": ["listing_month_end", "bea_gdp_release"]
+    },
+    "session_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "lookback_sufficient": {
+      "type": "boolean"
+    },
+    "listing_currency": {
+      "type": ["string", "null"]
+    },
+    "publication_allowed": {
+      "const": false
+    }
+  }
+}

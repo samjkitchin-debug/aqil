@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/state_observation.v1.json",
+  "title": "State observation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "state_id",
+    "anchor_id",
+    "feature_id",
+    "availability",
+    "clock",
+    "usable_as_decision_input",
+    "value_text",
+    "publication_allowed"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "state_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "anchor_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "feature_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "availability": {
+      "enum": [
+        "observed",
+        "insufficient_lookback",
+        "insufficient_frequency",
+        "insufficient_gap_not_filled",
+        "insufficient_zero_base",
+        "insufficient_zero_variance",
+        "insufficient_no_trough_after_peak",
+        "insufficient_peer_date",
+        "insufficient_no_vintage",
+        "blocked_no_foreign_exchange",
+        "blocked_no_consensus",
+        "not_applicable"
+      ]
+    },
+    "clock": {
+      "enum": [
+        "stored_sessions",
+        "retrospective_latest_revised_release_lag_unknown",
+        "point_in_time_observation"
+      ]
+    },
+    "usable_as_decision_input": {
+      "type": "boolean"
+    },
+    "value_text": {
+      "type": ["string", "null"]
+    },
+    "publication_allowed": {
+      "const": false
+    }
+  }
+}

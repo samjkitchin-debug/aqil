@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/outcome_measure.v1.json",
+  "title": "Outcome measure v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "outcome_id",
+    "anchor_id",
+    "horizon_label",
+    "session_steps",
+    "status",
+    "value_text",
+    "readable_as_state_input",
+    "known_at_anchor",
+    "publication_allowed"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "outcome_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "anchor_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "horizon_label": {
+      "enum": ["1m", "3m", "6m", "12m", "24m", "36m"]
+    },
+    "session_steps": {
+      "enum": [21, 63, 126, 252, 504, 756]
+    },
+    "status": {
+      "enum": ["observed", "censored"]
+    },
+    "value_text": {
+      "type": ["string", "null"]
+    },
+    "labelled_advance": {
+      "type": ["boolean", "null"]
+    },
+    "readable_as_state_input": {
+      "const": false
+    },
+    "known_at_anchor": {
+      "const": false
+    },
+    "publication_allowed": {
+      "const": false
+    }
+  }
+}
