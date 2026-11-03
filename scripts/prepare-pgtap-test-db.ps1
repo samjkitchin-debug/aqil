@@ -86,6 +86,14 @@ if ($cyclesOnTest -eq "") {
   if ($LASTEXITCODE -ne 0) { throw "Could not apply the research cycle migration on $testDatabase." }
 }
 
+$atlasOnTest = (Invoke-Psql $testDatabase "select to_regclass('research.decision_anchors')").Trim()
+if ($atlasOnTest -eq "") {
+  $atlasMigration = Join-Path (Split-Path -Parent $PSScriptRoot) "supabase\migrations\20261104120000_historical_state_atlas.sql"
+  docker cp $atlasMigration "${container}:/tmp/aqil_state_atlas.sql"
+  if ($LASTEXITCODE -ne 0) { throw "Could not copy the historical-state atlas migration." }
+  docker exec $container psql -U postgres -d $testDatabase -v ON_ERROR_STOP=1 -1 -f /tmp/aqil_state_atlas.sql
+  if ($LASTEXITCODE -ne 0) { throw "Could not apply the historical-state atlas migration on $testDatabase." }
+}
 $after = (Invoke-Psql "postgres" $liveCountSql).Trim()
 if ($before -ne $after) {
   throw "Development live observation count changed from $before to $after."

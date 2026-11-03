@@ -1,7 +1,22 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 3 November 2026, outcome-first inventory
+**Last updated:** 4 November 2026, historical state atlas
+
+
+## Historical state atlas, 4 November 2026
+
+Branch `research/macro-etf-discovery`. The specification commit is `795d208d4d78103238f8c32228ad1d475f9c53ca`. It precedes the stored rows. `origin/main` remains `f52a888f6bbedf96e528ca3bccf6df751e3c8896`. This result commit was not merged and not deployed. `apps/web/public/icons/icon.svg` stayed unstaged. Local `postgres` and `aqil_etf` were not reset. Migration `20261104120000` was applied only to local `postgres`, after disposable pgTAP passed. Hosted Supabase was not changed. `publication_allowed` stays false. This is not Verified.
+
+Gate 0 inputs, recounted: 38,653 live latest-revised observations, 1,077 BEA vintage rows, 42,931 adjusted closes, 0 foreign-exchange rows, 0 INRG prices. After the disposable database preparations, live observations on `postgres` were still 39,730, which is those 38,653 plus the 1,077 vintage rows.
+
+Stored atlas: 2,358 anchors (2,065 listing month-ends and 293 BEA release dates), 618,007 states, 12,390 outcomes of which 1,672 are censored, 85 inventory rows, 1,675 event links, 52 episodes. Content checksum `c65ce0d4ff48a9967c8916c66a5c983776db78e78fb01d60eb8b89fb15affe79`. The second `uv run python -m aqil_research.long_horizon.state_atlas` printed `unchanged` and inserted 0 anchors. `EVT-DEF-001` hash is unchanged. Surprise has no state row. EUNA relative performance is blocked. The 26 methods are inventory only. Two are `unavailable_input` because Census advance orders are unstored. No historical method output was written.
+
+`LH-X-002` was recomputed and matched 1,749 events, 1,700 eligible month-ends, 1,553 condition-false, 147 condition-true, 631 labelled advances, 62 both, 85 false positives, status `inconclusive`. It was not re-estimated. `LH-H-004` is `inconclusive` because 13 symbols met the minimum counts, the median incremental difference is 0.1, the median lift over the eligible-month base rate is 0.0375, and the median event share is about 0.0789. The forbidden promotions were not used. The portfolio simulator was not called. The 618 scenarios were not executed. `LH-H-001` and `LH-H-002` stay `proposed`. `LH-H-003` stays `retrospective_only` and `LH-X-003` stays blocked and unestimated. `LH-X-001` stays `inconclusive`. Detail is in `docs/research/state-atlas/README.md`. The expansion boundary in that file was not executed.
+
+`research_reader` is still absent. `schema_migrations` gained `20261104120000` with statements null. The progress view now counts three succeeded executions because `LH-X-004` succeeded. That count is not three portfolio simulations.
+
+`npm run test:research` collected 838 tests: 834 passed and 4 failed. The four failures are `test_restricted_sources_block_collection_holdings_and_ter`, `test_every_etf_fragment_blocks_cost_collection`, `test_rights_fragments_refuse_automated_collection`, and `test_live_board_file_is_counted_in_memory` (868 federal-funds rows where the test expects 867). Those tests were not weakened. Pytest exited before the script's Ruff steps. Ruff check on the new atlas files passed. The 13 pre-existing files were not reformatted. `npm run test:db` passed 15 files and 244 tests. Web typecheck passed. The production build passed. No browser pass. GitHub Actions has not run.
 
 
 ## Outcome-first inventory, 3 November 2026

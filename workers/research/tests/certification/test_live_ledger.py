@@ -256,18 +256,18 @@ def test_progress_dependencies_and_vintage_gate_match_the_preserved_database() -
     assert counts == {
         "registered_scenarios": 618,
         "registered_signals": 309,
-        "executed_simulations": 2,
-        "validated_simulations": 2,
+        "executed_simulations": 3,
+        "validated_simulations": 3,
         "scientifically_supported_conclusions": 0,
         "candidate_rows_marked_as_results": 0,
     }
-    assert row["succeeded_executions"] == 2
+    assert row["succeeded_executions"] == 3
     assert row["blocked_executions"] == 1
     assert row["claims_statistically_supported"] == 0
     assert row["claims_economically_useful"] == 0
     assert row["claims_forward_validated"] == 0
     assert row["executions_published"] == 0
-    assert [item[0] for item in links] == [f"LH-D-{index:03d}" for index in range(1, 11)]
+    assert [item[0] for item in links] == [f"LH-D-{index:03d}" for index in range(1, 15)]
     assert (
         shared_rows_are_independent(
             [

@@ -200,6 +200,14 @@ def test_economic_window_refuses_a_full_sample_and_a_gap() -> None:
     future = [*points, _month(2021, 1, "999")]
     assert economic_features(future, anchor)["level"] == first["level"]
     assert first["trailing_standardisation"].availability == "observed"
+    quarters = [
+        EconomicPoint(date(year, month, 1), None, "quarterly", Decimal(str(index + 1)))
+        for index, (year, month) in enumerate(
+            (year, month) for year in (2018, 2019, 2020, 2021) for month in (1, 4, 7, 10)
+        )
+    ]
+    quarter_features = economic_features(quarters, date(2021, 12, 31))
+    assert quarter_features["year_on_year"].availability == "observed"
     gapped = [point for point in points if point.period_start != date(2020, 6, 1)]
     assert economic_features(gapped, anchor)["year_on_year"].availability == (
         "insufficient_gap_not_filled"

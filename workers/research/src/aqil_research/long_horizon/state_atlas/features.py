@@ -125,6 +125,8 @@ def _year_on_year(sample: Sequence[EconomicPoint]) -> FeatureValue:
     earlier = sample[-1 - steps]
     if frequency == "weekly":
         expected = current.period_start - timedelta(weeks=steps)
+    elif frequency == "quarterly":
+        expected = _shift_months(current.period_start, -steps * 3)
     else:
         expected = _shift_months(current.period_start, -steps)
     if earlier.period_start != expected:

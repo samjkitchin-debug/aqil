@@ -95,6 +95,9 @@ For each real-world observation, store:
 
 **Historical query for decision at T:** only records whose publication and availability timestamps were at or before T. Backfilled data are labelled retrospective and never used to falsely claim they were observed live. Version/revision tables preserve what was known then. Official FRED/ALFRED revisions illustrate this need.
 
+## Historical state atlas
+Migration `20261104120000_historical_state_atlas.sql` is local only. It adds append-only anchors, state observations, outcome measures, an inventory, event links, and episodes in `research`. `research.anchor_research_matrix` is a view of counts at the anchor. It is not a second fact table. A state row cannot be an outcome, and an outcome cannot be marked readable as a state input. Latest-revised features use a calendar period bound when `period_end` is null. That bound is not a release date, and those rows stay `usable_as_decision_input` false. The only point-in-time subject is `bea.vintage.real_gdp.pct_preceding`, selected by printed release date on or before the anchor, including the same calendar day. That selection is not the next-day `model_available_at` rule. The record is `docs/research/state-atlas/README.md`. ADR 030.
+
 ## Immutable record model
 Forecast origins, methodological approvals, original source hashes and journal events are append-only *at the application level*. Corrections append new superseding versions linked by `supersedes_id`; don't overwrite the past. Distinguish audit immutability from keeping personal data forever: user privacy deletion must support lawful deletion/crypto-shredding without falsifying public research history. Immutable public research **must not include personal account identifiers**. Use privacy-minimised public research results and explicit retention policy.
 

@@ -15,6 +15,8 @@ Aqil's chain is `source → extract → verify → observation → event/indicat
 - **Forecast/scenario**: contingent statement specifying probability *only if calibrated*, time horizon, observable target and falsification/evaluation rule.
 - **Investment interpretation**: separate judgement about prices, investability, exposures and whether action improves a risk-constrained portfolio relative to status quo.
 
+A historical state is not an outcome. A latest-revised economic feature is not evidence that the figure was knowable on the anchor date. The category C sequence `LH-H-004` compares stored prices only. Its status cannot be statistically supported, economically useful, or forward-validated, and `publication_allowed` stays false. Detail is in `docs/research/state-atlas/README.md`. ADR 030.
+
 ### Evidence levels and public display
 - `official_primary`: authenticated regulatory/statistical/issuer source. May still be revised or wrong.
 - `published_primary_research`: identifiable method/paper/data with caveats.
