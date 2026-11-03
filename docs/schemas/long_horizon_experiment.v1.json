@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/long_horizon_experiment.v1.json",
+  "title": "Long-horizon experiment specification v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "experiment_id",
+    "version",
+    "category",
+    "category_label",
+    "not_macroeconomic_investment_intelligence",
+    "hypothesis_id",
+    "hypothesis_version",
+    "research_question",
+    "independent_variables",
+    "dependent_variables",
+    "historical_data_requirements",
+    "input_transformations",
+    "point_in_time_assumptions",
+    "methodology_version",
+    "statistical_tests",
+    "portfolio_decision_policy",
+    "baseline_strategy",
+    "etf_universe",
+    "investability_rules",
+    "simulation_window_rule",
+    "starting_capital",
+    "contribution_amount",
+    "contribution_schedule",
+    "transaction_cost_rate",
+    "cash_interest_rate",
+    "distributions",
+    "corporate_actions",
+    "currency_conversion",
+    "risk_constraints",
+    "training_window",
+    "validation_window",
+    "holdout_window",
+    "acceptance_criteria",
+    "multiple_testing",
+    "macro_vintage_ids",
+    "publication_allowed",
+    "next_eligible_session_rule"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "experiment_id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer"
+    },
+    "category": {
+      "type": "string"
+    },
+    "category_label": {
+      "type": "string"
+    },
+    "not_macroeconomic_investment_intelligence": {
+      "type": "boolean"
+    },
+    "hypothesis_id": {
+      "type": "string"
+    },
+    "hypothesis_version": {
+      "type": "integer"
+    },
+    "research_question": {
+      "type": "string"
+    },
+    "independent_variables": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dependent_variables": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "historical_data_requirements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "input_transformations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "point_in_time_assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "methodology_version": {
+      "type": "string"
+    },
+    "statistical_tests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "portfolio_decision_policy": {
+      "type": "string"
+    },
+    "baseline_strategy": {
+      "type": "string"
+    },
+    "etf_universe": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "investability_rules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "simulation_window_rule": {
+      "type": "string"
+    },
+    "starting_capital": {
+      "type": "string"
+    },
+    "contribution_amount": {
+      "type": "string"
+    },
+    "contribution_schedule": {
+      "type": "string"
+    },
+    "transaction_cost_rate": {
+      "type": "string"
+    },
+    "cash_interest_rate": {
+      "type": "string"
+    },
+    "distributions": {
+      "type": "string"
+    },
+    "corporate_actions": {
+      "type": "string"
+    },
+    "currency_conversion": {
+      "type": "string"
+    },
+    "risk_constraints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "training_window": {
+      "type": "string"
+    },
+    "validation_window": {
+      "type": "string"
+    },
+    "holdout_window": {
+      "type": "string"
+    },
+    "acceptance_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "insufficient_data_if",
+        "rejected_if",
+        "inconclusive_if",
+        "forbidden_statuses"
+      ],
+      "properties": {
+        "insufficient_data_if": {
+          "type": "string"
+        },
+        "rejected_if": {
+          "type": "string"
+        },
+        "inconclusive_if": {
+          "type": "string"
+        },
+        "forbidden_statuses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "multiple_testing": {
+      "type": "string"
+    },
+    "macro_vintage_ids": {
+      "type": "array"
+    },
+    "publication_allowed": {
+      "type": "boolean"
+    },
+    "next_eligible_session_rule": {
+      "type": "string"
+    }
+  }
+}
