@@ -17,6 +17,8 @@ Aqil's chain is `source → extract → verify → observation → event/indicat
 
 A historical state is not an outcome. A latest-revised economic feature is not evidence that the figure was knowable on the anchor date. The category C sequence `LH-H-004` compares stored prices only. Its status cannot be statistically supported, economically useful, or forward-validated, and `publication_allowed` stays false. Detail is in `docs/research/state-atlas/README.md`. ADR 030.
 
+`ETF-PROT-001` reads that shared atlas. It does not build a second one. `EVT-DEF-002` adds five families and does not edit `EVT-DEF-001`. The scored dossiers are `LH-H-005` for VWRA, `LH-H-006` for EIMI, and `LH-H-007` for their matched excess. This inspected history registers no allocation policy. Detail is in `docs/research/etf-protocol/README.md`. ADR 031.
+
 ### Evidence levels and public display
 - `official_primary`: authenticated regulatory/statistical/issuer source. May still be revised or wrong.
 - `published_primary_research`: identifiable method/paper/data with caveats.

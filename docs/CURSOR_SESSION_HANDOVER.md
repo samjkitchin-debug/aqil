@@ -1,7 +1,24 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 4 November 2026, historical state atlas
+**Last updated:** 4 November 2026, ETF protocol
+
+
+## ETF protocol, 4 November 2026
+
+Branch `research/macro-etf-discovery`. The specification commit is `401f7e48eb08a89a7e63a8338f61fa94276d6dce`. It precedes the stored scores. `origin/main` remains `f52a888f6bbedf96e528ca3bccf6df751e3c8896`. `origin/research/macro-etf-discovery` was `18e90f8f189e2938f487a6faee94ff8be4b444dc` before this push. This result commit was not merged and not deployed. `apps/web/public/icons/icon.svg` stayed unstaged. Local `postgres` and `aqil_etf` were not reset. Migration `20261104183000` was applied only to local `postgres`, after disposable pgTAP passed. Hosted Supabase was not changed. `publication_allowed` stays false. This is not Verified.
+
+Recount before the score: 2,358 anchors, 618,007 states, 12,390 outcomes, 1,749 `EVT-DEF-001` events, 38,653 live latest-revised observations, 1,077 BEA vintage rows, 42,931 adjusted closes, 0 foreign-exchange rows, 0 INRG prices. After the disposable database preparations, live observations on `postgres` were still 39,730, which is those 38,653 plus the 1,077 vintage rows. The same live latest-revised count was 38,653 after the local migration and after the second protocol run.
+
+`EVT-DEF-002` catalogue, 19 priced listings: 478 sustained declines, 25 persistent bears, 19 failed recoveries, 388 trend reversals, and 1,000 volatility transitions. Total 1,910 events. Family-count rows 190, including the 24-month and 36-month decline horizons at event count 0. `EVT-DEF-001` hash `3844aff160a7f6fac7fb4c966707a313b6e8c89f4bb04cee6a72cb4d97275114` is unchanged.
+
+Stored trials 3,489, equal to the declared grid. VWRA `LH-X-005` is `no_incremental_information`: 67 eligible month-ends met the frozen floors, and the conjunction did not beat each leg by more than zero. EIMI `LH-X-006` is `no_incremental_information` on the same rule, with 99 eligible month-ends. The matched excess `LH-X-007` is `inconclusive`: 80 of 87 estimated primary-horizon excess Spearman rows have a larger absolute coefficient than the stored 252-session relative-performance control. The registry result is `no_policy_registered`. Logistic, probit, and regularized searches are 9 refusal rows, `not_estimable_effective_sample`, with null effects. Method rows have null effects. `LH-H-001` and `LH-H-002` stay `proposed`. `LH-H-003` stays `retrospective_only` and was not estimated. `LH-H-004` was not rescored. The portfolio path was not built. The 618 catalogue scenarios were not executed.
+
+The second `uv run python -m aqil_research.long_horizon.etf_protocol` printed `unchanged` and inserted 0 events and 0 trials. Stored `git_commit` is the specification commit. Detail is in `docs/research/etf-protocol/README.md`.
+
+`research.long_horizon_progress` counts every succeeded execution as an executed simulation. The certification expectation now records 6 succeeded executions and 4 inconclusive-or-rejected claims, because the three dossiers were added and only `LH-C-007` is inconclusive. Dependencies run from `LH-D-001` through `LH-D-026`. That update does not call a portfolio path.
+
+`npm run test:research` collected 847 tests: 843 passed and 4 failed. The four failures are `test_restricted_sources_block_collection_holdings_and_ter`, `test_every_etf_fragment_blocks_cost_collection`, `test_rights_fragments_refuse_automated_collection`, and `test_live_board_file_is_counted_in_memory` (868 federal-funds rows where the test expects 867). Those tests were not weakened. Pytest exited before the script's Ruff steps. Ruff check on the new protocol files passed. The 13 pre-existing files were not reformatted. `npm run test:db` passed 16 files and 252 tests, including `etf_protocol.test.sql`. Web typecheck passed. The production build passed. No browser pass. GitHub Actions has not run.
 
 
 ## Historical state atlas, 4 November 2026

@@ -94,6 +94,14 @@ if ($atlasOnTest -eq "") {
   docker exec $container psql -U postgres -d $testDatabase -v ON_ERROR_STOP=1 -1 -f /tmp/aqil_state_atlas.sql
   if ($LASTEXITCODE -ne 0) { throw "Could not apply the historical-state atlas migration on $testDatabase." }
 }
+$protocolOnTest = (Invoke-Psql $testDatabase "select to_regclass('research.etf_protocol_trials')").Trim()
+if ($protocolOnTest -eq "") {
+  $protocolMigration = Join-Path (Split-Path -Parent $PSScriptRoot) "supabase\migrations\20261104183000_etf_research_protocol.sql"
+  docker cp $protocolMigration "${container}:/tmp/aqil_etf_protocol.sql"
+  if ($LASTEXITCODE -ne 0) { throw "Could not copy the ETF protocol migration." }
+  docker exec $container psql -U postgres -d $testDatabase -v ON_ERROR_STOP=1 -1 -f /tmp/aqil_etf_protocol.sql
+  if ($LASTEXITCODE -ne 0) { throw "Could not apply the ETF protocol migration on $testDatabase." }
+}
 $after = (Invoke-Psql "postgres" $liveCountSql).Trim()
 if ($before -ne $after) {
   throw "Development live observation count changed from $before to $after."

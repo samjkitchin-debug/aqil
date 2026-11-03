@@ -42,6 +42,14 @@ class Score:
     p_value: str | None = None
 
 
+def stored_direction_sign(text: str) -> Decimal:
+    """The stored direction label is the sign of the latest change."""
+    signs = {"up": Decimal(1), "down": Decimal(-1), "flat": Decimal(0)}
+    if text not in signs:
+        raise ProtocolError("a stored direction is not up, down, or flat")
+    return signs[text]
+
+
 def assert_session_allowed(symbol: str, session: date) -> None:
     first = date.fromisoformat(VWRA_FIRST_SESSION)
     if symbol == "VWRA" and session < first:

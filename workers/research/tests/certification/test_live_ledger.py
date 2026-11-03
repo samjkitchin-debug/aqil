@@ -253,21 +253,26 @@ def test_progress_dependencies_and_vintage_gate_match_the_preserved_database() -
             """
         ).fetchall()
     counts = classify_progress(row)
+    # Succeeded executions include the atlas and the three ETF dossiers.
+    # The progress view still labels that count as executed simulations.
+    # LH-X-005, LH-X-006, and LH-X-007 are not portfolio paths.
+    # Only LH-C-007 is inconclusive. The other two dossiers are
+    # no_incremental_information, which this sum does not treat as validated.
     assert counts == {
         "registered_scenarios": 618,
         "registered_signals": 309,
-        "executed_simulations": 3,
-        "validated_simulations": 3,
+        "executed_simulations": 6,
+        "validated_simulations": 4,
         "scientifically_supported_conclusions": 0,
         "candidate_rows_marked_as_results": 0,
     }
-    assert row["succeeded_executions"] == 3
+    assert row["succeeded_executions"] == 6
     assert row["blocked_executions"] == 1
     assert row["claims_statistically_supported"] == 0
     assert row["claims_economically_useful"] == 0
     assert row["claims_forward_validated"] == 0
     assert row["executions_published"] == 0
-    assert [item[0] for item in links] == [f"LH-D-{index:03d}" for index in range(1, 15)]
+    assert [item[0] for item in links] == [f"LH-D-{index:03d}" for index in range(1, 27)]
     assert (
         shared_rows_are_independent(
             [
