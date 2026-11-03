@@ -1,7 +1,21 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 3 November 2026, one BEA real GDP growth vintage stored
+**Last updated:** 3 November 2026, one category C comparison stored
+
+
+## Long-horizon traceability, 3 November 2026
+
+Branch `research/macro-etf-discovery`. The freeze commit is `caf498b0149e9dbccecc4477d288fe9bec0bbbaf`. It was not pushed and it was not merged. `origin/main` remains `f52a888f6bbedf96e528ca3bccf6df751e3c8896`. Local `postgres` and `aqil_etf` were not reset. No hosted migration was applied. `apps/web/public/icons/icon.svg` stayed unstaged.
+
+The existing research tables did not carry a hypothesis, frozen specification, execution, evidence, and claim chain. Migration `20261103170000` adds that chain in the same `research` schema. `research.parameter_versions` is still absent locally, and `research_reader` is still absent. `schema_migrations` still does not list the prospective-assessment migration even though that table exists. Only the new migration row was inserted. `publication_allowed` stays false.
+
+The founding catalogue is a design register: 309 signals, 618 scenarios, 26 families, and zero parsed field disagreements across the JSON, CSV, and workbook. All three files are kept. Checksums are in `docs/research/long-horizon/CATALOGUE.md`. Nineteen families are blocked and seven remain design-only. None of the 618 scenarios was executed. The only registered hypothesis is `LH-H-001`, experiment `LH-E-001`, execution `LH-X-001`, evidence `LH-V-001`, claim `LH-C-001`.
+
+The category C pilot uses stored USD adjusted closes for VWRA and CSPX from 2019-07-25 to 2026-11-02. Both paths reconcile. Immediate VWRA terminal wealth is 150,430.016335996. The calendar split terminal wealth is 155,534.402817166. The predetermined rule assigns `inconclusive`. It is not macroeconomic investment intelligence, not economically useful, and not forward-validated. The real GDP growth vintage was not an input. Detail is in `docs/research/long-horizon/PILOT.md`.
+
+`npm run test:research`: 780 passed, 4 failed. The four failures are the known TradingView rights-fragment tests and the live H.15 count. `uv run ruff check .` passed. `uv run ruff format --check .` still reports 13 pre-existing files. Typecheck, web lint, production build, browser tests, and `npm run test:db` were not run. This is not Verified.
+
 
 ## Point-in-time vintage, 3 November 2026
 

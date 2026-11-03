@@ -34,3 +34,5 @@ No catalogue family is executed. Seven families stay design-only because a price
 | Volatility & left-tail risk | blocked | Blocked. VIX history beyond the stored adjusted closes is not a licensed input in this package. |
 
 The only registered experiment is the category C pilot `LH-E-001`. It uses stored USD adjusted closes for VWRA and CSPX. It does not use a macroeconomic vintage. Its scientific status is assigned only after the frozen specification is stored and the ledger reconciles. That status is not permission to publish and it is not an investment claim.
+
+The stored execution `LH-X-001` reconciled. The predetermined rule assigned `inconclusive`. That status is not an investment claim.

@@ -1,0 +1,46 @@
+{
+  "alternative_ending_cash": "27.192817166",
+  "alternative_ending_units": {
+    "CSPX": 93,
+    "VWRA": 416
+  },
+  "alternative_terminal_forgone_value": "8726.2",
+  "alternative_terminal_wealth": "155534.402817166",
+  "alternative_total_costs": "100.672404834",
+  "artifact_sha256": "cf77b6fb62f02eaf84828549189893dd7c45aaa49f0470cd6754a27ffa19d514",
+  "cash_interest_rate": "0",
+  "category": "C",
+  "category_label": "price_only_simulator_research",
+  "claim_id": "LH-C-001",
+  "code_hash": "a3055ec537c2028d32719cf1e0efca29682ae365c447fde963fe6e7f92ef8e51",
+  "contribution_amount": "1000",
+  "contribution_count": 89,
+  "contributions_equal": true,
+  "evidence_id": "LH-V-001",
+  "execution_id": "LH-X-001",
+  "experiment_id": "LH-E-001",
+  "git_commit": "caf498b0149e9dbccecc4477d288fe9bec0bbbaf",
+  "hypothesis_id": "LH-H-001",
+  "not_an_investment_claim": true,
+  "passive_ending_cash": "187.616335996",
+  "passive_ending_units": {
+    "VWRA": 792
+  },
+  "passive_terminal_wealth": "150430.016335996",
+  "passive_total_costs": "88.723660004",
+  "price_series_sha256": "947e5c247b9641e646b05e7cc08d951fcd4d3da8c75074ae893280b73e94559b",
+  "publication_allowed": false,
+  "reconciliation_matches": true,
+  "reproduction_command": "uv run python -m aqil_research.long_horizon.reproduce",
+  "session_count": 1838,
+  "simulation_end": "2026-11-02",
+  "simulation_start": "2019-07-25",
+  "specification_hash": "50cdcdb1bf00ee04af6dd09ecff8c4c1dd19df562d8032bbdd79e3ac17b1ac54",
+  "status": "inconclusive",
+  "supports_investment_alpha": false,
+  "symbol_sha256": {
+    "CSPX": "20af62df48c392196289a5fb7ad4828dd64afda8bf866801935c1d95745f8f2a",
+    "VWRA": "2a0e96da13e5ef1d228988b54e578d87ec24943c532203d696d9d2bb68bcb89e"
+  },
+  "transaction_cost_rate": "0.001"
+}
