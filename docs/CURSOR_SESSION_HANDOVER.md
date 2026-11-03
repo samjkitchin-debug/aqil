@@ -1,7 +1,18 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 3 November 2026, one category C comparison stored
+**Last updated:** 3 November 2026, research engine certification
+
+
+## Research engine certification, 3 November 2026
+
+Branch `research/macro-etf-discovery`. Local HEAD at the start of this pass was `5cc46a28e3d92d9187fda32f846c9cc585623b9e`. `origin/research/macro-etf-discovery` was `6fffff18d640949aceb28045a8e0a82106280166`. `origin/main` was `f52a888f6bbedf96e528ca3bccf6df751e3c8896`. The two earlier unpushed commits, `caf498b` and `5cc46a2`, stay in the branch history. The ledger certification is `536bd17dac3bc105ff3918a8902ad34db6838e11`. These commits are pushed together. There is no force-push, no merge, and no deploy. `apps/web/public/icons/icon.svg` stayed unstaged. Local `postgres` and `aqil_etf` were not reset. No hosted migration was applied. `publication_allowed` stays false.
+
+`LH-X-001` was reconstructed. Immediate VWRA terminal wealth is 150430.016335996. The calendar split is 155534.402817166. Forgone value is 8726.2, equal to 46 sold VWRA units at the final close of 189.7, and it sits outside terminal wealth. The wealth gap is 5104.386481170. The status remains `inconclusive`. No corrected execution was written. Price-only baselines on the same dates are in `docs/research/long-horizon/READINESS.md`. A higher terminal wealth on those paths stays inconclusive. The static CSPX overweight is a structural mix.
+
+Gate 5 is blocked. All 26 methods declare `latest_revised`. `bea.vintage.real_gdp.pct_preceding` is the only live provider vintage and is not a method input. `fred.alfred.UNRATE` remains ineligible for retention. Gate 6 did not run. The 618 catalogue scenarios were not executed. Registered scenarios 618, executed simulations 1, validated simulations 1, scientifically supported conclusions 0.
+
+`npm run test:research` prepared disposable `aqil_research_test` and did not reset `postgres` or `aqil_etf`. It collected 811 tests: 807 passed and 4 failed. The four failures are `test_restricted_sources_block_collection_holdings_and_ter`, `test_every_etf_fragment_blocks_cost_collection`, `test_rights_fragments_refuse_automated_collection`, and `test_live_board_file_is_counted_in_memory` (868 federal-funds rows where the test expects 867). Those tests were not weakened. Pytest exited before the script's Ruff steps. A separate `uv run ruff check .` passed. `uv run ruff format --check .` would reformat 13 pre-existing files, which were left unchanged. Typecheck, `npm run test:db`, production build, and browser tests were not run. This is not Verified.
 
 
 ## Long-horizon traceability, 3 November 2026
