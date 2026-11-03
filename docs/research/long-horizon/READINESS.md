@@ -36,3 +36,54 @@ No catalogue family is executed. Seven families stay design-only because a price
 The only registered experiment is the category C pilot `LH-E-001`. It uses stored USD adjusted closes for VWRA and CSPX. It does not use a macroeconomic vintage. Its scientific status is assigned only after the frozen specification is stored and the ledger reconciles. That status is not permission to publish and it is not an investment claim.
 
 The stored execution `LH-X-001` reconciled. The predetermined rule assigned `inconclusive`. That status is not an investment claim.
+
+## Laboratory certification, 3 November 2026
+
+This section records a later audit. It leaves `LH-E-001`, `LH-X-001`, `LH-V-001`, and `LH-C-001` in place. No corrected execution was stored. The tolerance is exact decimal equality, which is a difference of zero. `publication_allowed` stays false.
+
+### Portfolio accounting
+
+The passive path and the calendar-split path were rebuilt from the stored USD split-adjusted closes and from the event ledger. Both reconstructions match the stored evidence.
+
+| Path | Terminal wealth | Ending cash | Ending units | Costs | Forgone value |
+| --- | --- | --- | --- | --- | --- |
+| Immediate VWRA | 150430.016335996 | 187.616335996 | 792 VWRA | 88.723660004 | 0 |
+| Calendar split | 155534.402817166 | 27.192817166 | 416 VWRA and 93 CSPX | 100.672404834 | 8726.2 |
+
+There are 89 contributions of 1,000 US dollars, 89,000 in total, on the first common stored session of each month from 2019-07-25 to 2026-11-02. That is 1,838 sessions. The cost rate is 10 basis points of notional. Cash interest is the explicit zero. No distribution and no foreign-exchange conversion is applied. VWRA has no stored close before 2019-07-25.
+
+The figure 8,726.20 is the exact value 8726.2. It is 46 sold VWRA units marked at the 2026-11-02 split-adjusted close of 189.7. Those six sale lots are dated 2020-01-02, 2021-01-04, 2023-01-03, 2024-01-02, 2025-01-02, and 2026-01-02. Terminal wealth is ending cash plus units still held. The forgone mark is a separate field. The wealth gap between the two paths is 5104.386481170. Cent displays of the two terminal-wealth figures are 150,430.02 and 155,534.40. The stored values are the longer decimals above.
+
+The first fill, on 2019-07-25, buys 12 VWRA at 79.925003. Notional is 959.100036, cost is 0.959100036, and residual cash from the 1,000 contribution is 39.940863964. The first January sale, on 2020-01-02, sells 9 VWRA at 86.695. Notional is 780.255 and cost is 0.780255.
+
+A larger calendar-split terminal wealth remains `inconclusive`. The frozen rule is unchanged.
+
+### Passive baselines
+
+These paths use the same contribution dates, the same 1,000 US dollar amount, the same 10 basis point cost, zero cash interest, and the same stored USD split-adjusted closes. A split-adjusted close is a price return. It is a stored adjusted close, and this pass does not certify it as a total return. Holdings lines, exposure snapshots, fund returns, and foreign-exchange rows are zero, so constituent overlap is unsupported.
+
+| Baseline | What the path records | Terminal wealth | Forgone value |
+| --- | --- | --- | --- |
+| Immediate VWRA | Price path of one listing | 150430.016335996 | 0 |
+| Immediate CSPX | Price path of one other listing | 160618.95366197 | 0 |
+| Static equal VWRA and CSPX | Fixed mix, buys only | 154623.031399984 | 0 |
+| Static 70 percent CSPX | Structural overweight, buys only | 157058.342255089 | 0 |
+| Calendar fixed weight | Contribution buys, then a January position rebalance | 155257.058152937 | 379.4 |
+| Threshold 10 percent | Rebalance when a weight leaves the band | 155229.120995035 | 189.7 |
+| Cash-flow only | Buys toward equal weight, no sales | 155228.850695039 | 0 |
+
+The static CSPX overweight is a structural mix. The calendar fixed-weight path is a different rule from the registered odd-month calendar split. Where a baseline ends above immediate VWRA, the category C rule assigns `inconclusive`. None of these rows is a new hypothesis, a new claim, or macroeconomic investment intelligence.
+
+### Traceability
+
+`research.long_horizon_progress` on the preserved database separates the register from the results. Registered scenarios: 618. Executed simulations: 1. Validated simulations: 1. Scientifically supported conclusions: 0. Candidate rows marked as results: 0. The six dependency rows linking immediate VWRA and the calendar split have `independent_confirmation` false. Shared prices, the same contribution dates, and one overlapping window are one shared history.
+
+### Point-in-time gate
+
+Gate 5 is blocked. 26 registered methods were inspected. Declared vintage classes: latest_revised. This pass does not relabel one. `bea.vintage.real_gdp.pct_preceding` is not a required input of any registered method. The only live provider-vintage dataset on the preserved database is that real GDP growth series. `fred.alfred.UNRATE` historical archiving is prohibited, so ALFRED is not stored. Unemployment, CPI-U, industrial production, and the H.15 Treasury yields are permitted to be archived as their current publications. Those publications are not original vintages. The Employment Situation archive and the CPI archive are also permitted to be archived, and the rights rows say those archived releases may have been revised. No rights-cleared source supplies an original vintage for every input of one registered method. No methodology and no vintage were manufactured.
+
+Gate 6 did not run. There is no macro-informed portfolio experiment in this pass. The 618 catalogue scenarios were not executed.
+
+### Checks
+
+On this tree, not GitHub Actions, and not Verified: `npm run test:research` collected 811 tests, 807 passed and 4 failed. The four failures are the known TradingView rights-fragment tests and the live H.15 count of 868 federal-funds rows where the test expects 867. `uv run ruff check .` passed. `uv run ruff format --check .` would reformat 13 pre-existing files, which were left unchanged. Typecheck, `npm run test:db`, production build, and browser tests were not run.

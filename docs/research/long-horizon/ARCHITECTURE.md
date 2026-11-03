@@ -32,3 +32,5 @@ These were checked on the local databases. They are not assumed from an earlier 
 The migration is applied to the local development database only. It is not applied to a hosted project. Risk class is R2. Rollback is to leave the additive tables in place. They are not dropped on the preserved database.
 
 The Python package `aqil_research.long_horizon` holds the simulator, the frozen category C specification, the catalogue reader, and the registry writer. Methodology mathematics, `refresh.py`, allocation, the investment-policy statement, and Saxo behaviour are not edited.
+
+The certification pass adds `aqil_research.certification` beside that package. The stored code hash on `LH-X-001` covers only the `long_horizon` modules, so the audit can import the simulator without replacing the execution. Reproduction remains `uv run python -m aqil_research.long_horizon.reproduce` from `workers/research`.

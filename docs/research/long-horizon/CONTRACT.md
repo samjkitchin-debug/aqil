@@ -42,3 +42,5 @@ The status rule is fixed before the historical result is read:
 - an equal or smaller alternative terminal wealth is `rejected` on this window only.
 
 `statistically_supported`, `economically_useful`, and `forward_validated` are forbidden for category C. The sentence of the claim is filled from that rule. A language model does not assign the status. The result is not promoted to an investment claim.
+
+Later price-only baselines use the same contribution dates, costs, and stored closes. They are accounting paths. A static CSPX overweight is a structural mix. A larger terminal wealth on any of those paths stays `inconclusive` under the same rule. They do not replace `LH-C-001`.

@@ -17,3 +17,21 @@ The predetermined rule assigns `inconclusive` when the alternative terminal weal
 `uv run ruff check .` passed in `workers/research`. `uv run ruff format --check .` would still reformat 13 pre-existing files. Those files were not reformatted. The long-horizon package is not among them.
 
 Not run: `npm run test:db`, TypeScript typecheck, web lint, production build, browser tests, and GitHub Actions. The migration was applied to local Postgres only. It was not applied to a hosted project. The databases were not reset. Live `latest_revised` observations remain 38,653. Adjusted closes remain 42,931. `publication_allowed` remains false on all 54 research runs and on the new execution.
+
+## Certification review, 3 November 2026
+
+This review reads the certification pass. It is a record of that reading. It is not Verified, and it is not an investment claim.
+
+Portfolio accounting. The event replay matches `LH-X-001` exactly. Cash, units, costs, and terminal wealth agree with the fills. Forgone value is 46 sold VWRA units times the final close of 189.7, which is 8726.2, and that product is outside terminal wealth. The first buy and the first January sale match the hand arithmetic in the certification tests. No second execution was required.
+
+Historical data. The prices are stored USD split-adjusted closes. The window starts on the first VWRA session, 2019-07-25. Foreign-exchange rows, holdings lines, and fund-return rows are zero. A split-adjusted close stays a price return.
+
+Traceability. The hypothesis, frozen specification, execution, evidence, and claim still join. The progress view shows 618 registered scenarios, 1 executed simulation, 1 validated simulation, and 0 scientifically supported conclusions. The six dependency rows keep `independent_confirmation` false.
+
+Leakage. The category C pilot has no macroeconomic input. The real GDP growth vintage remains outside every registered method. Every method still declares `latest_revised`. A printed release date is still ineligible on that date. No timestamp was manufactured.
+
+Benchmark fairness. The baselines use the same contributions, cost rate, cash interest, and closes as the pilot. Immediate CSPX and the 70 percent CSPX mix are single-listing and structural results. They are not treated as macro signals.
+
+Inference. One shared price path is one history. A larger terminal wealth stays `inconclusive`. There is no holdout and no second sample.
+
+Reproducibility. `uv run python -m aqil_research.long_horizon.reproduce` returned `LH-X-001` with status `inconclusive` after the certification modules were added. Gate 6 did not run, because Gate 5 produced no eligible method.
