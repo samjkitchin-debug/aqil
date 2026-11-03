@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aqil.internal/schemas/etf_protocol_trial.v1.json",
+  "title": "ETF protocol trial v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "trial_id",
+    "specification_id",
+    "specification_version",
+    "specification_hash",
+    "dossier_id",
+    "symbol",
+    "feature",
+    "transform",
+    "horizon_label",
+    "outcome",
+    "statistic",
+    "eligibility",
+    "publication_allowed"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "trial_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "specification_id": {
+      "const": "ETF-PROT-001"
+    },
+    "specification_version": {
+      "const": 1
+    },
+    "specification_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "dossier_id": {
+      "enum": ["LH-X-005", "LH-X-006", "LH-X-007"]
+    },
+    "symbol": {
+      "enum": ["VWRA", "EIMI", "EIMI-VWRA"]
+    },
+    "feature": {
+      "type": "string",
+      "minLength": 1
+    },
+    "transform": {
+      "type": "string",
+      "minLength": 1
+    },
+    "horizon_label": {
+      "type": "string",
+      "minLength": 1
+    },
+    "outcome": {
+      "type": "string",
+      "minLength": 1
+    },
+    "statistic": {
+      "type": "string",
+      "minLength": 1
+    },
+    "eligibility": {
+      "enum": [
+        "category_c_price_only",
+        "category_b_retrospective",
+        "point_in_time_indicator",
+        "not_a_method_replay",
+        "not_estimable"
+      ]
+    },
+    "result_text": {
+      "type": ["string", "null"]
+    },
+    "refusal_reason": {
+      "type": ["string", "null"]
+    },
+    "effect_text": {
+      "type": ["string", "null"]
+    },
+    "publication_allowed": {
+      "const": false
+    }
+  }
+}
