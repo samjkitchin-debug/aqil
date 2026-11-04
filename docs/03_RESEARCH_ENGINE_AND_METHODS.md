@@ -21,6 +21,8 @@ A historical state is not an outcome. A latest-revised economic feature is not e
 
 `VWRA-DISCOVERY-001` replays registered methods on latest-revised inputs and stores the numerical output under `LH-H-008` through `LH-H-011`. Those rows are retrospective. They do not replace `LH-H-001` through `LH-H-007`, and they are not point-in-time signals. Detail is in `docs/research/vwra-discovery/README.md`. ADR 032.
 
+`EIMI-VWRA-COMPARISON-001` uses the same package with the symbol set to EIMI, then scores the matched excess against VWRA. The rows are `LH-H-012` through `LH-H-018`. They do not replace `LH-H-001` through `LH-H-011`. Detail is in `docs/research/eimi-discovery/README.md`. ADR 033.
+
 ### Evidence levels and public display
 - `official_primary`: authenticated regulatory/statistical/issuer source. May still be revised or wrong.
 - `published_primary_research`: identifiable method/paper/data with caveats.

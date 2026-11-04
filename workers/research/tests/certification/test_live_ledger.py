@@ -252,13 +252,25 @@ def test_progress_dependencies_and_vintage_gate_match_the_preserved_database() -
             order by dependency_id
             """
         ).fetchall()
+        simulations = research.execute(
+            """
+            select execution_id
+            from research.experiment_executions
+            where state = 'succeeded'
+              and coalesce(configuration->>'portfolio_path', '') <> 'not_called'
+              and coalesce(configuration->>'portfolio_simulator', '') <> 'not_called'
+              and coalesce(configuration->>'portfolio_comparison', '') <> 'blocked'
+              and coalesce(configuration->>'portfolio_simulation', '') <> 'not_called'
+            order by execution_id
+            """
+        ).fetchall()
     counts = classify_progress(row)
-    # Only the category C pilot called the portfolio simulator.
-    # Atlas and dossier executions stay in succeeded_executions and are not
-    # added to portfolio_simulations.
+    # LH-X-001 is the category C pilot. LH-X-018 is the later price-only
+    # EIMI comparison. Dossier executions stay out of this count.
     assert counts["registered_scenarios"] == 618
     assert counts["registered_signals"] == 309
-    assert counts["portfolio_simulations"] == 1
+    assert [item[0] for item in simulations] == ["LH-X-001", "LH-X-018"]
+    assert counts["portfolio_simulations"] == 2
     assert counts["point_in_time_results"] == 0
     assert counts["scientifically_validated_findings"] == 0
     assert counts["scientifically_supported_conclusions"] == 0
