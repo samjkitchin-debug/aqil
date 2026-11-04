@@ -186,6 +186,19 @@ def test_stored_discovery_has_a_number_or_a_reason_and_no_future_state() -> None
                 """
             )
             progress = cursor.fetchone()
+            cursor.execute(
+                """
+                select execution_id
+                from research.experiment_executions
+                where state = 'succeeded'
+                  and coalesce(configuration->>'portfolio_path', '') <> 'not_called'
+                  and coalesce(configuration->>'portfolio_simulator', '') <> 'not_called'
+                  and coalesce(configuration->>'portfolio_comparison', '') <> 'blocked'
+                  and coalesce(configuration->>'portfolio_simulation', '') <> 'not_called'
+                order by execution_id
+                """
+            )
+            counted_ids = [row[0] for row in cursor.fetchall()]
     assert len(runs) == 26
     unavailable = {row[0]: row for row in runs if row[1] == "unavailable"}
     assert set(unavailable) == {"CENSUS_ADV_DURABLE_ORDERS", "MACRO_CONDITIONS_PANEL"}
@@ -211,7 +224,8 @@ def test_stored_discovery_has_a_number_or_a_reason_and_no_future_state() -> None
         refused,
         succeeded_executions,
     ) = progress
-    assert portfolio == 1
+    assert "LH-X-001" in counted_ids
+    assert portfolio == len(counted_ids)
     assert point_in_time == 0
     assert validated == 0
     assert registered == executed + refused

@@ -110,6 +110,14 @@ if ($discoveryOnTest -eq "") {
   docker exec $container psql -U postgres -d $testDatabase -v ON_ERROR_STOP=1 -1 -f /tmp/aqil_vwra_discovery.sql
   if ($LASTEXITCODE -ne 0) { throw "Could not apply the VWRA discovery migration on $testDatabase." }
 }
+$symbolCheck = (Invoke-Psql $testDatabase "select pg_get_constraintdef(oid) from pg_constraint where conname = 'discovery_v2_trials_symbol'").Trim()
+if ($symbolCheck -notmatch "EIMI") {
+  $comparisonMigration = Join-Path (Split-Path -Parent $PSScriptRoot) "supabase\migrations\20261105120000_eimi_vwra_comparison.sql"
+  docker cp $comparisonMigration "${container}:/tmp/aqil_eimi_vwra_comparison.sql"
+  if ($LASTEXITCODE -ne 0) { throw "Could not copy the EIMI comparison migration." }
+  docker exec $container psql -U postgres -d $testDatabase -v ON_ERROR_STOP=1 -1 -f /tmp/aqil_eimi_vwra_comparison.sql
+  if ($LASTEXITCODE -ne 0) { throw "Could not apply the EIMI comparison migration on $testDatabase." }
+}
 $after = (Invoke-Psql "postgres" $liveCountSql).Trim()
 if ($before -ne $after) {
   throw "Development live observation count changed from $before to $after."
