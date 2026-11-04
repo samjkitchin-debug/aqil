@@ -10,6 +10,7 @@ import pytest
 
 from aqil_research.long_horizon.pilot import LOCAL_RESEARCH_URL
 from aqil_research.long_horizon.vwra_discovery.align import (
+    is_market_feature,
     market_values,
     refuse_fx_count,
     state_on_or_before,
@@ -73,6 +74,7 @@ def test_a_later_price_state_is_dropped_and_an_outcome_is_not_a_state() -> None:
     assert market_values(shared, shared, {"trailing_return_63": "0.05"}) == {
         "trailing_return_63": "0.05"
     }
+    assert is_market_feature("split_adjusted_close") is True
     assert state_on_or_before("trailing_return_63", date(2020, 2, 1), shared, "0.05") is None
     with pytest.raises(ValueError, match="outcome"):
         state_on_or_before("outcome_return_126", shared, shared, "0.05")

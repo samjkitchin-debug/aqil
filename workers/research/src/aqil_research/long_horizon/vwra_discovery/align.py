@@ -55,7 +55,8 @@ MARKET_PREFIXES = (
 
 
 def is_market_feature(feature_id: str) -> bool:
-    return feature_id.startswith(MARKET_PREFIXES)
+    """A listing price is not a shared economic print."""
+    return feature_id == "split_adjusted_close" or feature_id.startswith(MARKET_PREFIXES)
 
 
 def market_values(anchor_day: date, shared: date, features: dict[str, str]) -> dict[str, str]:

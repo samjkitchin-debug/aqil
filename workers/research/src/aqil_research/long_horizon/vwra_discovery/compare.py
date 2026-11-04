@@ -35,6 +35,7 @@ from aqil_research.long_horizon.simulator import (
 from aqil_research.long_horizon.spec import PILOT_CONTRIBUTION, PILOT_COST_RATE, PILOT_INTEREST_RATE
 from aqil_research.long_horizon.state_atlas.specification import SESSION_STEPS
 from aqil_research.long_horizon.vwra_discovery.align import (
+    is_market_feature,
     market_values,
     refuse_fx_count,
 )
@@ -730,19 +731,7 @@ def _copy_macro(
     if anchor_day > shared:
         return
     for feature, value in source.items():
-        if feature.startswith("method:") or feature.startswith(("EIMI:", "VWRA:")):
-            continue
-        if feature.startswith(
-            (
-                "trailing_return_",
-                "drawdown_",
-                "volatility_",
-                "recovery_",
-                "relative_performance_",
-                "downside_volatility_",
-                "trend_persistence_",
-            )
-        ):
+        if feature.startswith(("method:", "EIMI:", "VWRA:")) or is_market_feature(feature):
             continue
         previous = target.get(feature)
         if previous is not None and previous != value:
