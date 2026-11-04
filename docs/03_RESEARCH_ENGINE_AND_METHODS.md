@@ -23,6 +23,8 @@ A historical state is not an outcome. A latest-revised economic feature is not e
 
 `EIMI-VWRA-COMPARISON-001` uses the same package with the symbol set to EIMI, then scores the matched excess against VWRA. The rows are `LH-H-012` through `LH-H-018`. They do not replace `LH-H-001` through `LH-H-011`. Detail is in `docs/research/eimi-discovery/README.md`. ADR 033.
 
+`CNDX-VWRA-COMPARISON-001` uses the same package with the symbol set to CNDX. The rows are `LH-H-019` through `LH-H-025`. They do not replace `LH-H-001` through `LH-H-018`. The stored prices are split-adjusted closes. Detail is in `docs/research/cndx-discovery/README.md`. ADR 034.
+
 ### Evidence levels and public display
 - `official_primary`: authenticated regulatory/statistical/issuer source. May still be revised or wrong.
 - `published_primary_research`: identifiable method/paper/data with caveats.

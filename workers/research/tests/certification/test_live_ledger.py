@@ -265,12 +265,12 @@ def test_progress_dependencies_and_vintage_gate_match_the_preserved_database() -
             """
         ).fetchall()
     counts = classify_progress(row)
-    # LH-X-001 is the category C pilot. LH-X-018 is the later price-only
-    # EIMI comparison. Dossier executions stay out of this count.
+    # LH-X-001 is the category C pilot. LH-X-018 is the EIMI price path.
+    # LH-X-025 is the CNDX price path. Dossier executions stay out of this count.
     assert counts["registered_scenarios"] == 618
     assert counts["registered_signals"] == 309
-    assert [item[0] for item in simulations] == ["LH-X-001", "LH-X-018"]
-    assert counts["portfolio_simulations"] == 2
+    assert [item[0] for item in simulations] == ["LH-X-001", "LH-X-018", "LH-X-025"]
+    assert counts["portfolio_simulations"] == 3
     assert counts["point_in_time_results"] == 0
     assert counts["scientifically_validated_findings"] == 0
     assert counts["scientifically_supported_conclusions"] == 0

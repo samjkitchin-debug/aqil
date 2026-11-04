@@ -1,0 +1,446 @@
+# Intersections
+
+Each row is the frozen pair against the excess, compared with each leg and with price-only relative momentum. Foreign-exchange intersections stay blocked. A status is descriptive, retrospective exploratory, inconclusive, insufficient, rejected, or no incremental information. None of those statuses is a promotion.
+
+## conjunction_comparison
+
+- `SEQ-INF-MOM-001` / `cndx_advance_126`: result no_incremental_information, class retrospective_exploratory, refusal none, sample 82.
+- `SEQ-INF-MOM-001` / `excess_positive_126`: result no_incremental_information, class retrospective_exploratory, refusal none, sample 82.
+- `bis.ws_gli.Q.USD.3P.N.A.I.B.USD:percent_change` / `cndx_ahead_126`: result no_incremental_information, class retrospective_exploratory, refusal none, sample 82.
+- `bls.cu.CUSR0000SA0:year_on_year` / `cndx_ahead_126`: result no_incremental_information, class retrospective_exploratory, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:year_on_year` / `cndx_ahead_126`: result no_incremental_information, class retrospective_exploratory, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:year_on_year` / `cndx_ahead_126`: result inconclusive, class inconclusive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:year_on_year` / `cndx_ahead_126`: result no_incremental_information, class retrospective_exploratory, refusal none, sample 82.
+- `fed.h15.RIFSPFF_N.M:difference` / `cndx_ahead_126`: result inconclusive, class inconclusive, refusal none, sample 82.
+- `fed.sloos.SUBLPDCILS_N.Q:level` / `cndx_ahead_126`: result inconclusive, class inconclusive, refusal none, sample 82.
+- `method:LABOUR_MARKET_CONDITIONS:unemployment_change_percentage_points` / `cndx_ahead_126`: result no_incremental_information, class retrospective_exploratory, refusal none, sample 82.
+- `SEQ-INF-MOM-001` / `vwra_advance_126`: result no_incremental_information, class retrospective_exploratory, refusal none, sample 82.
+
+## control_increment
+
+- `CNDX:relative_performance_vs_vwra_252` / `excess_126`: result inconclusive, class inconclusive, refusal none, sample 89.
+
+## currency_intersection
+
+- `fx_observations` / `excess_126`: result refused, class insufficient_sample, refusal blocked_no_foreign_exchange, sample 0.
+
+## conditional_cndx_ahead
+
+- `CNDX:relative_performance_vs_vwra_252` / `cndx_ahead_126`: result -0.0959752321981424148606811145, class descriptive, refusal none, sample 70.
+- `CNDX:relative_performance_vs_vwra_252` / `excess_126`: result -0.0959752321981424148606811145, class descriptive, refusal none, sample 70.
+- `VWRA:trailing_return_252` / `excess_126`: result 0.0373563218390804597701149426, class descriptive, refusal none, sample 70.
+- `bea.nipa.T10106.A191RX:acceleration` / `excess_126`: result -0.0402402402402402402402402403, class descriptive, refusal none, sample 82.
+- `bea.nipa.T10106.A191RX:difference` / `excess_126`: result 0.1293759512937595129375951293, class descriptive, refusal none, sample 82.
+- `bea.nipa.T10106.A191RX:percent_change` / `excess_126`: result 0.1293759512937595129375951293, class descriptive, refusal none, sample 82.
+- `bea.nipa.T10106.A191RX:trailing_standardisation` / `excess_126`: result 0.00421940928270042194092827, class descriptive, refusal none, sample 82.
+- `bea.nipa.T10106.A191RX:year_on_year` / `excess_126`: result 0.1293759512937595129375951293, class descriptive, refusal none, sample 82.
+- `bea.nipa.T20600.W875RX:acceleration` / `excess_126`: result 0.1413043478260869565217391304, class descriptive, refusal none, sample 82.
+- `bea.nipa.T20600.W875RX:difference` / `excess_126`: result 0.1373626373626373626373626374, class descriptive, refusal none, sample 82.
+- `bea.nipa.T20600.W875RX:percent_change` / `excess_126`: result 0.1373626373626373626373626374, class descriptive, refusal none, sample 82.
+- `bea.nipa.T20600.W875RX:trailing_standardisation` / `excess_126`: result -0.3375, class descriptive, refusal none, sample 82.
+- `bea.nipa.T20600.W875RX:year_on_year` / `excess_126`: result 0.0657748049052396878483835005, class descriptive, refusal none, sample 82.
+- `bea.nipa.U002BU.KPMT:acceleration` / `excess_126`: result -0.105952380952380952380952381, class descriptive, refusal none, sample 82.
+- `bea.nipa.U002BU.KPMT:difference` / `excess_126`: result 0.0402402402402402402402402403, class descriptive, refusal none, sample 82.
+- `bea.nipa.U002BU.KPMT:percent_change` / `excess_126`: result 0.0402402402402402402402402403, class descriptive, refusal none, sample 82.
+- `bea.nipa.U002BU.KPMT:trailing_standardisation` / `excess_126`: result -0.3698630136986301369863013699, class descriptive, refusal none, sample 82.
+- `bea.nipa.U002BU.KPMT:year_on_year` / `excess_126`: result -0.1225604996096799375487900078, class descriptive, refusal none, sample 82.
+- `bea.vintage.real_gdp.pct_preceding:acceleration` / `excess_126`: result 0.1453308596165739022881880025, class descriptive, refusal none, sample 82.
+- `bea.vintage.real_gdp.pct_preceding:difference` / `excess_126`: result -0.1387387387387387387387387387, class descriptive, refusal none, sample 82.
+- `bea.vintage.real_gdp.pct_preceding:percent_change` / `excess_126`: result -0.0247252747252747252747252748, class descriptive, refusal none, sample 82.
+- `bea.vintage.real_gdp.pct_preceding:trailing_standardisation` / `excess_126`: result 0.0439084724799010513296227582, class descriptive, refusal none, sample 82.
+- `bea.vintage.real_gdp.pct_preceding:year_on_year` / `excess_126`: result -0.0240728692257644762524398178, class descriptive, refusal none, sample 82.
+- `bis.ws_gli.Q.USD.3P.N.A.I.B.USD:acceleration` / `excess_126`: result 0.1908212560386473429951690821, class descriptive, refusal none, sample 82.
+- `bis.ws_gli.Q.USD.3P.N.A.I.B.USD:difference` / `excess_126`: result 0.1334894613583138173302107729, class descriptive, refusal none, sample 82.
+- `bis.ws_gli.Q.USD.3P.N.A.I.B.USD:percent_change` / `excess_126`: result 0.1334894613583138173302107729, class descriptive, refusal none, sample 82.
+- `bis.ws_gli.Q.USD.3P.N.A.I.B.USD:percent_change` / `cndx_ahead_126`: result -0.1373626373626373626373626374, class descriptive, refusal none, sample 82.
+- `bis.ws_gli.Q.USD.3P.N.A.I.B.USD:trailing_standardisation` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `bis.ws_gli.Q.USD.3P.N.A.I.B.USD:year_on_year` / `excess_126`: result -0.3600668337510442773600668338, class descriptive, refusal none, sample 82.
+- `bls.ce.CES0000000001:acceleration` / `excess_126`: result 0.0275, class descriptive, refusal none, sample 82.
+- `bls.ce.CES0000000001:difference` / `excess_126`: result -0.1702944942381562099871959027, class descriptive, refusal none, sample 82.
+- `bls.ce.CES0000000001:percent_change` / `excess_126`: result -0.1702944942381562099871959027, class descriptive, refusal none, sample 82.
+- `bls.ce.CES0000000001:trailing_standardisation` / `excess_126`: result -0.0208333333333333333333333333, class descriptive, refusal none, sample 82.
+- `bls.ce.CES0000000001:year_on_year` / `excess_126`: result 0.0047619047619047619047619047, class descriptive, refusal none, sample 82.
+- `bls.cu.CUSR0000SA0:acceleration` / `excess_126`: result -0.0275, class descriptive, refusal none, sample 82.
+- `bls.cu.CUSR0000SA0:difference` / `excess_126`: result -0.3417721518987341772151898734, class descriptive, refusal none, sample 82.
+- `bls.cu.CUSR0000SA0:percent_change` / `excess_126`: result -0.3417721518987341772151898734, class descriptive, refusal none, sample 82.
+- `bls.cu.CUSR0000SA0:trailing_standardisation` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `bls.cu.CUSR0000SA0:year_on_year` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 77.
+- `bls.cu.CUSR0000SA0:year_on_year` / `cndx_ahead_126`: result -0.0499058380414312617702448211, class descriptive, refusal none, sample 77.
+- `bls.jt.JTS000000000000000JOL:acceleration` / `excess_126`: result 0.0237082066869300911854103344, class descriptive, refusal none, sample 82.
+- `bls.jt.JTS000000000000000JOL:difference` / `excess_126`: result -0.0411449016100178890876565295, class descriptive, refusal none, sample 82.
+- `bls.jt.JTS000000000000000JOL:percent_change` / `excess_126`: result -0.0411449016100178890876565295, class descriptive, refusal none, sample 82.
+- `bls.jt.JTS000000000000000JOL:trailing_standardisation` / `excess_126`: result -0.0906862745098039215686274509, class descriptive, refusal none, sample 82.
+- `bls.jt.JTS000000000000000JOL:year_on_year` / `excess_126`: result -0.3575757575757575757575757576, class descriptive, refusal none, sample 82.
+- `bls.ln.LNS14000000:acceleration` / `excess_126`: result -0.221291866028708133971291866, class descriptive, refusal none, sample 82.
+- `bls.ln.LNS14000000:difference` / `excess_126`: result 0.0879120879120879120879120879, class descriptive, refusal none, sample 82.
+- `bls.ln.LNS14000000:percent_change` / `excess_126`: result 0.0879120879120879120879120879, class descriptive, refusal none, sample 82.
+- `bls.ln.LNS14000000:trailing_standardisation` / `excess_126`: result -0.0566487775790101371496720334, class descriptive, refusal none, sample 82.
+- `bls.ln.LNS14000000:year_on_year` / `excess_126`: result -0.11, class descriptive, refusal none, sample 65.
+- `boe.iudbedr:acceleration` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `boe.iudbedr:difference` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `boe.iudbedr:percent_change` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `boe.iudbedr:trailing_standardisation` / `excess_126`: result 0.0713587487781036168132942326, class descriptive, refusal none, sample 64.
+- `cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar:acceleration` / `excess_126`: result -0.023923444976076555023923445, class descriptive, refusal none, sample 82.
+- `cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar:difference` / `excess_126`: result -0.1387387387387387387387387387, class descriptive, refusal none, sample 82.
+- `cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar:percent_change` / `excess_126`: result -0.1387387387387387387387387387, class descriptive, refusal none, sample 82.
+- `cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar:trailing_standardisation` / `excess_126`: result -0.1413043478260869565217391304, class descriptive, refusal none, sample 82.
+- `cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar:year_on_year` / `excess_126`: result -0.2564102564102564102564102564, class descriptive, refusal none, sample 82.
+- `dosm.ipi.abs:acceleration` / `excess_126`: result 0.0072463768115942028985507246, class descriptive, refusal none, sample 82.
+- `dosm.ipi.abs:difference` / `excess_126`: result 0.0068027210884353741496598639, class descriptive, refusal none, sample 82.
+- `dosm.ipi.abs:percent_change` / `excess_126`: result 0.0068027210884353741496598639, class descriptive, refusal none, sample 82.
+- `dosm.ipi.abs:trailing_standardisation` / `excess_126`: result -0.2450532724505327245053272451, class descriptive, refusal none, sample 82.
+- `dosm.ipi.abs:year_on_year` / `excess_126`: result -0.1202435312024353120243531203, class descriptive, refusal none, sample 82.
+- `drawdown_126` / `excess_126`: result -0.1040723981900452488687782805, class descriptive, refusal none, sample 82.
+- `drawdown_21` / `excess_126`: result -0.2883116883116883116883116883, class descriptive, refusal none, sample 82.
+- `drawdown_252` / `excess_126`: result -0.0509607351712614870509607351, class descriptive, refusal none, sample 82.
+- `drawdown_504` / `excess_126`: result 0.034635224760501105379513633, class descriptive, refusal none, sample 82.
+- `drawdown_63` / `excess_126`: result -0.1023809523809523809523809524, class descriptive, refusal none, sample 82.
+- `drawdown_756` / `excess_126`: result 0.0527950310559006211180124223, class descriptive, refusal none, sample 79.
+- `ecb.fm.D.U2.EUR.4F.KR.DFR.LEV:acceleration` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 80.
+- `ecb.fm.D.U2.EUR.4F.KR.DFR.LEV:difference` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `ecb.fm.D.U2.EUR.4F.KR.DFR.LEV:percent_change` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 80.
+- `ecb.fm.D.U2.EUR.4F.KR.DFR.LEV:trailing_standardisation` / `excess_126`: result 0.185064935064935064935064935, class descriptive, refusal none, sample 50.
+- `ecb.icp.M.U2.Y.000000.3.INX:acceleration` / `excess_126`: result -0.1707317073170731707317073171, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.000000.3.INX:difference` / `excess_126`: result -0.2450532724505327245053272451, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.000000.3.INX:percent_change` / `excess_126`: result -0.2450532724505327245053272451, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.000000.3.INX:trailing_standardisation` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `ecb.icp.M.U2.Y.000000.3.INX:year_on_year` / `excess_126`: result 0.2883116883116883116883116883, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.XEF000.3.INX:acceleration` / `excess_126`: result -0.1547619047619047619047619048, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.XEF000.3.INX:difference` / `excess_126`: result -0.3461538461538461538461538462, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.XEF000.3.INX:percent_change` / `excess_126`: result -0.3461538461538461538461538462, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.XEF000.3.INX:trailing_standardisation` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `ecb.icp.M.U2.Y.XEF000.3.INX:year_on_year` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21:acceleration` / `excess_126`: result -0.3004427577482605945604048071, class descriptive, refusal none, sample 82.
+- `eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21:difference` / `excess_126`: result -0.3109243697478991596638655462, class descriptive, refusal none, sample 82.
+- `eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21:percent_change` / `excess_126`: result -0.3109243697478991596638655462, class descriptive, refusal none, sample 82.
+- `eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21:trailing_standardisation` / `excess_126`: result 0.1293759512937595129375951293, class descriptive, refusal none, sample 82.
+- `eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21:year_on_year` / `excess_126`: result 0.0047619047619047619047619047, class descriptive, refusal none, sample 82.
+- `eurostat.prc_hicp_minr.M.I25.TOTAL.EA:acceleration` / `excess_126`: result -0.0566487775790101371496720334, class descriptive, refusal none, sample 82.
+- `eurostat.prc_hicp_minr.M.I25.TOTAL.EA:difference` / `excess_126`: result -0.1545530492898913951545530493, class descriptive, refusal none, sample 82.
+- `eurostat.prc_hicp_minr.M.I25.TOTAL.EA:percent_change` / `excess_126`: result -0.1545530492898913951545530493, class descriptive, refusal none, sample 82.
+- `eurostat.prc_hicp_minr.M.I25.TOTAL.EA:trailing_standardisation` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `eurostat.prc_hicp_minr.M.I25.TOTAL.EA:year_on_year` / `excess_126`: result 0.2883116883116883116883116883, class descriptive, refusal none, sample 82.
+- `eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21:acceleration` / `excess_126`: result -0.0729665071770334928229665071, class descriptive, refusal none, sample 82.
+- `eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21:difference` / `excess_126`: result -0.0571428571428571428571428571, class descriptive, refusal none, sample 82.
+- `eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21:percent_change` / `excess_126`: result -0.0571428571428571428571428571, class descriptive, refusal none, sample 82.
+- `eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21:trailing_standardisation` / `excess_126`: result -0.106280193236714975845410628, class descriptive, refusal none, sample 82.
+- `eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21:year_on_year` / `excess_126`: result -0.221291866028708133971291866, class descriptive, refusal none, sample 82.
+- `eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21:acceleration` / `excess_126`: result 0.1413043478260869565217391304, class descriptive, refusal none, sample 82.
+- `eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21:difference` / `excess_126`: result 0.2035714285714285714285714286, class descriptive, refusal none, sample 82.
+- `eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21:percent_change` / `excess_126`: result 0.2035714285714285714285714286, class descriptive, refusal none, sample 82.
+- `eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21:trailing_standardisation` / `excess_126`: result -0.3257575757575757575757575758, class descriptive, refusal none, sample 82.
+- `eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21:year_on_year` / `excess_126`: result -0.229885057471264367816091954, class descriptive, refusal none, sample 82.
+- `eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21:acceleration` / `excess_126`: result -0.0057471264367816091954022988, class descriptive, refusal none, sample 82.
+- `eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21:difference` / `excess_126`: result 0.1904761904761904761904761904, class descriptive, refusal none, sample 82.
+- `eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21:percent_change` / `excess_126`: result 0.1904761904761904761904761904, class descriptive, refusal none, sample 82.
+- `eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21:trailing_standardisation` / `excess_126`: result 0.0208333333333333333333333333, class descriptive, refusal none, sample 82.
+- `eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21:year_on_year` / `excess_126`: result 0.0659722222222222222222222222, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:acceleration` / `excess_126`: result 0.1595959595959595959595959596, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:difference` / `excess_126`: result -0.0243902439024390243902439024, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:percent_change` / `excess_126`: result -0.0243902439024390243902439024, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:trailing_standardisation` / `excess_126`: result 0.0068027210884353741496598639, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:year_on_year` / `excess_126`: result -0.2522361359570661896243291592, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:year_on_year` / `cndx_ahead_126`: result -0.3201094391244870041039671683, class descriptive, refusal none, sample 77.
+- `fed.g17.IP.B50001.S:year_on_year` / `cndx_ahead_126`: result 0.2015151515151515151515151515, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:year_on_year` / `cndx_ahead_126`: result -0.2258064516129032258064516129, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCM03_N.M:acceleration` / `excess_126`: result 0.042270531400966183574879227, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCM03_N.M:difference` / `excess_126`: result -0.0404411764705882352941176471, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCM03_N.M:percent_change` / `excess_126`: result -0.0404411764705882352941176471, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCM03_N.M:trailing_standardisation` / `excess_126`: result 0.1232057416267942583732057417, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCM03_N.M:year_on_year` / `excess_126`: result 0.07875, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCY10_N.M:acceleration` / `excess_126`: result -0.042270531400966183574879227, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCY10_N.M:difference` / `excess_126`: result -0.1258358662613981762917933131, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCY10_N.M:percent_change` / `excess_126`: result -0.1258358662613981762917933131, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCY10_N.M:trailing_standardisation` / `excess_126`: result -0.0600490196078431372549019608, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCY10_N.M:year_on_year` / `excess_126`: result -0.1144845034788108791903858318, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFSPFF_N.M:acceleration` / `excess_126`: result 0.1284210526315789473684210526, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFSPFF_N.M:difference` / `excess_126`: result 0.0315934065934065934065934066, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFSPFF_N.M:difference` / `cndx_ahead_126`: result 0.3913043478260869565217391304, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFSPFF_N.M:percent_change` / `excess_126`: result 0.0315934065934065934065934066, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFSPFF_N.M:trailing_standardisation` / `excess_126`: result 0.1547619047619047619047619048, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFSPFF_N.M:year_on_year` / `excess_126`: result 0.2255319148936170212765957447, class descriptive, refusal none, sample 82.
+- `fed.h8.B1001NCBA:acceleration` / `excess_126`: result -0.123404255319148936170212766, class descriptive, refusal none, sample 82.
+- `fed.h8.B1001NCBA:difference` / `excess_126`: result -0.1048387096774193548387096774, class descriptive, refusal none, sample 82.
+- `fed.h8.B1001NCBA:percent_change` / `excess_126`: result -0.1048387096774193548387096774, class descriptive, refusal none, sample 82.
+- `fed.h8.B1001NCBA:trailing_standardisation` / `excess_126`: result -0.3648648648648648648648648649, class descriptive, refusal none, sample 82.
+- `fed.h8.B1001NCBA:year_on_year` / `excess_126`: result -0.2263513513513513513513513514, class descriptive, refusal none, sample 82.
+- `fed.sloos.SUBLPDCILS_N.Q:acceleration` / `excess_126`: result 0.1394927536231884057971014493, class descriptive, refusal none, sample 70.
+- `fed.sloos.SUBLPDCILS_N.Q:difference` / `excess_126`: result -0.009009009009009009009009009, class descriptive, refusal none, sample 82.
+- `fed.sloos.SUBLPDCILS_N.Q:level` / `cndx_ahead_126`: result 0.3314393939393939393939393939, class descriptive, refusal none, sample 82.
+- `fed.sloos.SUBLPDCILS_N.Q:percent_change` / `excess_126`: result 0.0541427399507793273174733388, class descriptive, refusal none, sample 76.
+- `fed.sloos.SUBLPDCILS_N.Q:trailing_standardisation` / `excess_126`: result 0.3011904761904761904761904762, class descriptive, refusal none, sample 82.
+- `fed.sloos.SUBLPDCILS_N.Q:year_on_year` / `excess_126`: result 0.0260416666666666666666666667, class descriptive, refusal none, sample 76.
+- `method:BAI_PERRON_MEAN_SHIFTS:mean_log_growth` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `method:BRY_BOSCHAN_SPENCER15_VARIANT:g17:phase` / `excess_126`: result -0.3279292557111274871039056742, class descriptive, refusal none, sample 82.
+- `method:CREDIT_STANDARDS_AND_VOLUMES:difference_percentage_points` / `excess_126`: result -0.009009009009009009009009009, class descriptive, refusal none, sample 82.
+- `method:ESTRELLA_MISHKIN_TERM_SPREAD:spread` / `excess_126`: result -0.2255319148936170212765957447, class descriptive, refusal none, sample 82.
+- `method:EX_POST_REAL_FEDERAL_FUNDS_RATE:ex_post_real_rate_percentage_points` / `excess_126`: result 0.1547619047619047619047619048, class descriptive, refusal none, sample 82.
+- `method:EX_POST_REAL_FUNDS_RATE:real_funds_rate_percent_per_year` / `excess_126`: result 0.0735562310030395136778115501, class descriptive, refusal none, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:bea.nipa.T20600.W875RX:amplitude_percent` / `excess_126`: result -0.7333333333333333333333333333, class descriptive, refusal none, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:bea.nipa.T20600.W875RX:phase` / `excess_126`: result 0.1203703703703703703703703704, class descriptive, refusal none, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:bea.nipa.U002BU.KPMT:amplitude_percent` / `excess_126`: result 0.3698630136986301369863013699, class descriptive, refusal none, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:bea.nipa.U002BU.KPMT:phase` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:bls.ce.CES0000000001:amplitude_percent` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:bls.ce.CES0000000001:phase` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:fed.g17.IP.B50001.S:amplitude_percent` / `excess_126`: result 0.2523809523809523809523809524, class descriptive, refusal none, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:fed.g17.IP.B50001.S:phase` / `excess_126`: result -0.3279292557111274871039056742, class descriptive, refusal none, sample 82.
+- `method:INDUSTRIAL_PRODUCTION_ACTIVITY:twelve_month_percent_change` / `excess_126`: result -0.2522361359570661896243291592, class descriptive, refusal none, sample 82.
+- `method:LABOUR_MARKET_CONDITIONS:openings_percent_change` / `excess_126`: result -0.3591954022988505747126436781, class descriptive, refusal none, sample 82.
+- `method:LABOUR_MARKET_CONDITIONS:payrolls_percent_change` / `excess_126`: result 0.0047619047619047619047619047, class descriptive, refusal none, sample 82.
+- `method:LABOUR_MARKET_CONDITIONS:unemployment_change_percentage_points` / `excess_126`: result 0.0402402402402402402402402403, class descriptive, refusal none, sample 82.
+- `method:LABOUR_MARKET_CONDITIONS:unemployment_change_percentage_points` / `cndx_ahead_126`: result 0.0013513513513513513513513514, class descriptive, refusal none, sample 77.
+- `method:PERIOD_LEVEL_CHANGE:level_change` / `excess_126`: result 0.1709770114942528735632183908, class descriptive, refusal none, sample 82.
+- `method:PRICES_AND_POLICY:cpi_twelve_month_percent_change` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `method:PRICES_AND_POLICY:funds_one_month_change_percentage_points` / `excess_126`: result 0.0315934065934065934065934066, class descriptive, refusal none, sample 82.
+- `method:PRICES_AND_POLICY:treasury_10y_one_month_change_percentage_points` / `excess_126`: result -0.1258358662613981762917933131, class descriptive, refusal none, sample 82.
+- `method:SAHM_UNEMPLOYMENT_GAP:gap_percentage_points` / `excess_126`: result 0.1448450347881087919038583175, class descriptive, refusal none, sample 82.
+- `method:SLOOS_CIL_LENDING_STANDARDS:net_tightening_share_percent` / `excess_126`: result 0.3626373626373626373626373626, class descriptive, refusal none, sample 82.
+- `method:STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT:filtered_factor` / `excess_126`: result -0.0566487775790101371496720334, class descriptive, refusal none, sample 82.
+- `oecd.stes.DF_CLI.G20.M.LI.IX._Z.AA.IX._Z.H:acceleration` / `excess_126`: result -0.023923444976076555023923445, class descriptive, refusal none, sample 82.
+- `oecd.stes.DF_CLI.G20.M.LI.IX._Z.AA.IX._Z.H:difference` / `excess_126`: result 0.0077519379844961240310077519, class descriptive, refusal none, sample 82.
+- `oecd.stes.DF_CLI.G20.M.LI.IX._Z.AA.IX._Z.H:percent_change` / `excess_126`: result 0.0077519379844961240310077519, class descriptive, refusal none, sample 82.
+- `oecd.stes.DF_CLI.G20.M.LI.IX._Z.AA.IX._Z.H:trailing_standardisation` / `excess_126`: result -0.4812164579606440071556350626, class descriptive, refusal none, sample 82.
+- `oecd.stes.DF_CLI.G20.M.LI.IX._Z.AA.IX._Z.H:year_on_year` / `excess_126`: result 0.0237082066869300911854103344, class descriptive, refusal none, sample 82.
+- `ons.mm23.D7BT:acceleration` / `excess_126`: result -0.106280193236714975845410628, class descriptive, refusal none, sample 82.
+- `ons.mm23.D7BT:difference` / `excess_126`: result -0.1859649122807017543859649123, class descriptive, refusal none, sample 82.
+- `ons.mm23.D7BT:percent_change` / `excess_126`: result -0.1859649122807017543859649123, class descriptive, refusal none, sample 82.
+- `ons.mm23.D7BT:trailing_standardisation` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `ons.mm23.D7BT:year_on_year` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `recovery_from_prior_trough_126` / `excess_126`: result -0.1809210526315789473684210526, class descriptive, refusal none, sample 73.
+- `recovery_from_prior_trough_21` / `excess_126`: result 0.1233766233766233766233766234, class descriptive, refusal none, sample 71.
+- `recovery_from_prior_trough_252` / `excess_126`: result -0.1684322033898305084745762712, class descriptive, refusal none, sample 75.
+- `recovery_from_prior_trough_504` / `excess_126`: result -0.1244239631336405529953917051, class descriptive, refusal none, sample 76.
+- `recovery_from_prior_trough_63` / `excess_126`: result -0.0676767676767676767676767677, class descriptive, refusal none, sample 73.
+- `recovery_from_prior_trough_756` / `excess_126`: result -0.1416464891041162227602905569, class descriptive, refusal none, sample 73.
+- `relative_performance_vs_vwra_126` / `excess_126`: result -0.1307692307692307692307692308, class descriptive, refusal none, sample 76.
+- `relative_performance_vs_vwra_21` / `excess_126`: result -0.0168961201501877346683354192, class descriptive, refusal none, sample 81.
+- `relative_performance_vs_vwra_252` / `excess_126`: result -0.0959752321981424148606811145, class descriptive, refusal none, sample 70.
+- `relative_performance_vs_vwra_504` / `excess_126`: result -0.2375, class descriptive, refusal none, sample 58.
+- `relative_performance_vs_vwra_63` / `excess_126`: result -0.1041379310344827586206896552, class descriptive, refusal none, sample 79.
+- `relative_performance_vs_vwra_756` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 46.
+- `stat.cpi.2025base.JP.0001.all_items.monthly.calendar.nsa.reference_3dp:acceleration` / `excess_126`: result -0.1333333333333333333333333333, class descriptive, refusal none, sample 14.
+- `stat.cpi.2025base.JP.0001.all_items.monthly.calendar.nsa.reference_3dp:difference` / `excess_126`: result -0.1666666666666666666666666666, class descriptive, refusal none, sample 15.
+- `stat.cpi.2025base.JP.0001.all_items.monthly.calendar.nsa.reference_3dp:percent_change` / `excess_126`: result -0.1666666666666666666666666666, class descriptive, refusal none, sample 15.
+- `stat.cpi.2025base.JP.0001.all_items.monthly.calendar.nsa.reference_3dp:year_on_year` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 3.
+- `trailing_return_126` / `excess_126`: result 0.134469696969696969696969697, class descriptive, refusal none, sample 82.
+- `trailing_return_21` / `excess_126`: result -0.1043771043771043771043771043, class descriptive, refusal none, sample 82.
+- `trailing_return_252` / `excess_126`: result 0.1023809523809523809523809524, class descriptive, refusal none, sample 82.
+- `trailing_return_504` / `excess_126`: result -0.3648648648648648648648648649, class descriptive, refusal none, sample 82.
+- `trailing_return_63` / `excess_126`: result 0.0247252747252747252747252748, class descriptive, refusal none, sample 82.
+- `trailing_return_756` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 79.
+- `trailing_return_acceleration_126` / `excess_126`: result 0.1869047619047619047619047619, class descriptive, refusal none, sample 82.
+- `trailing_return_acceleration_21` / `excess_126`: result -0.1387387387387387387387387387, class descriptive, refusal none, sample 82.
+- `trailing_return_acceleration_252` / `excess_126`: result 0.2682926829268292682926829268, class descriptive, refusal none, sample 82.
+- `trailing_return_acceleration_504` / `excess_126`: result -0.256782945736434108527131783, class descriptive, refusal none, sample 67.
+- `trailing_return_acceleration_63` / `excess_126`: result -0.0404761904761904761904761905, class descriptive, refusal none, sample 82.
+- `trailing_return_acceleration_756` / `excess_126`: result -0.1397849462365591397849462365, class descriptive, refusal none, sample 43.
+
+## conditional_vwra_ahead
+
+- `CNDX:relative_performance_vs_vwra_252` / `excess_126`: result 0.0959752321981424148606811145, class descriptive, refusal none, sample 70.
+- `VWRA:trailing_return_252` / `excess_126`: result -0.0373563218390804597701149426, class descriptive, refusal none, sample 70.
+- `bea.nipa.T10106.A191RX:acceleration` / `excess_126`: result 0.0402402402402402402402402403, class descriptive, refusal none, sample 82.
+- `bea.nipa.T10106.A191RX:difference` / `excess_126`: result -0.1293759512937595129375951293, class descriptive, refusal none, sample 82.
+- `bea.nipa.T10106.A191RX:percent_change` / `excess_126`: result -0.1293759512937595129375951293, class descriptive, refusal none, sample 82.
+- `bea.nipa.T10106.A191RX:trailing_standardisation` / `excess_126`: result -0.00421940928270042194092827, class descriptive, refusal none, sample 82.
+- `bea.nipa.T10106.A191RX:year_on_year` / `excess_126`: result -0.1293759512937595129375951293, class descriptive, refusal none, sample 82.
+- `bea.nipa.T20600.W875RX:acceleration` / `excess_126`: result -0.1413043478260869565217391304, class descriptive, refusal none, sample 82.
+- `bea.nipa.T20600.W875RX:difference` / `excess_126`: result -0.1373626373626373626373626374, class descriptive, refusal none, sample 82.
+- `bea.nipa.T20600.W875RX:percent_change` / `excess_126`: result -0.1373626373626373626373626374, class descriptive, refusal none, sample 82.
+- `bea.nipa.T20600.W875RX:trailing_standardisation` / `excess_126`: result 0.3375, class descriptive, refusal none, sample 82.
+- `bea.nipa.T20600.W875RX:year_on_year` / `excess_126`: result -0.0657748049052396878483835005, class descriptive, refusal none, sample 82.
+- `bea.nipa.U002BU.KPMT:acceleration` / `excess_126`: result 0.105952380952380952380952381, class descriptive, refusal none, sample 82.
+- `bea.nipa.U002BU.KPMT:difference` / `excess_126`: result -0.0402402402402402402402402403, class descriptive, refusal none, sample 82.
+- `bea.nipa.U002BU.KPMT:percent_change` / `excess_126`: result -0.0402402402402402402402402403, class descriptive, refusal none, sample 82.
+- `bea.nipa.U002BU.KPMT:trailing_standardisation` / `excess_126`: result 0.3698630136986301369863013699, class descriptive, refusal none, sample 82.
+- `bea.nipa.U002BU.KPMT:year_on_year` / `excess_126`: result 0.1225604996096799375487900078, class descriptive, refusal none, sample 82.
+- `bea.vintage.real_gdp.pct_preceding:acceleration` / `excess_126`: result -0.1453308596165739022881880025, class descriptive, refusal none, sample 82.
+- `bea.vintage.real_gdp.pct_preceding:difference` / `excess_126`: result 0.1387387387387387387387387387, class descriptive, refusal none, sample 82.
+- `bea.vintage.real_gdp.pct_preceding:percent_change` / `excess_126`: result 0.0247252747252747252747252748, class descriptive, refusal none, sample 82.
+- `bea.vintage.real_gdp.pct_preceding:trailing_standardisation` / `excess_126`: result -0.0439084724799010513296227582, class descriptive, refusal none, sample 82.
+- `bea.vintage.real_gdp.pct_preceding:year_on_year` / `excess_126`: result 0.0240728692257644762524398178, class descriptive, refusal none, sample 82.
+- `bis.ws_gli.Q.USD.3P.N.A.I.B.USD:acceleration` / `excess_126`: result -0.1908212560386473429951690821, class descriptive, refusal none, sample 82.
+- `bis.ws_gli.Q.USD.3P.N.A.I.B.USD:difference` / `excess_126`: result -0.1334894613583138173302107729, class descriptive, refusal none, sample 82.
+- `bis.ws_gli.Q.USD.3P.N.A.I.B.USD:percent_change` / `excess_126`: result -0.1334894613583138173302107729, class descriptive, refusal none, sample 82.
+- `bis.ws_gli.Q.USD.3P.N.A.I.B.USD:percent_change` / `vwra_ahead_126`: result 0.1373626373626373626373626374, class descriptive, refusal none, sample 82.
+- `bis.ws_gli.Q.USD.3P.N.A.I.B.USD:trailing_standardisation` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `bis.ws_gli.Q.USD.3P.N.A.I.B.USD:year_on_year` / `excess_126`: result 0.3600668337510442773600668338, class descriptive, refusal none, sample 82.
+- `bls.ce.CES0000000001:acceleration` / `excess_126`: result -0.0275, class descriptive, refusal none, sample 82.
+- `bls.ce.CES0000000001:difference` / `excess_126`: result 0.1702944942381562099871959027, class descriptive, refusal none, sample 82.
+- `bls.ce.CES0000000001:percent_change` / `excess_126`: result 0.1702944942381562099871959027, class descriptive, refusal none, sample 82.
+- `bls.ce.CES0000000001:trailing_standardisation` / `excess_126`: result 0.0208333333333333333333333333, class descriptive, refusal none, sample 82.
+- `bls.ce.CES0000000001:year_on_year` / `excess_126`: result -0.0047619047619047619047619047, class descriptive, refusal none, sample 82.
+- `bls.cu.CUSR0000SA0:acceleration` / `excess_126`: result 0.0275, class descriptive, refusal none, sample 82.
+- `bls.cu.CUSR0000SA0:difference` / `excess_126`: result 0.3417721518987341772151898734, class descriptive, refusal none, sample 82.
+- `bls.cu.CUSR0000SA0:percent_change` / `excess_126`: result 0.3417721518987341772151898734, class descriptive, refusal none, sample 82.
+- `bls.cu.CUSR0000SA0:trailing_standardisation` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `bls.cu.CUSR0000SA0:year_on_year` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 77.
+- `bls.cu.CUSR0000SA0:year_on_year` / `vwra_ahead_126`: result 0.0499058380414312617702448211, class descriptive, refusal none, sample 77.
+- `bls.jt.JTS000000000000000JOL:acceleration` / `excess_126`: result -0.0237082066869300911854103344, class descriptive, refusal none, sample 82.
+- `bls.jt.JTS000000000000000JOL:difference` / `excess_126`: result 0.0411449016100178890876565295, class descriptive, refusal none, sample 82.
+- `bls.jt.JTS000000000000000JOL:percent_change` / `excess_126`: result 0.0411449016100178890876565295, class descriptive, refusal none, sample 82.
+- `bls.jt.JTS000000000000000JOL:trailing_standardisation` / `excess_126`: result 0.0906862745098039215686274509, class descriptive, refusal none, sample 82.
+- `bls.jt.JTS000000000000000JOL:year_on_year` / `excess_126`: result 0.3575757575757575757575757576, class descriptive, refusal none, sample 82.
+- `bls.ln.LNS14000000:acceleration` / `excess_126`: result 0.221291866028708133971291866, class descriptive, refusal none, sample 82.
+- `bls.ln.LNS14000000:difference` / `excess_126`: result -0.0879120879120879120879120879, class descriptive, refusal none, sample 82.
+- `bls.ln.LNS14000000:percent_change` / `excess_126`: result -0.0879120879120879120879120879, class descriptive, refusal none, sample 82.
+- `bls.ln.LNS14000000:trailing_standardisation` / `excess_126`: result 0.0566487775790101371496720334, class descriptive, refusal none, sample 82.
+- `bls.ln.LNS14000000:year_on_year` / `excess_126`: result 0.11, class descriptive, refusal none, sample 65.
+- `boe.iudbedr:acceleration` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `boe.iudbedr:difference` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `boe.iudbedr:percent_change` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `boe.iudbedr:trailing_standardisation` / `excess_126`: result -0.0713587487781036168132942326, class descriptive, refusal none, sample 64.
+- `cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar:acceleration` / `excess_126`: result 0.023923444976076555023923445, class descriptive, refusal none, sample 82.
+- `cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar:difference` / `excess_126`: result 0.1387387387387387387387387387, class descriptive, refusal none, sample 82.
+- `cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar:percent_change` / `excess_126`: result 0.1387387387387387387387387387, class descriptive, refusal none, sample 82.
+- `cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar:trailing_standardisation` / `excess_126`: result 0.1413043478260869565217391304, class descriptive, refusal none, sample 82.
+- `cao.mo.private_ex_volatile.nominal.million_yen.sa.monthly.calendar:year_on_year` / `excess_126`: result 0.2564102564102564102564102564, class descriptive, refusal none, sample 82.
+- `dosm.ipi.abs:acceleration` / `excess_126`: result -0.0072463768115942028985507246, class descriptive, refusal none, sample 82.
+- `dosm.ipi.abs:difference` / `excess_126`: result -0.0068027210884353741496598639, class descriptive, refusal none, sample 82.
+- `dosm.ipi.abs:percent_change` / `excess_126`: result -0.0068027210884353741496598639, class descriptive, refusal none, sample 82.
+- `dosm.ipi.abs:trailing_standardisation` / `excess_126`: result 0.2450532724505327245053272451, class descriptive, refusal none, sample 82.
+- `dosm.ipi.abs:year_on_year` / `excess_126`: result 0.1202435312024353120243531203, class descriptive, refusal none, sample 82.
+- `drawdown_126` / `excess_126`: result 0.1040723981900452488687782805, class descriptive, refusal none, sample 82.
+- `drawdown_21` / `excess_126`: result 0.2883116883116883116883116883, class descriptive, refusal none, sample 82.
+- `drawdown_252` / `excess_126`: result 0.0509607351712614870509607351, class descriptive, refusal none, sample 82.
+- `drawdown_504` / `excess_126`: result -0.034635224760501105379513633, class descriptive, refusal none, sample 82.
+- `drawdown_63` / `excess_126`: result 0.1023809523809523809523809524, class descriptive, refusal none, sample 82.
+- `drawdown_756` / `excess_126`: result -0.0527950310559006211180124223, class descriptive, refusal none, sample 79.
+- `ecb.fm.D.U2.EUR.4F.KR.DFR.LEV:acceleration` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 80.
+- `ecb.fm.D.U2.EUR.4F.KR.DFR.LEV:difference` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `ecb.fm.D.U2.EUR.4F.KR.DFR.LEV:percent_change` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 80.
+- `ecb.fm.D.U2.EUR.4F.KR.DFR.LEV:trailing_standardisation` / `excess_126`: result -0.185064935064935064935064935, class descriptive, refusal none, sample 50.
+- `ecb.icp.M.U2.Y.000000.3.INX:acceleration` / `excess_126`: result 0.1707317073170731707317073171, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.000000.3.INX:difference` / `excess_126`: result 0.2450532724505327245053272451, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.000000.3.INX:percent_change` / `excess_126`: result 0.2450532724505327245053272451, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.000000.3.INX:trailing_standardisation` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `ecb.icp.M.U2.Y.000000.3.INX:year_on_year` / `excess_126`: result -0.2883116883116883116883116883, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.XEF000.3.INX:acceleration` / `excess_126`: result 0.1547619047619047619047619048, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.XEF000.3.INX:difference` / `excess_126`: result 0.3461538461538461538461538462, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.XEF000.3.INX:percent_change` / `excess_126`: result 0.3461538461538461538461538462, class descriptive, refusal none, sample 82.
+- `ecb.icp.M.U2.Y.XEF000.3.INX:trailing_standardisation` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `ecb.icp.M.U2.Y.XEF000.3.INX:year_on_year` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21:acceleration` / `excess_126`: result 0.3004427577482605945604048071, class descriptive, refusal none, sample 82.
+- `eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21:difference` / `excess_126`: result 0.3109243697478991596638655462, class descriptive, refusal none, sample 82.
+- `eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21:percent_change` / `excess_126`: result 0.3109243697478991596638655462, class descriptive, refusal none, sample 82.
+- `eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21:trailing_standardisation` / `excess_126`: result -0.1293759512937595129375951293, class descriptive, refusal none, sample 82.
+- `eurostat.namq_10_gdp.Q.CLV_I15.SCA.B1GQ.EA21:year_on_year` / `excess_126`: result -0.0047619047619047619047619047, class descriptive, refusal none, sample 82.
+- `eurostat.prc_hicp_minr.M.I25.TOTAL.EA:acceleration` / `excess_126`: result 0.0566487775790101371496720334, class descriptive, refusal none, sample 82.
+- `eurostat.prc_hicp_minr.M.I25.TOTAL.EA:difference` / `excess_126`: result 0.1545530492898913951545530493, class descriptive, refusal none, sample 82.
+- `eurostat.prc_hicp_minr.M.I25.TOTAL.EA:percent_change` / `excess_126`: result 0.1545530492898913951545530493, class descriptive, refusal none, sample 82.
+- `eurostat.prc_hicp_minr.M.I25.TOTAL.EA:trailing_standardisation` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `eurostat.prc_hicp_minr.M.I25.TOTAL.EA:year_on_year` / `excess_126`: result -0.2883116883116883116883116883, class descriptive, refusal none, sample 82.
+- `eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21:acceleration` / `excess_126`: result 0.0729665071770334928229665071, class descriptive, refusal none, sample 82.
+- `eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21:difference` / `excess_126`: result 0.0571428571428571428571428571, class descriptive, refusal none, sample 82.
+- `eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21:percent_change` / `excess_126`: result 0.0571428571428571428571428571, class descriptive, refusal none, sample 82.
+- `eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21:trailing_standardisation` / `excess_126`: result 0.106280193236714975845410628, class descriptive, refusal none, sample 82.
+- `eurostat.sts_inpr_m.M.PRD.B-D.SCA.I21.EA21:year_on_year` / `excess_126`: result 0.221291866028708133971291866, class descriptive, refusal none, sample 82.
+- `eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21:acceleration` / `excess_126`: result -0.1413043478260869565217391304, class descriptive, refusal none, sample 82.
+- `eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21:difference` / `excess_126`: result -0.2035714285714285714285714286, class descriptive, refusal none, sample 82.
+- `eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21:percent_change` / `excess_126`: result -0.2035714285714285714285714286, class descriptive, refusal none, sample 82.
+- `eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21:trailing_standardisation` / `excess_126`: result 0.3257575757575757575757575758, class descriptive, refusal none, sample 82.
+- `eurostat.sts_trtu_m.M.VOL_SLS.G47.SCA.I21.EA21:year_on_year` / `excess_126`: result 0.229885057471264367816091954, class descriptive, refusal none, sample 82.
+- `eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21:acceleration` / `excess_126`: result 0.0057471264367816091954022988, class descriptive, refusal none, sample 82.
+- `eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21:difference` / `excess_126`: result -0.1904761904761904761904761904, class descriptive, refusal none, sample 82.
+- `eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21:percent_change` / `excess_126`: result -0.1904761904761904761904761904, class descriptive, refusal none, sample 82.
+- `eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21:trailing_standardisation` / `excess_126`: result -0.0208333333333333333333333333, class descriptive, refusal none, sample 82.
+- `eurostat.une_rt_m.M.SA.TOTAL.PC_ACT.T.EA21:year_on_year` / `excess_126`: result -0.0659722222222222222222222222, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:acceleration` / `excess_126`: result -0.1595959595959595959595959596, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:difference` / `excess_126`: result 0.0243902439024390243902439024, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:percent_change` / `excess_126`: result 0.0243902439024390243902439024, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:trailing_standardisation` / `excess_126`: result -0.0068027210884353741496598639, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:year_on_year` / `excess_126`: result 0.2522361359570661896243291592, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:year_on_year` / `vwra_ahead_126`: result 0.3201094391244870041039671683, class descriptive, refusal none, sample 77.
+- `fed.g17.IP.B50001.S:year_on_year` / `vwra_ahead_126`: result -0.2015151515151515151515151515, class descriptive, refusal none, sample 82.
+- `fed.g17.IP.B50001.S:year_on_year` / `vwra_ahead_126`: result 0.2258064516129032258064516129, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCM03_N.M:acceleration` / `excess_126`: result -0.042270531400966183574879227, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCM03_N.M:difference` / `excess_126`: result 0.0404411764705882352941176471, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCM03_N.M:percent_change` / `excess_126`: result 0.0404411764705882352941176471, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCM03_N.M:trailing_standardisation` / `excess_126`: result -0.1232057416267942583732057417, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCM03_N.M:year_on_year` / `excess_126`: result -0.07875, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCY10_N.M:acceleration` / `excess_126`: result 0.042270531400966183574879227, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCY10_N.M:difference` / `excess_126`: result 0.1258358662613981762917933131, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCY10_N.M:percent_change` / `excess_126`: result 0.1258358662613981762917933131, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCY10_N.M:trailing_standardisation` / `excess_126`: result 0.0600490196078431372549019608, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFLGFCY10_N.M:year_on_year` / `excess_126`: result 0.1144845034788108791903858318, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFSPFF_N.M:acceleration` / `excess_126`: result -0.1284210526315789473684210526, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFSPFF_N.M:difference` / `excess_126`: result -0.0315934065934065934065934066, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFSPFF_N.M:difference` / `vwra_ahead_126`: result -0.3913043478260869565217391304, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFSPFF_N.M:percent_change` / `excess_126`: result -0.0315934065934065934065934066, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFSPFF_N.M:trailing_standardisation` / `excess_126`: result -0.1547619047619047619047619048, class descriptive, refusal none, sample 82.
+- `fed.h15.RIFSPFF_N.M:year_on_year` / `excess_126`: result -0.2255319148936170212765957447, class descriptive, refusal none, sample 82.
+- `fed.h8.B1001NCBA:acceleration` / `excess_126`: result 0.123404255319148936170212766, class descriptive, refusal none, sample 82.
+- `fed.h8.B1001NCBA:difference` / `excess_126`: result 0.1048387096774193548387096774, class descriptive, refusal none, sample 82.
+- `fed.h8.B1001NCBA:percent_change` / `excess_126`: result 0.1048387096774193548387096774, class descriptive, refusal none, sample 82.
+- `fed.h8.B1001NCBA:trailing_standardisation` / `excess_126`: result 0.3648648648648648648648648649, class descriptive, refusal none, sample 82.
+- `fed.h8.B1001NCBA:year_on_year` / `excess_126`: result 0.2263513513513513513513513514, class descriptive, refusal none, sample 82.
+- `fed.sloos.SUBLPDCILS_N.Q:acceleration` / `excess_126`: result -0.1394927536231884057971014493, class descriptive, refusal none, sample 70.
+- `fed.sloos.SUBLPDCILS_N.Q:difference` / `excess_126`: result 0.009009009009009009009009009, class descriptive, refusal none, sample 82.
+- `fed.sloos.SUBLPDCILS_N.Q:level` / `vwra_ahead_126`: result -0.3314393939393939393939393939, class descriptive, refusal none, sample 82.
+- `fed.sloos.SUBLPDCILS_N.Q:percent_change` / `excess_126`: result -0.0541427399507793273174733388, class descriptive, refusal none, sample 76.
+- `fed.sloos.SUBLPDCILS_N.Q:trailing_standardisation` / `excess_126`: result -0.3011904761904761904761904762, class descriptive, refusal none, sample 82.
+- `fed.sloos.SUBLPDCILS_N.Q:year_on_year` / `excess_126`: result -0.0260416666666666666666666667, class descriptive, refusal none, sample 76.
+- `method:BAI_PERRON_MEAN_SHIFTS:mean_log_growth` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `method:BRY_BOSCHAN_SPENCER15_VARIANT:g17:phase` / `excess_126`: result 0.3279292557111274871039056742, class descriptive, refusal none, sample 82.
+- `method:CREDIT_STANDARDS_AND_VOLUMES:difference_percentage_points` / `excess_126`: result 0.009009009009009009009009009, class descriptive, refusal none, sample 82.
+- `method:ESTRELLA_MISHKIN_TERM_SPREAD:spread` / `excess_126`: result 0.2255319148936170212765957447, class descriptive, refusal none, sample 82.
+- `method:EX_POST_REAL_FEDERAL_FUNDS_RATE:ex_post_real_rate_percentage_points` / `excess_126`: result -0.1547619047619047619047619048, class descriptive, refusal none, sample 82.
+- `method:EX_POST_REAL_FUNDS_RATE:real_funds_rate_percent_per_year` / `excess_126`: result -0.0735562310030395136778115501, class descriptive, refusal none, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:bea.nipa.T20600.W875RX:amplitude_percent` / `excess_126`: result 0.7333333333333333333333333333, class descriptive, refusal none, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:bea.nipa.T20600.W875RX:phase` / `excess_126`: result -0.1203703703703703703703703704, class descriptive, refusal none, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:bea.nipa.U002BU.KPMT:amplitude_percent` / `excess_126`: result -0.3698630136986301369863013699, class descriptive, refusal none, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:bea.nipa.U002BU.KPMT:phase` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:bls.ce.CES0000000001:amplitude_percent` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:bls.ce.CES0000000001:phase` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:fed.g17.IP.B50001.S:amplitude_percent` / `excess_126`: result -0.2523809523809523809523809524, class descriptive, refusal none, sample 82.
+- `method:HARDING_PAGAN_CHARACTERISTICS:fed.g17.IP.B50001.S:phase` / `excess_126`: result 0.3279292557111274871039056742, class descriptive, refusal none, sample 82.
+- `method:INDUSTRIAL_PRODUCTION_ACTIVITY:twelve_month_percent_change` / `excess_126`: result 0.2522361359570661896243291592, class descriptive, refusal none, sample 82.
+- `method:LABOUR_MARKET_CONDITIONS:openings_percent_change` / `excess_126`: result 0.3591954022988505747126436781, class descriptive, refusal none, sample 82.
+- `method:LABOUR_MARKET_CONDITIONS:payrolls_percent_change` / `excess_126`: result -0.0047619047619047619047619047, class descriptive, refusal none, sample 82.
+- `method:LABOUR_MARKET_CONDITIONS:unemployment_change_percentage_points` / `excess_126`: result -0.0402402402402402402402402403, class descriptive, refusal none, sample 82.
+- `method:LABOUR_MARKET_CONDITIONS:unemployment_change_percentage_points` / `vwra_ahead_126`: result -0.0013513513513513513513513514, class descriptive, refusal none, sample 77.
+- `method:PERIOD_LEVEL_CHANGE:level_change` / `excess_126`: result -0.1709770114942528735632183908, class descriptive, refusal none, sample 82.
+- `method:PRICES_AND_POLICY:cpi_twelve_month_percent_change` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `method:PRICES_AND_POLICY:funds_one_month_change_percentage_points` / `excess_126`: result -0.0315934065934065934065934066, class descriptive, refusal none, sample 82.
+- `method:PRICES_AND_POLICY:treasury_10y_one_month_change_percentage_points` / `excess_126`: result 0.1258358662613981762917933131, class descriptive, refusal none, sample 82.
+- `method:SAHM_UNEMPLOYMENT_GAP:gap_percentage_points` / `excess_126`: result -0.1448450347881087919038583175, class descriptive, refusal none, sample 82.
+- `method:SLOOS_CIL_LENDING_STANDARDS:net_tightening_share_percent` / `excess_126`: result -0.3626373626373626373626373626, class descriptive, refusal none, sample 82.
+- `method:STOCK_WATSON_COINCIDENT_1988_MODERN_REFIT:filtered_factor` / `excess_126`: result 0.0566487775790101371496720334, class descriptive, refusal none, sample 82.
+- `oecd.stes.DF_CLI.G20.M.LI.IX._Z.AA.IX._Z.H:acceleration` / `excess_126`: result 0.023923444976076555023923445, class descriptive, refusal none, sample 82.
+- `oecd.stes.DF_CLI.G20.M.LI.IX._Z.AA.IX._Z.H:difference` / `excess_126`: result -0.0077519379844961240310077519, class descriptive, refusal none, sample 82.
+- `oecd.stes.DF_CLI.G20.M.LI.IX._Z.AA.IX._Z.H:percent_change` / `excess_126`: result -0.0077519379844961240310077519, class descriptive, refusal none, sample 82.
+- `oecd.stes.DF_CLI.G20.M.LI.IX._Z.AA.IX._Z.H:trailing_standardisation` / `excess_126`: result 0.4812164579606440071556350626, class descriptive, refusal none, sample 82.
+- `oecd.stes.DF_CLI.G20.M.LI.IX._Z.AA.IX._Z.H:year_on_year` / `excess_126`: result -0.0237082066869300911854103344, class descriptive, refusal none, sample 82.
+- `ons.mm23.D7BT:acceleration` / `excess_126`: result 0.106280193236714975845410628, class descriptive, refusal none, sample 82.
+- `ons.mm23.D7BT:difference` / `excess_126`: result 0.1859649122807017543859649123, class descriptive, refusal none, sample 82.
+- `ons.mm23.D7BT:percent_change` / `excess_126`: result 0.1859649122807017543859649123, class descriptive, refusal none, sample 82.
+- `ons.mm23.D7BT:trailing_standardisation` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `ons.mm23.D7BT:year_on_year` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 82.
+- `recovery_from_prior_trough_126` / `excess_126`: result 0.1809210526315789473684210526, class descriptive, refusal none, sample 73.
+- `recovery_from_prior_trough_21` / `excess_126`: result -0.1233766233766233766233766234, class descriptive, refusal none, sample 71.
+- `recovery_from_prior_trough_252` / `excess_126`: result 0.1684322033898305084745762712, class descriptive, refusal none, sample 75.
+- `recovery_from_prior_trough_504` / `excess_126`: result 0.1244239631336405529953917051, class descriptive, refusal none, sample 76.
+- `recovery_from_prior_trough_63` / `excess_126`: result 0.0676767676767676767676767677, class descriptive, refusal none, sample 73.
+- `recovery_from_prior_trough_756` / `excess_126`: result 0.1416464891041162227602905569, class descriptive, refusal none, sample 73.
+- `relative_performance_vs_vwra_126` / `excess_126`: result 0.1307692307692307692307692308, class descriptive, refusal none, sample 76.
+- `relative_performance_vs_vwra_21` / `excess_126`: result 0.0168961201501877346683354192, class descriptive, refusal none, sample 81.
+- `relative_performance_vs_vwra_252` / `excess_126`: result 0.0959752321981424148606811145, class descriptive, refusal none, sample 70.
+- `relative_performance_vs_vwra_504` / `excess_126`: result 0.2375, class descriptive, refusal none, sample 58.
+- `relative_performance_vs_vwra_63` / `excess_126`: result 0.1041379310344827586206896552, class descriptive, refusal none, sample 79.
+- `relative_performance_vs_vwra_756` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 46.
+- `stat.cpi.2025base.JP.0001.all_items.monthly.calendar.nsa.reference_3dp:acceleration` / `excess_126`: result 0.1333333333333333333333333333, class descriptive, refusal none, sample 14.
+- `stat.cpi.2025base.JP.0001.all_items.monthly.calendar.nsa.reference_3dp:difference` / `excess_126`: result 0.1666666666666666666666666666, class descriptive, refusal none, sample 15.
+- `stat.cpi.2025base.JP.0001.all_items.monthly.calendar.nsa.reference_3dp:percent_change` / `excess_126`: result 0.1666666666666666666666666666, class descriptive, refusal none, sample 15.
+- `stat.cpi.2025base.JP.0001.all_items.monthly.calendar.nsa.reference_3dp:year_on_year` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 3.
+- `trailing_return_126` / `excess_126`: result -0.134469696969696969696969697, class descriptive, refusal none, sample 82.
+- `trailing_return_21` / `excess_126`: result 0.1043771043771043771043771043, class descriptive, refusal none, sample 82.
+- `trailing_return_252` / `excess_126`: result -0.1023809523809523809523809524, class descriptive, refusal none, sample 82.
+- `trailing_return_504` / `excess_126`: result 0.3648648648648648648648648649, class descriptive, refusal none, sample 82.
+- `trailing_return_63` / `excess_126`: result -0.0247252747252747252747252748, class descriptive, refusal none, sample 82.
+- `trailing_return_756` / `excess_126`: result refused, class insufficient_sample, refusal one conditional side is empty, sample 79.
+- `trailing_return_acceleration_126` / `excess_126`: result -0.1869047619047619047619047619, class descriptive, refusal none, sample 82.
+- `trailing_return_acceleration_21` / `excess_126`: result 0.1387387387387387387387387387, class descriptive, refusal none, sample 82.
+- `trailing_return_acceleration_252` / `excess_126`: result -0.2682926829268292682926829268, class descriptive, refusal none, sample 82.
+- `trailing_return_acceleration_504` / `excess_126`: result 0.256782945736434108527131783, class descriptive, refusal none, sample 67.
+- `trailing_return_acceleration_63` / `excess_126`: result 0.0404761904761904761904761905, class descriptive, refusal none, sample 82.
+- `trailing_return_acceleration_756` / `excess_126`: result 0.1397849462365591397849462365, class descriptive, refusal none, sample 43.

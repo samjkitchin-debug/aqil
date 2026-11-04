@@ -104,6 +104,8 @@ Migration `20261104210000_vwra_discovery_v2.sql` is local only. It adds a parall
 
 Migration `20261105120000_eimi_vwra_comparison.sql` is local only. It widens the discovery symbol checks so an EIMI row and a matched-excess row can sit beside VWRA. It does not add a second method registry. The record is `docs/research/eimi-discovery/README.md`. ADR 033.
 
+Migration `20261105180000_cndx_vwra_comparison.sql` is local only. It widens those symbol checks for CNDX and the CNDX matched excess. It does not add a second method registry and it does not represent a total return. The record is `docs/research/cndx-discovery/README.md`. ADR 034.
+
 ## Immutable record model
 Forecast origins, methodological approvals, original source hashes and journal events are append-only *at the application level*. Corrections append new superseding versions linked by `supersedes_id`; don't overwrite the past. Distinguish audit immutability from keeping personal data forever: user privacy deletion must support lawful deletion/crypto-shredding without falsifying public research history. Immutable public research **must not include personal account identifiers**. Use privacy-minimised public research results and explicit retention policy.
 
