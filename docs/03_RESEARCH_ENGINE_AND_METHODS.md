@@ -19,6 +19,8 @@ A historical state is not an outcome. A latest-revised economic feature is not e
 
 `ETF-PROT-001` reads that shared atlas. It does not build a second one. `EVT-DEF-002` adds five families and does not edit `EVT-DEF-001`. The scored dossiers are `LH-H-005` for VWRA, `LH-H-006` for EIMI, and `LH-H-007` for their matched excess. This inspected history registers no allocation policy. Detail is in `docs/research/etf-protocol/README.md`. ADR 031.
 
+`VWRA-DISCOVERY-001` replays registered methods on latest-revised inputs and stores the numerical output under `LH-H-008` through `LH-H-011`. Those rows are retrospective. They do not replace `LH-H-001` through `LH-H-007`, and they are not point-in-time signals. Detail is in `docs/research/vwra-discovery/README.md`. ADR 032.
+
 ### Evidence levels and public display
 - `official_primary`: authenticated regulatory/statistical/issuer source. May still be revised or wrong.
 - `published_primary_research`: identifiable method/paper/data with caveats.

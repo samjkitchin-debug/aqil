@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import date
 from decimal import Decimal
 
+import psycopg
 import pytest
 
 from aqil_research.discovery.eligibility import SampleFloors
@@ -12,6 +13,7 @@ from aqil_research.long_horizon.etf_protocol.specification import (
     ADVANCE_MINIMUM,
     PRIMARY_STEPS,
 )
+from aqil_research.long_horizon.pilot import LOCAL_RESEARCH_URL
 from aqil_research.long_horizon.state_atlas.specification import SESSION_STEPS
 from aqil_research.long_horizon.vwra_discovery.extract import extract_points
 from aqil_research.long_horizon.vwra_discovery.guards import (
@@ -146,3 +148,71 @@ def test_sample_floors_match_the_frozen_literals() -> None:
     assert NON_OVERLAP_SESSION_GAP == PRIMARY_STEPS == SESSION_STEPS["6m"] == 126
     assert ADVANCE_MINIMUM == "0.10"
     assert len(specification_hash()) == 64
+
+
+def test_stored_discovery_has_a_number_or_a_reason_and_no_future_state() -> None:
+    try:
+        connection = psycopg.connect(LOCAL_RESEARCH_URL, connect_timeout=3)
+    except psycopg.OperationalError:
+        pytest.skip("local research database is unavailable")
+    with connection:
+        connection.read_only = True
+        with connection.cursor() as cursor:
+            cursor.execute("select to_regclass('research.discovery_v2_method_runs')")
+            if cursor.fetchone()[0] is None:
+                pytest.skip("discovery tables are absent")
+            cursor.execute(
+                """
+                select method_id, status, numeric_count, reason, publication_allowed
+                from research.discovery_v2_method_runs
+                order by method_id
+                """
+            )
+            runs = cursor.fetchall()
+            cursor.execute(
+                """
+                select count(*)
+                from research.discovery_v2_anchor_features
+                where period_end > anchor_session or usable_as_decision_input
+                """
+            )
+            leaked = cursor.fetchone()[0]
+            cursor.execute(
+                """
+                select portfolio_simulations, point_in_time_results,
+                       scientifically_validated_findings, registered_comparisons,
+                       executed_comparisons, refused_comparisons, succeeded_executions
+                from research.long_horizon_progress
+                """
+            )
+            progress = cursor.fetchone()
+    assert len(runs) == 26
+    unavailable = {row[0]: row for row in runs if row[1] == "unavailable"}
+    assert set(unavailable) == {"CENSUS_ADV_DURABLE_ORDERS", "MACRO_CONDITIONS_PANEL"}
+    for row in unavailable.values():
+        assert row[2] == 0
+        assert CENSUS_DATASET in row[3]
+        assert row[4] is False
+    failed = [row for row in runs if row[1] == "failed"]
+    assert [row[0] for row in failed] == ["INFLATION_AUTOREGRESSION"]
+    assert failed[0][2] == 0
+    assert failed[0][3]
+    assert failed[0][4] is False
+    succeeded = [row for row in runs if row[1] == "succeeded"]
+    assert len(succeeded) == 23
+    assert all(row[2] > 0 and row[4] is False for row in succeeded)
+    assert leaked == 0
+    (
+        portfolio,
+        point_in_time,
+        validated,
+        registered,
+        executed,
+        refused,
+        succeeded_executions,
+    ) = progress
+    assert portfolio == 1
+    assert point_in_time == 0
+    assert validated == 0
+    assert registered == executed + refused
+    assert succeeded_executions > portfolio

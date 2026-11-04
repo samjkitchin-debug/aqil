@@ -100,6 +100,8 @@ Migration `20261104120000_historical_state_atlas.sql` is local only. It adds app
 
 Migration `20261104183000_etf_research_protocol.sql` is local only. It widens the event-family check for `EVT-DEF-002` and adds append-only `research.etf_protocol_trials`. Coverage and dossier counts are views. A category C trial cannot store a promoted status, and `publication_allowed` stays false. The record is `docs/research/etf-protocol/README.md`. ADR 031.
 
+Migration `20261104210000_vwra_discovery_v2.sql` is local only. It adds a parallel discovery registry for reconstructed method timelines, VWRA anchor features, trials, casebooks, and findings. `research.long_horizon_progress` keeps dossier comparisons apart from portfolio simulations. A discovery finding cannot be point-in-time, independently validated, or an executable strategy, and `publication_allowed` stays false. The record is `docs/research/vwra-discovery/README.md`. ADR 032.
+
 ## Immutable record model
 Forecast origins, methodological approvals, original source hashes and journal events are append-only *at the application level*. Corrections append new superseding versions linked by `supersedes_id`; don't overwrite the past. Distinguish audit immutability from keeping personal data forever: user privacy deletion must support lawful deletion/crypto-shredding without falsifying public research history. Immutable public research **must not include personal account identifiers**. Use privacy-minimised public research results and explicit retention policy.
 

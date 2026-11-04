@@ -1,7 +1,32 @@
 # Cursor session handover
 
 **Status:** living continuity note  
-**Last updated:** 4 November 2026, ETF protocol
+**Last updated:** 4 November 2026, VWRA discovery
+
+
+## VWRA discovery, 4 November 2026
+
+Branch `research/macro-etf-discovery`. The specification commit is `45078bc33e10261be2d30cb26bec73ec8bfe1526`. It precedes the stored scores. This result commit was not merged and not deployed. `apps/web/public/icons/icon.svg` stayed unstaged. Local `postgres` and `aqil_etf` were not reset. Migration `20261104210000` was applied only to local `postgres`. Hosted Supabase was not changed. `publication_allowed` stays false. This is not Verified.
+
+Recount before the score, and again after it: 618,007 state observations, 12,390 outcomes, 1,749 `EVT-DEF-001` events, 1,910 `EVT-DEF-002` events, 42,931 adjusted closes, 38,653 live latest-revised observations, 1,077 BEA vintage rows, 26 registered methods, 3,489 ETF protocol trials. Disposable pgTAP left live observations at 39,730.
+
+Of the 26 methods, 23 produced a numerical timeline. `CENSUS_ADV_DURABLE_ORDERS` and `MACRO_CONDITIONS_PANEL` are unavailable because `census.m3.adv.MDM.NO` has no stored rows. `INFLATION_AUTOREGRESSION` failed because its contiguous monthly logarithmic-change sample is shorter than its own minimum of 144 months. That failure is stored with zero points. Full-sample filters, ex-post smoothers, and confirmation delays are `retrospective_reconstruction`. No equation was widened and no substitute series was used.
+
+VWRA decision dates are 89 month-ends from 2019-07-31 to 2026-11-02. No stored VWRA session is earlier than 2019-07-25. Outcome anchors with an observed 126-session return: 82. Non-overlapping 126-session keeps: 13. Macro periods: 453. Macro series-periods: 1,270. Market episodes: 144. These counts are separate. Overlapping month-ends are not independent trials.
+
+`LH-E-009` stores 295 Spearman coefficients and 295 Pearson coefficients against the later 126-session return. Logistic and probit are 312 refusals, `not_estimable_effective_sample`, because 82 decision points and 13 non-overlapping keeps miss the frozen floors of 60 and 15. The descriptive rows were still stored. The largest stored Spearman values include unemployment year-on-year 0.666 on 65 anchors and real GDP trailing standardisation -0.663 on 82 anchors. They are retrospective rank associations. A Benjamini-Hochberg diagnostic flagged 75 of 295 Spearman p-values. The flag count cannot promote a claim. Artifact `882ff96372ff1af1ad4a49c0fc0907b5153032f724db60398933752467a33feb`.
+
+`LH-E-010` estimated all eight frozen pairs. Growth and inflation year-on-year have Spearman 0.765 on 77 anchors. The unemployment-rate change and CPI year-on-year have Spearman -0.765 on 77. Growth and credit standards have Spearman -0.451 on 82. CPI year-on-year and the 252-session drawdown have Spearman -0.426 on 65. Global liquidity and industrial production have Spearman 0.016 on 82. Shared inputs are not independent confirmation. Artifact `47c80b5dd2402b88aa2578b0f60682e2246b1769d7459c1e3547e78f47493eaa`.
+
+`LH-E-011` is `no_incremental_information`, recorded as `retrospective_exploratory`. On 82 eligible month-ends the sequence was true 35 times and those rows later advanced 16 times, a rate of about 0.457. Deceleration alone advanced on 13 of 24. Positive 63-session momentum advanced on 24 of 56. False positives 19. Missed advances 21. The thresholds were not retuned. The sequence is not an executable strategy. Artifact `6495408b4a4136052fe8ff881d14b1c27648838851c17c1baafac80e0bfdfe4c`.
+
+`failed_recovery` has no VWRA event. `failed_rally` has one. Bulls have two events and no complete 252-session pre-event window. Controls are month-ends outside the event interval.
+
+New chain: `LH-H-008` through `LH-H-011`, executions `LH-X-008` through `LH-X-011`, dependencies `LH-D-027` through `LH-D-032`. `LH-H-001` through `LH-H-007` were not overwritten. `EVT-DEF-001` and `EVT-DEF-002` were not overwritten. Point-in-time results 0. Scientifically validated findings 0. Scientifically supported conclusions 0. Registered scenarios stay 618. Portfolio simulations stay 1, which is `LH-X-001`. Succeeded executions are 10 and are not 10 portfolio simulations. Registered comparisons 1,526, executed 983, refused 543. The second `uv run python -m aqil_research.long_horizon.vwra_discovery` inserted 0. Stored `git_commit` is the specification commit. Detail is in `docs/research/vwra-discovery/README.md`.
+
+EIMI was not scored. Stored EIMI month-end anchors: 121, from 2016-11-30 to 2026-11-02. First stored session 2016-11-03. Stored sessions 2,525. The 618 catalogue scenarios were not executed. The portfolio simulator was not called.
+
+`npm run test:research` collected 857 tests: 853 passed and 4 failed. The four failures are `test_restricted_sources_block_collection_holdings_and_ter`, `test_every_etf_fragment_blocks_cost_collection`, `test_rights_fragments_refuse_automated_collection`, and `test_live_board_file_is_counted_in_memory` (the downloaded H.15 federal-funds file has 868 rows where the test expects 867). Those tests were not weakened. Pytest exited before the script's Ruff steps. Ruff check on the new discovery files passed. The 13 pre-existing files were not reformatted. `npm run test:db` passed 16 files and 252 tests. Web typecheck passed. The production build passed. No browser pass. GitHub Actions has not run.
 
 
 ## ETF protocol, 4 November 2026
@@ -16,7 +41,7 @@ Stored trials 3,489, equal to the declared grid. VWRA `LH-X-005` is `no_incremen
 
 The second `uv run python -m aqil_research.long_horizon.etf_protocol` printed `unchanged` and inserted 0 events and 0 trials. Stored `git_commit` is the specification commit. Detail is in `docs/research/etf-protocol/README.md`.
 
-`research.long_horizon_progress` counts every succeeded execution as an executed simulation. The certification expectation now records 6 succeeded executions and 4 inconclusive-or-rejected claims, because the three dossiers were added and only `LH-C-007` is inconclusive. Dependencies run from `LH-D-001` through `LH-D-026`. That update does not call a portfolio path.
+`research.long_horizon_progress` counted every succeeded execution as an executed simulation at the close of the ETF protocol. The certification expectation then recorded 6 succeeded executions and 4 inconclusive-or-rejected claims, because the three dossiers were added and only `LH-C-007` is inconclusive. Dependencies ran from `LH-D-001` through `LH-D-026`. That update did not call a portfolio path. The VWRA discovery section above separates those dossier executions from the one portfolio simulation. The earlier claim rows were not rewritten.
 
 `npm run test:research` collected 847 tests: 843 passed and 4 failed. The four failures are `test_restricted_sources_block_collection_holdings_and_ter`, `test_every_etf_fragment_blocks_cost_collection`, `test_rights_fragments_refuse_automated_collection`, and `test_live_board_file_is_counted_in_memory` (868 federal-funds rows where the test expects 867). Those tests were not weakened. Pytest exited before the script's Ruff steps. Ruff check on the new protocol files passed. The 13 pre-existing files were not reformatted. `npm run test:db` passed 16 files and 252 tests, including `etf_protocol.test.sql`. Web typecheck passed. The production build passed. No browser pass. GitHub Actions has not run.
 
