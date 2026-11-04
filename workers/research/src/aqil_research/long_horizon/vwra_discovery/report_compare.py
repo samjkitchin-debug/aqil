@@ -14,6 +14,7 @@ from aqil_research.long_horizon.vwra_discovery.comparison import (
     specification_hash,
 )
 from aqil_research.long_horizon.vwra_discovery.dossier import CaseRow, Finding
+from aqil_research.long_horizon.vwra_discovery.lh017_correction import sentence_from_cases
 
 
 def write_documents(
@@ -32,7 +33,8 @@ def write_documents(
     hashes: dict[str, str] = prepared["hashes"]
     (folder / "method-coverage.md").write_text(census_markdown, encoding="utf-8")
     (folder / "README.md").write_text(
-        _readme(coverage, portfolio, hashes, git_commit, findings), encoding="utf-8"
+        _readme(coverage, portfolio, hashes, git_commit, findings, cases),
+        encoding="utf-8",
     )
     (folder / "dossier.md").write_text(_dossier(trials, coverage), encoding="utf-8")
     (folder / "comparison.md").write_text(_comparison(trials, coverage), encoding="utf-8")
@@ -49,6 +51,7 @@ def _readme(
     hashes: dict[str, str],
     git_commit: str,
     findings: list[Finding],
+    cases: list[CaseRow],
 ) -> str:
     lines = [
         "# EIMI and VWRA comparison",
@@ -77,7 +80,10 @@ def _readme(
         lines.append(f"- `{execution_id}` `{digest}`")
     lines.extend(["", "## Findings", ""])
     for finding in findings:
-        lines.append(f"- `{finding.finding_id}` `{finding.finding_class}`. {finding.statement}")
+        statement = finding.statement
+        if finding.experiment_id == "LH-E-017":
+            statement = sentence_from_cases(cases)
+        lines.append(f"- `{finding.finding_id}` `{finding.finding_class}`. {statement}")
     lines.extend(
         [
             "",

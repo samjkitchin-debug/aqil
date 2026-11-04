@@ -118,6 +118,13 @@ if ($symbolCheck -notmatch "EIMI") {
   docker exec $container psql -U postgres -d $testDatabase -v ON_ERROR_STOP=1 -1 -f /tmp/aqil_eimi_vwra_comparison.sql
   if ($LASTEXITCODE -ne 0) { throw "Could not apply the EIMI comparison migration on $testDatabase." }
 }
+if ($symbolCheck -notmatch "CNDX") {
+  $cndxMigration = Join-Path (Split-Path -Parent $PSScriptRoot) "supabase\migrations\20261105180000_cndx_vwra_comparison.sql"
+  docker cp $cndxMigration "${container}:/tmp/aqil_cndx_vwra_comparison.sql"
+  if ($LASTEXITCODE -ne 0) { throw "Could not copy the CNDX comparison migration." }
+  docker exec $container psql -U postgres -d $testDatabase -v ON_ERROR_STOP=1 -1 -f /tmp/aqil_cndx_vwra_comparison.sql
+  if ($LASTEXITCODE -ne 0) { throw "Could not apply the CNDX comparison migration on $testDatabase." }
+}
 $after = (Invoke-Psql "postgres" $liveCountSql).Trim()
 if ($before -ne $after) {
   throw "Development live observation count changed from $before to $after."

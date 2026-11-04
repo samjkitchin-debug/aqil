@@ -82,6 +82,8 @@ class RelativeMomentumPolicy:
     name: str = "contribution_to_higher_trailing_return_252"
     steps: int = MOMENTUM_STEPS
     baseline: str = MOMENTUM_BASELINE
+    peer: str = "EIMI"
+    control: str = "VWRA"
     fallbacks: int = 0
     ties: int = 0
     choices: list[str] = field(default_factory=list)
@@ -101,20 +103,20 @@ class RelativeMomentumPolicy:
             return []
         returns = {
             symbol: trailing_return_before(self.prices[symbol], session, self.steps)
-            for symbol in ("EIMI", "VWRA")
+            for symbol in (self.peer, self.control)
         }
-        eimi = returns["EIMI"]
-        vwra = returns["VWRA"]
-        if eimi is None or vwra is None:
+        peer_return = returns[self.peer]
+        control_return = returns[self.control]
+        if peer_return is None or control_return is None:
             chosen = self.baseline
             self.fallbacks += 1
-        elif eimi == vwra:
+        elif peer_return == control_return:
             chosen = self.baseline
             self.ties += 1
-        elif eimi > vwra:
-            chosen = "EIMI"
+        elif peer_return > control_return:
+            chosen = self.peer
         else:
-            chosen = "VWRA"
+            chosen = self.control
         self.choices.append(chosen)
         bar = prices.get(chosen)
         if bar is None:

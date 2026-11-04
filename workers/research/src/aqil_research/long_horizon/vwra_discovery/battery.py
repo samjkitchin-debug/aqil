@@ -65,8 +65,12 @@ class ScoredTrial:
     trial: Trial
 
 
-def experiment_id(hypothesis_id: str) -> str:
-    row = next(item for item in HYPOTHESES if item["hypothesis_id"] == hypothesis_id)
+def experiment_id(
+    hypothesis_id: str,
+    hypotheses: tuple[dict[str, object], ...] | None = None,
+) -> str:
+    rows = HYPOTHESES if hypotheses is None else hypotheses
+    row = next(item for item in rows if item["hypothesis_id"] == hypothesis_id)
     return str(row["experiment_id"])
 
 
@@ -89,13 +93,14 @@ def score_features(
     negative_outcome: str,
     logistic_outcome: str,
     apply_bh: bool = True,
+    hypotheses: tuple[dict[str, object], ...] | None = None,
 ) -> list[ScoredTrial]:
     """Spearman, Pearson, conditional labels, and logistic under the frozen floors."""
     features = sorted({feature for row in panel.values() for feature in row})
     labelled = [row_id for row_id in row_ids if outcomes.get(row_id) is not None]
     allowed = model_allowed(len(labelled), len(thinned_ids))
     trials: list[ScoredTrial] = []
-    experiment = experiment_id(hypothesis_id)
+    experiment = experiment_id(hypothesis_id, hypotheses)
     for feature in features:
         unit = units.get(feature, "stored")
         kind = split_kind(feature, unit)
@@ -225,8 +230,9 @@ def score_pairs(
     positive_outcome: str,
     negative_statistic: str,
     negative_outcome: str,
+    hypotheses: tuple[dict[str, object], ...] | None = None,
 ) -> list[ScoredTrial]:
-    experiment = experiment_id(hypothesis_id)
+    experiment = experiment_id(hypothesis_id, hypotheses)
     trials: list[ScoredTrial] = []
     for pair in INTERSECTION_PAIRS:
         left_id = str(pair["left_feature"])
@@ -329,9 +335,10 @@ def score_sequence(
     non_overlapping: int,
     outcome_name: str,
     label_note: str,
+    hypotheses: tuple[dict[str, object], ...] | None = None,
 ) -> tuple[dict[str, object], list[ScoredTrial]]:
     """The stored sequence. Momentum remains strictly positive."""
-    experiment = experiment_id(hypothesis_id)
+    experiment = experiment_id(hypothesis_id, hypotheses)
     inflation = str(SEQUENCE["inflation_feature"])
     momentum = str(SEQUENCE["momentum_feature"])
     yoy = [panel[row_id].get(inflation) for row_id in row_ids]
@@ -407,25 +414,35 @@ def score_sequence(
 
 def score_horizons(
     rows: list[dict[str, Decimal | None]],
+    *,
+    peer: str = "EIMI",
+    pair_symbol: str = "EIMI-VWRA",
+    hypothesis_id: str = "LH-H-016",
+    hypotheses: tuple[dict[str, object], ...] | None = None,
+    class_names: tuple[str, ...] | None = None,
+    rename: dict[str, str] | None = None,
 ) -> list[ScoredTrial]:
     """Five exclusive classes at each horizon. A missing leg is censored, not zero."""
-    experiment = experiment_id("LH-H-016")
+    experiment = experiment_id(hypothesis_id, hypotheses)
+    names = EXCLUSIVE_CLASSES if class_names is None else class_names
     trials: list[ScoredTrial] = []
     for label, steps in SESSION_STEPS.items():
-        counts = dict.fromkeys(EXCLUSIVE_CLASSES, 0)
+        counts = dict.fromkeys(names, 0)
         censored = 0
         for row in rows:
-            eimi = row.get(f"EIMI:{steps}")
+            peer_return = row.get(f"{peer}:{steps}")
             vwra = row.get(f"VWRA:{steps}")
-            if eimi is None or vwra is None:
+            if peer_return is None or vwra is None:
                 censored += 1
                 continue
-            counts[exclusive_class(eimi, vwra)] += 1
+            raw_label = exclusive_class(peer_return, vwra)
+            mapped = raw_label if rename is None else rename[raw_label]
+            counts[mapped] += 1
         observed = sum(counts.values())
-        for name in EXCLUSIVE_CLASSES:
+        for name in names:
             trials.append(
                 _raw(
-                    "EIMI-VWRA",
+                    pair_symbol,
                     experiment,
                     name,
                     None,
@@ -445,7 +462,7 @@ def score_horizons(
             )
         trials.append(
             _raw(
-                "EIMI-VWRA",
+                pair_symbol,
                 experiment,
                 "censored",
                 None,
@@ -467,18 +484,27 @@ def score_named_associations(
     row_ids: list[str],
     outcomes: dict[str, dict[str, Decimal | None]],
     non_overlapping: int,
+    *,
+    peer: str = "EIMI",
+    peer_outcome: str = "eimi_return_126",
+    control_outcome: str = "vwra_return_126",
+    excess_outcome: str = "excess_126",
+    pair_symbol: str = "EIMI-VWRA",
+    relation_outcome: str = "eimi_minus_vwra",
+    peer_label: str = "eimi",
+    hypothesis_id: str = "LH-H-016",
+    hypotheses: tuple[dict[str, object], ...] | None = None,
+    price_control: str = PRICE_CONTROL,
+    relative_control: str = RELATIVE_CONTROL,
 ) -> list[ScoredTrial]:
     """Unemployment and real GDP on both legs and the excess, then the price controls."""
-    experiment = experiment_id("LH-H-016")
+    experiment = experiment_id(hypothesis_id, hypotheses)
     trials: list[ScoredTrial] = []
     features = (UNEMPLOYMENT_FEATURE, REAL_GDP_FEATURE)
+    outcome_names = (peer_outcome, control_outcome, excess_outcome)
     stored: dict[tuple[str, str, str], Decimal | None] = {}
     for feature in features:
-        for outcome_name in (
-            "eimi_return_126",
-            "vwra_return_126",
-            "excess_126",
-        ):
+        for outcome_name in outcome_names:
             pairs = _feature_pairs(panel, row_ids, outcomes, feature, outcome_name)
             for statistic, association in (
                 ("spearman", rank_association(pairs)),
@@ -486,33 +512,33 @@ def score_named_associations(
             ):
                 stored[(feature, outcome_name, statistic)] = parse_decimal(association.result_text)
         for statistic in ("spearman", "pearson"):
-            left = stored[(feature, "eimi_return_126", statistic)]
-            right = stored[(feature, "vwra_return_126", statistic)]
+            left = stored[(feature, peer_outcome, statistic)]
+            right = stored[(feature, control_outcome, statistic)]
             relation = association_relation(left, right)
             difference = None if left is None or right is None else left - right
             trials.append(
                 _raw(
-                    "EIMI-VWRA",
+                    pair_symbol,
                     experiment,
                     feature,
                     "VWRA",
                     statistic + "_relation",
-                    "eimi_minus_vwra",
+                    relation_outcome,
                     len(row_ids),
                     non_overlapping,
                     relation,
                     None,
                     "descriptive" if relation != "not_comparable" else "insufficient_sample",
                     (
-                        f"eimi={_text(left)}; vwra={_text(right)}; "
+                        f"{peer_label}={_text(left)}; vwra={_text(right)}; "
                         f"difference={_text(difference)}. "
                         "Signs differ only when both coefficients are strictly opposite. "
                         "A refusal is not_comparable."
                     ),
                 )
             )
-        for outcome_name in ("eimi_return_126", "vwra_return_126", "excess_126"):
-            for control in (PRICE_CONTROL, RELATIVE_CONTROL):
+        for outcome_name in outcome_names:
+            for control in (price_control, relative_control):
                 target, feature_values, control_values = _controlled(
                     panel, row_ids, outcomes, feature, outcome_name, control
                 )
@@ -520,15 +546,12 @@ def score_named_associations(
                     ("partial_pearson", partial_linear(target, feature_values, control_values)),
                     ("partial_spearman", partial_rank(target, feature_values, control_values)),
                 ):
-                    symbol = (
-                        "EIMI-VWRA"
-                        if outcome_name == "excess_126"
-                        else outcome_name.split("_", 1)[0].upper()
-                    )
-                    if outcome_name == "vwra_return_126":
+                    if outcome_name == excess_outcome:
+                        symbol = pair_symbol
+                    elif outcome_name == control_outcome:
                         symbol = "VWRA"
-                    if outcome_name == "eimi_return_126":
-                        symbol = "EIMI"
+                    else:
+                        symbol = peer
                     trials.append(
                         _from(
                             symbol,
@@ -552,9 +575,19 @@ def score_excess_pairs(
     outcomes: dict[str, dict[str, Decimal | None]],
     non_overlapping: int,
     reasons: dict[str, str],
+    *,
+    pair_symbol: str = "EIMI-VWRA",
+    hypothesis_id: str = "LH-H-016",
+    hypotheses: tuple[dict[str, object], ...] | None = None,
+    positive_statistic: str = "conditional_eimi_ahead",
+    positive_outcome: str = "eimi_ahead_126",
+    negative_statistic: str = "conditional_vwra_ahead",
+    negative_outcome: str = "vwra_ahead_126",
+    conjunction_outcome: str = "eimi_ahead_126",
+    relative_control: str = RELATIVE_CONTROL,
 ) -> list[ScoredTrial]:
     """The eight pairs against the excess, each leg, and price-only relative momentum."""
-    experiment = experiment_id("LH-H-016")
+    experiment = experiment_id(hypothesis_id, hypotheses)
     trials: list[ScoredTrial] = []
     excess_labels = {
         row_id: None
@@ -570,31 +603,32 @@ def score_excess_pairs(
     }
     trials.extend(
         score_pairs(
-            hypothesis_id="LH-H-016",
-            symbol="EIMI-VWRA",
+            hypothesis_id=hypothesis_id,
+            hypotheses=hypotheses,
+            symbol=pair_symbol,
             panel=panel,
             row_ids=row_ids,
             positive_labels=excess_labels,
             negative_labels=vwra_labels,
             non_overlapping=non_overlapping,
             reasons=reasons,
-            positive_statistic="conditional_eimi_ahead",
-            positive_outcome="eimi_ahead_126",
-            negative_statistic="conditional_vwra_ahead",
-            negative_outcome="vwra_ahead_126",
+            positive_statistic=positive_statistic,
+            positive_outcome=positive_outcome,
+            negative_statistic=negative_statistic,
+            negative_outcome=negative_outcome,
         )
     )
     momentum_flags: list[bool] = []
     momentum_hits: list[bool] = []
     for row_id in row_ids:
         excess = outcomes[row_id].get("excess_126")
-        momentum = parse_decimal(panel[row_id].get(RELATIVE_CONTROL))
+        momentum = parse_decimal(panel[row_id].get(relative_control))
         if excess is None or momentum is None:
             continue
         momentum_flags.append(momentum > 0)
         momentum_hits.append(excess > 0)
     pair_abs: list[Decimal] = []
-    control_pairs = _feature_pairs(panel, row_ids, outcomes, RELATIVE_CONTROL, "excess_126")
+    control_pairs = _feature_pairs(panel, row_ids, outcomes, relative_control, "excess_126")
     control_rank = rank_association(control_pairs)
     control_value = parse_decimal(control_rank.result_text)
     any_estimated = False
@@ -642,12 +676,12 @@ def score_excess_pairs(
         )
         trials.append(
             _raw(
-                "EIMI-VWRA",
+                pair_symbol,
                 experiment,
                 left_id,
                 right_id,
                 "conjunction_comparison",
-                "eimi_ahead_126",
+                conjunction_outcome,
                 eligible,
                 non_overlapping,
                 status,
@@ -664,7 +698,7 @@ def score_excess_pairs(
         association = rank_association(flag_pairs)
         trials.append(
             _from(
-                "EIMI-VWRA",
+                pair_symbol,
                 experiment,
                 left_id,
                 right_id,
@@ -684,12 +718,12 @@ def score_excess_pairs(
     momentum_rate = frequency_association(momentum_flags, momentum_hits, "relative_momentum")
     trials.append(
         _from(
-            "EIMI-VWRA",
+            pair_symbol,
             experiment,
-            RELATIVE_CONTROL,
+            relative_control,
             None,
-            "conditional_eimi_ahead",
-            "eimi_ahead_126",
+            positive_statistic,
+            positive_outcome,
             non_overlapping,
             momentum_rate,
             "Price-only relative momentum against excess greater than zero.",
@@ -702,9 +736,9 @@ def score_excess_pairs(
     )
     trials.append(
         _raw(
-            "EIMI-VWRA",
+            pair_symbol,
             experiment,
-            RELATIVE_CONTROL,
+            relative_control,
             "eight_pairs",
             "control_increment",
             "excess_126",
@@ -722,7 +756,7 @@ def score_excess_pairs(
     )
     trials.append(
         _raw(
-            "EIMI-VWRA",
+            pair_symbol,
             experiment,
             "fx_observations",
             None,

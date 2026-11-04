@@ -28,7 +28,7 @@ Executed trials 4266. Refused trials 1822.
 - `CMP-F-014` `descriptive`. LH-E-014 stores 24 descriptive or comparison rows and 0 refusals. Overlapping month-ends are not independent replications. Nothing in this row is statistically supported, economically useful, or forward-validated.
 - `CMP-F-015` `retrospective_exploratory`. The EIMI sequence comparison is no_incremental_information, stored as retrospective_exploratory. The thresholds were not retuned and the sequence is not an executable strategy.
 - `CMP-F-016` `descriptive`. LH-E-016 stores 2985 descriptive or comparison rows and 1548 refusals. Overlapping month-ends are not independent replications. Nothing in this row is statistically supported, economically useful, or forward-validated.
-- `CMP-F-017` `insufficient_sample`. LH-E-017 has no stored result.
+- `CMP-F-017` `insufficient_sample`. LH-E-017 casebook counts, which may overlap: EIMI ahead 5, VWRA ahead 4, both advance 25, both decline 7, leadership reversal 0, approximately neutral 73.
 - `CMP-F-018` `rejected`. The price-only comparison is rejected. Terminal wealth values are immediate_eimi 134754.294595556, immediate_vwra 150430.016335996, relative_momentum 145357.70234994, static_mix 142633.337854735. These are split-adjusted US-dollar price paths with the category C cost rate. They are not total returns, not SGD investor returns, not economically useful, and not forward-validated.
 
 The portfolio result is `rejected` on a provisional price-return path.

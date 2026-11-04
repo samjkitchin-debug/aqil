@@ -14,4 +14,4 @@ Portfolio paths, when stored, use the category C contribution, cost rate, and ca
 
 Promoted trial classes found: 0. Catalogue scenarios executed: 0. `publication_allowed` stays false.
 
-The `LH-H-017` finding sentence counts trials, so it says there is no stored result. The class counts are in the casebook table: EIMI ahead 5, VWRA ahead 4, both advance 25, both decline 7, leadership reversal 0, approximately neutral 73. Those classes may overlap.
+The stored finding row `CMP-F-017` and claim `LH-C-017` version 1 still say that LH-E-017 has no stored result. That sentence counted trials. The casebook rows, their counts, and the evidence hash are unchanged. The counts, which may overlap, are EIMI ahead 5, VWRA ahead 4, both advance 25, both decline 7, leadership reversal 0, and approximately neutral 73. Claim `LH-C-017` version 2 records that sentence. The report generator quotes the casebook counts. The historical evidence row was not deleted.
