@@ -253,26 +253,30 @@ def test_progress_dependencies_and_vintage_gate_match_the_preserved_database() -
             """
         ).fetchall()
     counts = classify_progress(row)
-    # Succeeded executions include the atlas and the three ETF dossiers.
-    # The progress view still labels that count as executed simulations.
-    # LH-X-005, LH-X-006, and LH-X-007 are not portfolio paths.
-    # Only LH-C-007 is inconclusive. The other two dossiers are
-    # no_incremental_information, which this sum does not treat as validated.
-    assert counts == {
-        "registered_scenarios": 618,
-        "registered_signals": 309,
-        "executed_simulations": 6,
-        "validated_simulations": 4,
-        "scientifically_supported_conclusions": 0,
-        "candidate_rows_marked_as_results": 0,
-    }
-    assert row["succeeded_executions"] == 6
+    # Only the category C pilot called the portfolio simulator.
+    # Atlas and dossier executions stay in succeeded_executions and are not
+    # added to portfolio_simulations.
+    assert counts["registered_scenarios"] == 618
+    assert counts["registered_signals"] == 309
+    assert counts["portfolio_simulations"] == 1
+    assert counts["point_in_time_results"] == 0
+    assert counts["scientifically_validated_findings"] == 0
+    assert counts["scientifically_supported_conclusions"] == 0
+    assert counts["candidate_rows_marked_as_results"] == 0
+    assert counts["registered_comparisons"] == (
+        counts["executed_comparisons"] + counts["refused_comparisons"]
+    )
+    assert row["succeeded_executions"] > row["portfolio_simulations"]
     assert row["blocked_executions"] == 1
     assert row["claims_statistically_supported"] == 0
     assert row["claims_economically_useful"] == 0
     assert row["claims_forward_validated"] == 0
     assert row["executions_published"] == 0
-    assert [item[0] for item in links] == [f"LH-D-{index:03d}" for index in range(1, 27)]
+    dependency_ids = [item[0] for item in links]
+    assert dependency_ids[:26] == [f"LH-D-{index:03d}" for index in range(1, 27)]
+    assert dependency_ids[26:] == [
+        f"LH-D-{index:03d}" for index in range(27, 27 + len(dependency_ids) - 26)
+    ]
     assert (
         shared_rows_are_independent(
             [

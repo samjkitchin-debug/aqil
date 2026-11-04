@@ -30,21 +30,33 @@ def test_progress_counts_do_not_treat_the_catalogue_as_results() -> None:
         {
             "candidate_scenario_ids": 618,
             "candidate_signal_ids": 309,
-            "succeeded_executions": 1,
+            "succeeded_executions": 6,
             "claims_inconclusive_at_version": 1,
             "claims_rejected_at_version": 0,
             "claims_statistically_supported": 0,
             "claims_economically_useful": 0,
             "claims_forward_validated": 0,
             "candidate_rows_marked_as_results": 0,
+            "registered_comparisons": 4,
+            "executed_comparisons": 3,
+            "refused_comparisons": 1,
+            "retrospective_results": 2,
+            "point_in_time_results": 0,
+            "portfolio_simulations": 1,
+            "scientifically_validated_findings": 0,
         }
     )
     assert counts["registered_scenarios"] == 618
-    assert counts["executed_simulations"] == 1
-    assert counts["validated_simulations"] == 1
+    assert counts["portfolio_simulations"] == 1
+    assert counts["portfolio_simulations"] != 6
+    assert counts["registered_comparisons"] == 4
+    assert counts["executed_comparisons"] + counts["refused_comparisons"] == 4
+    assert counts["point_in_time_results"] == 0
+    assert counts["scientifically_validated_findings"] == 0
     assert counts["scientifically_supported_conclusions"] == 0
     text = progress_paragraph(counts)
     assert text.startswith("Registered scenarios: 618.")
+    assert "Portfolio simulations: 1." in text
     assert "Scientifically supported conclusions: 0." in text
 
 

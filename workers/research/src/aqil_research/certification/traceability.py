@@ -53,18 +53,26 @@ def missing_fields(document: dict[str, object], required: tuple[str, ...]) -> tu
 
 
 def classify_progress(row: dict[str, int]) -> dict[str, int]:
-    """Separate the design register, the runs, the reconciled runs, and the claims."""
+    """Keep dossier executions out of the portfolio-simulation count.
+
+    Succeeded executions are not portfolio simulations. A claim that is
+    inconclusive or rejected is not a scientifically validated finding.
+    """
     supported = (
         row["claims_statistically_supported"]
         + row["claims_economically_useful"]
         + row["claims_forward_validated"]
     )
-    validated = row["claims_inconclusive_at_version"] + row["claims_rejected_at_version"]
     return {
         "registered_scenarios": row["candidate_scenario_ids"],
         "registered_signals": row["candidate_signal_ids"],
-        "executed_simulations": row["succeeded_executions"],
-        "validated_simulations": validated,
+        "registered_comparisons": row["registered_comparisons"],
+        "executed_comparisons": row["executed_comparisons"],
+        "refused_comparisons": row["refused_comparisons"],
+        "retrospective_results": row["retrospective_results"],
+        "point_in_time_results": row["point_in_time_results"],
+        "portfolio_simulations": row["portfolio_simulations"],
+        "scientifically_validated_findings": row["scientifically_validated_findings"],
         "scientifically_supported_conclusions": supported,
         "candidate_rows_marked_as_results": row["candidate_rows_marked_as_results"],
     }
@@ -73,8 +81,13 @@ def classify_progress(row: dict[str, int]) -> dict[str, int]:
 def progress_paragraph(counts: dict[str, int]) -> str:
     return (
         f"Registered scenarios: {counts['registered_scenarios']}. "
-        f"Executed simulations: {counts['executed_simulations']}. "
-        f"Validated simulations: {counts['validated_simulations']}. "
+        f"Registered comparisons: {counts['registered_comparisons']}. "
+        f"Executed comparisons: {counts['executed_comparisons']}. "
+        f"Refused comparisons: {counts['refused_comparisons']}. "
+        f"Retrospective results: {counts['retrospective_results']}. "
+        f"Point-in-time results: {counts['point_in_time_results']}. "
+        f"Portfolio simulations: {counts['portfolio_simulations']}. "
+        f"Scientifically validated findings: {counts['scientifically_validated_findings']}. "
         f"Scientifically supported conclusions: {counts['scientifically_supported_conclusions']}."
     )
 

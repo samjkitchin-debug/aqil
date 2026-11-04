@@ -102,6 +102,14 @@ if ($protocolOnTest -eq "") {
   docker exec $container psql -U postgres -d $testDatabase -v ON_ERROR_STOP=1 -1 -f /tmp/aqil_etf_protocol.sql
   if ($LASTEXITCODE -ne 0) { throw "Could not apply the ETF protocol migration on $testDatabase." }
 }
+$discoveryOnTest = (Invoke-Psql $testDatabase "select to_regclass('research.discovery_v2_trials')").Trim()
+if ($discoveryOnTest -eq "") {
+  $discoveryMigration = Join-Path (Split-Path -Parent $PSScriptRoot) "supabase\migrations\20261104210000_vwra_discovery_v2.sql"
+  docker cp $discoveryMigration "${container}:/tmp/aqil_vwra_discovery.sql"
+  if ($LASTEXITCODE -ne 0) { throw "Could not copy the VWRA discovery migration." }
+  docker exec $container psql -U postgres -d $testDatabase -v ON_ERROR_STOP=1 -1 -f /tmp/aqil_vwra_discovery.sql
+  if ($LASTEXITCODE -ne 0) { throw "Could not apply the VWRA discovery migration on $testDatabase." }
+}
 $after = (Invoke-Psql "postgres" $liveCountSql).Trim()
 if ($before -ne $after) {
   throw "Development live observation count changed from $before to $after."
